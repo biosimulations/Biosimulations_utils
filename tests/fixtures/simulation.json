@@ -1,0 +1,97 @@
+{
+  "id": "simulation-1",
+  "name": "simulation 1",
+  "authors": [
+    {
+      "firstName": "John",
+      "middleName": "C",
+      "lastName": "Doe"
+    },
+    {
+      "firstName": "Jane",
+      "middleName": "D",
+      "lastName": "Doe"
+    }
+  ],
+  "description": "Description of simulation 1",
+  "tags": ["tag-1", "tag-2"],
+  "refs": [
+    {
+      "authors": "Doe JC & Doe JD",
+      "title": "Title-1",
+      "journal": "Journal-1",
+      "volume": 1,
+      "num": 1,
+      "pages": "1-10",
+      "year": 2019,
+      "doi": "10.1016/XXXX"
+    },
+    {
+      "authors": "Doe JC & Doe JD",
+      "title": "Title-2",
+      "journal": "Journal-2",
+      "volume": 2,
+      "num": 2,
+      "pages": "11-20",
+      "year": 2020,
+      "doi": "10.1016/XXXX"
+    }
+  ],
+  "license": "CC0",
+  "format": {
+    "name": "SED-ML",
+    "version": "L1V3"
+  },
+  "model": {
+    "id": "model-1",
+    "format": {
+      "name": "SBML"
+    }
+  },
+  "modelParameterChanges": [
+    {
+      "parameter": {
+        "id": "k_1",
+        "name": "Kinetic constant 1",
+        "value": 1.0,
+        "units": "s"
+      },
+      "value": 1.1
+    },
+    {
+      "parameter": {
+        "id": "k_2",
+        "name": "Kinetic constant 2",
+        "value": 2.0,
+        "units": "g"
+      },
+      "value": 2.1
+    }
+  ],
+  "startTime": 0.0,
+  "endTime": 10.0,
+  "length": 10.0,
+  "numTimePoints": 100,
+  "algorithm": {
+    "id": "KISAO:0000019",
+    "name": "CVODE"
+  },
+  "algorithmParameterChanges": [
+    {
+      "parameter": {
+        "name": "absolute toleran",
+        "kisaoId": "KISAO:0000211",
+        "value": 3.0
+      },
+      "value": 3.3
+    },
+    {
+      "parameter": {
+        "name": "relative tolerance",
+        "kisaoId": "KISAO:0000209",
+        "value": 4.0
+      },
+      "value": 4.4
+    }
+  ]
+}

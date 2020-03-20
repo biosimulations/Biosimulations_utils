@@ -1,0 +1,20 @@
+# Compiled Python files
+*.pyc
+*.egg-info/
+dist/
+build/
+
+# Python cache files
+__pycache__/
+
+# coverage files
+.coverage*
+htmlcov/
+
+# Compiled documentation files
+docs/source/
+docs/_build/
+docs/.doctrees/
+
+# converted README for PyPI
+README.rst

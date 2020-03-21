@@ -6,12 +6,12 @@
 :License: MIT
 """
 
-from .core import SedMlGenerator
+from .core import SedMlWriter
 
-__all__ = ['SbmlSedMlGenerator']
+__all__ = ['SbmlSedMlWriter']
 
 
-class SbmlSedMlGenerator(SedMlGenerator):
+class SbmlSedMlWriter(SedMlWriter):
     """ Generator for SED-ML for SBML models """
 
     def _add_language_to_model(self, doc_sed, model_sed):

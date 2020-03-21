@@ -15,7 +15,7 @@ import tempfile
 import unittest
 
 
-class GenSedMlTestCase(unittest.TestCase):
+class WriteSedMlTestCase(unittest.TestCase):
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
 
@@ -31,7 +31,7 @@ class GenSedMlTestCase(unittest.TestCase):
             sim = json.load(file)
         model_filename = os.path.join(self.dirname, 'model.sbml.xml')
         sim_filename = os.path.join(self.dirname, 'simulation.sed-ml.xml')
-        sedml.gen_sedml(model_species, sim, model_filename, sim_filename)
+        sedml.write_sedml(model_species, sim, model_filename, sim_filename)
 
         doc = libsedml.readSedMLFromFile(sim_filename)
 
@@ -49,7 +49,7 @@ class GenSedMlTestCase(unittest.TestCase):
             }
         }
         with self.assertRaisesRegex(ValueError, 'Format must be SED-ML'):
-            sedml.gen_sedml(None, sim, None, None)
+            sedml.write_sedml(None, sim, None, None)
 
         # other simulation experiments formats (e.g., SESSL) are not supported
         sim = {
@@ -63,7 +63,7 @@ class GenSedMlTestCase(unittest.TestCase):
             }
         }
         with self.assertRaisesRegex(ValueError, 'Format must be SED-ML'):
-            sedml.gen_sedml(None, sim, None, None)
+            sedml.write_sedml(None, sim, None, None)
 
         # other simulation experiments formats (e.g., SESSL) are not supported
         sim = {
@@ -78,16 +78,16 @@ class GenSedMlTestCase(unittest.TestCase):
             },
         }
         with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
-            sedml.gen_sedml(None, sim, 'model.sbml.xml', None)
+            sedml.write_sedml(None, sim, 'model.sbml.xml', None)
 
     def test__format_person_name(self):
-        self.assertEqual(sedml.SedMlGenerator._format_person_name({'firstName': 'John'}), 'John')
-        self.assertEqual(sedml.SedMlGenerator._format_person_name({'lastName': 'Doe'}), 'Doe')
-        self.assertEqual(sedml.SedMlGenerator._format_person_name({'firstName': 'John', 'lastName': 'Doe'}), 'John Doe')
-        self.assertEqual(sedml.SedMlGenerator._format_person_name(
+        self.assertEqual(sedml.SedMlWriter._format_person_name({'firstName': 'John'}), 'John')
+        self.assertEqual(sedml.SedMlWriter._format_person_name({'lastName': 'Doe'}), 'Doe')
+        self.assertEqual(sedml.SedMlWriter._format_person_name({'firstName': 'John', 'lastName': 'Doe'}), 'John Doe')
+        self.assertEqual(sedml.SedMlWriter._format_person_name(
             {'firstName': 'John', 'middleName': 'C', 'lastName': 'Doe'}), 'John C Doe')
 
     def test__call_sedml_error(self):
         doc = libsedml.SedDocument()
         with self.assertRaisesRegex(ValueError, 'libsedml error:'):
-            sedml.SedMlGenerator._call_libsedml_method(doc, doc, 'setName', 'name')
+            sedml.SedMlWriter._call_libsedml_method(doc, doc, 'setName', 'name')

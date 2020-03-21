@@ -11,12 +11,12 @@ import abc
 import libsedml
 
 __all__ = [
-    'gen_sedml',
-    'SedMlGenerator',
+    'write_sedml',
+    'SedMlWriter',
 ]
 
 
-def gen_sedml(model_species, sim, model_filename, sim_filename, level=1, version=3):
+def write_sedml(model_species, sim, model_filename, sim_filename, level=1, version=3):
     """ Encode a simulation experiment into SED-ML
 
     Args:
@@ -28,15 +28,15 @@ def gen_sedml(model_species, sim, model_filename, sim_filename, level=1, version
         version (:obj:`int`): SED-ML version
     """
     if sim['model']['format']['name'] == 'SBML':
-        from .sbml import SbmlSedMlGenerator
-        Generator = SbmlSedMlGenerator
+        from .sbml import SbmlSedMlWriter
+        Generator = SbmlSedMlWriter
     else:
         raise NotImplementedError('Model format {} is not supported'.format(sim['model']['format']['name']))
 
     return Generator().run(model_species, sim, model_filename, sim_filename, level=level, version=version)
 
 
-class SedMlGenerator(abc.ABC):
+class SedMlWriter(abc.ABC):
     """ Base class for SED-ML generator for each model format """
 
     def run(self, model_species, sim, model_filename, sim_filename, level=1, version=3):

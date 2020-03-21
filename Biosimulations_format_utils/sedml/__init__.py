@@ -1,1 +1,1 @@
-from .core import gen_sedml, SedMlGenerator
+from .core import write_sedml, SedMlWriter

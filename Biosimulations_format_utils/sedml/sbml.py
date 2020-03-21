@@ -33,9 +33,27 @@ class SbmlSedMlWriter(SedMlWriter):
             :obj:`libsedml.SedChangeAttribute`: SED model parameter change
         """
         change_sed = model_sed.createChangeAttribute()
-        self._call_libsedml_method(doc_sed, change_sed, 'setTarget',
-                                   '/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id="{}"]/@value'.format(
-                                       change['parameter']['id']))
+        if change['parameter'].get('reactionId', None):
+            self._call_libsedml_method(
+                doc_sed, change_sed, 'setTarget', '/'.join([
+                    '/sbml:sbml',
+                    'sbml:model',
+                    'sbml:listOfReactions',
+                    'sbml:reaction[@id="{}"]'.format(change['parameter']['reactionId']),
+                    'sbml:kineticLaw',
+                    'sbml:listOfLocalParameters',
+                    'sbml:localParameter[@id="{}"]'.format(change['parameter']['id']),
+                    '@value',
+                ]))
+        else:
+            self._call_libsedml_method(
+                doc_sed, change_sed, 'setTarget', '/'.join([
+                    '/sbml:sbml',
+                    'sbml:model',
+                    'sbml:listOfParameters',
+                    'sbml:parameter[@id="{}"]'.format(change['parameter']['id']),
+                    '@value',
+                ]))
         self._add_annotation_to_obj({'name': change['parameter']['name']}, doc_sed, change_sed)
         self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change['value']))
         return change_sed
@@ -48,8 +66,9 @@ class SbmlSedMlWriter(SedMlWriter):
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             var_sed (:obj:`libsedml.SedVariable`): SED: variable
         """
-        self._call_libsedml_method(doc_sed, var_sed, 'setTarget',
-                                   '/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="{}"]'.format(id))
+        self._call_libsedml_method(
+            doc_sed, var_sed, 'setTarget',
+            '/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="{}"]'.format(id))
 
 
 class SbmlSedMlReader(SedMlReader):
@@ -67,12 +86,24 @@ class SbmlSedMlReader(SedMlReader):
             obj:`dict`: model parameter change
         """
         target = change_sed.getTarget()
-        match = re.match(r'^/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter\[@id="(.*?)"\]/@value$', target)
+
+        match = re.search(r'/sbml:parameter\[@id="(.*?)"\]/', target)
+        if match:
+            reactionId = None
+            id = match.group(1)
+        else:
+            match = re.search(r'/sbml:reaction\[@id="(.*?)"\]/', target)
+            reactionId = match.group(1)
+
+            match = re.search(r'/sbml:localParameter\[@id="(.*?)"\]/', target)
+            id = match.group(1)
+
         props = self._get_obj_annotation(change_sed)
 
         return {
             "parameter": {
-                "id": match.group(1),
+                "id": id,
+                "reactionId": reactionId,
                 "name": props.get('name', None),
             },
             "value": float(change_sed.getNewValue())

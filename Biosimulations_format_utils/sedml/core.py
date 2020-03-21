@@ -379,7 +379,6 @@ class SedMlWriter(abc.ABC):
             obj_sed (:obj:`libsedml.SedBase`): SED object
         """
         annot_xml = self._encode_obj_to_xml(annot)
-        print(annot_xml)
         self._call_libsedml_method(doc_sed, obj_sed, 'setAnnotation',
                                    ('<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
                                     '{}'

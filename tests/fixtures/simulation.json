@@ -51,6 +51,7 @@
     {
       "parameter": {
         "id": "k_1",
+        "reactionId": null,
         "name": "Kinetic constant 1"
       },
       "value": 1.1
@@ -58,6 +59,7 @@
     {
       "parameter": {
         "id": "k_2",
+        "reactionId": "r_2",
         "name": "Kinetic constant 2"
       },
       "value": 2.1

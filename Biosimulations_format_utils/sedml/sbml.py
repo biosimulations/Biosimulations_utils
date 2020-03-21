@@ -34,7 +34,7 @@ class SbmlSedMlWriter(SedMlWriter):
         self._call_libsedml_method(doc_sed, change_sed, 'setTarget',
                                    '/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id="{}"]/@value'.format(
                                        change['parameter']['id']))
-        self._add_annotated_props_to_obj({'name': change['parameter']['name']}, doc_sed, change_sed)
+        self._add_annotation_to_obj({'name': change['parameter']['name']}, doc_sed, change_sed)
         self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change['value']))
         return change_sed
 
@@ -57,7 +57,7 @@ class SbmlSedMlReader(SedMlReader):
     def _get_parameter_change_from_model(self, change_sed):
         """ Get a model parameter change from a SED change attribute
 
-        Args:            
+        Args:
             change_sed (:obj:`libsedml.SedChangeAttribute`): SED change attribute
 
         Returns:
@@ -65,7 +65,7 @@ class SbmlSedMlReader(SedMlReader):
         """
         target = change_sed.getTarget()
         match = re.match(r'^/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter\[@id="(.*?)"\]/@value$', target)
-        props = self._get_annotated_props(change_sed)
+        props = self._get_obj_annotation(change_sed)
 
         return {
             "parameter": {

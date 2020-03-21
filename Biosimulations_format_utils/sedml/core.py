@@ -6,9 +6,14 @@
 :License: MIT
 """
 
+from xml.sax import saxutils
 import abc
 import libsedml
-from xml.sax import saxutils
+
+__all__ = [
+    'gen_sedml',
+    'SedMlGenerator',
+]
 
 
 def gen_sedml(model_species, sim, model_filename, sim_filename, level=1, version=3):
@@ -23,6 +28,7 @@ def gen_sedml(model_species, sim, model_filename, sim_filename, level=1, version
         version (:obj:`int`): SED-ML version
     """
     if sim['model']['format']['name'] == 'SBML':
+        from .sbml import SbmlSedMlGenerator
         Generator = SbmlSedMlGenerator
     else:
         raise NotImplementedError('Model format {} is not supported'.format(sim['model']['format']['name']))
@@ -467,45 +473,3 @@ class SedMlGenerator(abc.ABC):
 
             raise ValueError('libsedml error: {}{}'.format(return_val, msg))
         return return_val
-
-
-class SbmlSedMlGenerator(SedMlGenerator):
-    """ Generator for SED-ML for SBML models """
-
-    def _add_language_to_model(self, doc_sed, model_sed):
-        """ Add a model language to a SED model
-
-        Args:
-            doc_sed (:obj:`libsedml.SedDocument`): SED document
-            model_sed (:obj:`libsedml.SedModel`): SED model
-        """
-        self._call_libsedml_method(doc_sed, model_sed, 'setLanguage', 'urn:sedml:sbml')
-
-    def _add_parameter_change_to_model(self, change, doc_sed, model_sed):
-        """ Add a model parameter change to a SED document
-
-        Args:
-            change (:obj:`dict`): model parameter change
-            doc_sed (:obj:`libsedml.SedDocument`): SED document
-            model_sed (:obj:`libsedml.SedModel`): SED model
-
-        Returns:
-            :obj:`libsedml.SedChangeAttribute`: SED model parameter change
-        """
-        change_sed = model_sed.createChangeAttribute()
-        self._call_libsedml_method(doc_sed, change_sed, 'setTarget',
-                                   '/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id="{}"]/@value'.format(
-                                       change['parameter']['id']))
-        self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change['value']))
-        return change_sed
-
-    def _set_var_target(self, id, doc_sed, var_sed):
-        """ Set the target of a SED variable
-
-        Args:
-            id (:obj:`str`): id
-            doc_sed (:obj:`libsedml.SedDocument`): SED document
-            var_sed (:obj:`libsedml.SedVariable`): SED: variable
-        """
-        self._call_libsedml_method(doc_sed, var_sed, 'setTarget',
-                                   '/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="{}"]'.format(id))

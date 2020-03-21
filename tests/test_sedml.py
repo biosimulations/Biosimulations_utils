@@ -89,5 +89,5 @@ class GenSedMlTestCase(unittest.TestCase):
 
     def test__call_sedml_error(self):
         doc = libsedml.SedDocument()
-        with self.assertRaisesRegex(ValueError, 'SED-ML error:'):
-            sedml.SedMlGenerator._call_sedml(doc, doc, 'setName', 'name')
+        with self.assertRaisesRegex(ValueError, 'libsedml error:'):
+            sedml.SedMlGenerator._call_libsedml_method(doc, doc, 'setName', 'name')

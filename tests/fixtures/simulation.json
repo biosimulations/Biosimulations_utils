@@ -43,7 +43,6 @@
     "version": "L1V3"
   },
   "model": {
-    "id": "model-1",
     "format": {
       "name": "SBML"
     }

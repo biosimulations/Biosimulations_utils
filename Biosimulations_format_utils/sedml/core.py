@@ -41,7 +41,8 @@ def write_sedml(model_species, sim, model_filename, sim_filename, level=1, versi
 class SedMlWriter(abc.ABC):
     """ Base class for SED-ML generator for each model format """
 
-    LANGUAGE = None
+    MODEL_LANGUAGE_URN = None
+    MODEL_LANGUAGE_NAME = None
 
     def run(self, model_species, sim, model_filename, sim_filename, level=1, version=3):
         """
@@ -97,7 +98,7 @@ class SedMlWriter(abc.ABC):
         return doc_sed
 
     def _add_metadata_to_doc(self, sim, doc_sed):
-        """ Add the metadata about a simulation experiment to the notes of a SED document
+        """ Add the metadata about a simulation experiment to the annotation of a SED document
 
         * Id
         * Name
@@ -111,43 +112,12 @@ class SedMlWriter(abc.ABC):
             sim (:obj:`dict`): simulation experiment
             doc_sed (:obj:`libsedml.SedDocument`): SED document
         """
-        # metadata
-        props = {}
+        metadata = {}
+        for attr_name in ['id', 'name', 'authors', 'description', 'tags', 'refs', 'license']:
+            if sim.get(attr_name, None):
+                metadata[attr_name] = sim[attr_name]
 
-        if sim.get('id', None):
-            props['id'] = sim['id']
-
-        if sim.get('name', None):
-            props['name'] = sim['name']
-
-        # if sim.get('authors', None):
-        #    notes.append({'label': 'Author(s)', 'value': '<ul>{}</ul>'.format(''.join(
-        #        '<li>{}</li>'.format(saxutils.escape(self._format_person_name(author))) for author in sim['authors']))})
-
-        if sim.get('description', None):
-            props['description'] = sim['description']
-
-        # if sim.get('tags', None):
-        #    notes.append({
-        #        'label': 'Tags',
-        #        'value': '<ul>{}</ul>'.format(''.join('<li>{}</li>'.format(saxutils.escape(tag)) for tag in sim['tags'])),
-        #    })
-
-        # if sim.get('refs', None):
-        #    notes.append({
-        #        'label': 'References',
-        #        'value': '<ul>{}</ul>'.format(''.join('<li>{}</li>'.format(self._format_reference(ref)) for ref in sim['refs'])),
-        #    })
-
-        if sim.get('license', None):
-            props['license'] = sim['license']
-
-        # if notes:
-        #    notes_xml = '<ul xmlns="http://www.w3.org/1999/xhtml">{}</ul>'.format(
-        #        ''.join('<li>{}: {}</li>'.format(note['label'], note['value']) for note in notes if note['value']))
-        #    self._call_libsedml_method(doc_sed, doc_sed, 'setAnnotation', notes_xml)
-
-        self._add_annotation_to_obj(props, doc_sed, doc_sed)
+        self._add_annotation_to_obj(metadata, doc_sed, doc_sed)
 
     def _add_model_to_doc(self, model, filename, doc_sed):
         """ Add a model to a SED document
@@ -163,7 +133,7 @@ class SedMlWriter(abc.ABC):
         model_sed = doc_sed.createModel()
         self._call_libsedml_method(doc_sed, model_sed, 'setId', 'model')
         self._call_libsedml_method(doc_sed, model_sed, 'setSource', filename)
-        self._call_libsedml_method(doc_sed, model_sed, 'setLanguage', self.LANGUAGE)
+        self._call_libsedml_method(doc_sed, model_sed, 'setLanguage', self.MODEL_LANGUAGE_URN)
         return model_sed
 
     def _add_parameter_changes_to_model(self, changes, doc_sed, model_sed):
@@ -409,13 +379,14 @@ class SedMlWriter(abc.ABC):
             obj_sed (:obj:`libsedml.SedBase`): SED object
         """
         annot_xml = self._encode_obj_to_xml(annot)
+        print(annot_xml)
         self._call_libsedml_method(doc_sed, obj_sed, 'setAnnotation',
                                    ('<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
                                     '{}'
                                     '</rdf:RDF>').format(''.join(annot_xml)))
 
     def _encode_obj_to_xml(self, obj, id=None):
-        """Encode an object into XML
+        """ Encode an object into XML
 
         Args:
             obj (:obj:`object`): object
@@ -423,27 +394,36 @@ class SedMlWriter(abc.ABC):
         Returns:
             :obj:`str`: XML representation of object
         """
+        if id:
+            id_xml = ' rdf:ID="{}"'.format(id)
+        else:
+            id_xml = ''
+
         if isinstance(obj, dict):
             els_xml = []
             for key, val in obj.items():
                 els_xml.append(self._encode_obj_to_xml(val, id=key))
-            return '<rdf:Description>{}</rdf:Description>'.format(''.join(els_xml))
+            return '<rdf:Description{}>{}</rdf:Description>'.format(id_xml, ''.join(els_xml))
         elif isinstance(obj, set):
             els_xml = []
             for el in obj:
                 els_xml.append("<rdf:li>" + self._encode_obj_to_xml(el) + "</rdf:li>")
-            return '<rdf:Bag>{}</rdf:Bag>'.format(''.join(els_xml))
+            return '<rdf:Bag{}>{}</rdf:Bag>'.format(id_xml, ''.join(els_xml))
         elif isinstance(obj, list):
+            els_xml = []
             for el in obj:
                 els_xml.append("<rdf:li>" + self._encode_obj_to_xml(el) + "</rdf:li>")
-            return '<rdf:Seq>{}</rdf:Seq>'.format(''.join(els_xml))
+            return '<rdf:Seq{}>{}</rdf:Seq>'.format(id_xml, ''.join(els_xml))
         else:
             if isinstance(obj, str):
                 datatype = 'string'
+                obj_xml = saxutils.escape(obj)
             elif isinstance(obj, int):
                 datatype = 'integer'
+                obj_xml = obj
             elif isinstance(obj, float):
                 datatype = 'float'
+                obj_xml = obj
             else:
                 raise ValueError('Value must be a float, integer, string, dist, or list not {}'.format(
                     obj._class__.__name__))
@@ -451,55 +431,7 @@ class SedMlWriter(abc.ABC):
                     '{}'
                     ' rdf:datatype="http://www.w3.org/2001/XMLSchema#{}">'
                     '{}'
-                    '</rdf:value>').format(' rdf:ID="{}"'.format(id) if id else '', datatype, obj)
-
-    @staticmethod
-    def _format_person_name(person):
-        """ Format a person for a note in a SED-ML document
-
-        Args:
-            person (:obj:`dict`): dictionary with three keys `firstName`, `middleName`, and `lastName`
-
-        Returns:
-            :obj:`str`
-        """
-        names = []
-
-        if person.get('firstName', None):
-            names.append(person['firstName'])
-
-        if person.get('middleName', None):
-            names.append(person['middleName'])
-
-        if person.get('lastName', None):
-            names.append(person['lastName'])
-
-        return ' '.join(names)
-
-    @staticmethod
-    def _format_reference(ref):
-        """ Format a journal article for a note in a SED document
-
-        Args:
-            ref (:obj:`dict`): dictionary with keys
-
-                * `authors`
-                * `title`
-                * `journal`
-                * `volume`
-                * `pages`
-                * `year`
-
-        Returns:
-            :obj:`str`
-        """
-        return '{}. {}. <i>{}</i> <b>{}</b>, {} ({})'.format(
-            saxutils.escape(ref['authors']),
-            saxutils.escape(ref['title']),
-            saxutils.escape(ref['journal']),
-            saxutils.escape(str(ref['volume'])),
-            saxutils.escape(ref['pages']),
-            saxutils.escape(str(ref['year'])))
+                    '</rdf:value>').format(id_xml, datatype, obj_xml)
 
     @staticmethod
     def _call_libsedml_method(doc_sed, obj_sed, method_name, *args, **kwargs):
@@ -551,7 +483,7 @@ def read_sedml(filename):
     model_sed = doc_sed.getModel(0)
     model_lang = model_sed.getLanguage()
 
-    if model_lang == SbmlSedMlReader.LANGUAGE:
+    if model_lang == SbmlSedMlReader.MODEL_LANGUAGE_URN:
         Reader = SbmlSedMlReader
     else:
         raise NotImplementedError('Model format {} is not supported'.format(model_format))
@@ -598,6 +530,17 @@ class SedMlReader(abc.ABC):
 
         # initialize simulation experiment with metadata
         sim = self._get_obj_annotation(doc_sed)
+        sim['format'] = {
+            "name": "SED-ML",
+            "version": "L{}V{}".format(doc_sed.getLevel(), doc_sed.getVersion()),
+        }
+
+        # model
+        sim["model"] = {
+            "format": {
+                "name": self.MODEL_LANGUAGE_NAME,
+            }
+        }
 
         # model parameter changes
         sim['modelParameterChanges'] = []
@@ -734,7 +677,7 @@ class SedMlReader(abc.ABC):
             assert obj_xml.getNumChildren() == 1
             val = libsedml.XMLNode.convertXMLNodeToString(obj_xml.getChild(0))
             if datatype == "http://www.w3.org/2001/XMLSchema#string":
-                pass
+                val = saxutils.unescape(val)
             elif datatype == "http://www.w3.org/2001/XMLSchema#integer":
                 val = int(val)
             elif datatype == "http://www.w3.org/2001/XMLSchema#float":

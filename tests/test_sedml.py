@@ -34,25 +34,12 @@ class WriteSedMlTestCase(unittest.TestCase):
         sim_filename = os.path.join(self.dirname, 'simulation.sed-ml.xml')
         doc_sed = sedml.write_sedml(model_species, sim, model_filename, sim_filename)
 
-        #model_species_2, sim_2, model_filename_2, level, version = sedml.read_sedml(sim_filename)
-        model_species_2, sim_2, model_filename_2, level, version = sbml.SbmlSedMlReader().run(doc_sed)
+        model_species_2, sim_2, model_filename_2, level, version = sedml.read_sedml(sim_filename)
         self.assertEqual(
-            set(s['id'] for s in model_species_2), 
+            set(s['id'] for s in model_species_2),
             set(s['id'] for s in model_species))
         self.assertEqual(model_filename_2, model_filename)
-        self.assertEqual(sim_2, {
-            'id': sim['id'],
-            'name': sim['name'],
-            'description': sim['description'],
-            'license': sim['license'],
-            'modelParameterChanges': sim['modelParameterChanges'],
-            'startTime': sim['startTime'],
-            'endTime': sim['endTime'],
-            'length': sim['length'],
-            'numTimePoints': sim['numTimePoints'],
-            'algorithm': sim['algorithm'],
-            'algorithmParameterChanges': sim['algorithmParameterChanges'],
-        })
+        self.assertEqual(sim_2, sim)
         self.assertEqual(level, 1)
         self.assertEqual(version, 3)
 
@@ -100,13 +87,6 @@ class WriteSedMlTestCase(unittest.TestCase):
         }
         with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
             sedml.write_sedml(None, sim, 'model.sbml.xml', None)
-
-    def test__format_person_name(self):
-        self.assertEqual(sedml.SedMlWriter._format_person_name({'firstName': 'John'}), 'John')
-        self.assertEqual(sedml.SedMlWriter._format_person_name({'lastName': 'Doe'}), 'Doe')
-        self.assertEqual(sedml.SedMlWriter._format_person_name({'firstName': 'John', 'lastName': 'Doe'}), 'John Doe')
-        self.assertEqual(sedml.SedMlWriter._format_person_name(
-            {'firstName': 'John', 'middleName': 'C', 'lastName': 'Doe'}), 'John C Doe')
 
     def test__call_sedml_error(self):
         doc = libsedml.SedDocument()

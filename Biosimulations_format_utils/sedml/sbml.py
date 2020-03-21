@@ -12,12 +12,14 @@ import re
 
 __all__ = ['SbmlSedMlWriter', 'SbmlSedMlReader']
 
-LANGUAGE = 'urn:sedml:sbml'
+MODEL_LANGUAGE_URN = 'urn:sedml:sbml'
+MODEL_LANGUAGE_NAME = 'SBML'
 
 
 class SbmlSedMlWriter(SedMlWriter):
     """ Writer for SED-ML for SBML models """
-    LANGUAGE = LANGUAGE
+    MODEL_LANGUAGE_URN = MODEL_LANGUAGE_URN
+    MODEL_LANGUAGE_NAME = MODEL_LANGUAGE_NAME
 
     def _add_parameter_change_to_model(self, change, doc_sed, model_sed):
         """ Add a model parameter change to a SED document
@@ -52,7 +54,8 @@ class SbmlSedMlWriter(SedMlWriter):
 
 class SbmlSedMlReader(SedMlReader):
     """ Reader for SED-ML for SBML models """
-    LANGUAGE = LANGUAGE
+    MODEL_LANGUAGE_URN = MODEL_LANGUAGE_URN
+    MODEL_LANGUAGE_NAME = MODEL_LANGUAGE_NAME
 
     def _get_parameter_change_from_model(self, change_sed):
         """ Get a model parameter change from a SED change attribute

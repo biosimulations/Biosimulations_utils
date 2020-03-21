@@ -12,7 +12,9 @@ import libsedml
 
 __all__ = [
     'write_sedml',
+    'read_sedml',
     'SedMlWriter',
+    'SedMlReader',
 ]
 
 
@@ -29,15 +31,17 @@ def write_sedml(model_species, sim, model_filename, sim_filename, level=1, versi
     """
     if sim['model']['format']['name'] == 'SBML':
         from .sbml import SbmlSedMlWriter
-        Generator = SbmlSedMlWriter
+        Writer = SbmlSedMlWriter
     else:
         raise NotImplementedError('Model format {} is not supported'.format(sim['model']['format']['name']))
 
-    return Generator().run(model_species, sim, model_filename, sim_filename, level=level, version=version)
+    return Writer().run(model_species, sim, model_filename, sim_filename, level=level, version=version)
 
 
 class SedMlWriter(abc.ABC):
     """ Base class for SED-ML generator for each model format """
+
+    LANGUAGE = None
 
     def run(self, model_species, sim, model_filename, sim_filename, level=1, version=3):
         """
@@ -48,6 +52,9 @@ class SedMlWriter(abc.ABC):
             sim_filename (:obj:`str`): Path to save simulation experiment in SED-ML format
             level (:obj:`int`): SED-ML level
             version (:obj:`int`): SED-ML version
+
+        Returns:
+            :obj:`libsedml.SedDocument`: SED document
         """
         if sim['format']['name'] != 'SED-ML' or sim['format']['version'] != 'L{}V{}'.format(level, version):
             raise ValueError('Format must be SED-ML L{}V{}'.format(level, version))
@@ -71,6 +78,8 @@ class SedMlWriter(abc.ABC):
         self._add_task_results_to_report(model_species, doc_sed, task_sed, report_sed)
 
         self._export_doc(doc_sed, sim_filename)
+
+        return doc_sed
 
     def _create_doc(self, level, version):
         """ Create a SED document
@@ -103,47 +112,49 @@ class SedMlWriter(abc.ABC):
             doc_sed (:obj:`libsedml.SedDocument`): SED document
         """
         # metadata
-        notes = []
+        props = {}
 
         if sim.get('id', None):
-            notes.append({'label': 'Id', 'value': saxutils.escape(sim['id'])})
+            props['id'] = sim['id']
 
         if sim.get('name', None):
-            notes.append({'label': 'Name', 'value': saxutils.escape(sim['name'])})
+            props['name'] = sim['name']
 
-        if sim.get('authors', None):
-            notes.append({'label': 'Author(s)', 'value': '<ul>{}</ul>'.format(''.join(
-                '<li>{}</li>'.format(saxutils.escape(self._format_person_name(author))) for author in sim['authors']))})
+        # if sim.get('authors', None):
+        #    notes.append({'label': 'Author(s)', 'value': '<ul>{}</ul>'.format(''.join(
+        #        '<li>{}</li>'.format(saxutils.escape(self._format_person_name(author))) for author in sim['authors']))})
 
         if sim.get('description', None):
-            notes.append({'label': 'Description', 'value': saxutils.escape(sim['description'])})
+            props['description'] = sim['description']
 
-        if sim.get('tags', None):
-            notes.append({
-                'label': 'Tags',
-                'value': '<ul>{}</ul>'.format(''.join('<li>{}</li>'.format(saxutils.escape(tag)) for tag in sim['tags'])),
-            })
+        # if sim.get('tags', None):
+        #    notes.append({
+        #        'label': 'Tags',
+        #        'value': '<ul>{}</ul>'.format(''.join('<li>{}</li>'.format(saxutils.escape(tag)) for tag in sim['tags'])),
+        #    })
 
-        if sim.get('refs', None):
-            notes.append({
-                'label': 'References',
-                'value': '<ul>{}</ul>'.format(''.join('<li>{}</li>'.format(self._format_reference(ref)) for ref in sim['refs'])),
-            })
+        # if sim.get('refs', None):
+        #    notes.append({
+        #        'label': 'References',
+        #        'value': '<ul>{}</ul>'.format(''.join('<li>{}</li>'.format(self._format_reference(ref)) for ref in sim['refs'])),
+        #    })
 
         if sim.get('license', None):
-            notes.append({'label': 'License', 'value': saxutils.escape(sim['license'])})
+            props['license'] = sim['license']
 
-        if notes:
-            notes_xml = '<ul xmlns="http://www.w3.org/1999/xhtml">{}</ul>'.format(
-                ''.join('<li>{}: {}</li>'.format(note['label'], note['value']) for note in notes if note['value']))
-            self._call_libsedml_method(doc_sed, doc_sed, 'setNotes', notes_xml)
+        # if notes:
+        #    notes_xml = '<ul xmlns="http://www.w3.org/1999/xhtml">{}</ul>'.format(
+        #        ''.join('<li>{}: {}</li>'.format(note['label'], note['value']) for note in notes if note['value']))
+        #    self._call_libsedml_method(doc_sed, doc_sed, 'setAnnotation', notes_xml)
+
+        self._add_annotated_props_to_obj(props, doc_sed, doc_sed)
 
     def _add_model_to_doc(self, model, filename, doc_sed):
         """ Add a model to a SED document
 
         Args:
             model (:obj:`dict`): model
-            model_filename (:obj:`str`): path to the model definition
+            filename (:obj:`str`): path to the model definition
             doc_sed (:obj:`libsedml.SedDocument`): SED document
 
         Returns:
@@ -152,18 +163,8 @@ class SedMlWriter(abc.ABC):
         model_sed = doc_sed.createModel()
         self._call_libsedml_method(doc_sed, model_sed, 'setId', 'model')
         self._call_libsedml_method(doc_sed, model_sed, 'setSource', filename)
-        self._add_language_to_model(doc_sed, model_sed)
+        self._call_libsedml_method(doc_sed, model_sed, 'setLanguage', self.LANGUAGE)
         return model_sed
-
-    @abc.abstractmethod
-    def _add_language_to_model(self, doc_sed, model_sed):
-        """ Add a model language to a SED model
-
-        Args:
-            doc_sed (:obj:`libsedml.SedDocument`): SED document
-            model_sed (:obj:`libsedml.SedModel`): SED model
-        """
-        pass  # pragma: no cover
 
     def _add_parameter_changes_to_model(self, changes, doc_sed, model_sed):
         """ Add model parameter changes to a SED document
@@ -226,6 +227,7 @@ class SedMlWriter(abc.ABC):
         """
         alg_sed = sim_sed.createAlgorithm()
         self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm['id'])
+        self._add_annotated_props_to_obj({'name': algorithm['name']}, doc_sed, alg_sed)
         return alg_sed
 
     def _add_param_changes_to_alg(self, changes, doc_sed, alg_sed):
@@ -258,6 +260,7 @@ class SedMlWriter(abc.ABC):
         """
         change_sed = alg_sed.createAlgorithmParameter()
         self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID', change['parameter']['kisaoId'])
+        self._add_annotated_props_to_obj({'name': change['parameter']['name']}, doc_sed, change_sed)
         self._call_libsedml_method(doc_sed, change_sed, 'setValue', str(change['value']))
         return change_sed
 
@@ -304,7 +307,7 @@ class SedMlWriter(abc.ABC):
             :obj:`libsedml.SedDataGenerator`: SED data generator
         """
         data_gen_sed = doc_sed.createDataGenerator()
-        self._call_libsedml_method(doc_sed, data_gen_sed, 'setId', 'data_generator_' + id)
+        self._call_libsedml_method(doc_sed, data_gen_sed, 'setId', 'data_gen_' + id)
         self._call_libsedml_method(doc_sed, data_gen_sed, 'setName', 'time')
         return data_gen_sed
 
@@ -397,6 +400,37 @@ class SedMlWriter(abc.ABC):
         # save the SED document to a file
         libsedml.writeSedML(doc_sed, filename)
 
+    def _add_annotated_props_to_obj(self, props, doc_sed, obj_sed):
+        """ Add annotated properties to a SED object
+
+        Args:
+            props (:obj:`dict`): dictionary of annotated properties and their values
+            doc_sed (:obj:`libsedml.SedDocument`): SED document
+            obj_sed (:obj:`libsedml.SedBase`): SED object
+        """
+        annots = []
+        for key, value in props.items():
+            if isinstance(value, str):
+                datatype = 'string'
+            elif isinstance(value, int):
+                datatype = 'integer'
+            elif isinstance(value, float):
+                datatype = 'float'
+            else:
+                raise ValueError('Value must be a float, integer, or string not {}'.format(
+                    value._class__.__name__))
+
+            annots.append(('<rdf:value '
+                           'rdf:ID="{}" '
+                           'rdf:datatype="http://www.w3.org/2001/XMLSchema#{}">'
+                           '{}'
+                           '</rdf:value>').format(key, datatype, value))
+
+        self._call_libsedml_method(doc_sed, obj_sed, 'setAnnotation',
+                                   ('<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
+                                    '<rdf:Description>{}</rdf:Description>'
+                                    '</rdf:RDF>').format(''.join(annots)))
+
     @staticmethod
     def _format_person_name(person):
         """ Format a person for a note in a SED-ML document
@@ -473,3 +507,160 @@ class SedMlWriter(abc.ABC):
 
             raise ValueError('libsedml error: {}{}'.format(return_val, msg))
         return return_val
+
+
+def read_sedml(filename):
+    """ Read a simulation experiment from a SED-ML document
+
+    Args:
+        filename (:obj:`str`): path to SED-ML document that describes a simulation experiment
+
+    Returns:
+        :obj:`list` of :obj:`dict`: List of species in the model. Each species should have the key `id`
+        :obj:`dict`: Simulation experiment
+        :obj:`str`: Path to the model definition
+        :obj:`int`: SED-ML level
+        :obj:`int`: SED-ML version
+    """
+    from .sbml import SbmlSedMlReader
+
+    doc_sed = libsedml.readSedMLFromFile(filename)
+    assert doc_sed.getNumModels() == 1, "SED-ML document must have one model"
+    model_sed = doc_sed.getModel(0)
+    model_lang = model_sed.getLanguage()
+
+    if model_lang == SbmlSedMlReader.LANGUAGE:
+        Reader = SbmlSedMlReader
+    else:
+        raise NotImplementedError('Model format {} is not supported'.format(model_format))
+
+    return Reader().run(doc_sed)
+
+
+class SedMlReader(abc.ABC):
+    def run(self, doc_sed):
+        """ Base class for reading a simulation experiment from a SED document
+
+        Args:
+            doc_sed (:obj:`libsedml.SedDocument`): SED document
+
+        Returns:
+            :obj:`list` of :obj:`dict`: List of species in the model. Each species should have the key `id`
+            :obj:`dict`: Simulation experiment
+            :obj:`str`: Path to the model definition
+            :obj:`int`: SED-ML level
+            :obj:`int`: SED-ML version
+        """
+        sim = None
+
+        assert doc_sed.getNumModels() == 1, "SED-ML document must have one model"
+        model_sed = doc_sed.getModel(0)
+
+        assert doc_sed.getNumTasks() == 1, "SED-ML document must have one task"
+        task_sed = doc_sed.getTask(0)
+
+        assert doc_sed.getNumSimulations() == 1, "SED-ML document must have one simulation"
+        sim_sed = doc_sed.getSimulation(0)
+
+        # model species
+        model_species = []
+        for i_data_gen in range(doc_sed.getNumDataGenerators()):
+            data_gen_sed = doc_sed.getDataGenerator(i_data_gen)
+            data_gen_id = data_gen_sed.getId()
+            assert data_gen_id.startswith('data_gen_'), "Data generator id must start with `data_gen_`"
+            species_id = data_gen_id[len('data_gen_'):]
+            if species_id != 'time':
+                model_species.append({
+                    'id': species_id
+                })
+
+        # initialize simulation experiment with metadata
+        sim = self._get_annotated_props(doc_sed)
+
+        # model parameter changes
+        sim['modelParameterChanges'] = []
+        for i_change in range(model_sed.getNumChanges()):
+            change_sed = model_sed.getChange(i_change)
+            assert isinstance(change_sed, libsedml.SedChangeAttribute), \
+                "Changes must be attribute changes"
+            change = self._get_parameter_change_from_model(change_sed)
+            sim['modelParameterChanges'].append(change)
+
+        # simulation timecourse
+        sim['startTime'] = float(sim_sed.getInitialTime())
+        assert float(sim_sed.getOutputStartTime()) == sim['startTime'], \
+            "Simulation initial time and output start time must be equal"
+        sim['endTime'] = float(sim_sed.getOutputEndTime())
+        sim['length'] = sim['endTime'] - sim['startTime']
+        sim['numTimePoints'] = int(sim_sed.getNumberOfPoints())
+
+        # simulation algorithm
+        alg_sed = sim_sed.getAlgorithm()
+        alg_props = self._get_annotated_props(alg_sed)
+        sim['algorithm'] = {
+            'id': alg_sed.getKisaoID(),
+            'name': alg_props.get('name', None),
+        }
+
+        # simulation algorithm parameters
+        sim['algorithmParameterChanges'] = []
+        for i_change in range(alg_sed.getNumAlgorithmParameters()):
+            change_sed = alg_sed.getAlgorithmParameter(i_change)
+            change_props = self._get_annotated_props(change_sed)
+            sim['algorithmParameterChanges'].append({
+                'parameter': {
+                    'kisaoId': change_sed.getKisaoID(),
+                    'name': change_props.get('name'),
+                },
+                'value': float(change_sed.getValue()),
+            })
+
+        # model filename
+        model_filename = model_sed.getSource()
+
+        # level and version
+        level = doc_sed.getLevel()
+        version = doc_sed.getVersion()
+
+        # return simulation experiment
+        return (model_species, sim, model_filename, level, version)
+
+    def _get_annotated_props(self, obj_sed):
+        """ Get the annotated properies of a SED object
+
+        Args:
+            obj_sed (:obj:`libsedml.SedBase`): SED object
+
+        Returns:
+            :obj:`dict`: dictionary of annotated properties and their values
+        """
+        props = {}
+        annotations = obj_sed.getAnnotation()
+        for i_annot in range(annotations.getNumChildren()):
+            annotation = annotations.getChild(i_annot)
+            if annotation.getPrefix() == 'rdf' and annotation.getName() == 'RDF':
+                for i_description in range(annotation.getNumChildren()):
+                    description = annotation.getChild(i_description)
+                    if description.getPrefix() == 'rdf' and description.getName() == 'Description':
+                        for i_value in range(description.getNumChildren()):
+                            value = description.getChild(i_value)
+                            if value.getPrefix() == 'rdf' and value.getName() == 'value' and value.getNumChildren() == 1:
+                                key = None
+                                datatype = None
+                                for i_attr in range(value.getAttributesLength()):
+                                    if value.getAttrPrefix(i_attr) == 'rdf' and value.getAttrName(i_attr) == 'ID':
+                                        key = value.getAttrValue(i_attr)
+                                    if value.getAttrPrefix(i_attr) == 'rdf' and value.getAttrName(i_attr) == 'datatype':
+                                        datatype = value.getAttrValue(i_attr)
+                                if key is not None and type is not None:
+                                    val = libsedml.XMLNode.convertXMLNodeToString(value.getChild(0))
+                                    if datatype == "http://www.w3.org/2001/XMLSchema#string":
+                                        pass
+                                    elif datatype == "http://www.w3.org/2001/XMLSchema#integer":
+                                        val = int(val)
+                                    elif datatype == "http://www.w3.org/2001/XMLSchema#float":
+                                        val = float(val)
+                                    else:
+                                        raise ValueError("Datatype must be float, integer, or string not {}".format(datatype))
+                                    props[key] = val
+        return props

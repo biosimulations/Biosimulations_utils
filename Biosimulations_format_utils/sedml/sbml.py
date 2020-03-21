@@ -6,22 +6,18 @@
 :License: MIT
 """
 
-from .core import SedMlWriter
+from .core import SedMlWriter, SedMlReader
+import libsedml
+import re
 
-__all__ = ['SbmlSedMlWriter']
+__all__ = ['SbmlSedMlWriter', 'SbmlSedMlReader']
+
+LANGUAGE = 'urn:sedml:sbml'
 
 
 class SbmlSedMlWriter(SedMlWriter):
-    """ Generator for SED-ML for SBML models """
-
-    def _add_language_to_model(self, doc_sed, model_sed):
-        """ Add a model language to a SED model
-
-        Args:
-            doc_sed (:obj:`libsedml.SedDocument`): SED document
-            model_sed (:obj:`libsedml.SedModel`): SED model
-        """
-        self._call_libsedml_method(doc_sed, model_sed, 'setLanguage', 'urn:sedml:sbml')
+    """ Writer for SED-ML for SBML models """
+    LANGUAGE = LANGUAGE
 
     def _add_parameter_change_to_model(self, change, doc_sed, model_sed):
         """ Add a model parameter change to a SED document
@@ -38,6 +34,7 @@ class SbmlSedMlWriter(SedMlWriter):
         self._call_libsedml_method(doc_sed, change_sed, 'setTarget',
                                    '/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id="{}"]/@value'.format(
                                        change['parameter']['id']))
+        self._add_annotated_props_to_obj({'name': change['parameter']['name']}, doc_sed, change_sed)
         self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change['value']))
         return change_sed
 
@@ -51,3 +48,29 @@ class SbmlSedMlWriter(SedMlWriter):
         """
         self._call_libsedml_method(doc_sed, var_sed, 'setTarget',
                                    '/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="{}"]'.format(id))
+
+
+class SbmlSedMlReader(SedMlReader):
+    """ Reader for SED-ML for SBML models """
+    LANGUAGE = LANGUAGE
+
+    def _get_parameter_change_from_model(self, change_sed):
+        """ Get a model parameter change from a SED change attribute
+
+        Args:            
+            change_sed (:obj:`libsedml.SedChangeAttribute`): SED change attribute
+
+        Returns:
+            obj:`dict`: model parameter change
+        """
+        target = change_sed.getTarget()
+        match = re.match(r'^/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter\[@id="(.*?)"\]/@value$', target)
+        props = self._get_annotated_props(change_sed)
+
+        return {
+            "parameter": {
+                "id": match.group(1),
+                "name": props.get('name', None),
+            },
+            "value": float(change_sed.getNewValue())
+        }

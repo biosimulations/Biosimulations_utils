@@ -52,18 +52,14 @@
     {
       "parameter": {
         "id": "k_1",
-        "name": "Kinetic constant 1",
-        "value": 1.0,
-        "units": "s"
+        "name": "Kinetic constant 1"
       },
       "value": 1.1
     },
     {
       "parameter": {
         "id": "k_2",
-        "name": "Kinetic constant 2",
-        "value": 2.0,
-        "units": "g"
+        "name": "Kinetic constant 2"
       },
       "value": 2.1
     }
@@ -79,17 +75,15 @@
   "algorithmParameterChanges": [
     {
       "parameter": {
-        "name": "absolute toleran",
         "kisaoId": "KISAO:0000211",
-        "value": 3.0
+        "name": "absolute tolerance"
       },
       "value": 3.3
     },
     {
       "parameter": {
-        "name": "relative tolerance",
         "kisaoId": "KISAO:0000209",
-        "value": 4.0
+        "name": "relative tolerance"
       },
       "value": 4.4
     }

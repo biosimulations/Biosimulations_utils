@@ -7,6 +7,7 @@
 """
 
 from Biosimulations_format_utils import sedml
+from Biosimulations_format_utils.sedml import sbml
 import json
 import libsedml
 import os
@@ -31,9 +32,29 @@ class WriteSedMlTestCase(unittest.TestCase):
             sim = json.load(file)
         model_filename = os.path.join(self.dirname, 'model.sbml.xml')
         sim_filename = os.path.join(self.dirname, 'simulation.sed-ml.xml')
-        sedml.write_sedml(model_species, sim, model_filename, sim_filename)
+        doc_sed = sedml.write_sedml(model_species, sim, model_filename, sim_filename)
 
-        doc = libsedml.readSedMLFromFile(sim_filename)
+        #model_species_2, sim_2, model_filename_2, level, version = sedml.read_sedml(sim_filename)
+        model_species_2, sim_2, model_filename_2, level, version = sbml.SbmlSedMlReader().run(doc_sed)
+        self.assertEqual(
+            set(s['id'] for s in model_species_2), 
+            set(s['id'] for s in model_species))
+        self.assertEqual(model_filename_2, model_filename)
+        self.assertEqual(sim_2, {
+            'id': sim['id'],
+            'name': sim['name'],
+            'description': sim['description'],
+            'license': sim['license'],
+            'modelParameterChanges': sim['modelParameterChanges'],
+            'startTime': sim['startTime'],
+            'endTime': sim['endTime'],
+            'length': sim['length'],
+            'numTimePoints': sim['numTimePoints'],
+            'algorithm': sim['algorithm'],
+            'algorithmParameterChanges': sim['algorithmParameterChanges'],
+        })
+        self.assertEqual(level, 1)
+        self.assertEqual(version, 3)
 
     def test_gen_sedml_errors(self):
         # Other versions/levels of SED-ML are not supported

@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from .core import SedMlWriter, SedMlReader
+from .sedml import SedMlWriter, SedMlReader
 import libsedml
 import re
 

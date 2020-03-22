@@ -6,8 +6,7 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils import sedml
-from Biosimulations_format_utils.sedml import sbml
+from Biosimulations_format_utils.sim import sedml
 import json
 import libsedml
 import os

@@ -51,6 +51,12 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(level, 1)
         self.assertEqual(version, 3)
 
+        with self.assertRaisesRegex(NotImplementedError, 'not supported'):
+            read_sim(None, ModelFormat.sbml, SimFormat.sessl)
+
+        with self.assertRaisesRegex(NotImplementedError, 'not supported'):
+            read_sim(None, ModelFormat.cellml, SimFormat.sedml)
+
     def test_gen_sedml_errors(self):
         # Other versions/levels of SED-ML are not supported
         sim = {

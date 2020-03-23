@@ -24,7 +24,7 @@ class ModelReader(abc.ABC):
             :obj:`dict`: model
         """
         model_orig = self._read_from_file(filename)
-
+        
         model = {}
         self._read_parameters(model_orig, model)
 

@@ -84,6 +84,8 @@ class WriteSedMlTestCase(unittest.TestCase):
                 'name': 'SESSL'
             }
         }
+        with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
+            write_sim(None, sim, None, None, SimFormat.sessl, level=1, version=3)
         with self.assertRaisesRegex(ValueError, 'Format must be SED-ML'):
             write_sim(None, sim, None, None, SimFormat.sedml, level=1, version=3)
 
@@ -101,6 +103,8 @@ class WriteSedMlTestCase(unittest.TestCase):
         }
         with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
             write_sim(None, sim, 'model.sbml.xml', None, SimFormat.sedml, level=1, version=3)
+
+
 
     def test__call_sedml_error(self):
         doc = libsedml.SedDocument()

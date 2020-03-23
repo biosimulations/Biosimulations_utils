@@ -8,6 +8,7 @@
 
 from .core import ModelReader
 import libsbml
+import os
 
 __all__ = ['SbmlModelReader']
 
@@ -25,8 +26,11 @@ class SbmlModelReader(ModelReader):
             :obj:`libsbml.Model`: SBML-encoded model
         """
         reader = libsbml.SBMLReader()
+        if not os.path.isfile(filename):
+            raise ValueError('{} does not exist'.format(filename))
         doc = reader.readSBMLFromFile(filename)
-        return doc.getModel()
+        model_sbml = doc.getModel()
+        return model_sbml
 
     def _read_parameters(self, model_sbml, model):
         """ Reader information about the parameters of a model
@@ -55,10 +59,6 @@ class SbmlModelReader(ModelReader):
 
             for i_param in range(kin_law_sbml.getNumParameters()):
                 param_sbml = kin_law_sbml.getParameter(i_param)
-                parameters.append(self._read_parameter(param_sbml, reaction_id=reaction_id, reaction_name=reaction_name))
-
-            for i_param in range(kin_law_sbml.getNumLocalParameters()):
-                param_sbml = kin_law_sbml.getLocalParameter(i_param)
                 parameters.append(self._read_parameter(param_sbml, reaction_id=reaction_id, reaction_name=reaction_name))
 
         return parameters

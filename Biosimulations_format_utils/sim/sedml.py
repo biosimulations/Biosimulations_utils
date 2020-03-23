@@ -550,8 +550,6 @@ class SedMlSimReader(SimReader):
             :obj:`dict`: dictionary of annotated properties and their values
         """
         annotations_xml = obj_sed.getAnnotation()
-        for i_child in range(min(10, annotations_xml.getNumChildren())):
-            print(annotations_xml.getChild(i_child).toString())
 
         assert annotations_xml.getNumChildren() <= 1
         if annotations_xml.getNumChildren() == 0:

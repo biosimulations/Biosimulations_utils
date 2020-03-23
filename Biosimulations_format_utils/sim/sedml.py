@@ -6,39 +6,18 @@
 :License: MIT
 """
 
+from .core import SimWriter, SimReader
 from xml.sax import saxutils
 import abc
 import libsedml
 
 __all__ = [
-    'write_sedml',
-    'read_sedml',
-    'SedMlWriter',
-    'SedMlReader',
+    'SedMlSimWriter',
+    'SedMlSimReader',
 ]
 
 
-def write_sedml(model_species, sim, model_filename, sim_filename, level=1, version=3):
-    """ Encode a simulation experiment into SED-ML
-
-    Args:
-        model_species (:obj:`list` of :obj:`dict`): List of species in the model. Each species should have the key `id`
-        sim (:obj:`dict`): Simulation experiment
-        model_filename (:obj:`str`): Path to the model definition
-        sim_filename (:obj:`str`): Path to save simulation experiment in SED-ML format
-        level (:obj:`int`): SED-ML level
-        version (:obj:`int`): SED-ML version
-    """
-    if sim['model']['format']['name'] == 'SBML':
-        from .sbml import SbmlSedMlWriter
-        Writer = SbmlSedMlWriter
-    else:
-        raise NotImplementedError('Model format {} is not supported'.format(sim['model']['format']['name']))
-
-    return Writer().run(model_species, sim, model_filename, sim_filename, level=level, version=version)
-
-
-class SedMlWriter(abc.ABC):
+class SedMlSimWriter(SimWriter):
     """ Base class for SED-ML generator for each model format """
 
     MODEL_LANGUAGE_URN = None
@@ -462,40 +441,12 @@ class SedMlWriter(abc.ABC):
         return return_val
 
 
-def read_sedml(filename):
-    """ Read a simulation experiment from a SED-ML document
-
-    Args:
-        filename (:obj:`str`): path to SED-ML document that describes a simulation experiment
-
-    Returns:
-        :obj:`list` of :obj:`dict`: List of species in the model. Each species should have the key `id`
-        :obj:`dict`: Simulation experiment
-        :obj:`str`: Path to the model definition
-        :obj:`int`: SED-ML level
-        :obj:`int`: SED-ML version
-    """
-    from .sbml import SbmlSedMlReader
-
-    doc_sed = libsedml.readSedMLFromFile(filename)
-    assert doc_sed.getNumModels() == 1, "SED-ML document must have one model"
-    model_sed = doc_sed.getModel(0)
-    model_lang = model_sed.getLanguage()
-
-    if model_lang == SbmlSedMlReader.MODEL_LANGUAGE_URN:
-        Reader = SbmlSedMlReader
-    else:
-        raise NotImplementedError('Model format {} is not supported'.format(model_format))
-
-    return Reader().run(doc_sed)
-
-
-class SedMlReader(abc.ABC):
-    def run(self, doc_sed):
+class SedMlSimReader(SimReader):
+    def run(self, filename):
         """ Base class for reading a simulation experiment from a SED document
 
         Args:
-            doc_sed (:obj:`libsedml.SedDocument`): SED document
+            filename (:obj:`str`): path to SED-ML document that describes a simulation experiment
 
         Returns:
             :obj:`list` of :obj:`dict`: List of species in the model. Each species should have the key `id`
@@ -504,7 +455,7 @@ class SedMlReader(abc.ABC):
             :obj:`int`: SED-ML level
             :obj:`int`: SED-ML version
         """
-        sim = None
+        doc_sed = libsedml.readSedMLFromFile(filename)
 
         assert doc_sed.getNumModels() == 1, "SED-ML document must have one model"
         model_sed = doc_sed.getModel(0)
@@ -599,6 +550,9 @@ class SedMlReader(abc.ABC):
             :obj:`dict`: dictionary of annotated properties and their values
         """
         annotations_xml = obj_sed.getAnnotation()
+        for i_child in range(min(10, annotations_xml.getNumChildren())):
+            print(annotations_xml.getChild(i_child).toString())
+
         assert annotations_xml.getNumChildren() <= 1
         if annotations_xml.getNumChildren() == 0:
             return {}

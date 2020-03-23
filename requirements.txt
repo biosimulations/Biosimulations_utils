@@ -1,1 +1,3 @@
+python_libsbml
 python_libsedml
+wc_utils

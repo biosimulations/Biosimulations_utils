@@ -6,16 +6,23 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.sim import sedml
+from Biosimulations_format_utils.model import ModelFormat
+from Biosimulations_format_utils.sim import SimFormat, write_sim, read_sim, sedml
+import importlib
 import json
 import libsedml
 import os
 import shutil
 import tempfile
+import time
 import unittest
 
 
 class WriteSedMlTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        importlib.reload(libsedml)
+
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
 
@@ -31,9 +38,11 @@ class WriteSedMlTestCase(unittest.TestCase):
             sim = json.load(file)
         model_filename = os.path.join(self.dirname, 'model.sbml.xml')
         sim_filename = os.path.join(self.dirname, 'simulation.sed-ml.xml')
-        doc_sed = sedml.write_sedml(model_species, sim, model_filename, sim_filename)
+        write_sim(model_species, sim, model_filename, sim_filename,
+                  SimFormat.sedml, level=1, version=3)
 
-        model_species_2, sim_2, model_filename_2, level, version = sedml.read_sedml(sim_filename)
+        model_species_2, sim_2, model_filename_2, level, version = read_sim(
+            sim_filename, ModelFormat.sbml, SimFormat.sedml)
         self.assertEqual(
             set(s['id'] for s in model_species_2),
             set(s['id'] for s in model_species))
@@ -56,7 +65,7 @@ class WriteSedMlTestCase(unittest.TestCase):
             }
         }
         with self.assertRaisesRegex(ValueError, 'Format must be SED-ML'):
-            sedml.write_sedml(None, sim, None, None)
+            write_sim(None, sim, None, None, SimFormat.sedml, level=1, version=3)
 
         # other simulation experiments formats (e.g., SESSL) are not supported
         sim = {
@@ -70,7 +79,7 @@ class WriteSedMlTestCase(unittest.TestCase):
             }
         }
         with self.assertRaisesRegex(ValueError, 'Format must be SED-ML'):
-            sedml.write_sedml(None, sim, None, None)
+            write_sim(None, sim, None, None, SimFormat.sedml, level=1, version=3)
 
         # other simulation experiments formats (e.g., SESSL) are not supported
         sim = {
@@ -85,9 +94,9 @@ class WriteSedMlTestCase(unittest.TestCase):
             },
         }
         with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
-            sedml.write_sedml(None, sim, 'model.sbml.xml', None)
+            write_sim(None, sim, 'model.sbml.xml', None, SimFormat.sedml, level=1, version=3)
 
     def test__call_sedml_error(self):
         doc = libsedml.SedDocument()
         with self.assertRaisesRegex(ValueError, 'libsedml error:'):
-            sedml.SedMlWriter._call_libsedml_method(doc, doc, 'setName', 'name')
+            sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setName', 'name')

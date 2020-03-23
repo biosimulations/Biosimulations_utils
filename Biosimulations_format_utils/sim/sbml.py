@@ -6,17 +6,17 @@
 :License: MIT
 """
 
-from .sedml import SedMlWriter, SedMlReader
+from .sedml import SedMlSimWriter, SedMlSimReader
 import libsedml
 import re
 
-__all__ = ['SbmlSedMlWriter', 'SbmlSedMlReader']
+__all__ = ['SbmlSedMlSimWriter', 'SbmlSedMlSimReader']
 
 MODEL_LANGUAGE_URN = 'urn:sedml:sbml'
 MODEL_LANGUAGE_NAME = 'SBML'
 
 
-class SbmlSedMlWriter(SedMlWriter):
+class SbmlSedMlSimWriter(SedMlSimWriter):
     """ Writer for SED-ML for SBML models """
     MODEL_LANGUAGE_URN = MODEL_LANGUAGE_URN
     MODEL_LANGUAGE_NAME = MODEL_LANGUAGE_NAME
@@ -39,10 +39,10 @@ class SbmlSedMlWriter(SedMlWriter):
                     '/sbml:sbml',
                     'sbml:model',
                     'sbml:listOfReactions',
-                    'sbml:reaction[@id="{}"]'.format(change['parameter']['reactionId']),
+                    "sbml:reaction[@id='{}']".format(change['parameter']['reactionId']),
                     'sbml:kineticLaw',
                     'sbml:listOfLocalParameters',
-                    'sbml:localParameter[@id="{}"]'.format(change['parameter']['id']),
+                    "sbml:localParameter[@id='{}']".format(change['parameter']['id']),
                     '@value',
                 ]))
         else:
@@ -51,7 +51,7 @@ class SbmlSedMlWriter(SedMlWriter):
                     '/sbml:sbml',
                     'sbml:model',
                     'sbml:listOfParameters',
-                    'sbml:parameter[@id="{}"]'.format(change['parameter']['id']),
+                    "sbml:parameter[@id='{}']".format(change['parameter']['id']),
                     '@value',
                 ]))
         self._add_annotation_to_obj({'name': change['parameter']['name']}, doc_sed, change_sed)
@@ -68,10 +68,10 @@ class SbmlSedMlWriter(SedMlWriter):
         """
         self._call_libsedml_method(
             doc_sed, var_sed, 'setTarget',
-            '/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id="{}"]'.format(id))
+            "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(id))
 
 
-class SbmlSedMlReader(SedMlReader):
+class SbmlSedMlSimReader(SedMlSimReader):
     """ Reader for SED-ML for SBML models """
     MODEL_LANGUAGE_URN = MODEL_LANGUAGE_URN
     MODEL_LANGUAGE_NAME = MODEL_LANGUAGE_NAME
@@ -87,15 +87,15 @@ class SbmlSedMlReader(SedMlReader):
         """
         target = change_sed.getTarget()
 
-        match = re.search(r'/sbml:parameter\[@id="(.*?)"\]/', target)
+        match = re.search(r"/sbml:parameter\[@id='(.*?)'\]/", target)
         if match:
             reactionId = None
             id = match.group(1)
         else:
-            match = re.search(r'/sbml:reaction\[@id="(.*?)"\]/', target)
+            match = re.search(r"/sbml:reaction\[@id='(.*?)'\]/", target)
             reactionId = match.group(1)
 
-            match = re.search(r'/sbml:localParameter\[@id="(.*?)"\]/', target)
+            match = re.search(r"/sbml:localParameter\[@id='(.*?)'\]/", target)
             id = match.group(1)
 
         props = self._get_obj_annotation(change_sed)

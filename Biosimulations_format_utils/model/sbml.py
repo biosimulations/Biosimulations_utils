@@ -32,8 +32,20 @@ class SbmlModelReader(ModelReader):
         model_sbml = doc.getModel()
         return model_sbml
 
+    def _read_units(self, model_sbml, model):
+        """ Reead the units of a model
+
+        Args:
+            model_sbml (:obj:`libsbml.Model`): SBML-encoded model
+            model (:obj:`dict`): model
+        """
+        model['units'] = {}
+        for i_unit in range(model_sbml.getNumUnitDefinitions()):
+            unit_sbml = model_sbml.getUnitDefinition(i_unit)
+            model['units'][unit_sbml.getId()] = unit_sbml.printUnits(unit_sbml, True)
+
     def _read_parameters(self, model_sbml, model):
-        """ Reader information about the parameters of a model
+        """ Read information about the parameters of a model
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
@@ -46,7 +58,7 @@ class SbmlModelReader(ModelReader):
 
         for i_param in range(model_sbml.getNumParameters()):
             param_sbml = model_sbml.getParameter(i_param)
-            parameters.append(self._read_parameter(param_sbml))
+            parameters.append(self._read_parameter(param_sbml, model))
 
         for i_rxn in range(model_sbml.getNumReactions()):
             rxn_sbml = model_sbml.getReaction(i_rxn)
@@ -59,26 +71,31 @@ class SbmlModelReader(ModelReader):
 
             for i_param in range(kin_law_sbml.getNumParameters()):
                 param_sbml = kin_law_sbml.getParameter(i_param)
-                parameters.append(self._read_parameter(param_sbml, reaction_id=reaction_id, reaction_name=reaction_name))
+                parameters.append(self._read_parameter(param_sbml, model, reaction_id=reaction_id, reaction_name=reaction_name))
 
         return parameters
 
-    def _read_parameter(self, param_sbml, reaction_id=None, reaction_name=None):
+    def _read_parameter(self, param_sbml, model, reaction_id=None, reaction_name=None):
         """ Read information about a SBML parameter
 
         Args:
             param_sbml (:obj:`libsbml.Parameter`): SBML parameter
+            model (:obj:`dict`): model
             reaction_id (:obj:`str`, optional): id of the parent reaction (used by local parameters)
             reaction_name (:obj:`str`, optional): name of the parent reaction (used by local parameters)
 
         Returns:
             :obj:`dict`: information about the parameter
         """
+        units = param_sbml.getUnits() or None
+        if units:
+            units = model['units'][units]
+
         return {
             'reaction_id': reaction_id,
             'id': param_sbml.getId() or None,
             'reaction_name': reaction_name,
             'name': param_sbml.getName() or None,
             'value': param_sbml.getValue(),
-            'units': param_sbml.getUnits() or None,
+            'units': units,
         }

@@ -24,8 +24,9 @@ class ModelReader(abc.ABC):
             :obj:`dict`: model
         """
         model_orig = self._read_from_file(filename)
-        
+
         model = {}
+        self._read_units(model_orig, model)
         self._read_parameters(model_orig, model)
 
         return model
@@ -39,6 +40,16 @@ class ModelReader(abc.ABC):
 
         Returns:
             :obj:`object`: model encoded in a format such as SBML
+        """
+        pass  # pragma: no cover
+
+    @abc.abstractmethod
+    def _read_units(self, model_orig, model):
+        """ Read the units of a model
+
+        Args:
+            model_orig (:obj:`object`): original model encoded in a format such as SBML
+            model (:obj:`dict`): model
         """
         pass  # pragma: no cover
 

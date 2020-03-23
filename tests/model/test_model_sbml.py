@@ -20,7 +20,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
     def test_run_l2(self):
         filename = 'tests/fixtures/MODEL1204280027.sbml-L2V4.xml'
         model = read_model(filename, format=ModelFormat.sbml)
-        self.assertEqual(set(model.keys()), set(['parameters']))
+        self.assertEqual(set(model.keys()), set(['units', 'parameters']))
 
         self.assertEqual(len(model['parameters']), 37)
 
@@ -42,7 +42,6 @@ class ReadSbmlModelTestCase(unittest.TestCase):
     def test_run_l3(self):
         filename = 'tests/fixtures/BIOMD0000000018.sbml-L3V1.xml'
         model = read_model(filename, format=ModelFormat.sbml)
-        self.assertEqual(set(model.keys()), set(['parameters']))
 
         self.assertEqual(len(model['parameters']), 107)
 
@@ -56,9 +55,15 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         self.assertEqual(lcl_params, [
             {'reaction_id': 'SHMT', 'id': 'Km1', 'reaction_name': None, 'name': None, 'value': 1.7, 'units': None},
             {'reaction_id': 'SHMT', 'id': 'Km2', 'reaction_name': None, 'name': None, 'value': 210, 'units': None},
-            {'reaction_id': 'SHMT', 'id': 'Vm', 'reaction_name': None, 'name': None, 'value': 18330, 'units': None},            
+            {'reaction_id': 'SHMT', 'id': 'Vm', 'reaction_name': None, 'name': None, 'value': 18330, 'units': None},
         ])
 
     def test_run_file_does_not_exist(self):
         with self.assertRaisesRegex(ValueError, 'does not exist'):
             read_model('__non_existant_file__', format=ModelFormat.sbml)
+
+    def test_run_units(self):
+        filename = 'tests/fixtures/BIOMD0000000821.sbml-L2V4.xml'
+        model = read_model(filename, format=ModelFormat.sbml)
+        param = list(filter(lambda param: param['id'] == 'lambda_1', model['parameters']))[0]
+        self.assertEqual(param['units'], '(8640 second)^-1')

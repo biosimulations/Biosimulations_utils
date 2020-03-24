@@ -20,7 +20,21 @@ class ReadSbmlModelTestCase(unittest.TestCase):
     def test_run_l2(self):
         filename = 'tests/fixtures/MODEL1204280027.sbml-L2V4.xml'
         model = read_model(filename, format=ModelFormat.sbml)
-        self.assertEqual(set(model.keys()), set(['units', 'parameters']))
+        self.assertEqual(set(model.keys()), set(['format', 'framework', 'taxon', 'units', 'parameters']))
+
+        self.assertEqual(model['format'], {
+            'name': 'SBML',
+            'version': 'L2V4',
+            'edamId': 'format_2585',
+            'url': 'http://sbml.org',
+        })
+
+        self.assertEqual(model['framework']['name'], 'non-spatial continuous framework')
+
+        self.assertEqual(model['taxon'], {
+            'id': 10090,
+            'name': 'Mus musculus',
+        })
 
         self.assertEqual(len(model['parameters']), 37)
 
@@ -61,6 +75,11 @@ class ReadSbmlModelTestCase(unittest.TestCase):
     def test_run_file_does_not_exist(self):
         with self.assertRaisesRegex(ValueError, 'does not exist'):
             read_model('__non_existant_file__', format=ModelFormat.sbml)
+
+    def test_run_fbc_framework(self):
+        filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'
+        model = read_model(filename, format=ModelFormat.sbml)
+        self.assertEqual(model['framework']['name'], 'flux balance framework')
 
     def test_run_units(self):
         filename = 'tests/fixtures/BIOMD0000000821.sbml-L2V4.xml'

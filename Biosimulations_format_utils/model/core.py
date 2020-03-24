@@ -26,6 +26,8 @@ class ModelReader(abc.ABC):
         model_orig = self._read_from_file(filename)
 
         model = {}
+        self._read_format(model_orig, model)
+        self._read_metadata(model_orig, model)
         self._read_units(model_orig, model)
         self._read_parameters(model_orig, model)
 
@@ -40,6 +42,26 @@ class ModelReader(abc.ABC):
 
         Returns:
             :obj:`object`: model encoded in a format such as SBML
+        """
+        pass  # pragma: no cover
+
+    @abc.abstractmethod
+    def _read_format(self, model_orig, model):
+        """ Read the format of a model
+
+        Args:
+            model_orig (:obj:`object`): original model encoded in a format such as SBML
+            model (:obj:`dict`): model
+        """
+        pass  # pragma: no cover
+
+    @abc.abstractmethod
+    def _read_metadata(self, model_orig, model):
+        """ Read the metadata of a model
+
+        Args:
+            model_orig (:obj:`object`): original model encoded in a format such as SBML
+            model (:obj:`dict`): model
         """
         pass  # pragma: no cover
 

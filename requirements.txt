@@ -1,3 +1,6 @@
+ete3
 python_libsbml
 python_libsedml
+requests
+requests_cache
 wc_utils

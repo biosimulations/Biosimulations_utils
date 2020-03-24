@@ -186,6 +186,7 @@ class SbmlModelReader(ModelReader):
             XmlName('rdf', 'Bag'),
             XmlName('rdf', 'li'),
         ])
+        model['taxon'] = None
         if taxon_xml:
             taxon_url = self._get_xml_attr_by_name(taxon_xml, XmlName('rdf', 'resource'))
             match = re.match(r'https?://identifiers.org/taxonomy/(\d+)', taxon_url)
@@ -253,7 +254,7 @@ class SbmlModelReader(ModelReader):
             :obj:`dict`: information about the parameter
         """
         units = param_sbml.getUnits() or None
-        if units:
+        if units and units != 'dimensionless':
             units = model['units'][units]
 
         return {
@@ -265,7 +266,8 @@ class SbmlModelReader(ModelReader):
             'units': units,
         }
 
-    def _get_xml_child_by_names(self, node, names):
+    @classmethod
+    def _get_xml_child_by_names(cls, node, names):
         """ Get the child of an XML element with a prefix and name
 
         Args:
@@ -278,10 +280,11 @@ class SbmlModelReader(ModelReader):
         for name in names:
             if not node:
                 break
-            node = self._get_xml_child_by_name(node, name)
+            node = cls._get_xml_child_by_name(node, name)
         return node
 
-    def _get_xml_child_by_name(self, node, name):
+    @classmethod
+    def _get_xml_child_by_name(cls, node, name):
         """ Get the child of an XML element with a prefix and name
 
         Args:
@@ -301,7 +304,8 @@ class SbmlModelReader(ModelReader):
         else:
             return None
 
-    def _get_xml_attr_by_name(self, node, name):
+    @classmethod
+    def _get_xml_attr_by_name(cls, node, name):
         """ Get an attribute of an XML element with a prefix and name
 
         Args:

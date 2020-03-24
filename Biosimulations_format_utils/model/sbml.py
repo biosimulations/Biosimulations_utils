@@ -193,10 +193,14 @@ class SbmlModelReader(ModelReader):
             if match:
                 taxon_id = int(match.group(1))
                 ncbi_taxa = ete3.NCBITaxa()
-                model['taxon'] = {
-                    'id': taxon_id,
-                    'name': ncbi_taxa.get_taxid_translator([taxon_id])[taxon_id],
-                }
+                taxon_name = ncbi_taxa.get_taxid_translator([taxon_id]).get(taxon_id, None)
+                if taxon_name:
+                    model['taxon'] = {
+                        'id': taxon_id,
+                        'name': taxon_name,
+                    }
+                else:
+                    model['taxon_name'] = None
 
     def _read_units(self, model_sbml, model):
         """ Read the units of a model
@@ -254,7 +258,7 @@ class SbmlModelReader(ModelReader):
             :obj:`dict`: information about the parameter
         """
         units = param_sbml.getUnits() or None
-        if units and units != 'dimensionless':
+        if units and units not in ['dimensionless', 'gram', 'hertz', 'item', 'kelvin', 'kilogram', 'second', 'volt']:
             units = model['units'][units]
 
         return {

@@ -32,6 +32,17 @@ class ImportBioModels(object):
     BIOSIMULATIONS_ENDPOINT = 'https://api.biosimulations.dev'
     NUM_MODELS_PER_BATCH = 100
     MAX_RETRIES = 5
+    SKIP_MODELS = set([
+        'BIOMD0000000173',  # undefined 'time' units
+        # 'BIOMD0000000232', # unit kelvin undefined
+        # 'BIOMD0000000241', # unit kilogram undefined
+        # 'BIOMD0000000246', # unit hertz undefined
+        # 'BIOMD0000000255', # unit item undefined
+        # 'BIOMD0000000327', # units second, volt undefined
+        # 'BIOMD0000000504', # invalid PubMed publication id
+        # 'BIOMD0000000619', # unit gram undefined
+        # 'BIOMD0000000765', # invalid taxonomy id
+    ])
 
     def __init__(self, _max_models=float('inf'), _cache_dir=None):
         self._max_models = _max_models
@@ -72,6 +83,8 @@ class ImportBioModels(object):
             results = self.get_model_batch(num_results=self.NUM_MODELS_PER_BATCH, i_batch=i_batch)
             for model_result in results['models']:
                 print('  {}. {}: {}'.format(len(models) + 1, model_result['id'], model_result['name']))
+                if model_result['id'] in self.SKIP_MODELS:
+                    continue
                 models.append(self.get_model(model_result['id']))
                 if len(models) == self._max_models:
                     break
@@ -120,54 +133,11 @@ class ImportBioModels(object):
         """
         metadata = self.get_model_metadata(id)
 
-        match = re.match(r'^https?://identifiers\.org/pubmed/(\d+)$', metadata['publication']['link'])
-        if match:
-            pubmed_id = match.group(1)
-            response = self._requests_session.get(self.PUBMED_ENDPOINT, params={
-                'db': 'pubmed',
-                'id': pubmed_id,
-                'retmode': 'xml'
-            })
-            response.raise_for_status()
-            pub_xml = xml.etree.ElementTree.fromstring(response.content).find('PubmedArticle')
-
-            doi = None
-            pub_ids_xml = pub_xml.find('PubmedData').find('ArticleIdList').findall('ArticleId')
-            for pub_id_xml in pub_ids_xml:
-                if pub_id_xml.get('IdType') == 'doi':
-                    doi = pub_id_xml.text
-                    break
-
-            authors = []
-            authors_str = []
-            authors_xml = pub_xml.find('MedlineCitation').find('Article').find('AuthorList').findall('Author')
-            for author_xml in authors_xml:
-                last_name = author_xml.find('LastName').text or None
-                first_name, _, middle_name = author_xml.find('ForeName').text.partition(' ')
-                first_name = first_name or None
-                middle_name = middle_name or None
-
-                authors.append({
-                    'lastName': last_name,
-                    'firstName': first_name,
-                    'middleName': middle_name,
-                })
-
-                author_str = []
-                if first_name:
-                    author_str.append(first_name)
-                if middle_name:
-                    author_str.append(middle_name)
-                if last_name:
-                    author_str.append(last_name)
-
-                if author_str:
-                    authors_str.append(' '.join(author_str))
-        else:
+        if 'publication' in metadata:
             doi = None
             authors = []
             authors_str = []
-            for author in metadata['publication']['authors']:
+            for author in metadata['publication'].get('authors', []):
                 last_name, _, first_name = author['name'].partition(' ')
 
                 authors.append({'firstName': first_name, 'middleName': None, 'lastName': last_name})
@@ -181,10 +151,86 @@ class ImportBioModels(object):
                 if author_str:
                     authors_str.append(' '.join(author_str))
 
-        if len(authors_str) == 1:
-            authors_str = authors_str[-1]
+            match = re.match(r'^https?://identifiers\.org/pubmed/(\d+)$', metadata['publication']['link'])
+
+            if match:
+                pubmed_id = match.group(1)
+                response = self._requests_session.get(self.PUBMED_ENDPOINT, params={
+                    'db': 'pubmed',
+                    'id': pubmed_id,
+                    'retmode': 'xml'
+                })
+                response.raise_for_status()
+                pub_xml = xml.etree.ElementTree.fromstring(response.content).find('PubmedArticle')
+
+                doi = None
+                if pub_xml:
+                    pub_ids_xml = pub_xml.find('PubmedData').find('ArticleIdList').findall('ArticleId')
+                    for pub_id_xml in pub_ids_xml:
+                        if pub_id_xml.get('IdType') == 'doi':
+                            doi = pub_id_xml.text
+                            break
+
+                authors = []
+                authors_str = ''
+                if pub_xml:
+                    authors_str = []
+                    authors_xml = pub_xml.find('MedlineCitation').find('Article').find('AuthorList').findall('Author')
+                    for author_xml in authors_xml:
+                        last_name_xml = author_xml.find('LastName')
+                        if last_name_xml is not None:
+                            last_name = last_name_xml.text or None
+                        else:
+                            last_name = None
+
+                        fore_name_xml = author_xml.find('ForeName')
+                        if fore_name_xml is not None:
+                            first_name, _, middle_name = fore_name_xml.text.partition(' ')
+                            first_name = first_name or None
+                            middle_name = middle_name or None
+                        else:
+                            first_name = None
+                            middle_name = None
+
+                        authors.append({
+                            'lastName': last_name,
+                            'firstName': first_name,
+                            'middleName': middle_name,
+                        })
+
+                        author_str = []
+                        if first_name:
+                            author_str.append(first_name)
+                        if middle_name:
+                            author_str.append(middle_name)
+                        if last_name:
+                            author_str.append(last_name)
+
+                        if author_str:
+                            authors_str.append(' '.join(author_str))
+
+            if len(authors_str) == 0:
+                authors_str = ''
+            elif len(authors_str) == 1:
+                authors_str = authors_str[-1]
+            else:
+                authors_str = ', '.join(authors_str[0:-1]) + ' & ' + authors_str[-1]
+
+            refs = [
+                {
+                    'authors': authors_str,
+                    'title': metadata['publication']['title'],
+                    'journal': metadata['publication']['journal'],
+                    'volume': metadata['publication'].get('volume', None),
+                    'num': metadata['publication'].get('issue', None),
+                    'pages': metadata['publication'].get('pages', None),
+                    'year': metadata['publication'].get('year', None),
+                    'doi': doi,
+                },
+            ]
         else:
-            authors_str = ', '.join(authors_str[0:-1]) + ' & ' + authors_str[-1]
+            authors = []
+            refs = []
 
         filename = self.get_model_files_metadata(id)['main'][0]['name']
         local_path = os.path.join(self._cache_dir, filename)
@@ -193,15 +239,16 @@ class ImportBioModels(object):
 
         model = read_model(local_path, format=ModelFormat.sbml)
 
-        description = metadata['description']
-        try:
-            description_xml = xml.dom.minidom.parseString(description)
-            for div_xml in description_xml.getElementsByTagNameNS('http://www.w3.org/1999/xhtml', 'div'):
-                if div_xml.getAttribute('class') == 'dc:description':
-                    div_xml.removeAttribute('class')
-                    description = div_xml.toxml()
-        except Exception:
-            pass
+        description = metadata.get('description', None)
+        if description:
+            try:
+                description_xml = xml.dom.minidom.parseString(description)
+                for div_xml in description_xml.getElementsByTagNameNS('http://www.w3.org/1999/xhtml', 'div'):
+                    if div_xml.getAttribute('class') == 'dc:description':
+                        div_xml.removeAttribute('class')
+                        description = div_xml.toxml()
+            except Exception:
+                pass
 
         return {
             'id': id,
@@ -224,18 +271,7 @@ class ImportBioModels(object):
                     'id': metadata['publicationId'],
                 },
             ],
-            'refs': [
-                {
-                    'authors': authors_str,
-                    'title': metadata['publication']['title'],
-                    'journal': metadata['publication']['journal'],
-                    'volume': metadata['publication']['volume'],
-                    'num': metadata['publication'].get('issue', None),
-                    'pages': metadata['publication']['pages'],
-                    'year': metadata['publication']['year'],
-                    'doi': doi,
-                },
-            ],
+            'refs': refs,
             'authors': authors,
             'license': 'CC0',
         }

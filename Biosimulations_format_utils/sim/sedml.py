@@ -257,7 +257,7 @@ class SedMlSimWriter(SimWriter):
         """
         data_gen_sed = doc_sed.createDataGenerator()
         self._call_libsedml_method(doc_sed, data_gen_sed, 'setId', 'data_gen_' + id)
-        self._call_libsedml_method(doc_sed, data_gen_sed, 'setName', 'time')
+        self._call_libsedml_method(doc_sed, data_gen_sed, 'setName', name)
         return data_gen_sed
 
     def _add_var_to_data_gen(self, id, name, symbol, doc_sed, data_gen_sed, task_sed):

@@ -51,16 +51,16 @@
     {
       "parameter": {
         "id": "k_1",
-        "reactionId": null,
-        "name": "Kinetic constant 1"
+        "name": "Kinetic constant 1",
+        "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='k_1']/@value"
       },
       "value": 1.1
     },
     {
       "parameter": {
         "id": "k_2",
-        "reactionId": "r_2",
-        "name": "Kinetic constant 2"
+        "name": "Reaction 2: Kinetic constant 2",
+        "target": "/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='r_2']/sbml:kineticLaw/sbml:listOfLocalParameters/sbml:localParameter[@id='k_2']/@value"
       },
       "value": 2.1
     }

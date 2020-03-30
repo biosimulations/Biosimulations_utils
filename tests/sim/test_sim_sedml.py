@@ -31,8 +31,8 @@ class WriteSedMlTestCase(unittest.TestCase):
 
     def test_gen_sedml(self):
         model_species = [
-            {'id': 'species_1'},
-            {'id': 'species_2'},
+            {'id': 'species_1', 'target': "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_1']"},
+            {'id': 'species_2', 'target': "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_2']"},
         ]
         with open('tests/fixtures/simulation.json', 'rb') as file:
             sim = json.load(file)
@@ -103,8 +103,6 @@ class WriteSedMlTestCase(unittest.TestCase):
         }
         with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
             write_sim(None, sim, 'model.sbml.xml', None, SimFormat.sedml, level=1, version=3)
-
-
 
     def test__call_sedml_error(self):
         doc = libsedml.SedDocument()

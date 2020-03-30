@@ -23,10 +23,10 @@ class SedMlSimWriter(SimWriter):
     MODEL_LANGUAGE_URN = None
     MODEL_LANGUAGE_NAME = None
 
-    def run(self, model_species, sim, model_filename, sim_filename, level=1, version=3):
+    def run(self, model_vars, sim, model_filename, sim_filename, level=1, version=3):
         """
         Args:
-            model_species (:obj:`list` of :obj:`dict`): List of species in the model. Each species should have the key `id`
+            model_vars (:obj:`list` of :obj:`dict`): List of variables in the model. Each variable should have the keys `id` and `target`
             sim (:obj:`dict`): Simulation experiment
             model_filename (:obj:`str`): Path to the model definition
             sim_filename (:obj:`str`): Path to save simulation experiment in SED-ML format
@@ -55,7 +55,7 @@ class SedMlSimWriter(SimWriter):
         self._add_var_to_data_gen('time', 'time', 'urn:sedml:symbol:time', doc_sed, time_gen_sed, task_sed)
         self._add_data_set_to_report('time', 'time', doc_sed, report_sed, time_gen_sed)
 
-        self._add_task_results_to_report(model_species, doc_sed, task_sed, report_sed)
+        self._add_task_results_to_report(model_vars, doc_sed, task_sed, report_sed)
 
         self._export_doc(doc_sed, sim_filename)
 
@@ -131,7 +131,6 @@ class SedMlSimWriter(SimWriter):
             changes_sed.append(self._add_parameter_change_to_model(change, doc_sed, model_sed))
         return changes_sed
 
-    @abc.abstractmethod
     def _add_parameter_change_to_model(self, change, doc_sed, model_sed):
         """ Add a model parameter change to a SED document
 
@@ -143,7 +142,14 @@ class SedMlSimWriter(SimWriter):
         Returns:
             :obj:`libsedml.SedChangeAttribute`: SED model parameter change
         """
-        pass  # pragma: no cover
+        change_sed = model_sed.createChangeAttribute()
+        self._call_libsedml_method(doc_sed, change_sed, 'setTarget', change['parameter']['target'])
+        self._add_annotation_to_obj({
+            'id': change['parameter']['id'],
+            'name': change['parameter']['name'],
+        }, doc_sed, change_sed)
+        self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change['value']))
+        return change_sed
 
     def _add_timecourse_sim_to_doc(self, sim, doc_sed):
         """ Add a timecourse simulation to a SED document
@@ -302,11 +308,11 @@ class SedMlSimWriter(SimWriter):
         self._call_libsedml_method(doc_sed, dataset_sed, 'setDataReference', data_gen_sed.getId())
         return dataset_sed
 
-    def _add_task_results_to_report(self, species, doc_sed, task_sed, report_sed):
+    def _add_task_results_to_report(self, vars, doc_sed, task_sed, report_sed):
         """ Add simulation predictions to a SED report
 
         Args:
-            species (:obj:`list` of :obj:`dict`): species predicted by a model
+            vars (:obj:`list` of :obj:`dict`): variables predicted by a model
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             task_sed (:obj:`libsedml.SedTask`): SED task
             report_sed (:obj:`libsedml.SedReport`): SED report
@@ -316,28 +322,17 @@ class SedMlSimWriter(SimWriter):
                 simulation prediction
         """
         seds = []
-        for spec in species:
-            id = spec['id']
+        for var in vars:
+            id = var['id']
             data_gen_sed = self._add_data_gen_to_doc(id, id, doc_sed)
             var_sed = self._add_var_to_data_gen(id, id, None, doc_sed, data_gen_sed, task_sed)
-            self._set_var_target(id, doc_sed, var_sed)
+            self._call_libsedml_method(doc_sed, var_sed, 'setTarget', var['target'])
             self._add_data_set_to_report(id, id, doc_sed, report_sed, data_gen_sed)
             seds.append({
                 'data_gen': data_gen_sed,
                 'var': var_sed,
             })
         return seds
-
-    @abc.abstractmethod
-    def _set_var_target(self, id, doc_sed, var_sed):
-        """ Set the target of a SED variable
-
-        Args:
-            id (:obj:`str`): id
-            doc_sed (:obj:`libsedml.SedDocument`): SED document
-            var_sed (:obj:`libsedml.SedVariable`): SED: variable
-        """
-        pass  # pragma: no cover
 
     def _export_doc(self, doc_sed, filename):
         """ Export a SED document to an XML file
@@ -449,7 +444,7 @@ class SedMlSimReader(SimReader):
             filename (:obj:`str`): path to SED-ML document that describes a simulation experiment
 
         Returns:
-            :obj:`list` of :obj:`dict`: List of species in the model. Each species should have the key `id`
+            :obj:`list` of :obj:`dict`: List of variables in the model. Each variable should have the keys `id` and `target`
             :obj:`dict`: Simulation experiment
             :obj:`str`: Path to the model definition
             :obj:`int`: SED-ML level
@@ -466,17 +461,21 @@ class SedMlSimReader(SimReader):
         assert doc_sed.getNumSimulations() == 1, "SED-ML document must have one simulation"
         sim_sed = doc_sed.getSimulation(0)
 
-        # model species
-        model_species = []
+        # model variables
+        model_vars = []
         for i_data_gen in range(doc_sed.getNumDataGenerators()):
             data_gen_sed = doc_sed.getDataGenerator(i_data_gen)
-            data_gen_id = data_gen_sed.getId()
-            assert data_gen_id.startswith('data_gen_'), "Data generator id must start with `data_gen_`"
-            species_id = data_gen_id[len('data_gen_'):]
-            if species_id != 'time':
-                model_species.append({
-                    'id': species_id
-                })
+
+            for i_var in range(data_gen_sed.getNumVariables()):
+                var_sed = data_gen_sed.getVariable(i_var)
+                var_id = var_sed.getId()
+                var_id = var_id[len('var_'):]
+
+                if var_id != 'time':
+                    model_vars.append({
+                        'id': var_id,
+                        'target': var_sed.getTarget(),
+                    })
 
         # initialize simulation experiment with metadata
         sim = self._get_obj_annotation(doc_sed)
@@ -538,7 +537,27 @@ class SedMlSimReader(SimReader):
         version = doc_sed.getVersion()
 
         # return simulation experiment
-        return (model_species, sim, model_filename, level, version)
+        return (model_vars, sim, model_filename, level, version)
+
+    def _get_parameter_change_from_model(self, change_sed):
+        """ Get a model parameter change from a SED change attribute
+
+        Args:
+            change_sed (:obj:`libsedml.SedChangeAttribute`): SED change attribute
+
+        Returns:
+            obj:`dict`: model parameter change
+        """
+        props = self._get_obj_annotation(change_sed)
+
+        return {
+            "parameter": {
+                "id": props.get('id', None),
+                "name": props.get('name', None),
+                "target": change_sed.getTarget(),
+            },
+            "value": float(change_sed.getNewValue())
+        }
 
     def _get_obj_annotation(self, obj_sed):
         """ Get the annotated properies of a SED object

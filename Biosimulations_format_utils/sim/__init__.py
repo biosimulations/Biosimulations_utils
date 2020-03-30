@@ -19,11 +19,11 @@ class SimFormat(int, wc_utils.util.enumerate.CaseInsensitiveEnum):
     SESSL = 2  # SESSL
 
 
-def write_sim(model_species, sim, model_filename, sim_filename, sim_format, **sim_format_opts):
+def write_sim(model_vars, sim, model_filename, sim_filename, sim_format, **sim_format_opts):
     """ Write a simulation experiment to a file
 
     Args:
-        model_species (:obj:`list` of :obj:`dict`): List of species in the model. Each species should have the key `id`
+        model_vars (:obj:`list` of :obj:`dict`): List of variables in the model. Each variable should have the keys `id` and `target`.
         sim (:obj:`dict`): Simulation experiment
         model_filename (:obj:`str`): Path to the model definition
         sim_filename (:obj:`str`): Path to save simulation experiment in SED-ML format
@@ -38,7 +38,7 @@ def write_sim(model_species, sim, model_filename, sim_filename, sim_format, **si
             raise NotImplementedError('Model format {} is not supported'.format(model_format.name))
     else:
         raise NotImplementedError("Simulation experiment format {} is not supported".format(sim_format.name))
-    return Writer().run(model_species, sim, model_filename, sim_filename, **sim_format_opts)
+    return Writer().run(model_vars, sim, model_filename, sim_filename, **sim_format_opts)
 
 
 def read_sim(filename, model_format, sim_format):
@@ -50,7 +50,7 @@ def read_sim(filename, model_format, sim_format):
         sim_format (:obj:`SimFormat`): simulation experiment format
 
     Returns:
-        :obj:`list` of :obj:`dict`: List of species in the model. Each species should have the key `id`
+        :obj:`list` of :obj:`dict`: List of variables in the model. Each variable will have the keys `id` and `target`.
         :obj:`dict`: Simulation experiment
         :obj:`str`: Path to the model definition
         :obj:`dict`: simulation experiment format options (e.g., level, version)

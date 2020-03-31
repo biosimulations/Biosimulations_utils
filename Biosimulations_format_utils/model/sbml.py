@@ -206,7 +206,7 @@ class SbmlModelReader(ModelReader):
         model['units'] = {}
         for i_unit_def in range(model_sbml.getNumUnitDefinitions()):
             unit_def_sbml = model_sbml.getUnitDefinition(i_unit_def)
-            model['units'][unit_def_sbml.getId()] = self._format_units(unit_def_sbml.getDerivedUnitDefinition())
+            model['units'][unit_def_sbml.getId()] = self._format_unit_def(unit_def_sbml.getDerivedUnitDefinition())
 
         return model['units']
 
@@ -220,12 +220,14 @@ class SbmlModelReader(ModelReader):
         Returns:
             :obj:`list` of :obj:`dict`: information about parameters
         """
-        model['parameters'] = parameters = []
+        parameters = {}
 
+        # global parameters
         for i_param in range(model_sbml.getNumParameters()):
             param_sbml = model_sbml.getParameter(i_param)
-            parameters.append(self._read_parameter(param_sbml, model))
+            parameters[param_sbml.getId()] = self._read_parameter(param_sbml, model)
 
+        # local parameters of reactions
         for i_rxn in range(model_sbml.getNumReactions()):
             rxn_sbml = model_sbml.getReaction(i_rxn)
 
@@ -239,9 +241,86 @@ class SbmlModelReader(ModelReader):
             for i_param in range(kin_law_sbml.getNumParameters()):
                 assert reaction_id
                 param_sbml = kin_law_sbml.getParameter(i_param)
-                parameters.append(self._read_parameter(param_sbml, model, reaction_id=reaction_id, reaction_name=reaction_name))
+                parameters[(reaction_id, param_sbml.getId())] = self._read_parameter(
+                    param_sbml, model, reaction_id=reaction_id, reaction_name=reaction_name)
 
-        return parameters
+        # compartment sizes
+        for i_comp in range(model_sbml.getNumCompartments()):
+            comp_sbml = model_sbml.getCompartment(i_comp)
+            comp_id = comp_sbml.getId()
+            assert comp_id
+            comp_name = comp_sbml.getName() or comp_id
+            parameters[comp_id] = {
+                'target': "/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@id='{}']/@size".format(comp_id),
+                'type': 'Initial compartment size',
+                'id': "init_size_{}".format(comp_id),
+                'name': 'Initial size of {}'.format(comp_name),
+                'value': comp_sbml.getSize(),
+                'units': self._format_unit_def(comp_sbml.getDerivedUnitDefinition()),
+            }
+
+        # initial amounts / concentrations of species
+        for i_species in range(model_sbml.getNumSpecies()):
+            species_sbml = model_sbml.getSpecies(i_species)
+
+            species_id = species_sbml.getId()
+            assert species_id
+
+            species_name = species_sbml.getName() or species_id
+            
+            species_substance_units = model['units'].get(species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits(), None)
+            if species_sbml.isSetInitialConcentration():
+                species_initial_type = 'Concentration'
+                species_initial_val = species_sbml.getInitialConcentration()                
+
+                comp_sbml = self._get_compartment(model_sbml, species_sbml.getCompartment())
+
+                if species_substance_units:
+                    species_initial_units = self._pretty_print_units('({}) / ({})'.format(
+                        species_substance_units,
+                        self._format_unit_def(comp_sbml.getDerivedUnitDefinition())
+                    ))
+                else:
+                    species_initial_units = None
+            else:
+                species_initial_type = 'Amount'
+                species_initial_val = species_sbml.getInitialAmount()
+                species_initial_units = species_substance_units
+
+            parameters[species_id] = {
+                'target': '/' + '/'.join([
+                    "sbml:sbml",
+                    "sbml:model",
+                    "sbml:listOfSpecies",
+                    "sbml:species[@id='{}']".format(species_id),
+                    "@initial{}".format(species_initial_type),
+                ]),
+                'type': 'Initial variable value',
+                'id': "init_{}_{}".format(species_initial_type.lower(), species_id),
+                'name': 'Initial {} of {}'.format(species_initial_type.lower(), species_name),
+                'value': species_initial_val,
+                'units': species_initial_units,
+            }
+            if species_id == 'species_1':
+                print(parameters[species_id])
+
+        # ignore parameters set via assignment rules and initial assignments
+        for i_rule in range(model_sbml.getNumRules()):
+            rule_sbml = model_sbml.getRule(i_rule)
+            if rule_sbml.isScalar():
+                param_id = rule_sbml.getVariable()
+                if param_id in parameters:
+                    parameters.pop(param_id)
+
+        for i_init_assign in range(model_sbml.getNumInitialAssignments()):
+            init_assign_sbml = model_sbml.getInitialAssignment(i_init_assign)
+            param_id = init_assign_sbml.getSymbol()
+            if param_id in parameters:
+                parameters.pop(param_id)
+
+        # return parameters
+        model['parameters'] = parameters.values()
+        return model['parameters']
 
     def _read_parameter(self, param_sbml, model, reaction_id=None, reaction_name=None):
         """ Read information about a SBML parameter
@@ -259,10 +338,11 @@ class SbmlModelReader(ModelReader):
 
         param = {
             'target': None,
+            'type': 'Other parameter',
             'id': param_sbml.getId(),
             'name': param_sbml.getName() or None,
             'value': param_sbml.getValue(),
-            'units': self._format_units(param_sbml.getDerivedUnitDefinition()),
+            'units': self._format_unit_def(param_sbml.getDerivedUnitDefinition()),
         }
 
         if reaction_id:
@@ -339,10 +419,7 @@ class SbmlModelReader(ModelReader):
         comp_id = species_sbml.getCompartment() or None
         comp_name = None
         if comp_id:
-            for i_comp in range(model_sbml.getNumCompartments()):
-                comp_sbml = model_sbml.getCompartment(i_comp)
-                if comp_sbml.getId() == comp_id:
-                    break
+            comp_sbml = self._get_compartment(model_sbml, comp_id)
             comp_name = comp_sbml.getName()
 
         var = {
@@ -351,14 +428,29 @@ class SbmlModelReader(ModelReader):
             'name': species_sbml.getName() or None,
             'compartment_id': comp_id,
             'compartment_name': comp_name,
-            'units': self._format_units(species_sbml.getDerivedUnitDefinition()),
+            'units': self._format_unit_def(species_sbml.getDerivedUnitDefinition()),
             'constant': species_sbml.getConstant(),
             'boundary_condition': species_sbml.getBoundaryCondition(),
         }
 
         return var
 
-    def _format_units(self, unit_def_sbml):
+    def _get_compartment(self, model_sbml, comp_id):
+        """ Get a compartment
+
+        Args:
+            model_sbml (:obj:`libsbml.Model`): SBML-encoded model
+            comp_id (:obj:`str`): compartment id
+
+        Returns:
+            :obj:`libsbml.Compartment`: compartment
+        """
+        for i_comp in range(model_sbml.getNumCompartments()):
+            comp_sbml = model_sbml.getCompartment(i_comp)
+            if comp_sbml.getId() == comp_id:
+                return comp_sbml
+
+    def _format_unit_def(self, unit_def_sbml):
         """ Get a human-readable representation of a unit definition
 
         Args:
@@ -374,22 +466,7 @@ class SbmlModelReader(ModelReader):
         if unit_def_str == 'indeterminable':
             return None
 
-        unit_def_exp = self._unit_registry.parse_expression(unit_def_str.replace(', ', ' * '))
-        mag = unit_def_exp.magnitude
-        pow = math.floor(math.log10(mag))
-        mag = round(mag / math.pow(10, pow), 3)
-        units = str(unit_def_exp.units)
-
-        if pow == 0:
-            if mag == 1:
-                return units
-            else:
-                return '{} {}'.format(mag, units)
-        else:
-            if mag == 1:
-                return '10^{} {}'.format(pow, units)
-            else:
-                return '{} 10^{} {}'.format(mag, pow, units)
+        return self._pretty_print_units(unit_def_str.replace(', ', ' * '))
 
     @classmethod
     def _get_xml_child_by_names(cls, node, names):

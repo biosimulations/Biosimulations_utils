@@ -39,12 +39,14 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         })
 
         # parameters
-        self.assertEqual(len(model['parameters']), 37)
+        other_params = list(filter(lambda param: param['type'] == 'Other parameter', model['parameters']))
+        self.assertEqual(len(other_params), 37)
 
-        gbl_params = list(filter(lambda param: '.' not in param['id'], model['parameters']))
+        gbl_params = list(filter(lambda param: '.' not in param['id'], other_params))
         self.assertEqual(gbl_params, [
             {
                 'target': "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='parameter_1']/@value",
+                'type': 'Other parameter',
                 'id': 'parameter_1',
                 'name': 'quantity_1',
                 'value': 0.0,
@@ -52,12 +54,13 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             },
         ])
 
-        lcl_params = list(filter(lambda param: param['id'].startswith('reaction_1.'), model['parameters']))
+        lcl_params = list(filter(lambda param: param['id'].startswith('reaction_1.'), other_params))
         lcl_params.sort(key=lambda param: param['id'])
         self.assertEqual(lcl_params, [
             {
                 'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='reaction_1']"
                            "/sbml:kineticLaw/sbml:listOfParameters/sbml:parameter[@id='k1']/@value"),
+                'type': 'Other parameter',
                 'id': 'reaction_1.k1',
                 'name': '15: k1',
                 'value': 0.02,
@@ -66,12 +69,34 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             {
                 'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='reaction_1']"
                            "/sbml:kineticLaw/sbml:listOfParameters/sbml:parameter[@id='k2']/@value"),
+                'type': 'Other parameter',
                 'id': 'reaction_1.k2',
                 'name': '15: k2',
                 'value': 1.0,
                 'units': None
             },
         ])
+
+        init_comp_size_params = list(filter(lambda param: param['type'] == 'Initial compartment size', model['parameters']))
+        self.assertEqual(init_comp_size_params, [{
+            'target': "/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@id='compartment_1']/@size",
+            'type': 'Initial compartment size',
+            'id': 'init_size_compartment_1',
+            'name': 'Initial size of compartment',
+            'value': 1.0,
+            'units': '10^-3 liter',
+        }])
+
+        init_species_params = list(filter(lambda param: param['type'] == 'Initial variable value', model['parameters']))
+        init_species_param = next(param for param in init_species_params if param['id'] == 'init_concentration_species_1')
+        self.assertEqual(init_species_param, {
+            'target': "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_1']/@initialConcentration",
+            'type': 'Initial variable value',
+            'id': 'init_concentration_species_1',
+            'name': 'Initial concentration of MK',
+            'value': 1200.,
+            'units': None,
+        })
 
         # variables
         self.assertEqual(len(model['variables']), 24)
@@ -95,12 +120,14 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         filename = 'tests/fixtures/BIOMD0000000018.sbml-L3V1.xml'
         model = read_model(filename, format=ModelFormat.sbml)
 
-        self.assertEqual(len(model['parameters']), 107)
+        other_params = list(filter(lambda param: param['type'] == 'Other parameter', model['parameters']))
+        self.assertEqual(len(other_params), 107)
 
-        gbl_params = list(filter(lambda param: '.' not in param['id'], model['parameters']))
+        gbl_params = list(filter(lambda param: '.' not in param['id'], other_params))
         self.assertEqual(gbl_params, [
             {
                 'target': "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='Keq']/@value",
+                'type': 'Other parameter',
                 'id': 'Keq',
                 'name': None,
                 'value': 0.32,
@@ -108,12 +135,13 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             },
         ])
 
-        lcl_params = list(filter(lambda param: param['id'].startswith('SHMT.'), model['parameters']))
+        lcl_params = list(filter(lambda param: param['id'].startswith('SHMT.'), other_params))
         lcl_params.sort(key=lambda param: param['id'])
         self.assertEqual(lcl_params, [
             {
                 'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='SHMT']"
                            "/sbml:kineticLaw/sbml:listOfLocalParameters/sbml:localParameter[@id='Km1']/@value"),
+                'type': 'Other parameter',
                 'id': 'SHMT.Km1',
                 'name': None,
                 'value': 1.7,
@@ -122,6 +150,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             {
                 'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='SHMT']"
                            "/sbml:kineticLaw/sbml:listOfLocalParameters/sbml:localParameter[@id='Km2']/@value"),
+                'type': 'Other parameter',
                 'id': 'SHMT.Km2',
                 'name': None,
                 'value': 210,
@@ -130,6 +159,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             {
                 'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='SHMT']"
                            "/sbml:kineticLaw/sbml:listOfLocalParameters/sbml:localParameter[@id='Vm']/@value"),
+                'type': 'Other parameter',
                 'id': 'SHMT.Vm',
                 'name': None,
                 'value': 18330,
@@ -145,6 +175,8 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'
         with self.assertRaisesRegex(ModelIoError, 'packages are not supported'):
             model = read_model(filename, format=ModelFormat.sbml)
+
+        # todo: test that a_sum parameter is ignored because it is set by an assignment rule
 
     def test_run_units(self):
         filename = 'tests/fixtures/BIOMD0000000821.sbml-L2V4.xml'

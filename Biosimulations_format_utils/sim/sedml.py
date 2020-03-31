@@ -463,11 +463,8 @@ class SedMlSimReader(SimReader):
 
         # model variables
         model_vars = []
-        for i_data_gen in range(doc_sed.getNumDataGenerators()):
-            data_gen_sed = doc_sed.getDataGenerator(i_data_gen)
-
-            for i_var in range(data_gen_sed.getNumVariables()):
-                var_sed = data_gen_sed.getVariable(i_var)
+        for data_gen_sed in doc_sed.getListOfDataGenerators():
+            for var_sed in data_gen_sed.getListOfVariables():
                 var_id = var_sed.getId()
                 var_id = var_id[len('var_'):]
 
@@ -493,8 +490,7 @@ class SedMlSimReader(SimReader):
 
         # model parameter changes
         sim['modelParameterChanges'] = []
-        for i_change in range(model_sed.getNumChanges()):
-            change_sed = model_sed.getChange(i_change)
+        for change_sed in model_sed.getListOfChanges():
             assert isinstance(change_sed, libsedml.SedChangeAttribute), \
                 "Changes must be attribute changes"
             change = self._get_parameter_change_from_model(change_sed)
@@ -518,8 +514,7 @@ class SedMlSimReader(SimReader):
 
         # simulation algorithm parameters
         sim['algorithmParameterChanges'] = []
-        for i_change in range(alg_sed.getNumAlgorithmParameters()):
-            change_sed = alg_sed.getAlgorithmParameter(i_change)
+        for change_sed in alg_sed.getListOfAlgorithmParameters():
             change_props = self._get_obj_annotation(change_sed)
             sim['algorithmParameterChanges'].append({
                 'parameter': {

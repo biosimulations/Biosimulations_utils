@@ -30,7 +30,7 @@ class WriteSedMlTestCase(unittest.TestCase):
         shutil.rmtree(self.dirname)
 
     def test_gen_sedml(self):
-        model_species = [
+        model_vars = [
             {'id': 'species_1', 'target': "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_1']"},
             {'id': 'species_2', 'target': "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_2']"},
         ]
@@ -38,14 +38,14 @@ class WriteSedMlTestCase(unittest.TestCase):
             sim = json.load(file)
         model_filename = os.path.join(self.dirname, 'model.sbml.xml')
         sim_filename = os.path.join(self.dirname, 'simulation.sed-ml.xml')
-        write_sim(model_species, sim, model_filename, sim_filename,
+        write_sim(model_vars, sim, model_filename, sim_filename,
                   SimFormat.sedml, level=1, version=3)
 
-        model_species_2, sim_2, model_filename_2, level, version = read_sim(
+        model_vars_2, sim_2, model_filename_2, level, version = read_sim(
             sim_filename, ModelFormat.sbml, SimFormat.sedml)
         self.assertEqual(
-            set(s['id'] for s in model_species_2),
-            set(s['id'] for s in model_species))
+            set(s['id'] for s in model_vars_2),
+            set(s['id'] for s in model_vars))
         self.assertEqual(model_filename_2, model_filename)
         self.assertEqual(sim_2, sim)
         self.assertEqual(level, 1)

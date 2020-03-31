@@ -6,10 +6,11 @@
 :License: MIT
 """
 
+from .core import ModelIoError
 from .sbml import SbmlModelReader
 import wc_utils.util.enumerate
 
-__all__ = ['ModelFormat', 'read_model']
+__all__ = ['ModelFormat', 'read_model', 'ModelIoError']
 
 
 class ModelFormat(int, wc_utils.util.enumerate.CaseInsensitiveEnum):

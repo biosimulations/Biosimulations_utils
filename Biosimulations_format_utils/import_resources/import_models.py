@@ -8,6 +8,7 @@
 
 
 from ..model import ModelFormat, read_model
+from ..model.core import ModelIoError
 from ..model.sbml import SbmlModelReader, XmlName
 import libsbml
 import math
@@ -85,7 +86,10 @@ class ImportBioModels(object):
                 print('  {}. {}: {}'.format(len(models) + 1, model_result['id'], model_result['name']))
                 if model_result['id'] in self.SKIP_MODELS:
                     continue
-                models.append(self.get_model(model_result['id']))
+                try:
+                    models.append(self.get_model(model_result['id']))
+                except ModelIoError:
+                    pass
                 if len(models) == self._max_models:
                     break
         return models

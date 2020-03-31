@@ -6,11 +6,12 @@
 :License: MIT
 """
 
-from .core import ModelReader
+from .core import ModelReader, ModelIoError
 import copy
 import enum
 import ete3
 import libsbml
+import math
 import os
 import re
 
@@ -127,6 +128,9 @@ class SbmlModelReader(ModelReader):
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
             model (:obj:`dict`): model
+
+        Returns:
+            :obj:`dict`: format of the model
         """
         model['format'] = {
             'name': 'SBML',
@@ -135,12 +139,17 @@ class SbmlModelReader(ModelReader):
             'url': 'http://sbml.org',
         }
 
+        return model['format']
+
     def _read_metadata(self, model_sbml, model):
         """ Read the metadata of a model
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
             model (:obj:`dict`): model
+
+        Returns:
+            :obj:`dict`: model with additional metadata
         """
         annot_xml = model_sbml.getAnnotation()
         desc_xml = self._get_xml_child_by_names(annot_xml, [
@@ -153,31 +162,11 @@ class SbmlModelReader(ModelReader):
         for i_plugin in range(model_sbml.getNumPlugins()):
             plugin = model_sbml.getPlugin(i_plugin)
             packages.add(plugin.getPackageName())
+        packages = packages.difference(set(['annot', 'layout', 'render', 'req']))
+        if packages:
+            raise ModelIoError("{} packages are not supported".format(', '.join(packages)))
 
-        if 'fbc' in packages:
-            if packages & set(['multi', 'qual', 'spatial']):
-                framework = None
-            else:
-                framework = ModelFramework.flux_balance
-        elif 'multi' in packages:
-            if packages & set(['fbc', 'qual']):
-                framework = None
-            if 'spatial' in packages:
-                framework = ModelFramework.spatial_discrete
-            else:
-                framework = ModelFramework.non_spatial_discrete
-        elif 'qual' in packages:
-            if packages & set(['fbc', 'multi', 'spatial']):
-                framework = None
-            else:
-                framework = ModelFramework.logical
-        elif 'spatial' in packages:
-            if packages & set(['fbc', 'qual']):
-                framework = None
-            else:
-                framework = ModelFramework.spatial_continuous
-        else:
-            framework = ModelFramework.non_spatial_continuous
+        framework = ModelFramework.non_spatial_continuous
         model['framework'] = framework.value
 
         # taxon
@@ -202,17 +191,24 @@ class SbmlModelReader(ModelReader):
                 else:
                     model['taxon_name'] = None
 
+        return model
+
     def _read_units(self, model_sbml, model):
         """ Read the units of a model
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
             model (:obj:`dict`): model
+
+        Returns:
+            :obj:`dict`: dictionary that maps the ids of units to their definitions
         """
         model['units'] = {}
-        for i_unit in range(model_sbml.getNumUnitDefinitions()):
-            unit_sbml = model_sbml.getUnitDefinition(i_unit)
-            model['units'][unit_sbml.getId()] = unit_sbml.printUnits(unit_sbml, True)
+        for i_unit_def in range(model_sbml.getNumUnitDefinitions()):
+            unit_def_sbml = model_sbml.getUnitDefinition(i_unit_def)
+            model['units'][unit_def_sbml.getId()] = self._format_units(unit_def_sbml.getDerivedUnitDefinition())
+
+        return model['units']
 
     def _read_parameters(self, model_sbml, model):
         """ Read information about the parameters of a model
@@ -232,14 +228,16 @@ class SbmlModelReader(ModelReader):
 
         for i_rxn in range(model_sbml.getNumReactions()):
             rxn_sbml = model_sbml.getReaction(i_rxn)
+
             kin_law_sbml = rxn_sbml.getKineticLaw()
             if not kin_law_sbml:
                 continue
 
-            reaction_id = rxn_sbml.getId() or None
+            reaction_id = rxn_sbml.getId()
             reaction_name = rxn_sbml.getName() or None
 
             for i_param in range(kin_law_sbml.getNumParameters()):
+                assert reaction_id
                 param_sbml = kin_law_sbml.getParameter(i_param)
                 parameters.append(self._read_parameter(param_sbml, model, reaction_id=reaction_id, reaction_name=reaction_name))
 
@@ -257,18 +255,141 @@ class SbmlModelReader(ModelReader):
         Returns:
             :obj:`dict`: information about the parameter
         """
-        units = param_sbml.getUnits() or None
-        if units and units not in ['dimensionless', 'gram', 'hertz', 'item', 'kelvin', 'kilogram', 'second', 'volt']:
-            units = model['units'][units]
+        assert param_sbml.getId()
 
-        return {
-            'reaction_id': reaction_id,
-            'id': param_sbml.getId() or None,
-            'reaction_name': reaction_name,
+        param = {
+            'target': None,
+            'id': param_sbml.getId(),
             'name': param_sbml.getName() or None,
             'value': param_sbml.getValue(),
-            'units': units,
+            'units': self._format_units(param_sbml.getDerivedUnitDefinition()),
         }
+
+        if reaction_id:
+            if int(model['format']['version'][1]) >= 3:
+                target = [
+                    "sbml:sbml",
+                    "sbml:model",
+                    "sbml:listOfReactions",
+                    "sbml:reaction[@id='{}']".format(reaction_id),
+                    "sbml:kineticLaw",
+                    "sbml:listOfLocalParameters",
+                    "sbml:localParameter[@id='{}']".format(param['id']),
+                    "@value",
+                ]
+            else:
+                target = [
+                    "sbml:sbml",
+                    "sbml:model",
+                    "sbml:listOfReactions",
+                    "sbml:reaction[@id='{}']".format(reaction_id),
+                    "sbml:kineticLaw",
+                    "sbml:listOfParameters",
+                    "sbml:parameter[@id='{}']".format(param['id']),
+                    "@value",
+                ]
+        else:
+            target = [
+                "sbml:sbml",
+                "sbml:model",
+                "sbml:listOfParameters",
+                "sbml:parameter[@id='{}']".format(param['id']),
+                "@value",
+            ]
+        param['target'] = '/' + '/'.join(target)
+
+        if reaction_id and param['id']:
+            param['id'] = reaction_id + '.' + param['id']
+        if reaction_name and param['name']:
+            param['name'] = reaction_name + ': ' + param['name']
+
+        return param
+
+    def _read_variables(self, model_sbml, model):
+        """ Read the variables of a model
+
+        Args:
+            model_sbml (:obj:`libsbml.Model`): SBML-encoded model
+            model (:obj:`dict`): model
+
+        Returns:
+            :obj:`list` of :obj:`dict`: information about the variables of the model
+        """
+        model['variables'] = vars = []
+        for i_species in range(model_sbml.getNumSpecies()):
+            species_sbml = model_sbml.getSpecies(i_species)
+            vars.append(self._read_variable(model_sbml, species_sbml, model))
+        return vars
+
+    def _read_variable(self, model_sbml, species_sbml, model):
+        """ Read information about a SBML species
+
+        Args:
+            model_sbml (:obj:`libsbml.Model`): SBML-encoded model
+            species_sbml (:obj:`libsbml.Species`): SBML species
+            model (:obj:`dict`): model
+
+        Returns:
+            :obj:`dict`: information about the species
+        """
+        id = species_sbml.getId()
+        assert id
+
+        comp_sbml = None
+        comp_id = species_sbml.getCompartment() or None
+        comp_name = None
+        if comp_id:
+            for i_comp in range(model_sbml.getNumCompartments()):
+                comp_sbml = model_sbml.getCompartment(i_comp)
+                if comp_sbml.getId() == comp_id:
+                    break
+            comp_name = comp_sbml.getName()
+
+        var = {
+            'target': "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(id),
+            'id': id,
+            'name': species_sbml.getName() or None,
+            'compartment_id': comp_id,
+            'compartment_name': comp_name,
+            'units': self._format_units(species_sbml.getDerivedUnitDefinition()),
+            'constant': species_sbml.getConstant(),
+            'boundary_condition': species_sbml.getBoundaryCondition(),
+        }
+
+        return var
+
+    def _format_units(self, unit_def_sbml):
+        """ Get a human-readable representation of a unit definition
+
+        Args:
+            unit_def_sbml (:obj:`libsbml.UnitDefinition`): unit definition
+
+        Returns:
+            :obj:`str`: human-readable string representation of the unit definition
+        """
+        if not unit_def_sbml:
+            return None
+
+        unit_def_str = unit_def_sbml.printUnits(unit_def_sbml, True)
+        if unit_def_str == 'indeterminable':
+            return None
+
+        unit_def_exp = self._unit_registry.parse_expression(unit_def_str.replace(', ', ' * '))
+        mag = unit_def_exp.magnitude
+        pow = math.floor(math.log10(mag))
+        mag = round(mag / math.pow(10, pow), 3)
+        units = str(unit_def_exp.units)
+
+        if pow == 0:
+            if mag == 1:
+                return units
+            else:
+                return '{} {}'.format(mag, units)
+        else:
+            if mag == 1:
+                return '10^{} {}'.format(pow, units)
+            else:
+                return '{} 10^{} {}'.format(mag, pow, units)
 
     @classmethod
     def _get_xml_child_by_names(cls, node, names):

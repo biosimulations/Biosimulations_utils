@@ -162,7 +162,7 @@ class SbmlModelReader(ModelReader):
         for i_plugin in range(model_sbml.getNumPlugins()):
             plugin_sbml = model_sbml.getPlugin(i_plugin)
             packages.add(plugin_sbml.getPackageName())
-        packages = packages.difference(set(['annot', 'fbc', 'layout', 'qual', 'render', 'req']))
+        packages = packages.difference(set(['annot', 'fbc', 'groups', 'layout', 'qual', 'render', 'req']))
         if packages:
             raise ModelIoError("{} package(s) are not supported".format(', '.join(packages)))
         if 'fbc' in packages and 'qual' in packages:
@@ -250,12 +250,16 @@ class SbmlModelReader(ModelReader):
             assert comp_id
             comp_name = comp_sbml.getName() or comp_id
 
+            value = comp_sbml.getSize()
             parameters[comp_id] = {
                 'target': "/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@id='{}']/@size".format(comp_id),
                 'group': 'Initial compartment sizes',
                 'id': "init_size_{}".format(comp_id),
                 'name': 'Initial size of {}'.format(comp_name),
-                'value': comp_sbml.getSize(),
+                'description': None,
+                'identifiers': [],
+                'value': value,
+                'recommended_range': self._calc_recommended_param_range(value),
                 'units': self._format_unit_def(comp_sbml.getDerivedUnitDefinition()),
             }
 
@@ -299,7 +303,10 @@ class SbmlModelReader(ModelReader):
                 'group': 'Initial species amounts/concentrations',
                 'id': "init_{}_{}".format(species_initial_type.lower(), species_id),
                 'name': 'Initial {} of {}'.format(species_initial_type.lower(), species_name),
+                'description': None,
+                'identifiers': [],
                 'value': species_initial_val,
+                'recommended_range': self._calc_recommended_param_range(species_initial_val),
                 'units': species_initial_units,
             }
 
@@ -315,6 +322,7 @@ class SbmlModelReader(ModelReader):
                 reaction_id = flux_obj_sbml.getReaction()
                 reaction_sbml = self._get_reaction(model_sbml, reaction_id)
                 reaction_name = reaction_sbml.getName() or reaction_id
+                value = flux_obj_sbml.getCoefficient()
                 parameters[species_id] = {
                     'target': '/' + '/'.join([
                         "sbml:sbml",
@@ -328,7 +336,10 @@ class SbmlModelReader(ModelReader):
                     'group': 'Flux objectives',
                     'id': "{}/{}".format(obj_id, reaction_id),
                     'name': 'Coefficient of {} of {}'.format(obj_name, reaction_name),
-                    'value': flux_obj_sbml.getCoefficient(),
+                    'description': None,
+                    'identifiers': [],
+                    'value': value,
+                    'recommended_range': self._calc_recommended_param_range(value),
                     'units': 'dimensionless',
                 }
 
@@ -367,12 +378,16 @@ class SbmlModelReader(ModelReader):
         """
         assert param_sbml.getId()
 
+        value = param_sbml.getValue()
         param = {
             'target': None,
             'group': 'Other parameters',
             'id': param_sbml.getId(),
             'name': param_sbml.getName() or None,
-            'value': param_sbml.getValue(),
+            'description': None,
+            'identifiers': [],
+            'value': value,
+            'recommended_range': self._calc_recommended_param_range(value),
             'units': self._format_unit_def(param_sbml.getDerivedUnitDefinition()),
         }
 
@@ -448,6 +463,8 @@ class SbmlModelReader(ModelReader):
                 'group': 'Objectives',
                 'id': obj_id,
                 'name': obj_sbml.getName() or obj_id,
+                'description': None,
+                'identifiers': [],
                 'compartment_id': None,
                 'compartment_name': None,
                 'units': flux_units,
@@ -463,6 +480,8 @@ class SbmlModelReader(ModelReader):
                     'group': 'Reaction fluxes',
                     'id': rxn_id,
                     'name': rxn_sbml.getName() or None,
+                    'description': None,
+                    'identifiers': [],
                     'compartment_id': None,
                     'compartment_name': None,
                     'units': flux_units,
@@ -505,6 +524,8 @@ class SbmlModelReader(ModelReader):
             'group': 'Species amounts/concentrations',
             'id': id,
             'name': species_sbml.getName() or None,
+            'description': None,
+            'identifiers': [],
             'compartment_id': comp_id,
             'compartment_name': comp_name,
             'units': self._format_unit_def(species_sbml.getDerivedUnitDefinition()),
@@ -573,6 +594,26 @@ class SbmlModelReader(ModelReader):
             return None
 
         return self._pretty_print_units(unit_def_str.replace(', ', ' * '))
+
+    def _calc_recommended_param_range(self, value, zero_fold=10., non_zero_fold=10.):
+        """ Calculate a recommended range for the value of a parameter
+
+        Args:
+            value (:obj:`float`): Default value
+            non_zero_fold (:obj:`float`, optional): Multiplicative factor, :math:`f`, for the recommended minimum and maximum
+                values relative to the default value, :math:`d`, producing the recommend range :math:`d / f - d * f`.
+
+        Returns:
+            :obj:`list` of :obj:`float`: recommended minimum and maximum values of the parameter
+        """
+        if value == 0:
+            return [0., zero_fold]
+
+        else:
+            return [
+                value * non_zero_fold ** -1,
+                value * non_zero_fold,
+            ]
 
     @classmethod
     def _get_xml_child_by_names(cls, node, names):

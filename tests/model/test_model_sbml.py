@@ -43,13 +43,17 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         self.assertEqual(len(other_params), 37)
 
         gbl_params = list(filter(lambda param: '.' not in param['id'], other_params))
+        print(gbl_params)
         self.assertEqual(gbl_params, [
             {
                 'target': "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='parameter_1']/@value",
                 'group': 'Other parameters',
                 'id': 'parameter_1',
                 'name': 'quantity_1',
+                'description': None,
+                'identifiers': [],
                 'value': 0.0,
+                'recommended_range': [0., 10.],
                 'units': None
             },
         ])
@@ -63,7 +67,10 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'group': 'Other parameters',
                 'id': 'reaction_1.k1',
                 'name': '15: k1',
+                'description': None,
+                'identifiers': [],
                 'value': 0.02,
+                'recommended_range': [0.002, 0.2],
                 'units': None
             },
             {
@@ -72,7 +79,10 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'group': 'Other parameters',
                 'id': 'reaction_1.k2',
                 'name': '15: k2',
+                'description': None,
+                'identifiers': [],
                 'value': 1.0,
+                'recommended_range': [0.1, 10.],
                 'units': None
             },
         ])
@@ -83,7 +93,10 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'group': 'Initial compartment sizes',
             'id': 'init_size_compartment_1',
             'name': 'Initial size of compartment',
+            'description': None,
+            'identifiers': [],
             'value': 1.0,
+            'recommended_range': [0.1, 10.],
             'units': '10^-3 liter',
         }])
 
@@ -94,7 +107,10 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'group': 'Initial species amounts/concentrations',
             'id': 'init_concentration_species_1',
             'name': 'Initial concentration of MK',
+            'description': None,
+            'identifiers': [],
             'value': 1200.,
+            'recommended_range': [120., 12000.],
             'units': None,
         })
 
@@ -106,6 +122,8 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'group': 'Species amounts/concentrations',
             'id': 'species_1',
             'name': 'MK',
+            'description': None,
+            'identifiers': [],
             'compartment_id': 'compartment_1',
             'compartment_name': 'compartment',
             'units': '10^-6 mole / liter',
@@ -131,7 +149,10 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'group': 'Other parameters',
                 'id': 'Keq',
                 'name': None,
+                'description': None,
+                'identifiers': [],
                 'value': 0.32,
+                'recommended_range': [0.032, 3.2],
                 'units': None
             },
         ])
@@ -145,7 +166,10 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'group': 'Other parameters',
                 'id': 'SHMT.Km1',
                 'name': None,
+                'description': None,
+                'identifiers': [],
                 'value': 1.7,
+                'recommended_range': [0.17, 17.],
                 'units': None
             },
             {
@@ -154,7 +178,10 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'group': 'Other parameters',
                 'id': 'SHMT.Km2',
                 'name': None,
-                'value': 210,
+                'description': None,
+                'identifiers': [],
+                'value': 210.,
+                'recommended_range': [21., 2100.],
                 'units': None
             },
             {
@@ -163,7 +190,10 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'group': 'Other parameters',
                 'id': 'SHMT.Vm',
                 'name': None,
-                'value': 18330,
+                'description': None,
+                'identifiers': [],
+                'value': 18330.,
+                'recommended_range': [1833., 183300.],
                 'units': None
             },
         ])
@@ -203,7 +233,10 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'group': 'Flux objectives',
             'id': 'atp_consume_max/ATPPROD',
             'name': 'Coefficient of atp_consume_max of ATP production',
+            'description': None,
+            'identifiers': [],
             'value': 1.0,
+            'recommended_range': [0.1, 10.],
             'units': 'dimensionless',
         })
 
@@ -214,6 +247,8 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'group': 'Objectives',
             'id': 'atp_consume_max',
             'name': 'atp_consume_max',
+            'description': None,
+            'identifiers': [],
             'compartment_id': None,
             'compartment_name': None,
             'units': 'millimole / second',
@@ -229,6 +264,8 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'group': 'Reaction fluxes',
             'id': 'GK',
             'name': 'Glucokinase',
+            'description': None,
+            'identifiers': [],
             'compartment_id': None,
             'compartment_name': None,
             'units': 'millimole / second',

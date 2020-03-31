@@ -162,9 +162,11 @@ class SbmlModelReader(ModelReader):
         for i_plugin in range(model_sbml.getNumPlugins()):
             plugin_sbml = model_sbml.getPlugin(i_plugin)
             packages.add(plugin_sbml.getPackageName())
-        packages = packages.difference(set(['annot', 'layout', 'render', 'req']))
+        packages = packages.difference(set(['annot', 'fbc', 'layout', 'qual', 'render', 'req']))
         if packages:
-            raise ModelIoError("{} packages are not supported".format(', '.join(packages)))
+            raise ModelIoError("{} package(s) are not supported".format(', '.join(packages)))
+        if 'fbc' in packages and 'qual' in packages:
+            raise ModelIoError("fbc and qual packages are not supported together")
 
         framework = ModelFramework.non_spatial_continuous
         model['framework'] = framework.value
@@ -250,7 +252,7 @@ class SbmlModelReader(ModelReader):
 
             parameters[comp_id] = {
                 'target': "/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@id='{}']/@size".format(comp_id),
-                'type': 'Initial compartment size',
+                'group': 'Initial compartment sizes',
                 'id': "init_size_{}".format(comp_id),
                 'name': 'Initial size of {}'.format(comp_name),
                 'value': comp_sbml.getSize(),
@@ -294,19 +296,41 @@ class SbmlModelReader(ModelReader):
                     "sbml:species[@id='{}']".format(species_id),
                     "@initial{}".format(species_initial_type),
                 ]),
-                'type': 'Initial variable value',
+                'group': 'Initial species amounts/concentrations',
                 'id': "init_{}_{}".format(species_initial_type.lower(), species_id),
                 'name': 'Initial {} of {}'.format(species_initial_type.lower(), species_name),
                 'value': species_initial_val,
                 'units': species_initial_units,
             }
-            if species_id == 'species_1':
-                print(parameters[species_id])
 
         # fbc package
         plugin_sbml = model_sbml.getPlugin('fbc')
         if plugin_sbml:
-            pass
+            obj_sbml = plugin_sbml.getActiveObjective()
+            assert obj_sbml
+
+            obj_id = obj_sbml.getId()
+            obj_name = obj_sbml.getName() or obj_id
+            for flux_obj_sbml in obj_sbml.getListOfFluxObjectives():
+                reaction_id = flux_obj_sbml.getReaction()
+                reaction_sbml = self._get_reaction(model_sbml, reaction_id)
+                reaction_name = reaction_sbml.getName() or reaction_id
+                parameters[species_id] = {
+                    'target': '/' + '/'.join([
+                        "sbml:sbml",
+                        "sbml:model",
+                        "fbc:listOfObjectives",
+                        "fbc:objective[@fbc:id='{}']".format(obj_id),
+                        "fbc:listOfFluxObjectives",
+                        "fbc:fluxObjective[@fbc:reaction='{}']".format(reaction_id),
+                        "@fbc:coefficient",
+                    ]),
+                    'group': 'Flux objectives',
+                    'id': "{}/{}".format(obj_id, reaction_id),
+                    'name': 'Coefficient of {} of {}'.format(obj_name, reaction_name),
+                    'value': flux_obj_sbml.getCoefficient(),
+                    'units': 'dimensionless',
+                }
 
         # qual package
         plugin_sbml = model_sbml.getPlugin('qual')
@@ -345,7 +369,7 @@ class SbmlModelReader(ModelReader):
 
         param = {
             'target': None,
-            'type': 'Other parameter',
+            'group': 'Other parameters',
             'id': param_sbml.getId(),
             'name': param_sbml.getName() or None,
             'value': param_sbml.getValue(),
@@ -403,8 +427,56 @@ class SbmlModelReader(ModelReader):
             :obj:`list` of :obj:`dict`: information about the variables of the model
         """
         model['variables'] = vars = []
-        for species_sbml in model_sbml.getListOfSpecies():
-            vars.append(self._read_variable(model_sbml, species_sbml, model))
+        fbc_plugin_sbml = model_sbml.getPlugin('fbc')
+        qual_plugin_sbml = model_sbml.getPlugin('qual')
+
+        if fbc_plugin_sbml:
+            flux_units = self._pretty_print_units('({}) / ({})'.format(
+                model['units'].get(model_sbml.getExtentUnits(), None) or model_sbml.getExtentUnits(),
+                model['units'].get(model_sbml.getTimeUnits(), None) or model_sbml.getTimeUnits(),
+            ))
+
+            # objective
+            obj_sbml = fbc_plugin_sbml.getActiveObjective()
+            assert obj_sbml
+
+            obj_id = obj_sbml.getId()
+            assert obj_id
+
+            vars.append({
+                'target': "/sbml:sbml/sbml:model/fbc:listOfObjectives/fbc:objective[@fbc:id='{}']".format(obj_id),
+                'group': 'Objectives',
+                'id': obj_id,
+                'name': obj_sbml.getName() or obj_id,
+                'compartment_id': None,
+                'compartment_name': None,
+                'units': flux_units,
+                'constant': False,
+                'boundary_condition': False,
+            })
+
+            # reaction fluxes
+            for rxn_sbml in model_sbml.getListOfReactions():
+                rxn_id = rxn_sbml.getId()
+                vars.append({
+                    'target': "/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='{}']".format(rxn_id),
+                    'group': 'Reaction fluxes',
+                    'id': rxn_id,
+                    'name': rxn_sbml.getName() or None,
+                    'compartment_id': None,
+                    'compartment_name': None,
+                    'units': flux_units,
+                    'constant': False,
+                    'boundary_condition': False,
+                })
+
+        elif qual_plugin_sbml:
+            pass
+
+        else:
+            for species_sbml in model_sbml.getListOfSpecies():
+                vars.append(self._read_variable(model_sbml, species_sbml, model))
+
         return vars
 
     def _read_variable(self, model_sbml, species_sbml, model):
@@ -430,6 +502,7 @@ class SbmlModelReader(ModelReader):
 
         var = {
             'target': "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(id),
+            'group': 'Species amounts/concentrations',
             'id': id,
             'name': species_sbml.getName() or None,
             'compartment_id': comp_id,
@@ -454,6 +527,34 @@ class SbmlModelReader(ModelReader):
         for comp_sbml in model_sbml.getListOfCompartments():
             if comp_sbml.getId() == comp_id:
                 return comp_sbml
+
+    def _get_species(self, model_sbml, species_id):
+        """ Get a species
+
+        Args:
+            model_sbml (:obj:`libsbml.Model`): SBML-encoded model
+            species_id (:obj:`str`): species id
+
+        Returns:
+            :obj:`libsbml.Species`: species
+        """
+        for species_sbml in model_sbml.getListOfSpecies():
+            if species_sbml.getId() == species_id:
+                return species_sbml
+
+    def _get_reaction(self, model_sbml, rxn_id):
+        """ Get a reaction
+
+        Args:
+            model_sbml (:obj:`libsbml.Model`): SBML-encoded model
+            rxn_id (:obj:`str`): reaction id
+
+        Returns:
+            :obj:`libsbml.Reaction`: reaction
+        """
+        for rxn_sbml in model_sbml.getListOfReactions():
+            if rxn_sbml.getId() == rxn_id:
+                return rxn_sbml
 
     def _format_unit_def(self, unit_def_sbml):
         """ Get a human-readable representation of a unit definition

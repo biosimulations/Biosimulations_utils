@@ -14,7 +14,7 @@ __all__ = ['ModelReader']
 
 
 class ModelReader(abc.ABC):
-    """ Read information about models 
+    """ Read information about models
 
     Attributes:
         _unit_registry (:obj:`pint.UnitRegistry`): unit registry

@@ -44,7 +44,7 @@ def write_sim(model_vars, sim, model_filename, sim_filename, sim_format, **sim_f
 def read_sim(filename, model_format, sim_format):
     """ Read a simulation experiment from a file
 
-    Args:        
+    Args:
         filename (:obj:`str`): path to save simulation
         model_format (:obj:`ModelFormat`): model format
         sim_format (:obj:`SimFormat`): simulation experiment format

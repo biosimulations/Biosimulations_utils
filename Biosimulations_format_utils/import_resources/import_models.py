@@ -21,12 +21,12 @@ import xml.etree.ElementTree
 
 
 class ImportBioModels(object):
-    """ Import models from BioModels 
+    """ Import models from BioModels
 
     Attributes:
         _max_models (:obj:`int`): maximum number of models to download from BioModels
         _cache_dir (:obj:`str`): directory to cache models from BioModels
-        _requests_session (:obj:`requests_cache.core.CachedSession`): requests cached session        
+        _requests_session (:obj:`requests_cache.core.CachedSession`): requests cached session
     """
     BIOMODELS_ENDPOINT = 'https://www.ebi.ac.uk/biomodels'
     PUBMED_ENDPOINT = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
@@ -62,7 +62,7 @@ class ImportBioModels(object):
                                      requests.adapters.HTTPAdapter(max_retries=self.MAX_RETRIES))
 
     def run(self):
-        """ Retrieve models from BioModels and submit to BioSimulations 
+        """ Retrieve models from BioModels and submit to BioSimulations
 
         Returns:
             :obj:`list` of :obj:`dict`: models

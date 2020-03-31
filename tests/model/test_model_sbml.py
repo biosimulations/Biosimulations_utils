@@ -39,15 +39,12 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         })
 
         # parameters
-        other_params = list(filter(lambda param: param['group'] == 'Other parameters', model['parameters']))
-        self.assertEqual(len(other_params), 37)
-
-        gbl_params = list(filter(lambda param: '.' not in param['id'], other_params))
-        print(gbl_params)
+        gbl_params = list(filter(lambda param: param['group'] == 'Other global parameters', model['parameters']))
+        self.assertEqual(len(gbl_params), 1)
         self.assertEqual(gbl_params, [
             {
                 'target': "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='parameter_1']/@value",
-                'group': 'Other parameters',
+                'group': 'Other global parameters',
                 'id': 'parameter_1',
                 'name': 'quantity_1',
                 'description': None,
@@ -58,14 +55,14 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             },
         ])
 
-        lcl_params = list(filter(lambda param: param['id'].startswith('reaction_1.'), other_params))
+        lcl_params = list(filter(lambda param: param['id'].startswith('reaction_1/'), model['parameters']))
         lcl_params.sort(key=lambda param: param['id'])
         self.assertEqual(lcl_params, [
             {
                 'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='reaction_1']"
                            "/sbml:kineticLaw/sbml:listOfParameters/sbml:parameter[@id='k1']/@value"),
-                'group': 'Other parameters',
-                'id': 'reaction_1.k1',
+                'group': '15 kinetic parameters',
+                'id': 'reaction_1/k1',
                 'name': '15: k1',
                 'description': None,
                 'identifiers': [],
@@ -76,8 +73,8 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             {
                 'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='reaction_1']"
                            "/sbml:kineticLaw/sbml:listOfParameters/sbml:parameter[@id='k2']/@value"),
-                'group': 'Other parameters',
-                'id': 'reaction_1.k2',
+                'group': '15 kinetic parameters',
+                'id': 'reaction_1/k2',
                 'name': '15: k2',
                 'description': None,
                 'identifiers': [],
@@ -139,16 +136,14 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         filename = 'tests/fixtures/BIOMD0000000018.sbml-L3V1.xml'
         model = read_model(filename, format=ModelFormat.sbml)
 
-        other_params = list(filter(lambda param: param['group'] == 'Other parameters', model['parameters']))
-        self.assertEqual(len(other_params), 107)
-
-        gbl_params = list(filter(lambda param: '.' not in param['id'], other_params))
+        gbl_params = list(filter(lambda param: param['group'] == 'Other global parameters', model['parameters']))
+        self.assertEqual(len(gbl_params), 1)
         self.assertEqual(gbl_params, [
             {
                 'target': "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='Keq']/@value",
-                'group': 'Other parameters',
+                'group': 'Other global parameters',
                 'id': 'Keq',
-                'name': None,
+                'name': 'Keq',
                 'description': None,
                 'identifiers': [],
                 'value': 0.32,
@@ -157,15 +152,15 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             },
         ])
 
-        lcl_params = list(filter(lambda param: param['id'].startswith('SHMT.'), other_params))
+        lcl_params = list(filter(lambda param: param['id'].startswith('SHMT/'), model['parameters']))
         lcl_params.sort(key=lambda param: param['id'])
         self.assertEqual(lcl_params, [
             {
                 'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='SHMT']"
                            "/sbml:kineticLaw/sbml:listOfLocalParameters/sbml:localParameter[@id='Km1']/@value"),
-                'group': 'Other parameters',
-                'id': 'SHMT.Km1',
-                'name': None,
+                'group': 'SHMT kinetic parameters',
+                'id': 'SHMT/Km1',
+                'name': 'SHMT: Km1',
                 'description': None,
                 'identifiers': [],
                 'value': 1.7,
@@ -175,9 +170,9 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             {
                 'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='SHMT']"
                            "/sbml:kineticLaw/sbml:listOfLocalParameters/sbml:localParameter[@id='Km2']/@value"),
-                'group': 'Other parameters',
-                'id': 'SHMT.Km2',
-                'name': None,
+                'group': 'SHMT kinetic parameters',
+                'id': 'SHMT/Km2',
+                'name': 'SHMT: Km2',
                 'description': None,
                 'identifiers': [],
                 'value': 210.,
@@ -187,9 +182,9 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             {
                 'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='SHMT']"
                            "/sbml:kineticLaw/sbml:listOfLocalParameters/sbml:localParameter[@id='Vm']/@value"),
-                'group': 'Other parameters',
-                'id': 'SHMT.Vm',
-                'name': None,
+                'group': 'SHMT kinetic parameters',
+                'id': 'SHMT/Vm',
+                'name': 'SHMT: Vm',
                 'description': None,
                 'identifiers': [],
                 'value': 18330.,
@@ -212,11 +207,11 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'does not exist'):
             read_model('__non_existant_file__', format=ModelFormat.sbml)
 
-    def test_run_fbc_framework(self):
+    def test_run_fbc_package(self):
         filename = 'tests/fixtures/MODEL1904090001-without-comp.sbml-L3V2.xml'
         model = read_model(filename, format=ModelFormat.sbml)
 
-        params = list(filter(lambda param: param['group'] == 'Other parameters', model['parameters']))
+        params = list(filter(lambda param: param['group'] == 'Other global parameters', model['parameters']))
         self.assertEqual(len(params), 9)
 
         params = list(filter(lambda param: param['group'] == 'Initial compartment sizes', model['parameters']))
@@ -225,12 +220,12 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         params = list(filter(lambda param: param['group'] == 'Initial species amounts/concentrations', model['parameters']))
         self.assertEqual(len(params), 5)
 
-        params = list(filter(lambda param: param['group'] == 'Flux objectives', model['parameters']))
+        params = list(filter(lambda param: param['group'] == 'Flux objective coefficients', model['parameters']))
         self.assertEqual(len(params), 1)
         self.assertEqual(params[0], {
             'target': ("/sbml:sbml/sbml:model/fbc:listOfObjectives/fbc:objective[@fbc:id='atp_consume_max']"
                        "/fbc:listOfFluxObjectives/fbc:fluxObjective[@fbc:reaction='ATPPROD']/@fbc:coefficient"),
-            'group': 'Flux objectives',
+            'group': 'Flux objective coefficients',
             'id': 'atp_consume_max/ATPPROD',
             'name': 'Coefficient of atp_consume_max of ATP production',
             'description': None,
@@ -271,6 +266,25 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'units': 'millimole / second',
             'constant': False,
             'boundary_condition': False,
+        })
+
+    def test_run_multi_package(self):
+        filename = 'tests/fixtures/multi_example1.sbml-L3V1.xml'
+        model = read_model(filename, format=ModelFormat.sbml)
+
+        self.assertEqual(len(model['parameters']), 8)
+        param = next(param for param in model['parameters'] if param['id'] == 'rc_Intra_Complex_Trans_Association/kon')
+        self.assertEqual(param, {
+            'target': ("/sbml:sbml/sbml:model/sbml:listOfReactions/multi:intraSpeciesReaction[@id='rc_Intra_Complex_Trans_Association']"
+                       "/sbml:kineticLaw/sbml:listOfLocalParameters/sbml:localParameter[@id='kon']/@value"),
+            'group': 'Intra-Complex_Trans_Association kinetic parameters',
+            'id': 'rc_Intra_Complex_Trans_Association/kon',
+            'name': 'Intra-Complex_Trans_Association: kon',
+            'description': None,
+            'identifiers': [],
+            'value': 100.,
+            'recommended_range': [10., 1000.],
+            'units': None,
         })
 
     def test_run_unsupported_packages(self):

@@ -162,11 +162,14 @@ class SbmlModelReader(ModelReader):
         for i_plugin in range(model_sbml.getNumPlugins()):
             plugin_sbml = model_sbml.getPlugin(i_plugin)
             packages.add(plugin_sbml.getPackageName())
-        packages = packages.difference(set(['annot', 'fbc', 'groups', 'layout', 'qual', 'render', 'req']))
-        if packages:
-            raise ModelIoError("{} package(s) are not supported".format(', '.join(packages)))
-        if 'fbc' in packages and 'qual' in packages:
-            raise ModelIoError("fbc and qual packages are not supported together")
+
+        unsupported_packages = packages.difference(set(['annot', 'fbc', 'groups', 'layout', 'multi', 'qual', 'render', 'req']))
+        if unsupported_packages:
+            raise ModelIoError("{} package(s) are not supported".format(', '.join(unsupported_packages)))
+
+        supported_packages = packages.intersection(set(['fbc', 'multi', 'qual']))
+        if len(supported_packages) > 1:
+            raise ModelIoError("{} packages are not supported together".format(', '.join(supported_packages)))
 
         framework = ModelFramework.non_spatial_continuous
         model['framework'] = framework.value
@@ -233,13 +236,13 @@ class SbmlModelReader(ModelReader):
             if not kin_law_sbml:
                 continue
 
-            reaction_id = rxn_sbml.getId()
-            reaction_name = rxn_sbml.getName() or None
+            rxn_id = rxn_sbml.getId()
+            rxn_name = rxn_sbml.getName() or None
 
             for param_sbml in kin_law_sbml.getListOfParameters():
-                assert reaction_id
-                parameters[(reaction_id, param_sbml.getId())] = self._read_parameter(
-                    param_sbml, model, reaction_id=reaction_id, reaction_name=reaction_name)
+                assert rxn_id
+                parameters[(rxn_id, param_sbml.getId())] = self._read_parameter(
+                    param_sbml, model, rxn_sbml=rxn_sbml, rxn_id=rxn_id, rxn_name=rxn_name)
 
         # compartment sizes
         for comp_sbml in model_sbml.getListOfCompartments():
@@ -319,9 +322,9 @@ class SbmlModelReader(ModelReader):
             obj_id = obj_sbml.getId()
             obj_name = obj_sbml.getName() or obj_id
             for flux_obj_sbml in obj_sbml.getListOfFluxObjectives():
-                reaction_id = flux_obj_sbml.getReaction()
-                reaction_sbml = self._get_reaction(model_sbml, reaction_id)
-                reaction_name = reaction_sbml.getName() or reaction_id
+                rxn_id = flux_obj_sbml.getReaction()
+                rxn_sbml = self._get_reaction(model_sbml, rxn_id)
+                rxn_name = rxn_sbml.getName() or rxn_id
                 value = flux_obj_sbml.getCoefficient()
                 parameters[species_id] = {
                     'target': '/' + '/'.join([
@@ -330,12 +333,12 @@ class SbmlModelReader(ModelReader):
                         "fbc:listOfObjectives",
                         "fbc:objective[@fbc:id='{}']".format(obj_id),
                         "fbc:listOfFluxObjectives",
-                        "fbc:fluxObjective[@fbc:reaction='{}']".format(reaction_id),
+                        "fbc:fluxObjective[@fbc:reaction='{}']".format(rxn_id),
                         "@fbc:coefficient",
                     ]),
-                    'group': 'Flux objectives',
-                    'id': "{}/{}".format(obj_id, reaction_id),
-                    'name': 'Coefficient of {} of {}'.format(obj_name, reaction_name),
+                    'group': 'Flux objective coefficients',
+                    'id': "{}/{}".format(obj_id, rxn_id),
+                    'name': 'Coefficient of {} of {}'.format(obj_name, rxn_name),
                     'description': None,
                     'identifiers': [],
                     'value': value,
@@ -364,14 +367,15 @@ class SbmlModelReader(ModelReader):
         model['parameters'] = parameters.values()
         return model['parameters']
 
-    def _read_parameter(self, param_sbml, model, reaction_id=None, reaction_name=None):
+    def _read_parameter(self, param_sbml, model, rxn_sbml=None, rxn_id=None, rxn_name=None):
         """ Read information about a SBML parameter
 
         Args:
             param_sbml (:obj:`libsbml.Parameter`): SBML parameter
             model (:obj:`dict`): model
-            reaction_id (:obj:`str`, optional): id of the parent reaction (used by local parameters)
-            reaction_name (:obj:`str`, optional): name of the parent reaction (used by local parameters)
+            rxn_sbml (:obj:`libsbml.Reaction`, optional): SBML reaction
+            rxn_id (:obj:`str`, optional): id of the parent reaction (used by local parameters)
+            rxn_name (:obj:`str`, optional): name of the parent reaction (used by local parameters)
 
         Returns:
             :obj:`dict`: information about the parameter
@@ -381,9 +385,9 @@ class SbmlModelReader(ModelReader):
         value = param_sbml.getValue()
         param = {
             'target': None,
-            'group': 'Other parameters',
+            'group': None,
             'id': param_sbml.getId(),
-            'name': param_sbml.getName() or None,
+            'name': param_sbml.getName() or param_sbml.getId(),
             'description': None,
             'identifiers': [],
             'value': value,
@@ -391,16 +395,16 @@ class SbmlModelReader(ModelReader):
             'units': self._format_unit_def(param_sbml.getDerivedUnitDefinition()),
         }
 
-        if reaction_id:
+        if rxn_sbml:
             if int(model['format']['version'][1]) >= 3:
                 target = [
                     "sbml:sbml",
                     "sbml:model",
                     "sbml:listOfReactions",
-                    "sbml:reaction[@id='{}']".format(reaction_id),
+                    "{}:{}[@id='{}']".format(rxn_sbml.getPrefix() or 'sbml', rxn_sbml.getElementName(), rxn_id),
                     "sbml:kineticLaw",
                     "sbml:listOfLocalParameters",
-                    "sbml:localParameter[@id='{}']".format(param['id']),
+                    "sbml:{}[@id='{}']".format(param_sbml.getElementName(), param['id']),
                     "@value",
                 ]
             else:
@@ -408,12 +412,13 @@ class SbmlModelReader(ModelReader):
                     "sbml:sbml",
                     "sbml:model",
                     "sbml:listOfReactions",
-                    "sbml:reaction[@id='{}']".format(reaction_id),
+                    "{}:{}[@id='{}']".format(rxn_sbml.getPrefix() or 'sbml', rxn_sbml.getElementName(), rxn_id),
                     "sbml:kineticLaw",
                     "sbml:listOfParameters",
-                    "sbml:parameter[@id='{}']".format(param['id']),
+                    "sbml:{}[@id='{}']".format(param_sbml.getElementName(), param['id']),
                     "@value",
                 ]
+            group = '{} kinetic parameters'.format(rxn_name or rxn_id)
         else:
             target = [
                 "sbml:sbml",
@@ -422,12 +427,13 @@ class SbmlModelReader(ModelReader):
                 "sbml:parameter[@id='{}']".format(param['id']),
                 "@value",
             ]
+            group = 'Other global parameters'
         param['target'] = '/' + '/'.join(target)
+        param['group'] = group
 
-        if reaction_id and param['id']:
-            param['id'] = reaction_id + '.' + param['id']
-        if reaction_name and param['name']:
-            param['name'] = reaction_name + ': ' + param['name']
+        if rxn_id:
+            param['id'] = rxn_id + '/' + param['id']
+            param['name'] = (rxn_name or rxn_id) + ': ' + (param['name'] or param['id'])
 
         return param
 
@@ -476,7 +482,8 @@ class SbmlModelReader(ModelReader):
             for rxn_sbml in model_sbml.getListOfReactions():
                 rxn_id = rxn_sbml.getId()
                 vars.append({
-                    'target': "/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='{}']".format(rxn_id),
+                    'target': "/sbml:sbml/sbml:model/sbml:listOfReactions/{}:{}[@id='{}']".format(
+                        rxn_sbml.getPrefix() or 'sbml', rxn_sbml.getElementName(), rxn_id),
                     'group': 'Reaction fluxes',
                     'id': rxn_id,
                     'name': rxn_sbml.getName() or None,

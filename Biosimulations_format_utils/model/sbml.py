@@ -160,8 +160,8 @@ class SbmlModelReader(ModelReader):
         # modeling framework
         packages = set()
         for i_plugin in range(model_sbml.getNumPlugins()):
-            plugin = model_sbml.getPlugin(i_plugin)
-            packages.add(plugin.getPackageName())
+            plugin_sbml = model_sbml.getPlugin(i_plugin)
+            packages.add(plugin_sbml.getPackageName())
         packages = packages.difference(set(['annot', 'layout', 'render', 'req']))
         if packages:
             raise ModelIoError("{} packages are not supported".format(', '.join(packages)))
@@ -204,8 +204,7 @@ class SbmlModelReader(ModelReader):
             :obj:`dict`: dictionary that maps the ids of units to their definitions
         """
         model['units'] = {}
-        for i_unit_def in range(model_sbml.getNumUnitDefinitions()):
-            unit_def_sbml = model_sbml.getUnitDefinition(i_unit_def)
+        for unit_def_sbml in model_sbml.getListOfUnitDefinitions():
             model['units'][unit_def_sbml.getId()] = self._format_unit_def(unit_def_sbml.getDerivedUnitDefinition())
 
         return model['units']
@@ -223,14 +222,11 @@ class SbmlModelReader(ModelReader):
         parameters = {}
 
         # global parameters
-        for i_param in range(model_sbml.getNumParameters()):
-            param_sbml = model_sbml.getParameter(i_param)
+        for param_sbml in model_sbml.getListOfParameters():
             parameters[param_sbml.getId()] = self._read_parameter(param_sbml, model)
 
         # local parameters of reactions
-        for i_rxn in range(model_sbml.getNumReactions()):
-            rxn_sbml = model_sbml.getReaction(i_rxn)
-
+        for rxn_sbml in model_sbml.getListOfReactions():
             kin_law_sbml = rxn_sbml.getKineticLaw()
             if not kin_law_sbml:
                 continue
@@ -238,18 +234,20 @@ class SbmlModelReader(ModelReader):
             reaction_id = rxn_sbml.getId()
             reaction_name = rxn_sbml.getName() or None
 
-            for i_param in range(kin_law_sbml.getNumParameters()):
+            for param_sbml in kin_law_sbml.getListOfParameters():
                 assert reaction_id
-                param_sbml = kin_law_sbml.getParameter(i_param)
                 parameters[(reaction_id, param_sbml.getId())] = self._read_parameter(
                     param_sbml, model, reaction_id=reaction_id, reaction_name=reaction_name)
 
         # compartment sizes
-        for i_comp in range(model_sbml.getNumCompartments()):
-            comp_sbml = model_sbml.getCompartment(i_comp)
+        for comp_sbml in model_sbml.getListOfCompartments():
+            if not comp_sbml.isSetSize():
+                continue
+
             comp_id = comp_sbml.getId()
             assert comp_id
             comp_name = comp_sbml.getName() or comp_id
+
             parameters[comp_id] = {
                 'target': "/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@id='{}']/@size".format(comp_id),
                 'type': 'Initial compartment size',
@@ -260,18 +258,23 @@ class SbmlModelReader(ModelReader):
             }
 
         # initial amounts / concentrations of species
-        for i_species in range(model_sbml.getNumSpecies()):
-            species_sbml = model_sbml.getSpecies(i_species)
+        for species_sbml in model_sbml.getListOfSpecies():
+            if not (species_sbml.isSetInitialAmount() or species_sbml.isSetInitialConcentration()):
+                continue
 
             species_id = species_sbml.getId()
             assert species_id
 
             species_name = species_sbml.getName() or species_id
-            
+
             species_substance_units = model['units'].get(species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits(), None)
-            if species_sbml.isSetInitialConcentration():
+            if species_sbml.isSetInitialAmount():
+                species_initial_type = 'Amount'
+                species_initial_val = species_sbml.getInitialAmount()
+                species_initial_units = species_substance_units
+            else:
                 species_initial_type = 'Concentration'
-                species_initial_val = species_sbml.getInitialConcentration()                
+                species_initial_val = species_sbml.getInitialConcentration()
 
                 comp_sbml = self._get_compartment(model_sbml, species_sbml.getCompartment())
 
@@ -282,10 +285,6 @@ class SbmlModelReader(ModelReader):
                     ))
                 else:
                     species_initial_units = None
-            else:
-                species_initial_type = 'Amount'
-                species_initial_val = species_sbml.getInitialAmount()
-                species_initial_units = species_substance_units
 
             parameters[species_id] = {
                 'target': '/' + '/'.join([
@@ -304,16 +303,24 @@ class SbmlModelReader(ModelReader):
             if species_id == 'species_1':
                 print(parameters[species_id])
 
+        # fbc package
+        plugin_sbml = model_sbml.getPlugin('fbc')
+        if plugin_sbml:
+            pass
+
+        # qual package
+        plugin_sbml = model_sbml.getPlugin('qual')
+        if plugin_sbml:
+            pass
+
         # ignore parameters set via assignment rules and initial assignments
-        for i_rule in range(model_sbml.getNumRules()):
-            rule_sbml = model_sbml.getRule(i_rule)
+        for rule_sbml in model_sbml.getListOfRules():
             if rule_sbml.isScalar():
                 param_id = rule_sbml.getVariable()
                 if param_id in parameters:
                     parameters.pop(param_id)
 
-        for i_init_assign in range(model_sbml.getNumInitialAssignments()):
-            init_assign_sbml = model_sbml.getInitialAssignment(i_init_assign)
+        for init_assign_sbml in model_sbml.getListOfInitialAssignments():
             param_id = init_assign_sbml.getSymbol()
             if param_id in parameters:
                 parameters.pop(param_id)
@@ -396,8 +403,7 @@ class SbmlModelReader(ModelReader):
             :obj:`list` of :obj:`dict`: information about the variables of the model
         """
         model['variables'] = vars = []
-        for i_species in range(model_sbml.getNumSpecies()):
-            species_sbml = model_sbml.getSpecies(i_species)
+        for species_sbml in model_sbml.getListOfSpecies():
             vars.append(self._read_variable(model_sbml, species_sbml, model))
         return vars
 
@@ -445,8 +451,7 @@ class SbmlModelReader(ModelReader):
         Returns:
             :obj:`libsbml.Compartment`: compartment
         """
-        for i_comp in range(model_sbml.getNumCompartments()):
-            comp_sbml = model_sbml.getCompartment(i_comp)
+        for comp_sbml in model_sbml.getListOfCompartments():
             if comp_sbml.getId() == comp_id:
                 return comp_sbml
 

@@ -49,6 +49,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'name': 'quantity_1',
                 'description': None,
                 'identifiers': [],
+                'type': 'float',
                 'value': 0.0,
                 'recommended_range': [0., 10.],
                 'units': None
@@ -66,6 +67,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'name': '15: k1',
                 'description': None,
                 'identifiers': [],
+                'type': 'float',
                 'value': 0.02,
                 'recommended_range': [0.002, 0.2],
                 'units': None
@@ -78,6 +80,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'name': '15: k2',
                 'description': None,
                 'identifiers': [],
+                'type': 'float',
                 'value': 1.0,
                 'recommended_range': [0.1, 10.],
                 'units': None
@@ -92,6 +95,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'name': 'Initial size of compartment',
             'description': None,
             'identifiers': [],
+            'type': 'float',
             'value': 1.0,
             'recommended_range': [0.1, 10.],
             'units': '10^-3 liter',
@@ -106,6 +110,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'name': 'Initial concentration of MK',
             'description': None,
             'identifiers': [],
+            'type': 'float',
             'value': 1200.,
             'recommended_range': [120., 12000.],
             'units': None,
@@ -123,6 +128,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'identifiers': [],
             'compartment_id': 'compartment_1',
             'compartment_name': 'compartment',
+            'type': 'float',
             'units': '10^-6 mole / liter',
             'constant': False,
             'boundary_condition': False,
@@ -146,6 +152,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'name': 'Keq',
                 'description': None,
                 'identifiers': [],
+                'type': 'float',
                 'value': 0.32,
                 'recommended_range': [0.032, 3.2],
                 'units': None
@@ -163,6 +170,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'name': 'SHMT: Km1',
                 'description': None,
                 'identifiers': [],
+                'type': 'float',
                 'value': 1.7,
                 'recommended_range': [0.17, 17.],
                 'units': None
@@ -175,6 +183,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'name': 'SHMT: Km2',
                 'description': None,
                 'identifiers': [],
+                'type': 'float',
                 'value': 210.,
                 'recommended_range': [21., 2100.],
                 'units': None
@@ -187,6 +196,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 'name': 'SHMT: Vm',
                 'description': None,
                 'identifiers': [],
+                'type': 'float',
                 'value': 18330.,
                 'recommended_range': [1833., 183300.],
                 'units': None
@@ -230,6 +240,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'name': 'Coefficient of atp_consume_max of ATP production',
             'description': None,
             'identifiers': [],
+            'type': 'float',
             'value': 1.0,
             'recommended_range': [0.1, 10.],
             'units': 'dimensionless',
@@ -246,6 +257,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'identifiers': [],
             'compartment_id': None,
             'compartment_name': None,
+            'type': 'float',
             'units': 'millimole / second',
             'constant': False,
             'boundary_condition': False,
@@ -263,6 +275,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'identifiers': [],
             'compartment_id': None,
             'compartment_name': None,
+            'type': 'float',
             'units': 'millimole / second',
             'constant': False,
             'boundary_condition': False,
@@ -282,9 +295,52 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             'name': 'Intra-Complex_Trans_Association: kon',
             'description': None,
             'identifiers': [],
+            'type': 'float',
             'value': 100.,
             'recommended_range': [10., 1000.],
             'units': None,
+        })
+
+    def test_run_qual_package(self):
+        filename = 'tests/fixtures/qual_example_4.2.sbml-L3V1.xml'
+        model = read_model(filename, format=ModelFormat.sbml)
+
+        self.assertEqual(len(model['parameters']), 4)
+        param = next(param for param in model['parameters'] if param['id'] == 'init_level_A')
+        self.assertEqual(param, {
+            'target': '/' + '/'.join([
+                "sbml:sbml",
+                "sbml:model",
+                "qual:listOfQualitativeSpecies",
+                "qual:qualitativeSpecies[@qual:id='A']",
+                "@qual:initialLevel",
+            ]),
+            'group': 'Initial species levels',
+            'id': 'init_level_A',
+            'name': 'Initial level of A',
+            'description': None,
+            'identifiers': [],
+            'type': 'integer',
+            'value': 2,
+            'recommended_range': [0, 2],
+            'units': 'dimensionless',
+        })
+
+        self.assertEqual(len(model['variables']), 4)
+        var = next(var for var in model['variables'] if var['id'] == 'A')
+        self.assertEqual(var, {
+            'target': "/sbml:sbml/sbml:model/qual:listOfQualitativeSpecies/qual:qualitativeSpecies[@qual:id='A']",
+            'group': 'Species levels',
+            'id': 'A',
+            'name': None,
+            'description': None,
+            'identifiers': [],
+            'compartment_id': 'default',
+            'compartment_name': None,
+            'type': 'integer',
+            'units': 'dimensionless',
+            'constant': False,
+            'boundary_condition': False,
         })
 
     def test_run_unsupported_packages(self):

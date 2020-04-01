@@ -261,6 +261,7 @@ class SbmlModelReader(ModelReader):
                 'name': 'Initial size of {}'.format(comp_name),
                 'description': None,
                 'identifiers': [],
+                'type': 'float',
                 'value': value,
                 'recommended_range': self._calc_recommended_param_range(value),
                 'units': self._format_unit_def(comp_sbml.getDerivedUnitDefinition()),
@@ -308,6 +309,7 @@ class SbmlModelReader(ModelReader):
                 'name': 'Initial {} of {}'.format(species_initial_type.lower(), species_name),
                 'description': None,
                 'identifiers': [],
+                'type': 'float',
                 'value': species_initial_val,
                 'recommended_range': self._calc_recommended_param_range(species_initial_val),
                 'units': species_initial_units,
@@ -341,6 +343,7 @@ class SbmlModelReader(ModelReader):
                     'name': 'Coefficient of {} of {}'.format(obj_name, rxn_name),
                     'description': None,
                     'identifiers': [],
+                    'type': 'float',
                     'value': value,
                     'recommended_range': self._calc_recommended_param_range(value),
                     'units': 'dimensionless',
@@ -349,7 +352,32 @@ class SbmlModelReader(ModelReader):
         # qual package
         plugin_sbml = model_sbml.getPlugin('qual')
         if plugin_sbml:
-            pass
+            for species_sbml in plugin_sbml.getListOfQualitativeSpecies():
+                species_id = species_sbml.getId()
+                init_level = species_sbml.getInitialLevel()
+                if species_sbml.isSetMaxLevel():
+                    max_level = species_sbml.getMaxLevel()
+                else:
+                    max_level = max(1, init_level)
+
+                parameters[species_id] = {
+                    'target': '/' + '/'.join([
+                        "sbml:sbml",
+                        "sbml:model",
+                        "qual:listOfQualitativeSpecies",
+                        "qual:qualitativeSpecies[@qual:id='{}']".format(species_id),
+                        "@qual:initialLevel",
+                    ]),
+                    'group': 'Initial species levels',
+                    'id': 'init_level_' + species_id,
+                    'name': 'Initial level of {}'.format(species_sbml.getName() or species_id),
+                    'description': None,
+                    'identifiers': [],
+                    'type': 'integer',
+                    'value': init_level,
+                    'recommended_range': [0, max_level],
+                    'units': 'dimensionless',
+                }
 
         # ignore parameters set via assignment rules and initial assignments
         for rule_sbml in model_sbml.getListOfRules():
@@ -390,6 +418,7 @@ class SbmlModelReader(ModelReader):
             'name': param_sbml.getName() or param_sbml.getId(),
             'description': None,
             'identifiers': [],
+            'type': 'float',
             'value': value,
             'recommended_range': self._calc_recommended_param_range(value),
             'units': self._format_unit_def(param_sbml.getDerivedUnitDefinition()),
@@ -448,8 +477,8 @@ class SbmlModelReader(ModelReader):
             :obj:`list` of :obj:`dict`: information about the variables of the model
         """
         model['variables'] = vars = []
+
         fbc_plugin_sbml = model_sbml.getPlugin('fbc')
-        qual_plugin_sbml = model_sbml.getPlugin('qual')
 
         if fbc_plugin_sbml:
             flux_units = self._pretty_print_units('({}) / ({})'.format(
@@ -473,6 +502,7 @@ class SbmlModelReader(ModelReader):
                 'identifiers': [],
                 'compartment_id': None,
                 'compartment_name': None,
+                'type': 'float',
                 'units': flux_units,
                 'constant': False,
                 'boundary_condition': False,
@@ -491,17 +521,40 @@ class SbmlModelReader(ModelReader):
                     'identifiers': [],
                     'compartment_id': None,
                     'compartment_name': None,
+                    'type': 'float',
                     'units': flux_units,
                     'constant': False,
                     'boundary_condition': False,
                 })
 
-        elif qual_plugin_sbml:
-            pass
-
         else:
+            # regular species
             for species_sbml in model_sbml.getListOfSpecies():
                 vars.append(self._read_variable(model_sbml, species_sbml, model))
+
+            # qualitative species of qual package
+            qual_plugin = model_sbml.getPlugin('qual')
+            if qual_plugin:
+                for species_sbml in qual_plugin.getListOfQualitativeSpecies():
+                    species_id = species_sbml.getId()
+                    comp_id = species_sbml.getCompartment()
+                    comp_sbml = self._get_compartment(model_sbml, comp_id)
+
+                    vars.append({
+                        'target': ("/sbml:sbml/sbml:model/qual:listOfQualitativeSpecies"
+                                   "/qual:qualitativeSpecies[@qual:id='{}']").format(species_id),
+                        'group': 'Species levels',
+                        'id': species_id,
+                        'name': species_sbml.getName() or None,
+                        'description': None,
+                        'identifiers': [],
+                        'compartment_id': comp_id,
+                        'compartment_name': comp_sbml.getName() or None,
+                        'type': 'integer',
+                        'units': 'dimensionless',
+                        'constant': species_sbml.getConstant(),
+                        'boundary_condition': False,
+                    })
 
         return vars
 
@@ -535,6 +588,7 @@ class SbmlModelReader(ModelReader):
             'identifiers': [],
             'compartment_id': comp_id,
             'compartment_name': comp_name,
+            'type': 'float',
             'units': self._format_unit_def(species_sbml.getDerivedUnitDefinition()),
             'constant': species_sbml.getConstant(),
             'boundary_condition': species_sbml.getBoundaryCondition(),

@@ -111,3 +111,5 @@ class WriteSedMlTestCase(unittest.TestCase):
         doc = libsedml.SedDocument()
         with self.assertRaisesRegex(ValueError, 'libsedml error:'):
             sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setName', 'name')
+
+        # todo: use malfored XML annotation

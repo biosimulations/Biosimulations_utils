@@ -1,5 +1,6 @@
 ete3
 pint
+python_dateutil
 python_libsbml
 python_libsedml >= 2
 requests

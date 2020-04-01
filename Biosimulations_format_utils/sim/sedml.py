@@ -10,7 +10,10 @@ from .core import SimWriter, SimReader
 from .data_model import Simulation, Algorithm, AlgorithmParameter, ParameterChange
 from ..data_model import Format
 from ..model.data_model import Model, Parameter, Variable
+from datetime import datetime
 from xml.sax import saxutils
+import dateutil.parser
+import enum
 import libsedml
 
 __all__ = [
@@ -94,20 +97,58 @@ class SedMlSimWriter(SimWriter):
             doc_sed (:obj:`libsedml.SedDocument`): SED document
         """
         metadata = {}
-        for attr_name in ['id', 'name', 'description', 'tags']:
-            attr_val = getattr(sim, attr_name)
-            if attr_val:
-                metadata[attr_name] = attr_val
+
+        if sim.id:
+            metadata['id'] = XmlNode(
+                prefix='dc',
+                name='title',
+                id='id',
+                type=RdfDataType.string,
+                value=sim.id,
+            )
+
+        if sim.name:
+            metadata['name'] = XmlNode(
+                prefix='dc',
+                name='description',
+                id='name',
+                type=RdfDataType.string,
+                value=sim.name,
+            )
+
+        if sim.description:
+            metadata['description'] = XmlNode(
+                prefix='dc',
+                name='description',
+                id='description',
+                type=RdfDataType.string,
+                value=sim.description,
+            )
+
+        if sim.tags:
+            metadata['tags'] = [XmlNode('dc', 'description', None, RdfDataType.string, tag) for tag in sim.tags]
 
         if sim.authors:
+            # todo
             metadata['authors'] = [author.to_json() for author in sim.authors]
-        if sim.refs:
-            metadata['refs'] = [ref.to_json() for ref in sim.refs]
-        if sim.license:
-            metadata['license'] = sim.license.value
 
-        if metadata:
-            self._add_annotation_to_obj(metadata, doc_sed, doc_sed)
+        if sim.refs:
+            # todo
+            metadata['refs'] = [ref.to_json() for ref in sim.refs]
+
+        if sim.license:
+            metadata['license'] = XmlNode(
+                prefix='dcterms',
+                name='license',
+                id='license',
+                type=RdfDataType.string,
+                value=sim.license.value,
+            )
+
+        metadata['creator'] = XmlNode('dcterms', 'creator', None, RdfDataType.string, 'BioSimulations')
+        metadata['created'] = XmlNode('dcterms', 'created', None, RdfDataType.date_time, datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+
+        self._add_annotation_to_obj(metadata, doc_sed, doc_sed)
 
     def _add_model_to_doc(self, model, filename, doc_sed):
         """ Add a model to a SED document
@@ -159,9 +200,21 @@ class SedMlSimWriter(SimWriter):
 
         metadata = {}
         if change.parameter.id:
-            metadata['id'] = change.parameter.id
+            metadata['id'] = XmlNode(
+                prefix='dc',
+                name='title',
+                id='id',
+                type=RdfDataType.string,
+                value=change.parameter.id,
+            )
         if change.parameter.name:
-            metadata['name'] = change.parameter.name
+            metadata['name'] = XmlNode(
+                prefix='dc',
+                name='description',
+                id='name',
+                type=RdfDataType.string,
+                value=change.parameter.name,
+            )
         if metadata:
             self._add_annotation_to_obj(metadata, doc_sed, change_sed)
 
@@ -200,7 +253,14 @@ class SedMlSimWriter(SimWriter):
         alg_sed = sim_sed.createAlgorithm()
         self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.id)
         if algorithm.name:
-            self._add_annotation_to_obj({'name': algorithm.name}, doc_sed, alg_sed)
+            self._add_annotation_to_obj({'name': XmlNode(
+                prefix='dc',
+                name='title',
+                id='name',
+                type=RdfDataType.string,
+                value=algorithm.name,
+            )}, doc_sed, alg_sed)
+
         return alg_sed
 
     def _add_param_changes_to_alg(self, changes, doc_sed, alg_sed):
@@ -234,7 +294,13 @@ class SedMlSimWriter(SimWriter):
         change_sed = alg_sed.createAlgorithmParameter()
         self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID', change.parameter.kisao_id)
         if change.parameter.name:
-            self._add_annotation_to_obj({'name': change.parameter.name}, doc_sed, change_sed)
+            self._add_annotation_to_obj({'name': XmlNode(
+                prefix='dc',
+                name='title',
+                id='name',
+                type=RdfDataType.string,
+                value=change.parameter.name,
+            )}, doc_sed, change_sed)
         self._call_libsedml_method(doc_sed, change_sed, 'setValue', str(change.value))
         return change_sed
 
@@ -375,10 +441,14 @@ class SedMlSimWriter(SimWriter):
             annot_xml = self._encode_obj_to_xml(annot)
             self._call_libsedml_method(doc_sed, obj_sed, 'setAnnotation',
                                        ('<annotation>'
-                                        '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
-                                        '{}'
-                                        '</rdf:RDF>'
-                                        '</annotation>').format(''.join(annot_xml)))
+                                        '  <rdf:RDF'
+                                        '    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"'
+                                        '    xmlns:dc="http://purl.org/dc/elements/1.1/"'
+                                        '    xmlns:dcterms="http://purl.org/dc/terms/"'
+                                        '  >'
+                                        '    {}'
+                                        '  </rdf:RDF>'
+                                        '  </annotation>').format(''.join(annot_xml)))
 
     def _encode_obj_to_xml(self, obj, id=None):
         """ Encode an object into XML
@@ -409,24 +479,19 @@ class SedMlSimWriter(SimWriter):
             for el in obj:
                 els_xml.append("<rdf:li>" + self._encode_obj_to_xml(el) + "</rdf:li>")
             return '<rdf:Seq{}>{}</rdf:Seq>'.format(id_xml, ''.join(els_xml))
-        else:
-            if isinstance(obj, str):
-                datatype = 'string'
-                obj_xml = saxutils.escape(obj)
-            elif isinstance(obj, int):
-                datatype = 'integer'
-                obj_xml = obj
+        elif isinstance(obj, XmlNode):
+            return obj.encode()
+        elif isinstance(obj, (int, float, str)):
+            if isinstance(obj, int):
+                type = RdfDataType.integer
             elif isinstance(obj, float):
-                datatype = 'float'
-                obj_xml = obj
+                type = RdfDataType.float
             else:
-                raise ValueError('Value must be a float, integer, string, dist, or list not {}'.format(
-                    obj.__class__.__name__))
-            return ('<rdf:value'
-                    '{}'
-                    ' rdf:datatype="http://www.w3.org/2001/XMLSchema#{}">'
-                    '{}'
-                    '</rdf:value>').format(id_xml, datatype, obj_xml)
+                type = RdfDataType.string
+            return XmlNode(prefix='rdf', name='value', id=id, type=type, value=obj).encode()
+        else:
+            raise ValueError('Value must be a float, integer, string, dict, or list not {}'.format(
+                obj.__class__.__name__))
 
     @staticmethod
     def _call_libsedml_method(doc_sed, obj_sed, method_name, *args, **kwargs):
@@ -615,10 +680,7 @@ class SedMlSimReader(SimReader):
         Returns:
             :obj:`object`: object
         """
-        if obj_xml.getPrefix() != 'rdf':
-            raise ValueError('Unable to decode object')
-
-        if obj_xml.getName() == 'Description':
+        if obj_xml.getPrefix() == 'rdf' and obj_xml.getName() == 'Description':
             val = {}
             for i_child in range(obj_xml.getNumChildren()):
                 child_xml = obj_xml.getChild(i_child)
@@ -629,13 +691,11 @@ class SedMlSimReader(SimReader):
                         id = child_xml.getAttrValue(i_attr)
                         break
 
-                if id is None:
-                    raise ValueError('Unable to decode object')
-
-                val[id] = self._decode_obj_from_xml(child_xml)
+                if id:
+                    val[id] = self._decode_obj_from_xml(child_xml)
             return val
 
-        if obj_xml.getName() == 'Bag':
+        if obj_xml.getPrefix() == 'rdf' and obj_xml.getName() == 'Bag':
             val = set()
             for i_child in range(obj_xml.getNumChildren()):
                 child_xml = obj_xml.getChild(i_child)
@@ -644,7 +704,7 @@ class SedMlSimReader(SimReader):
                 val.add(self._decode_obj_from_xml(child_xml.getChild(0)))
             return val
 
-        elif obj_xml.getName() == 'Seq':
+        elif obj_xml.getPrefix() == 'rdf' and obj_xml.getName() == 'Seq':
             val = []
             for i_child in range(obj_xml.getNumChildren()):
                 child_xml = obj_xml.getChild(i_child)
@@ -653,26 +713,82 @@ class SedMlSimReader(SimReader):
                 val.append(self._decode_obj_from_xml(child_xml.getChild(0)))
             return val
 
-        elif obj_xml.getName() == 'value':
-            datatype = None
+        elif obj_xml.getPrefix() in ['dc', 'dcterms', 'rdf']:
+            type = None
             for i_attr in range(obj_xml.getAttributesLength()):
                 if obj_xml.getAttrPrefix(i_attr) == 'rdf' and obj_xml.getAttrName(i_attr) == 'datatype':
-                    datatype = obj_xml.getAttrValue(i_attr)
+                    type = obj_xml.getAttrValue(i_attr)
 
-            if datatype is None:
+            if type is None:
                 raise ValueError('Unable to decode object')
 
             assert obj_xml.getNumChildren() == 1
             val = libsedml.XMLNode.convertXMLNodeToString(obj_xml.getChild(0))
-            if datatype == "http://www.w3.org/2001/XMLSchema#string":
+            if type == "http://www.w3.org/2001/XMLSchema#string":
                 val = saxutils.unescape(val)
-            elif datatype == "http://www.w3.org/2001/XMLSchema#integer":
+            elif type == "http://www.w3.org/2001/XMLSchema#integer":
                 val = int(val)
-            elif datatype == "http://www.w3.org/2001/XMLSchema#float":
+            elif type == "http://www.w3.org/2001/XMLSchema#float":
                 val = float(val)
+            elif type == "http://www.w3.org/2001/XMLSchema#dateTime":
+                val = dateutil.parser.parse(val)
             else:
-                raise ValueError("Datatype must be float, integer, or string not {}".format(datatype))
+                raise ValueError("Data type must be float, integer, or string not {}".format(type))
             return val
 
         else:
             raise ValueError('Unable to decode object')
+
+
+class RdfDataType(str, enum.Enum):
+    """ RDF data type """
+    string = 'string'
+    integer = 'integer'
+    float = 'float'
+    date_time = 'dateTime'
+
+
+class XmlNode(object):
+    """ XML node, used for annotations
+
+    Attributes:
+        prefix (:obj:`str`): tag prefix
+        name (:obj:`str`): tag name
+        id (:obj:`str`): RDF id
+        type (:obj:`RdfDataType`): RDF data type
+        value (:obj:`object`): value
+    """
+
+    def __init__(self, prefix=None, name=None, id=None, type=None, value=None):
+        """
+        Args:
+            prefix (:obj:`str`): tag prefix
+            name (:obj:`str`): tag name
+            id (:obj:`str`): RDF id
+            type (:obj:`RdfDataType`): RDF data type
+            value (:obj:`object`): value
+        """
+        self.prefix = prefix
+        self.name = name
+        self.id = id
+        self.type = type
+        self.value = value
+
+    def encode(self):
+        if self.id:
+            id = ' rdf:ID="{}"'.format(self.id)
+        else:
+            id = ''
+
+        if self.type == RdfDataType.string:
+            value_xml = saxutils.escape(self.value)
+        else:
+            value_xml = self.value
+
+        return ('<{}:{}'
+                '{}'
+                ' rdf:datatype="http://www.w3.org/2001/XMLSchema#{}">'
+                '{}'
+                '</{}:{}>').format(self.prefix, self.name,
+                                   id, self.type.value, value_xml,
+                                   self.prefix, self.name)

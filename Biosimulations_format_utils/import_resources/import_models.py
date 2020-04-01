@@ -7,8 +7,10 @@
 """
 
 
+from ..data_model import Identifier, JournalReference, License, Person, RemoteFile
 from ..model import ModelFormat, read_model
 from ..model.core import ModelIoError
+from ..model.data_model import Model
 from ..model.sbml import SbmlModelReader, XmlName
 import libsbml
 import math
@@ -65,7 +67,7 @@ class ImportBioModels(object):
         """ Retrieve models from BioModels and submit to BioSimulations
 
         Returns:
-            :obj:`list` of :obj:`dict`: models
+            :obj:`list` of :obj:`Model`: models
         """
         models = self.get_models()
         self.submit_models(models)
@@ -75,7 +77,7 @@ class ImportBioModels(object):
         """ Get models from BioModels
 
         Returns:
-            :obj:`list` of :obj:`dict`: list of metadata about each model
+            :obj:`list` of :obj:`Model`: list of metadata about each model
         """
         models = []
         num_models = min(self._max_models, self.get_num_models())
@@ -133,7 +135,7 @@ class ImportBioModels(object):
             id (:obj:`str`): model id
 
         Returns:
-            :obj:`dict`: information about model
+            :obj:`Model`: information about model
         """
         metadata = self.get_model_metadata(id)
 
@@ -144,7 +146,7 @@ class ImportBioModels(object):
             for author in metadata['publication'].get('authors', []):
                 last_name, _, first_name = author['name'].partition(' ')
 
-                authors.append({'firstName': first_name, 'middleName': None, 'lastName': last_name})
+                authors.append(Person(first_name=first_name, last_name=last_name))
 
                 author_str = []
                 if first_name:
@@ -196,11 +198,11 @@ class ImportBioModels(object):
                             first_name = None
                             middle_name = None
 
-                        authors.append({
-                            'lastName': last_name,
-                            'firstName': first_name,
-                            'middleName': middle_name,
-                        })
+                        authors.append(Person(
+                            last_name=last_name,
+                            first_name=first_name,
+                            middle_name=middle_name,
+                        ))
 
                         author_str = []
                         if first_name:
@@ -221,16 +223,16 @@ class ImportBioModels(object):
                 authors_str = ', '.join(authors_str[0:-1]) + ' & ' + authors_str[-1]
 
             refs = [
-                {
-                    'authors': authors_str,
-                    'title': metadata['publication']['title'],
-                    'journal': metadata['publication']['journal'],
-                    'volume': metadata['publication'].get('volume', None),
-                    'num': metadata['publication'].get('issue', None),
-                    'pages': metadata['publication'].get('pages', None),
-                    'year': metadata['publication'].get('year', None),
-                    'doi': doi,
-                },
+                JournalReference(
+                    authors=authors_str,
+                    title=metadata['publication']['title'],
+                    journal=metadata['publication']['journal'],
+                    volume=metadata['publication'].get('volume', None),
+                    num=metadata['publication'].get('issue', None),
+                    pages=metadata['publication'].get('pages', None),
+                    year=metadata['publication'].get('year', None),
+                    doi=doi,
+                ),
             ]
         else:
             authors = []
@@ -242,43 +244,28 @@ class ImportBioModels(object):
             file.write(self.get_model_file(id, filename))
 
         model = read_model(local_path, format=ModelFormat.sbml)
-
-        description = metadata.get('description', None)
-        if description:
+        model.id = id
+        model.name = metadata['name']
+        model.file = RemoteFile(
+            name=filename,
+            type='application/sbml+xml',
+            size=os.path.getsize(local_path),
+        )
+        model.description = metadata.get('description', None)
+        if model.description:
             try:
-                description_xml = xml.dom.minidom.parseString(description)
+                description_xml = xml.dom.minidom.parseString(model.description)
                 for div_xml in description_xml.getElementsByTagNameNS('http://www.w3.org/1999/xhtml', 'div'):
                     if div_xml.getAttribute('class') == 'dc:description':
                         div_xml.removeAttribute('class')
-                        description = div_xml.toxml()
+                        model.description = div_xml.toxml()
             except Exception:
                 pass
-
-        return {
-            'id': id,
-            'name': metadata['name'],
-            'file': {
-                'name': filename,
-                'type': 'application/sbml+xml',
-                'size': os.path.getsize(local_path),
-            },
-            'parameters': model['parameters'],
-            'image': None,
-            'description': description,
-            'taxon': model['taxon'],
-            'tags': [],
-            'framework': model['framework'],
-            'format': model['format'],
-            'identifiers': [
-                {
-                    'namespace': 'biomodels.db',
-                    'id': metadata['publicationId'],
-                },
-            ],
-            'refs': refs,
-            'authors': authors,
-            'license': 'CC0',
-        }
+        model.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
+        model.refs = refs
+        model.authors = authors
+        model.license = License.cc0
+        return model
 
     def get_model_metadata(self, id):
         """ Get metadata about a model

@@ -11,7 +11,11 @@ import enum
 __all__ = [
     'Format',
     'Identifier',
+    'JournalReference',
+    'License',
     'OntologyTerm',
+    'Person',
+    'RemoteFile',
     'Taxon',
     'Type',
 ]
@@ -155,6 +159,131 @@ class Identifier(object):
         return (identifier.namespace, identifier.id)
 
 
+class License(str, enum.Enum):
+    """ A license """
+    cc0 = 'CC0'
+    cc_by = 'CC BY'
+    cc_by_sa = 'CC BY-SA'
+    cc_by_nc = 'CC BY-NC'
+    cc_by_nc_sa = 'CC BY-NC-SA'
+    mit = 'MIT'
+    other = 'Other'
+
+
+class JournalReference(object):
+    """ A format
+
+    Attributes:
+        authors (:obj:`str`): authors
+        title (:obj:`str`): title
+        journal (:obj:`str`): journal
+        volume (:obj:`int` or :obj:`str`): volume
+        num (:obj:`int`): issue number
+        pages (:obj:`str`): pages
+        year (:obj:`int`): year
+        doi (:obj:`str`): DOI
+    """
+
+    def __init__(self, authors=None, title=None, journal=None, volume=None, num=None, pages=None, year=None, doi=None):
+        """
+        Args:
+            authors (:obj:`str`, optional): authors
+            title (:obj:`str`, optional): title
+            journal (:obj:`str`, optional): journal
+            volume (:obj:`int` or :obj:`str`, optional): volume
+            num (:obj:`int`, optional): issue number
+            pages (:obj:`str`, optional): pages
+            year (:obj:`int`, optional): year
+            doi (:obj:`str`, optional): DOI
+        """
+        self.authors = authors
+        self.title = title
+        self.journal = journal
+        self.volume = volume
+        self.num = num
+        self.pages = pages
+        self.year = year
+        self.doi = doi
+
+    def __eq__(self, other):
+        """ Determine if two formats are semantically equal
+
+        Args:
+            other (:obj:`Format`): other format
+
+        Returns:
+            :obj:`bool`
+        """
+        return isinstance(other, self.__class__) \
+            and self.authors == other.authors \
+            and self.title == other.title \
+            and self.journal == other.journal \
+            and self.volume == other.volume \
+            and self.num == other.num \
+            and self.pages == other.pages \
+            and self.year == other.year \
+            and self.doi == other.doi
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'authors': self.authors,
+            'title': self.title,
+            'journal': self.journal,
+            'volume': self.volume,
+            'num': self.num,
+            'pages': self.pages,
+            'year': self.year,
+            'doi': self.doi,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create journal reference from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`JournalReference`
+        """
+        return cls(
+            authors=val.get('authors', None),
+            title=val.get('title', None),
+            journal=val.get('journal', None),
+            volume=val.get('volume', None),
+            num=val.get('num', None),
+            pages=val.get('pages', None),
+            year=val.get('year', None),
+            doi=val.get('doi', None),
+        )
+
+    @staticmethod
+    def sort_key(ref):
+        """ Get a key to sort a reference
+
+        Args:
+            ref (:obj:`JournalReference`): reference
+
+        Returns:
+            :obj:`tuple`
+        """
+        return (
+            ref.authors,
+            ref.title,
+            ref.journal,
+            ref.volume,
+            ref.num,
+            ref.pages,
+            ref.year,
+            ref.doi,
+        )
+
+
 class OntologyTerm(object):
     """ A term in an ontology
 
@@ -227,6 +356,144 @@ class OntologyTerm(object):
             name=val.get('name', None),
             description=val.get('description', None),
             iri=val.get('iri', None),
+        )
+
+
+class Person(object):
+    """ A person, such as an author of a journal article
+
+    Attributes:
+        first_name (:obj:`str`): first name
+        middle_name (:obj:`str`): middle name
+        last_name (:obj:`str`): last name
+    """
+
+    def __init__(self, first_name=None, middle_name=None, last_name=None):
+        """
+        Args:
+            first_name (:obj:`str`, optional): first name
+            middle_name (:obj:`str`, optional): middle name
+            last_name (:obj:`str`, optional): last name
+        """
+        self.first_name = first_name
+        self.middle_name = middle_name
+        self.last_name = last_name
+
+    def __eq__(self, other):
+        """ Determine if two formats are semantically equal
+
+        Args:
+            other (:obj:`Format`): other format
+
+        Returns:
+            :obj:`bool`
+        """
+        return isinstance(other, self.__class__) \
+            and self.first_name == other.first_name \
+            and self.middle_name == other.middle_name \
+            and self.last_name == other.last_name
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'firstName': self.first_name,
+            'middleName': self.middle_name,
+            'lastName': self.last_name,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create person from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`Person`
+        """
+        return cls(
+            first_name=val.get('firstName', None),
+            middle_name=val.get('middleName', None),
+            last_name=val.get('lastName', None),
+        )
+
+    @staticmethod
+    def sort_key(person):
+        """ Get a key to sort a person
+
+        Args:
+            person (:obj:`Person`): person
+
+        Returns:
+            :obj:`tuple`
+        """
+        return (person.last_name, person.first_name, person.middle_name)
+
+
+class RemoteFile(object):
+    """ A remote file
+
+    Attributes:
+        name (:obj:`str`): name (e.g., model.xml)
+        type (:obj:`str`): MIME type (e.g., application/sbml+xml)
+        size (:obj:`int`): size in bytes
+    """
+
+    def __init__(self, name=None, type=None, size=None):
+        """
+        Args:
+            name (:obj:`str`, optional): name (e.g., model.xml)
+            type (:obj:`str`, optional): MIME type (e.g., application/sbml+xml)
+            size (:obj:`int`, optional): size in bytes
+        """
+        self.name = name
+        self.type = type
+        self.size = size
+
+    def __eq__(self, other):
+        """ Determine if two formats are semantically equal
+
+        Args:
+            other (:obj:`Format`): other format
+
+        Returns:
+            :obj:`bool`
+        """
+        return isinstance(other, self.__class__) \
+            and self.name == other.name \
+            and self.type == other.type \
+            and self.size == other.size
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'name': self.name,
+            'type': self.type,
+            'size': self.size,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create a remote file from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`RemoteFile`
+        """
+        return cls(
+            name=val.get('name', None),
+            type=val.get('type', None),
+            size=val.get('size', None),
         )
 
 

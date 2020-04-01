@@ -7,6 +7,9 @@
 """
 
 from .core import SimWriter, SimReader
+from .data_model import Simulation, Algorithm, AlgorithmParameter, ParameterChange
+from ..data_model import Format
+from ..model.data_model import Model, Parameter, Variable
 from xml.sax import saxutils
 import abc
 import libsedml
@@ -26,8 +29,8 @@ class SedMlSimWriter(SimWriter):
     def run(self, model_vars, sim, model_filename, sim_filename, level=1, version=3):
         """
         Args:
-            model_vars (:obj:`list` of :obj:`dict`): List of variables in the model. Each variable should have the keys `id` and `target`
-            sim (:obj:`dict`): Simulation experiment
+            model_vars (:obj:`list` of :obj:`Variable`): List of variables in the model. Each variable should have the keys `id` and `target`
+            sim (:obj:`Simulation`): Simulation experiment
             model_filename (:obj:`str`): Path to the model definition
             sim_filename (:obj:`str`): Path to save simulation experiment in SED-ML format
             level (:obj:`int`): SED-ML level
@@ -36,18 +39,18 @@ class SedMlSimWriter(SimWriter):
         Returns:
             :obj:`libsedml.SedDocument`: SED document
         """
-        if sim['format']['name'] != 'SED-ML' or sim['format']['version'] != 'L{}V{}'.format(level, version):
+        if sim.format.name != 'SED-ML' or sim.format.version != 'L{}V{}'.format(level, version):
             raise ValueError('Format must be SED-ML L{}V{}'.format(level, version))
 
         doc_sed = self._create_doc(level, version)
         self._add_metadata_to_doc(sim, doc_sed)
 
-        model_sed = self._add_model_to_doc(sim['model'], model_filename, doc_sed)
-        self._add_parameter_changes_to_model(sim['modelParameterChanges'], doc_sed, model_sed)
+        model_sed = self._add_model_to_doc(sim.model, model_filename, doc_sed)
+        self._add_parameter_changes_to_model(sim.model_parameter_changes, doc_sed, model_sed)
 
         sim_sed = self._add_timecourse_sim_to_doc(sim, doc_sed)
-        alg_sed = self._add_algorithm_to_sim(sim['algorithm'], doc_sed, sim_sed)
-        self._add_param_changes_to_alg(sim['algorithmParameterChanges'], doc_sed, alg_sed)
+        alg_sed = self._add_algorithm_to_sim(sim.algorithm, doc_sed, sim_sed)
+        self._add_param_changes_to_alg(sim.algorithm_parameter_changes, doc_sed, alg_sed)
         task_sed = self._add_sim_task_to_doc(doc_sed, model_sed, sim_sed)
 
         report_sed = self._add_report_to_doc(doc_sed)
@@ -88,13 +91,21 @@ class SedMlSimWriter(SimWriter):
         * License
 
         Args:
-            sim (:obj:`dict`): simulation experiment
+            sim (:obj:`Simulation`): simulation experiment
             doc_sed (:obj:`libsedml.SedDocument`): SED document
         """
         metadata = {}
-        for attr_name in ['id', 'name', 'authors', 'description', 'tags', 'refs', 'license']:
-            if sim.get(attr_name, None):
-                metadata[attr_name] = sim[attr_name]
+        for attr_name in ['id', 'name', 'description', 'tags']:
+            attr_val = getattr(sim, attr_name)
+            if attr_val:
+                metadata[attr_name] = attr_val
+
+        if sim.authors:
+            metadata['authors'] = [author.to_json() for author in sim.authors]
+        if sim.refs:
+            metadata['refs'] = [ref.to_json() for ref in sim.refs]
+        if sim.license:
+            metadata['license'] = sim.license.value
 
         self._add_annotation_to_obj(metadata, doc_sed, doc_sed)
 
@@ -143,19 +154,19 @@ class SedMlSimWriter(SimWriter):
             :obj:`libsedml.SedChangeAttribute`: SED model parameter change
         """
         change_sed = model_sed.createChangeAttribute()
-        self._call_libsedml_method(doc_sed, change_sed, 'setTarget', change['parameter']['target'])
+        self._call_libsedml_method(doc_sed, change_sed, 'setTarget', change.parameter.target)
         self._add_annotation_to_obj({
-            'id': change['parameter']['id'],
-            'name': change['parameter']['name'],
+            'id': change.parameter.id,
+            'name': change.parameter.name,
         }, doc_sed, change_sed)
-        self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change['value']))
+        self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change.value))
         return change_sed
 
     def _add_timecourse_sim_to_doc(self, sim, doc_sed):
         """ Add a timecourse simulation to a SED document
 
         Args:
-            sim (:obj:`object`): simulation experiment
+            sim (:obj:`Simulation`): simulation experiment
             doc_sed (:obj:`libsedml.SedDocument`): SED document
 
         Returns:
@@ -163,17 +174,17 @@ class SedMlSimWriter(SimWriter):
         """
         sim_sed = doc_sed.createUniformTimeCourse()
         self._call_libsedml_method(doc_sed, sim_sed, 'setId', 'simulation')
-        self._call_libsedml_method(doc_sed, sim_sed, 'setInitialTime', sim['startTime'])
-        self._call_libsedml_method(doc_sed, sim_sed, 'setOutputStartTime', sim['startTime'])
-        self._call_libsedml_method(doc_sed, sim_sed, 'setOutputEndTime', sim['endTime'])
-        self._call_libsedml_method(doc_sed, sim_sed, 'setNumberOfPoints', sim['numTimePoints'])
+        self._call_libsedml_method(doc_sed, sim_sed, 'setInitialTime', sim.start_time)
+        self._call_libsedml_method(doc_sed, sim_sed, 'setOutputStartTime', sim.start_time)
+        self._call_libsedml_method(doc_sed, sim_sed, 'setOutputEndTime', sim.end_time)
+        self._call_libsedml_method(doc_sed, sim_sed, 'setNumberOfPoints', sim.num_time_points)
         return sim_sed
 
     def _add_algorithm_to_sim(self, algorithm, doc_sed, sim_sed):
         """ Add a simulation algorithm to a SED document
 
         Args:
-            algorithm (:obj:`dict`): simulation algorithm
+            algorithm (:obj:`Algorithm`): simulation algorithm
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             sim_sed (:obj:`libsedml.SedSimulation`): SED simulation
 
@@ -181,15 +192,15 @@ class SedMlSimWriter(SimWriter):
             :obj:`libsedml.SedAlgorithm`: SED simulation algorithm
         """
         alg_sed = sim_sed.createAlgorithm()
-        self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm['id'])
-        self._add_annotation_to_obj({'name': algorithm['name']}, doc_sed, alg_sed)
+        self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.id)
+        self._add_annotation_to_obj({'name': algorithm.name}, doc_sed, alg_sed)
         return alg_sed
 
     def _add_param_changes_to_alg(self, changes, doc_sed, alg_sed):
         """ Add simulation algorithm parameter changes to a SED document
 
         Args:
-            changes (:obj:`list` of :obj:`dict`): simulation algorithm parameter changes
+            changes (:obj:`list` of :obj:`ParameterChange`): simulation algorithm parameter changes
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             alg_sed (:obj:`libsedml.SedAlgorithm`): SED simulation algorithm
 
@@ -206,7 +217,7 @@ class SedMlSimWriter(SimWriter):
         """ Add simulation algorithm parameter change to a SED document
 
         Args:
-            change (:obj:`dict`): simulation algorithm parameter change
+            change (:obj:`ParameterChange`): simulation algorithm parameter change
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             alg_sed (:obj:`libsedml.SedAlgorithm`): SED simulation algorithm
 
@@ -214,9 +225,9 @@ class SedMlSimWriter(SimWriter):
             :obj:`libsedml.SedAlgorithmParameter`: SED simulation algorithm paremeter change
         """
         change_sed = alg_sed.createAlgorithmParameter()
-        self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID', change['parameter']['kisaoId'])
-        self._add_annotation_to_obj({'name': change['parameter']['name']}, doc_sed, change_sed)
-        self._call_libsedml_method(doc_sed, change_sed, 'setValue', str(change['value']))
+        self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID', change.parameter.kisao_id)
+        self._add_annotation_to_obj({'name': change.parameter.name}, doc_sed, change_sed)
+        self._call_libsedml_method(doc_sed, change_sed, 'setValue', str(change.value))
         return change_sed
 
     def _add_sim_task_to_doc(self, doc_sed, model_sed, sim_sed):
@@ -312,7 +323,7 @@ class SedMlSimWriter(SimWriter):
         """ Add simulation predictions to a SED report
 
         Args:
-            vars (:obj:`list` of :obj:`dict`): variables predicted by a model
+            vars (:obj:`list` of :obj:`Variable`): variables predicted by a model
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             task_sed (:obj:`libsedml.SedTask`): SED task
             report_sed (:obj:`libsedml.SedReport`): SED report
@@ -323,10 +334,10 @@ class SedMlSimWriter(SimWriter):
         """
         seds = []
         for var in vars:
-            id = var['id']
+            id = var.id
             data_gen_sed = self._add_data_gen_to_doc(id, id, doc_sed)
             var_sed = self._add_var_to_data_gen(id, id, None, doc_sed, data_gen_sed, task_sed)
-            self._call_libsedml_method(doc_sed, var_sed, 'setTarget', var['target'])
+            self._call_libsedml_method(doc_sed, var_sed, 'setTarget', var.target)
             self._add_data_set_to_report(id, id, doc_sed, report_sed, data_gen_sed)
             seds.append({
                 'data_gen': data_gen_sed,
@@ -399,7 +410,7 @@ class SedMlSimWriter(SimWriter):
                 obj_xml = obj
             else:
                 raise ValueError('Value must be a float, integer, string, dist, or list not {}'.format(
-                    obj._class__.__name__))
+                    obj.__class__.__name__))
             return ('<rdf:value'
                     '{}'
                     ' rdf:datatype="http://www.w3.org/2001/XMLSchema#{}">'
@@ -444,8 +455,8 @@ class SedMlSimReader(SimReader):
             filename (:obj:`str`): path to SED-ML document that describes a simulation experiment
 
         Returns:
-            :obj:`list` of :obj:`dict`: List of variables in the model. Each variable should have the keys `id` and `target`
-            :obj:`dict`: Simulation experiment
+            :obj:`list` of :obj:`Variable`: List of variables in the model. Each variable should have the keys `id` and `target`
+            :obj:`Simulation`: Simulation experiment
             :obj:`str`: Path to the model definition
             :obj:`int`: SED-ML level
             :obj:`int`: SED-ML version
@@ -469,60 +480,60 @@ class SedMlSimReader(SimReader):
                 var_id = var_id[len('var_'):]
 
                 if var_id != 'time':
-                    model_vars.append({
-                        'id': var_id,
-                        'target': var_sed.getTarget(),
-                    })
+                    model_vars.append(Variable(
+                        id=var_id,
+                        target=var_sed.getTarget(),
+                    ))
 
         # initialize simulation experiment with metadata
-        sim = self._get_obj_annotation(doc_sed)
-        sim['format'] = {
-            "name": "SED-ML",
-            "version": "L{}V{}".format(doc_sed.getLevel(), doc_sed.getVersion()),
-        }
+        sim = Simulation.from_json(self._get_obj_annotation(doc_sed))
+        sim.format = Format(
+            name="SED-ML",
+            version="L{}V{}".format(doc_sed.getLevel(), doc_sed.getVersion()),
+        )
 
         # model
-        sim["model"] = {
-            "format": {
-                "name": self.MODEL_LANGUAGE_NAME,
-            }
-        }
+        sim.model = Model(
+            format=Format(
+                name=self.MODEL_LANGUAGE_NAME,
+            )
+        )
 
         # model parameter changes
-        sim['modelParameterChanges'] = []
+        sim.model_parameter_changes = []
         for change_sed in model_sed.getListOfChanges():
             assert isinstance(change_sed, libsedml.SedChangeAttribute), \
                 "Changes must be attribute changes"
             change = self._get_parameter_change_from_model(change_sed)
-            sim['modelParameterChanges'].append(change)
+            sim.model_parameter_changes.append(change)
 
         # simulation timecourse
-        sim['startTime'] = float(sim_sed.getInitialTime())
-        assert float(sim_sed.getOutputStartTime()) == sim['startTime'], \
+        sim.start_time = float(sim_sed.getInitialTime())
+        assert float(sim_sed.getOutputStartTime()) == sim.start_time, \
             "Simulation initial time and output start time must be equal"
-        sim['endTime'] = float(sim_sed.getOutputEndTime())
-        sim['length'] = sim['endTime'] - sim['startTime']
-        sim['numTimePoints'] = int(sim_sed.getNumberOfPoints())
+        sim.end_time = float(sim_sed.getOutputEndTime())
+        sim.length = sim.end_time - sim.start_time
+        sim.num_time_points = int(sim_sed.getNumberOfPoints())
 
         # simulation algorithm
         alg_sed = sim_sed.getAlgorithm()
         alg_props = self._get_obj_annotation(alg_sed)
-        sim['algorithm'] = {
-            'id': alg_sed.getKisaoID(),
-            'name': alg_props.get('name', None),
-        }
+        sim.algorithm = Algorithm(
+            id=alg_sed.getKisaoID(),
+            name=alg_props.get('name', None),
+        )
 
         # simulation algorithm parameters
-        sim['algorithmParameterChanges'] = []
+        sim.algorithm_parameter_changes = []
         for change_sed in alg_sed.getListOfAlgorithmParameters():
             change_props = self._get_obj_annotation(change_sed)
-            sim['algorithmParameterChanges'].append({
-                'parameter': {
-                    'kisaoId': change_sed.getKisaoID(),
-                    'name': change_props.get('name'),
-                },
-                'value': float(change_sed.getValue()),
-            })
+            sim.algorithm_parameter_changes.append(ParameterChange(
+                parameter=AlgorithmParameter(
+                    kisao_id=change_sed.getKisaoID(),
+                    name=change_props.get('name'),
+                ),
+                value=float(change_sed.getValue()),
+            ))
 
         # model filename
         model_filename = model_sed.getSource()
@@ -541,18 +552,18 @@ class SedMlSimReader(SimReader):
             change_sed (:obj:`libsedml.SedChangeAttribute`): SED change attribute
 
         Returns:
-            obj:`dict`: model parameter change
+            obj:`ParameterChange`: model parameter change
         """
         props = self._get_obj_annotation(change_sed)
 
-        return {
-            "parameter": {
-                "id": props.get('id', None),
-                "name": props.get('name', None),
-                "target": change_sed.getTarget(),
-            },
-            "value": float(change_sed.getNewValue())
-        }
+        return ParameterChange(
+            parameter=Parameter(
+                id=props.get('id', None),
+                name=props.get('name', None),
+                target=change_sed.getTarget(),
+            ),
+            value=float(change_sed.getNewValue())
+        )
 
     def _get_obj_annotation(self, obj_sed):
         """ Get the annotated properies of a SED object

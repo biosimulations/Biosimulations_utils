@@ -30,7 +30,7 @@ def write_sim(model_vars, sim, model_filename, sim_filename, sim_format, **sim_f
         sim_format (:obj:`SimFormat`): simulation experiment format
         sim_format_opts (:obj:`dict`): options to the simulation experiment format (e.g., level, version)
     """
-    model_format = ModelFormat[sim['model']['format']['name']]
+    model_format = ModelFormat[sim.model.format.name]
     if sim_format == SimFormat.sedml:
         if model_format == ModelFormat.sbml:
             Writer = SbmlSedMlSimWriter

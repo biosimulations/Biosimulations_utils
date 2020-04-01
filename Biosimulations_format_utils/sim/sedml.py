@@ -106,7 +106,8 @@ class SedMlSimWriter(SimWriter):
         if sim.license:
             metadata['license'] = sim.license.value
 
-        self._add_annotation_to_obj(metadata, doc_sed, doc_sed)
+        if metadata:
+            self._add_annotation_to_obj(metadata, doc_sed, doc_sed)
 
     def _add_model_to_doc(self, model, filename, doc_sed):
         """ Add a model to a SED document
@@ -153,11 +154,17 @@ class SedMlSimWriter(SimWriter):
             :obj:`libsedml.SedChangeAttribute`: SED model parameter change
         """
         change_sed = model_sed.createChangeAttribute()
+
         self._call_libsedml_method(doc_sed, change_sed, 'setTarget', change.parameter.target)
-        self._add_annotation_to_obj({
-            'id': change.parameter.id,
-            'name': change.parameter.name,
-        }, doc_sed, change_sed)
+
+        metadata = {}
+        if change.parameter.id:
+            metadata['id'] = change.parameter.id
+        if change.parameter.name:
+            metadata['name'] = change.parameter.name
+        if metadata:
+            self._add_annotation_to_obj(metadata, doc_sed, change_sed)
+
         self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change.value))
         return change_sed
 
@@ -192,7 +199,8 @@ class SedMlSimWriter(SimWriter):
         """
         alg_sed = sim_sed.createAlgorithm()
         self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.id)
-        self._add_annotation_to_obj({'name': algorithm.name}, doc_sed, alg_sed)
+        if algorithm.name:
+            self._add_annotation_to_obj({'name': algorithm.name}, doc_sed, alg_sed)
         return alg_sed
 
     def _add_param_changes_to_alg(self, changes, doc_sed, alg_sed):
@@ -225,7 +233,8 @@ class SedMlSimWriter(SimWriter):
         """
         change_sed = alg_sed.createAlgorithmParameter()
         self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID', change.parameter.kisao_id)
-        self._add_annotation_to_obj({'name': change.parameter.name}, doc_sed, change_sed)
+        if change.parameter.name:
+            self._add_annotation_to_obj({'name': change.parameter.name}, doc_sed, change_sed)
         self._call_libsedml_method(doc_sed, change_sed, 'setValue', str(change.value))
         return change_sed
 
@@ -362,13 +371,14 @@ class SedMlSimWriter(SimWriter):
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             obj_sed (:obj:`libsedml.SedBase`): SED object
         """
-        annot_xml = self._encode_obj_to_xml(annot)
-        self._call_libsedml_method(doc_sed, obj_sed, 'setAnnotation',
-                                   ('<annotation>'
-                                    '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
-                                    '{}'
-                                    '</rdf:RDF>'
-                                    '</annotation>').format(''.join(annot_xml)))
+        if annot:
+            annot_xml = self._encode_obj_to_xml(annot)
+            self._call_libsedml_method(doc_sed, obj_sed, 'setAnnotation',
+                                       ('<annotation>'
+                                        '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
+                                        '{}'
+                                        '</rdf:RDF>'
+                                        '</annotation>').format(''.join(annot_xml)))
 
     def _encode_obj_to_xml(self, obj, id=None):
         """ Encode an object into XML

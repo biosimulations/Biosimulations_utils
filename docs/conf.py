@@ -40,7 +40,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx_fontawesome',
-    'sphinxcontrib.addmetahtml',
+    # 'sphinxcontrib.addmetahtml',
     'sphinxcontrib.bibtex',
     'sphinxcontrib.googleanalytics',
     'sphinxcontrib.spelling',

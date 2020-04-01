@@ -6,7 +6,9 @@
 :License: MIT
 """
 
+from ..data_model import Format, OntologyTerm, Taxon, Type
 from .core import ModelReader, ModelIoError
+from .data_model import Model, Parameter, Variable
 import copy
 import enum
 import ete3
@@ -18,71 +20,71 @@ import re
 __all__ = ['SbmlModelReader']
 
 
-class ModelFramework(dict, enum.Enum):
-    flux_balance = {
-        'ontology': 'SBO',
-        'id': '0000624',
-        'name': 'flux balance framework',
-        'description': ('Modelling approach, typically used for metabolic models, where the flow '
-                        'of metabolites (flux) through a network can be calculated. This approach '
-                        'will generally produce a set of solutions (solution space), which may be '
-                        'reduced using objective functions and constraints on individual fluxes.'),
-        'iri': 'http://biomodels.net/SBO/SBO_0000624',
-    }
+class ModelFramework(enum.Enum):
+    flux_balance = OntologyTerm(
+        ontology='SBO',
+        id='0000624',
+        name='flux balance framework',
+        description=('Modelling approach, typically used for metabolic models, where the flow '
+                     'of metabolites (flux) through a network can be calculated. This approach '
+                     'will generally produce a set of solutions (solution space), which may be '
+                     'reduced using objective functions and constraints on individual fluxes.'),
+        iri='http://biomodels.net/SBO/SBO_0000624',
+    )
 
-    logical = {
-        'ontology': 'SBO',
-        'id': '0000234',
-        'name': 'logical framework',
-        'description': ('Modelling approach, pioneered by Rene Thomas and Stuart Kaufman, where the '
-                        'evolution of a system is described by the transitions between discrete activity '
-                        'states of "genes" that control each other.'),
-        'iri': 'http://biomodels.net/SBO/SBO_0000234',
-    }
+    logical = OntologyTerm(
+        ontology='SBO',
+        id='0000234',
+        name='logical framework',
+        description=('Modelling approach, pioneered by Rene Thomas and Stuart Kaufman, where the '
+                     'evolution of a system is described by the transitions between discrete activity '
+                     'states of "genes" that control each other.'),
+        iri='http://biomodels.net/SBO/SBO_0000234',
+    )
 
-    non_spatial_continuous = {
-        'ontology': 'SBO',
-        'id': '0000293',
-        'name': 'non-spatial continuous framework',
-        'description': ('Modelling approach where the quantities of participants are considered continuous, '
-                        'and represented by real values. The associated simulation methods make use of '
-                        'differential equations. The models do not take into account the distribution of the '
-                        'entities and describe only the temporal fluxes.'),
-        'iri': 'http://biomodels.net/SBO/SBO_0000293',
-    }
+    non_spatial_continuous = OntologyTerm(
+        ontology='SBO',
+        id='0000293',
+        name='non-spatial continuous framework',
+        description=('Modelling approach where the quantities of participants are considered continuous, '
+                     'and represented by real values. The associated simulation methods make use of '
+                     'differential equations. The models do not take into account the distribution of the '
+                     'entities and describe only the temporal fluxes.'),
+        iri='http://biomodels.net/SBO/SBO_0000293',
+    )
 
-    non_spatial_discrete = {
-        'ontology': 'SBO',
-        'id': '0000295',
-        'name': 'non-spatial discrete framework',
-        'description': ('Modelling approach where the quantities of participants are considered discrete, '
-                        'and represented by integer values. The associated simulation methods can be '
-                        'deterministic or stochastic.The models do not take into account the distribution '
-                        'of the entities and describe only the temporal fluxes.'),
-        'iri': 'http://biomodels.net/SBO/SBO_0000295',
-    }
+    non_spatial_discrete = OntologyTerm(
+        ontology='SBO',
+        id='0000295',
+        name='non-spatial discrete framework',
+        description=('Modelling approach where the quantities of participants are considered discrete, '
+                     'and represented by integer values. The associated simulation methods can be '
+                     'deterministic or stochastic.The models do not take into account the distribution '
+                     'of the entities and describe only the temporal fluxes.'),
+        iri='http://biomodels.net/SBO/SBO_0000295',
+    )
 
-    spatial_continuous = {
-        'ontology': 'SBO',
-        'id': '0000292 ',
-        'name': 'spatial continuous framework',
-        'description': ('Modelling approach where the quantities of participants are considered continuous, '
-                        'and represented by real values. The associated simulation methods make use of '
-                        'differential equations. The models take into account the distribution of the '
-                        'entities and describe the spatial fluxes.'),
-        'iri': 'http://biomodels.net/SBO/SBO_0000292 ',
-    }
+    spatial_continuous = OntologyTerm(
+        ontology='SBO',
+        id='0000292 ',
+        name='spatial continuous framework',
+        description=('Modelling approach where the quantities of participants are considered continuous, '
+                     'and represented by real values. The associated simulation methods make use of '
+                     'differential equations. The models take into account the distribution of the '
+                     'entities and describe the spatial fluxes.'),
+        iri='http://biomodels.net/SBO/SBO_0000292 ',
+    )
 
-    spatial_discrete = {
-        'ontology': 'SBO',
-        'id': '0000294',
-        'name': 'spatial discrete framework',
-        'description': ('Modelling approach where the quantities of participants are considered discrete, '
-                        'and represented by integer values. The associated simulation methods can be '
-                        'deterministic or stochastic. The models take into account the distribution of '
-                        'the entities and describe the spatial fluxes.'),
-        'iri': 'http://biomodels.net/SBO/SBO_0000294',
-    }
+    spatial_discrete = OntologyTerm(
+        ontology='SBO',
+        id='0000294',
+        name='spatial discrete framework',
+        description=('Modelling approach where the quantities of participants are considered discrete, '
+                     'and represented by integer values. The associated simulation methods can be '
+                     'deterministic or stochastic. The models take into account the distribution of '
+                     'the entities and describe the spatial fluxes.'),
+        iri='http://biomodels.net/SBO/SBO_0000294',
+    )
 
 
 class XmlName(object):
@@ -127,29 +129,29 @@ class SbmlModelReader(ModelReader):
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
 
         Returns:
-            :obj:`dict`: format of the model
+            :obj:`Format`: format of the model
         """
-        model['format'] = {
-            'name': 'SBML',
-            'version': 'L{}V{}'.format(model_sbml.getLevel(), model_sbml.getVersion()),
-            'edamId': 'format_2585',
-            'url': 'http://sbml.org',
-        }
+        model.format = format = Format(
+            name='SBML',
+            version='L{}V{}'.format(model_sbml.getLevel(), model_sbml.getVersion()),
+            edam_id='format_2585',
+            url='http://sbml.org',
+        )
 
-        return model['format']
+        return format
 
     def _read_metadata(self, model_sbml, model):
         """ Read the metadata of a model
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
 
         Returns:
-            :obj:`dict`: model with additional metadata
+            :obj:`Model`: model with additional metadata
         """
         annot_xml = model_sbml.getAnnotation()
         desc_xml = self._get_xml_child_by_names(annot_xml, [
@@ -172,7 +174,7 @@ class SbmlModelReader(ModelReader):
             raise ModelIoError("{} packages are not supported together".format(', '.join(supported_packages)))
 
         framework = ModelFramework.non_spatial_continuous
-        model['framework'] = framework.value
+        model.framework = framework.value
 
         # taxon
         taxon_xml = self._get_xml_child_by_names(desc_xml, [
@@ -180,7 +182,7 @@ class SbmlModelReader(ModelReader):
             XmlName('rdf', 'Bag'),
             XmlName('rdf', 'li'),
         ])
-        model['taxon'] = None
+        model.taxon = None
         if taxon_xml:
             taxon_url = self._get_xml_attr_by_name(taxon_xml, XmlName('rdf', 'resource'))
             match = re.match(r'https?://identifiers.org/taxonomy/(\d+)', taxon_url)
@@ -189,12 +191,12 @@ class SbmlModelReader(ModelReader):
                 ncbi_taxa = ete3.NCBITaxa()
                 taxon_name = ncbi_taxa.get_taxid_translator([taxon_id]).get(taxon_id, None)
                 if taxon_name:
-                    model['taxon'] = {
-                        'id': taxon_id,
-                        'name': taxon_name,
-                    }
+                    model.taxon = Taxon(
+                        id=taxon_id,
+                        name=taxon_name,
+                    )
                 else:
-                    model['taxon_name'] = None
+                    model.taxon = None
 
         return model
 
@@ -203,26 +205,27 @@ class SbmlModelReader(ModelReader):
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
 
         Returns:
             :obj:`dict`: dictionary that maps the ids of units to their definitions
         """
-        model['units'] = {}
+        units = {}
         for unit_def_sbml in model_sbml.getListOfUnitDefinitions():
-            model['units'][unit_def_sbml.getId()] = self._format_unit_def(unit_def_sbml.getDerivedUnitDefinition())
+            units[unit_def_sbml.getId()] = self._format_unit_def(unit_def_sbml.getDerivedUnitDefinition())
 
-        return model['units']
+        return units
 
-    def _read_parameters(self, model_sbml, model):
+    def _read_parameters(self, model_sbml, model, units):
         """ Read information about the parameters of a model
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
+            units (:obj:`dict`): dictionary that maps the ids of units to their definitions
 
         Returns:
-            :obj:`list` of :obj:`dict`: information about parameters
+            :obj:`list` of :obj:`Parameter`: information about parameters
         """
         parameters = {}
 
@@ -254,18 +257,18 @@ class SbmlModelReader(ModelReader):
             comp_name = comp_sbml.getName() or comp_id
 
             value = comp_sbml.getSize()
-            parameters[comp_id] = {
-                'target': "/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@id='{}']/@size".format(comp_id),
-                'group': 'Initial compartment sizes',
-                'id': "init_size_{}".format(comp_id),
-                'name': 'Initial size of {}'.format(comp_name),
-                'description': None,
-                'identifiers': [],
-                'type': 'float',
-                'value': value,
-                'recommended_range': self._calc_recommended_param_range(value),
-                'units': self._format_unit_def(comp_sbml.getDerivedUnitDefinition()),
-            }
+            parameters[comp_id] = Parameter(
+                target="/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@id='{}']/@size".format(comp_id),
+                group='Initial compartment sizes',
+                id="init_size_{}".format(comp_id),
+                name='Initial size of {}'.format(comp_name),
+                description=None,
+                identifiers=[],
+                type=Type.float,
+                value=value,
+                recommended_range=self._calc_recommended_param_range(value),
+                units=self._format_unit_def(comp_sbml.getDerivedUnitDefinition()),
+            )
 
         # initial amounts / concentrations of species
         for species_sbml in model_sbml.getListOfSpecies():
@@ -277,7 +280,7 @@ class SbmlModelReader(ModelReader):
 
             species_name = species_sbml.getName() or species_id
 
-            species_substance_units = model['units'].get(species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits(), None)
+            species_substance_units = units.get(species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits(), None)
             if species_sbml.isSetInitialAmount():
                 species_initial_type = 'Amount'
                 species_initial_val = species_sbml.getInitialAmount()
@@ -296,24 +299,24 @@ class SbmlModelReader(ModelReader):
                 else:
                     species_initial_units = None
 
-            parameters[species_id] = {
-                'target': '/' + '/'.join([
+            parameters[species_id] = Parameter(
+                target='/' + '/'.join([
                     "sbml:sbml",
                     "sbml:model",
                     "sbml:listOfSpecies",
                     "sbml:species[@id='{}']".format(species_id),
                     "@initial{}".format(species_initial_type),
                 ]),
-                'group': 'Initial species amounts/concentrations',
-                'id': "init_{}_{}".format(species_initial_type.lower(), species_id),
-                'name': 'Initial {} of {}'.format(species_initial_type.lower(), species_name),
-                'description': None,
-                'identifiers': [],
-                'type': 'float',
-                'value': species_initial_val,
-                'recommended_range': self._calc_recommended_param_range(species_initial_val),
-                'units': species_initial_units,
-            }
+                group='Initial species amounts/concentrations',
+                id="init_{}_{}".format(species_initial_type.lower(), species_id),
+                name='Initial {} of {}'.format(species_initial_type.lower(), species_name),
+                description=None,
+                identifiers=[],
+                type=Type.float,
+                value=species_initial_val,
+                recommended_range=self._calc_recommended_param_range(species_initial_val),
+                units=species_initial_units,
+            )
 
         # fbc package
         plugin_sbml = model_sbml.getPlugin('fbc')
@@ -328,8 +331,8 @@ class SbmlModelReader(ModelReader):
                 rxn_sbml = self._get_reaction(model_sbml, rxn_id)
                 rxn_name = rxn_sbml.getName() or rxn_id
                 value = flux_obj_sbml.getCoefficient()
-                parameters[species_id] = {
-                    'target': '/' + '/'.join([
+                parameters[species_id] = Parameter(
+                    target='/' + '/'.join([
                         "sbml:sbml",
                         "sbml:model",
                         "fbc:listOfObjectives",
@@ -338,16 +341,16 @@ class SbmlModelReader(ModelReader):
                         "fbc:fluxObjective[@fbc:reaction='{}']".format(rxn_id),
                         "@fbc:coefficient",
                     ]),
-                    'group': 'Flux objective coefficients',
-                    'id': "{}/{}".format(obj_id, rxn_id),
-                    'name': 'Coefficient of {} of {}'.format(obj_name, rxn_name),
-                    'description': None,
-                    'identifiers': [],
-                    'type': 'float',
-                    'value': value,
-                    'recommended_range': self._calc_recommended_param_range(value),
-                    'units': 'dimensionless',
-                }
+                    group='Flux objective coefficients',
+                    id="{}/{}".format(obj_id, rxn_id),
+                    name='Coefficient of {} of {}'.format(obj_name, rxn_name),
+                    description=None,
+                    identifiers=[],
+                    type=Type.float,
+                    value=value,
+                    recommended_range=self._calc_recommended_param_range(value),
+                    units='dimensionless',
+                )
 
         # qual package
         plugin_sbml = model_sbml.getPlugin('qual')
@@ -360,24 +363,24 @@ class SbmlModelReader(ModelReader):
                 else:
                     max_level = max(1, init_level)
 
-                parameters[species_id] = {
-                    'target': '/' + '/'.join([
+                parameters[species_id] = Parameter(
+                    target='/' + '/'.join([
                         "sbml:sbml",
                         "sbml:model",
                         "qual:listOfQualitativeSpecies",
                         "qual:qualitativeSpecies[@qual:id='{}']".format(species_id),
                         "@qual:initialLevel",
                     ]),
-                    'group': 'Initial species levels',
-                    'id': 'init_level_' + species_id,
-                    'name': 'Initial level of {}'.format(species_sbml.getName() or species_id),
-                    'description': None,
-                    'identifiers': [],
-                    'type': 'integer',
-                    'value': init_level,
-                    'recommended_range': [0, max_level],
-                    'units': 'dimensionless',
-                }
+                    group='Initial species levels',
+                    id='init_level_' + species_id,
+                    name='Initial level of {}'.format(species_sbml.getName() or species_id),
+                    description=None,
+                    identifiers=[],
+                    type=Type.integer,
+                    value=init_level,
+                    recommended_range=[0, max_level],
+                    units='dimensionless',
+                )
 
         # ignore parameters set via assignment rules and initial assignments
         for rule_sbml in model_sbml.getListOfRules():
@@ -392,40 +395,40 @@ class SbmlModelReader(ModelReader):
                 parameters.pop(param_id)
 
         # return parameters
-        model['parameters'] = parameters.values()
-        return model['parameters']
+        model.parameters = parameters.values()
+        return model.parameters
 
     def _read_parameter(self, param_sbml, model, rxn_sbml=None, rxn_id=None, rxn_name=None):
         """ Read information about a SBML parameter
 
         Args:
             param_sbml (:obj:`libsbml.Parameter`): SBML parameter
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
             rxn_sbml (:obj:`libsbml.Reaction`, optional): SBML reaction
             rxn_id (:obj:`str`, optional): id of the parent reaction (used by local parameters)
             rxn_name (:obj:`str`, optional): name of the parent reaction (used by local parameters)
 
         Returns:
-            :obj:`dict`: information about the parameter
+            :obj:`Parameter`: information about the parameter
         """
         assert param_sbml.getId()
 
         value = param_sbml.getValue()
-        param = {
-            'target': None,
-            'group': None,
-            'id': param_sbml.getId(),
-            'name': param_sbml.getName() or param_sbml.getId(),
-            'description': None,
-            'identifiers': [],
-            'type': 'float',
-            'value': value,
-            'recommended_range': self._calc_recommended_param_range(value),
-            'units': self._format_unit_def(param_sbml.getDerivedUnitDefinition()),
-        }
+        param = Parameter(
+            target=None,
+            group=None,
+            id=param_sbml.getId(),
+            name=param_sbml.getName() or param_sbml.getId(),
+            description=None,
+            identifiers=[],
+            type=Type.float,
+            value=value,
+            recommended_range=self._calc_recommended_param_range(value),
+            units=self._format_unit_def(param_sbml.getDerivedUnitDefinition()),
+        )
 
         if rxn_sbml:
-            if int(model['format']['version'][1]) >= 3:
+            if int(model.format.version[1]) >= 3:
                 target = [
                     "sbml:sbml",
                     "sbml:model",
@@ -433,7 +436,7 @@ class SbmlModelReader(ModelReader):
                     "{}:{}[@id='{}']".format(rxn_sbml.getPrefix() or 'sbml', rxn_sbml.getElementName(), rxn_id),
                     "sbml:kineticLaw",
                     "sbml:listOfLocalParameters",
-                    "sbml:{}[@id='{}']".format(param_sbml.getElementName(), param['id']),
+                    "sbml:{}[@id='{}']".format(param_sbml.getElementName(), param.id),
                     "@value",
                 ]
             else:
@@ -444,46 +447,47 @@ class SbmlModelReader(ModelReader):
                     "{}:{}[@id='{}']".format(rxn_sbml.getPrefix() or 'sbml', rxn_sbml.getElementName(), rxn_id),
                     "sbml:kineticLaw",
                     "sbml:listOfParameters",
-                    "sbml:{}[@id='{}']".format(param_sbml.getElementName(), param['id']),
+                    "sbml:{}[@id='{}']".format(param_sbml.getElementName(), param.id),
                     "@value",
                 ]
-            group = '{} kinetic parameters'.format(rxn_name or rxn_id)
+            group = '{} rate constants'.format(rxn_name or rxn_id)
         else:
             target = [
                 "sbml:sbml",
                 "sbml:model",
                 "sbml:listOfParameters",
-                "sbml:parameter[@id='{}']".format(param['id']),
+                "sbml:parameter[@id='{}']".format(param.id),
                 "@value",
             ]
             group = 'Other global parameters'
-        param['target'] = '/' + '/'.join(target)
-        param['group'] = group
+        param.target = '/' + '/'.join(target)
+        param.group = group
 
         if rxn_id:
-            param['id'] = rxn_id + '/' + param['id']
-            param['name'] = (rxn_name or rxn_id) + ': ' + (param['name'] or param['id'])
+            param.id = rxn_id + '/' + param.id
+            param.name = (rxn_name or rxn_id) + ': ' + (param.name or param.id)
 
         return param
 
-    def _read_variables(self, model_sbml, model):
+    def _read_variables(self, model_sbml, model, units):
         """ Read the variables of a model
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
+            units (:obj:`dict`): dictionary that maps the ids of units to their definitions
 
         Returns:
-            :obj:`list` of :obj:`dict`: information about the variables of the model
+            :obj:`list` of :obj:`Variable`: information about the variables of the model
         """
-        model['variables'] = vars = []
+        model.variables = vars = []
 
         fbc_plugin_sbml = model_sbml.getPlugin('fbc')
 
         if fbc_plugin_sbml:
             flux_units = self._pretty_print_units('({}) / ({})'.format(
-                model['units'].get(model_sbml.getExtentUnits(), None) or model_sbml.getExtentUnits(),
-                model['units'].get(model_sbml.getTimeUnits(), None) or model_sbml.getTimeUnits(),
+                units.get(model_sbml.getExtentUnits(), None) or model_sbml.getExtentUnits(),
+                units.get(model_sbml.getTimeUnits(), None) or model_sbml.getTimeUnits(),
             ))
 
             # objective
@@ -493,39 +497,31 @@ class SbmlModelReader(ModelReader):
             obj_id = obj_sbml.getId()
             assert obj_id
 
-            vars.append({
-                'target': "/sbml:sbml/sbml:model/fbc:listOfObjectives/fbc:objective[@fbc:id='{}']".format(obj_id),
-                'group': 'Objectives',
-                'id': obj_id,
-                'name': obj_sbml.getName() or obj_id,
-                'description': None,
-                'identifiers': [],
-                'compartment_id': None,
-                'compartment_name': None,
-                'type': 'float',
-                'units': flux_units,
-                'constant': False,
-                'boundary_condition': False,
-            })
+            vars.append(Variable(
+                target="/sbml:sbml/sbml:model/fbc:listOfObjectives/fbc:objective[@fbc:id='{}']".format(obj_id),
+                group='Objectives',
+                id=obj_id,
+                name=obj_sbml.getName() or obj_id,
+                description=None,
+                identifiers=[],
+                type=Type.float,
+                units=flux_units,
+            ))
 
             # reaction fluxes
             for rxn_sbml in model_sbml.getListOfReactions():
                 rxn_id = rxn_sbml.getId()
-                vars.append({
-                    'target': "/sbml:sbml/sbml:model/sbml:listOfReactions/{}:{}[@id='{}']".format(
+                vars.append(Variable(
+                    target="/sbml:sbml/sbml:model/sbml:listOfReactions/{}:{}[@id='{}']".format(
                         rxn_sbml.getPrefix() or 'sbml', rxn_sbml.getElementName(), rxn_id),
-                    'group': 'Reaction fluxes',
-                    'id': rxn_id,
-                    'name': rxn_sbml.getName() or None,
-                    'description': None,
-                    'identifiers': [],
-                    'compartment_id': None,
-                    'compartment_name': None,
-                    'type': 'float',
-                    'units': flux_units,
-                    'constant': False,
-                    'boundary_condition': False,
-                })
+                    group='Reaction fluxes',
+                    id=rxn_id,
+                    name=rxn_sbml.getName() or None,
+                    description=None,
+                    identifiers=[],
+                    type=Type.float,
+                    units=flux_units,
+                ))
 
         else:
             # regular species
@@ -540,21 +536,17 @@ class SbmlModelReader(ModelReader):
                     comp_id = species_sbml.getCompartment()
                     comp_sbml = self._get_compartment(model_sbml, comp_id)
 
-                    vars.append({
-                        'target': ("/sbml:sbml/sbml:model/qual:listOfQualitativeSpecies"
-                                   "/qual:qualitativeSpecies[@qual:id='{}']").format(species_id),
-                        'group': 'Species levels',
-                        'id': species_id,
-                        'name': species_sbml.getName() or None,
-                        'description': None,
-                        'identifiers': [],
-                        'compartment_id': comp_id,
-                        'compartment_name': comp_sbml.getName() or None,
-                        'type': 'integer',
-                        'units': 'dimensionless',
-                        'constant': species_sbml.getConstant(),
-                        'boundary_condition': False,
-                    })
+                    vars.append(Variable(
+                        target=("/sbml:sbml/sbml:model/qual:listOfQualitativeSpecies"
+                                "/qual:qualitativeSpecies[@qual:id='{}']").format(species_id),
+                        group='Species levels',
+                        id=species_id,
+                        name=species_sbml.getName() or None,
+                        description=None,
+                        identifiers=[],
+                        type=Type.integer,
+                        units='dimensionless',
+                    ))
 
         return vars
 
@@ -564,10 +556,10 @@ class SbmlModelReader(ModelReader):
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
             species_sbml (:obj:`libsbml.Species`): SBML species
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
 
         Returns:
-            :obj:`dict`: information about the species
+            :obj:`Variable`: information about the species
         """
         id = species_sbml.getId()
         assert id
@@ -579,20 +571,16 @@ class SbmlModelReader(ModelReader):
             comp_sbml = self._get_compartment(model_sbml, comp_id)
             comp_name = comp_sbml.getName()
 
-        var = {
-            'target': "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(id),
-            'group': 'Species amounts/concentrations',
-            'id': id,
-            'name': species_sbml.getName() or None,
-            'description': None,
-            'identifiers': [],
-            'compartment_id': comp_id,
-            'compartment_name': comp_name,
-            'type': 'float',
-            'units': self._format_unit_def(species_sbml.getDerivedUnitDefinition()),
-            'constant': species_sbml.getConstant(),
-            'boundary_condition': species_sbml.getBoundaryCondition(),
-        }
+        var = Variable(
+            target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(id),
+            group='Species amounts/concentrations',
+            id=id,
+            name=species_sbml.getName() or None,
+            description=None,
+            identifiers=[],
+            type=Type.float,
+            units=self._format_unit_def(species_sbml.getDerivedUnitDefinition()),
+        )
 
         return var
 

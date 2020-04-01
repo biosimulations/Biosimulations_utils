@@ -1,0 +1,295 @@
+""" Utility clases for data models for models and simulations
+
+:Author: Jonathan Karr <karr@mssm.edu>
+:Date: 2020-03-31
+:Copyright: 2020, Center for Reproducible Biomedical Modeling
+:License: MIT
+"""
+
+import enum
+
+__all__ = [
+    'Format',
+    'Identifier',
+    'OntologyTerm',
+    'Taxon',
+    'Type',
+]
+
+
+class Format(object):
+    """ A format
+
+    Attributes:
+        name (:obj:`str`): name (e.g., SBML)
+        version (:obj:`str`): version (e.g., L3V2)
+        edam_id (:obj:`str`): EDAM identifier
+        url (:obj:`str`): URL
+    """
+
+    def __init__(self, name=None, version=None, edam_id=None, url=None):
+        """
+        Args:
+            name (:obj:`str`, optional): name (e.g., SBML)
+            version (:obj:`str`, optional): version (e.g., L3V2)
+            edam_id (:obj:`str`, optional): EDAM identifier
+            url (:obj:`str`, optional): URL
+        """
+        self.name = name
+        self.version = version
+        self.edam_id = edam_id
+        self.url = url
+
+    def __eq__(self, other):
+        """ Determine if two formats are semantically equal
+
+        Args:
+            other (:obj:`Format`): other format
+
+        Returns:
+            :obj:`bool`
+        """
+        return isinstance(other, self.__class__) \
+            and self.name == other.name \
+            and self.version == other.version \
+            and self.edam_id == other.edam_id \
+            and self.url == other.url
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'name': self.name,
+            'version': self.version,
+            'edamId': self.edam_id,
+            'url': self.url,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create format from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`Format`
+        """
+        return cls(
+            name=val.get('name', None),
+            version=val.get('version', None),
+            edam_id=val.get('edamId', None),
+            url=val.get('url', None),
+        )
+
+
+class Identifier(object):
+    """ An identifier of a concept
+
+    Attributes:
+        namespace (:obj:`str`): namespace (e.g., Identifiers.org namespace such as 'biomodels.db')
+        id (:obj:`str`): id within namespace
+    """
+
+    def __init__(self, namespace=None, id=None):
+        """
+        Args:
+            namespace (:obj:`str`, optional): namespace (e.g., Identifiers.org namespace such as 'biomodels.db')
+            id (:obj:`str`, optional): id within namespace
+        """
+        self.namespace = namespace
+        self.id = id
+
+    def __eq__(self, other):
+        """ Determine if two identifiers are semantically equal
+
+        Args:
+            other (:obj:`Identifier`): other identifier
+
+        Returns:
+            :obj:`bool`
+        """
+        return isinstance(other, self.__class__) \
+            and self.namespace == other.namespace \
+            and self.id == other.id
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'namespace': self.namespace,
+            'id': self.id,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create an identifier from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`Identifier`
+        """
+        return cls(
+            namespace=val.get('namespace', None),
+            id=val.get('id', None),
+        )
+
+    @staticmethod
+    def sort_key(identifier):
+        """ Get a key to sort an identifier
+
+        Args:
+            identifier (:obj:`Identifier`): identifier
+
+        Returns:
+            :obj:`tuple`
+        """
+        return (identifier.namespace, identifier.id)
+
+
+class OntologyTerm(object):
+    """ A term in an ontology
+
+    Attributes:
+        ontology (:obj:`str`): id of the parent ontology
+        id (:obj:`str`): id
+        name (:obj:`str`): name
+        description (:obj:`str`): description
+        iri (:obj:`str`): IRI
+    """
+
+    def __init__(self, ontology=None, id=None, name=None, description=None, iri=None):
+        """
+        Args:
+            ontology (:obj:`str`, optional): id of the parent ontology
+            id (:obj:`str`, optional): id
+            name (:obj:`str`, optional): name
+            description (:obj:`str`, optional): description
+            iri (:obj:`str`, optional): IRI
+        """
+        self.ontology = ontology
+        self.id = id
+        self.name = name
+        self.description = description
+        self.iri = iri
+
+    def __eq__(self, other):
+        """ Determine if two ontology terms are semantically equal
+
+        Args:
+            other (:obj:`OntologyTerm`): other term
+
+        Returns:
+            :obj:`bool`
+        """
+        return isinstance(other, self.__class__) \
+            and self.ontology == other.ontology \
+            and self.id == other.id \
+            and self.name == other.name \
+            and self.description == other.description \
+            and self.iri == other.iri
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'ontology': self.ontology,
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'iri': self.iri,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create an ontology term from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`OntologyTerm`
+        """
+        return cls(
+            ontology=val.get('ontology', None),
+            id=val.get('id', None),
+            name=val.get('name', None),
+            description=val.get('description', None),
+            iri=val.get('iri', None),
+        )
+
+
+class Taxon(object):
+    """ A taxon in the NCBI Taxonomy database
+
+    Attributes:
+        id (:obj:`int`): id
+        name (:obj:`str`): name
+    """
+
+    def __init__(self, id=None, name=None):
+        """
+        Args:
+            id (:obj:`int`, optional): id
+            name (:obj:`str`, optional): name
+        """
+        self.id = id
+        self.name = name
+
+    def __eq__(self, other):
+        """ Determine if two taxa are semantically equal
+
+        Args:
+            other (:obj:`Taxon`): other taxon
+
+        Returns:
+            :obj:`bool`
+        """
+        return isinstance(other, self.__class__) \
+            and self.id == other.id \
+            and self.name == other.name
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create a taxon from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`Taxon`
+        """
+        return cls(
+            id=val.get('id', None),
+            name=val.get('name', None),
+        )
+
+
+class Type(str, enum.Enum):
+    """ A type """
+    boolean = 'boolean'
+    integer = 'integer'
+    float = 'float'
+    string = 'string'

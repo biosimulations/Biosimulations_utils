@@ -6,6 +6,8 @@
 :License: MIT
 """
 
+from ..data_model import Format
+from .data_model import Model, Parameter, Variable
 import abc
 import math
 import pint
@@ -30,16 +32,16 @@ class ModelReader(abc.ABC):
             filename (:obj:`str`): path to a file which defines a model
 
         Returns:
-            :obj:`dict`: model
+            :obj:`Model`: model
         """
         model_orig = self._read_from_file(filename)
 
-        model = {}
+        model = Model()
         self._read_format(model_orig, model)
         self._read_metadata(model_orig, model)
-        self._read_units(model_orig, model)
-        self._read_parameters(model_orig, model)
-        self._read_variables(model_orig, model)
+        units = self._read_units(model_orig, model)
+        self._read_parameters(model_orig, model, units)
+        self._read_variables(model_orig, model, units)
 
         return model
 
@@ -61,10 +63,10 @@ class ModelReader(abc.ABC):
 
         Args:
             model_orig (:obj:`object`): original model encoded in a format such as SBML
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
 
         Returns:
-            :obj:`dict`: format of the model
+            :obj:`Format`: format of the model
         """
         pass  # pragma: no cover
 
@@ -74,10 +76,10 @@ class ModelReader(abc.ABC):
 
         Args:
             model_orig (:obj:`object`): original model encoded in a format such as SBML
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
 
         Returns:
-            :obj:`dict`: model with additional metadata
+            :obj:`Model`: model with additional metadata
         """
         pass  # pragma: no cover
 
@@ -87,7 +89,7 @@ class ModelReader(abc.ABC):
 
         Args:
             model_orig (:obj:`object`): original model encoded in a format such as SBML
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
 
         Returns:
             :obj:`dict`: dictionary that maps the ids of units to their definitions
@@ -100,10 +102,10 @@ class ModelReader(abc.ABC):
 
         Args:
             model_orig (:obj:`object`): original model encoded in a format such as SBML
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
 
         Returns:
-            :obj:`list` of :obj:`dict`: information about parameters
+            :obj:`list` of :obj:`Parameter`: information about parameters
         """
         pass  # pragma: no cover
 
@@ -113,10 +115,10 @@ class ModelReader(abc.ABC):
 
         Args:
             model_orig (:obj:`object`): original model encoded in a format such as SBML
-            model (:obj:`dict`): model
+            model (:obj:`Model`): model
 
         Returns:
-            :obj:`list` of :obj:`dict`: information about the variables of the model
+            :obj:`list` of :obj:`Variable`: information about the variables of the model
         """
         pass  # pragma: no cover
 

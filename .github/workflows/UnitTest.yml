@@ -8,7 +8,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        pythonVersion: [3.5, 3.6, 3.7, 3.8]
+        pythonVersion: [3.6, 3.7, 3.8]
 
     steps:
       - uses: actions/checkout@v1
@@ -27,7 +27,9 @@ jobs:
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Install package
-        run: pip install -e .[tests]
+        run: |
+          pip install git+https://github.com/KarrLab/wc_utils.git
+          pip install -e .[tests]
       - name: Test with pytest
         run: |
           pytest --cov=./biosimulations_format_utils --cov-report=xml

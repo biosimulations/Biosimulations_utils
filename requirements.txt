@@ -1,7 +1,7 @@
 ete3
 pint
 python_libsbml
-python_libsedml
+python_libsedml >= 2
 requests
 requests_cache
 wc_utils

@@ -365,9 +365,11 @@ class SedMlSimWriter(SimWriter):
         """
         annot_xml = self._encode_obj_to_xml(annot)
         self._call_libsedml_method(doc_sed, obj_sed, 'setAnnotation',
-                                   ('<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
+                                   ('<annotation>'
+                                    '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
                                     '{}'
-                                    '</rdf:RDF>').format(''.join(annot_xml)))
+                                    '</rdf:RDF>'
+                                    '</annotation>').format(''.join(annot_xml)))
 
     def _encode_obj_to_xml(self, obj, id=None):
         """ Encode an object into XML
@@ -575,6 +577,8 @@ class SedMlSimReader(SimReader):
             :obj:`dict`: dictionary of annotated properties and their values
         """
         annotations_xml = obj_sed.getAnnotation()
+        if annotations_xml is None:
+            return {}
 
         assert annotations_xml.getNumChildren() <= 1
         if annotations_xml.getNumChildren() == 0:

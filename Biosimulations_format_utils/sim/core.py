@@ -7,7 +7,6 @@
 """
 
 import abc
-import wc_utils.util.enumerate
 
 __all__ = ['SimWriter', 'SimReader']
 

@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.data_model import Identifier, JournalReference, License, Person, RemoteFile, Taxon
+from Biosimulations_format_utils.data_model import Identifier, JournalReference, License, Person, Taxon
 from Biosimulations_format_utils.import_resources import import_models
 import importlib
 import libsbml

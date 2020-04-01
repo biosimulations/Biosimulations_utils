@@ -11,7 +11,6 @@ from .data_model import Simulation, Algorithm, AlgorithmParameter, ParameterChan
 from ..data_model import Format
 from ..model.data_model import Model, Parameter, Variable
 from xml.sax import saxutils
-import abc
 import libsedml
 
 __all__ = [
@@ -469,7 +468,6 @@ class SedMlSimReader(SimReader):
         model_sed = doc_sed.getModel(0)
 
         assert doc_sed.getNumTasks() == 1, "SED-ML document must have one task"
-        task_sed = doc_sed.getTask(0)
 
         assert doc_sed.getNumSimulations() == 1, "SED-ML document must have one simulation"
         sim_sed = doc_sed.getSimulation(0)

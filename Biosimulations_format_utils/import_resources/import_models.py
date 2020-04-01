@@ -11,8 +11,6 @@ from ..data_model import Identifier, JournalReference, License, Person, RemoteFi
 from ..model import ModelFormat, read_model
 from ..model.core import ModelIoError
 from ..model.data_model import Model
-from ..model.sbml import SbmlModelReader, XmlName
-import libsbml
 import math
 import os
 import re

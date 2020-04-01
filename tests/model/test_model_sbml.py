@@ -9,7 +9,7 @@
 from Biosimulations_format_utils.data_model import Format, Taxon, Type
 from Biosimulations_format_utils.model import ModelFormat, read_model
 from Biosimulations_format_utils.model.core import ModelIoError
-from Biosimulations_format_utils.model.data_model import Model, Parameter, Variable
+from Biosimulations_format_utils.model.data_model import Parameter, Variable
 import importlib
 import libsbml
 import unittest

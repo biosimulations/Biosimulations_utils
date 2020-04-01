@@ -9,11 +9,9 @@
 from ..data_model import Format, OntologyTerm, Taxon, Type
 from .core import ModelReader, ModelIoError
 from .data_model import Model, Parameter, Variable
-import copy
 import enum
 import ete3
 import libsbml
-import math
 import os
 import re
 
@@ -533,8 +531,6 @@ class SbmlModelReader(ModelReader):
             if qual_plugin:
                 for species_sbml in qual_plugin.getListOfQualitativeSpecies():
                     species_id = species_sbml.getId()
-                    comp_id = species_sbml.getCompartment()
-                    comp_sbml = self._get_compartment(model_sbml, comp_id)
 
                     vars.append(Variable(
                         target=("/sbml:sbml/sbml:model/qual:listOfQualitativeSpecies"
@@ -563,13 +559,6 @@ class SbmlModelReader(ModelReader):
         """
         id = species_sbml.getId()
         assert id
-
-        comp_sbml = None
-        comp_id = species_sbml.getCompartment() or None
-        comp_name = None
-        if comp_id:
-            comp_sbml = self._get_compartment(model_sbml, comp_id)
-            comp_name = comp_sbml.getName()
 
         var = Variable(
             target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(id),

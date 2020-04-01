@@ -26,7 +26,7 @@ class Model(object):
         description (:obj:`str`): description
         format (:obj:`Format`): format
         framework (:obj:`OntologyTerm`): modeling framework
-        taxon (:obj:`Taxon`): taxon        
+        taxon (:obj:`Taxon`): taxon
         tags (:obj:`list` of :obj:`str`): tags
         identifiers (:obj:`list` of :obj:`Identifier`): identifiers
         refs (:obj:`list` of :obj:`JournalReference`): references

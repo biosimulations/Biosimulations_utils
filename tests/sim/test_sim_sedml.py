@@ -17,7 +17,6 @@ import libsedml
 import os
 import shutil
 import tempfile
-import time
 import unittest
 
 
@@ -110,5 +109,5 @@ class WriteSedMlTestCase(unittest.TestCase):
     @unittest.skip('Figure out how to trigger an error that writes to the error log')
     def test__call_sedml_error(self):
         doc = libsedml.SedDocument()
-        # with self.assertRaisesRegex(ValueError, 'libsedml error:'):
-        #     sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setName', 'name')
+        with self.assertRaisesRegex(ValueError, 'libsedml error:'):
+            sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setName', 'name')

@@ -14,7 +14,7 @@ __all__ = ['Simulation', 'Algorithm', 'AlgorithmParameter', 'ParameterChange']
 
 
 class Simulation(object):
-    """ Simulation experiments 
+    """ Simulation experiments
 
     Attributes:
         id (:obj:`str`): id
@@ -27,7 +27,7 @@ class Simulation(object):
         license (:obj:`License`): license
         format (:obj:`Format`): format
         model (:obj:`Model`): model
-        model_parameter_changes (:obj:`list` of :obj:`ParameterChange`): model parameter changes        
+        model_parameter_changes (:obj:`list` of :obj:`ParameterChange`): model parameter changes
         start_time (:obj:`float`): start time
         end_time (:obj:`float`): end time
         length (:obj:`float`): length
@@ -57,7 +57,7 @@ class Simulation(object):
             end_time (:obj:`float`, optional): end time
             num_time_points (:obj:`int`, optional): number of time points to record
             algorithm (:obj:`Algorithm`, optional): simulation algorithm
-            algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes            
+            algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes
         """
         self.id = id
         self.name = name
@@ -228,7 +228,7 @@ class Algorithm(object):
 
 
 class AlgorithmParameter(object):
-    """ Algorithm parameter 
+    """ Algorithm parameter
 
     Attributes:
         id (:obj:`str`): id

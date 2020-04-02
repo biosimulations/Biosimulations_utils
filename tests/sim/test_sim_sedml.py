@@ -106,10 +106,7 @@ class WriteSedMlTestCase(unittest.TestCase):
         with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
             write_sim(None, sim, 'model.sbml.xml', None, SimFormat.sedml, level=1, version=3)
 
-    @unittest.skip('Figure out how to trigger an error that writes to the error log')
     def test__call_sedml_error(self):
         doc = libsedml.SedDocument()
         with self.assertRaisesRegex(ValueError, 'libsedml error:'):
-            sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setName', 'name')
-
-        # todo: use malfored XML annotation
+            sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setAnnotation', '<rdf')

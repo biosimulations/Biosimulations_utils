@@ -9,7 +9,7 @@
 from ..data_model import Format, OntologyTerm, Taxon, Type
 from ..utils import pretty_print_units
 from .core import ModelReader, ModelIoError
-from .data_model import Model, Parameter, Variable
+from .data_model import Model, ModelParameter, Variable
 import enum
 import ete3
 import libsbml
@@ -218,7 +218,7 @@ class SbmlModelReader(ModelReader):
             units (:obj:`dict`): dictionary that maps the ids of units to their definitions
 
         Returns:
-            :obj:`list` of :obj:`Parameter`: information about parameters
+            :obj:`list` of :obj:`ModelParameter`: information about parameters
         """
         parameters = {}
 
@@ -248,7 +248,7 @@ class SbmlModelReader(ModelReader):
             comp_name = comp_sbml.getName() or comp_id
 
             value = comp_sbml.getSize()
-            parameters[comp_id] = Parameter(
+            parameters[comp_id] = ModelParameter(
                 target="/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@id='{}']/@size".format(comp_id),
                 group='Initial compartment sizes',
                 id="init_size_{}".format(comp_id),
@@ -292,7 +292,7 @@ class SbmlModelReader(ModelReader):
                 else:
                     species_initial_units = None
 
-            parameters[species_id] = Parameter(
+            parameters[species_id] = ModelParameter(
                 target='/' + '/'.join([
                     "sbml:sbml",
                     "sbml:model",
@@ -324,7 +324,7 @@ class SbmlModelReader(ModelReader):
                 rxn_sbml = self._get_reaction(model_sbml, rxn_id)
                 rxn_name = rxn_sbml.getName() or rxn_id
                 value = flux_obj_sbml.getCoefficient()
-                parameters[species_id] = Parameter(
+                parameters[species_id] = ModelParameter(
                     target='/' + '/'.join([
                         "sbml:sbml",
                         "sbml:model",
@@ -356,7 +356,7 @@ class SbmlModelReader(ModelReader):
                 else:
                     max_level = max(1, init_level)
 
-                parameters[species_id] = Parameter(
+                parameters[species_id] = ModelParameter(
                     target='/' + '/'.join([
                         "sbml:sbml",
                         "sbml:model",
@@ -395,19 +395,19 @@ class SbmlModelReader(ModelReader):
         """ Read information about a SBML parameter
 
         Args:
-            param_sbml (:obj:`libsbml.Parameter`): SBML parameter
+            param_sbml (:obj:`libsbml.ModelParameter`): SBML parameter
             model (:obj:`Model`): model
             rxn_sbml (:obj:`libsbml.Reaction`, optional): SBML reaction
             rxn_id (:obj:`str`, optional): id of the parent reaction (used by local parameters)
             rxn_name (:obj:`str`, optional): name of the parent reaction (used by local parameters)
 
         Returns:
-            :obj:`Parameter`: information about the parameter
+            :obj:`ModelParameter`: information about the parameter
         """
         assert param_sbml.getId()
 
         value = param_sbml.getValue()
-        param = Parameter(
+        param = ModelParameter(
             target=None,
             group=None,
             id=param_sbml.getId(),

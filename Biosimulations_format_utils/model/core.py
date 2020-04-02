@@ -7,7 +7,7 @@
 """
 
 from ..data_model import Format
-from .data_model import Model, Parameter, Variable
+from .data_model import Model, ModelParameter, Variable
 import abc
 
 __all__ = ['ModelReader']
@@ -96,7 +96,7 @@ class ModelReader(abc.ABC):
             model (:obj:`Model`): model
 
         Returns:
-            :obj:`list` of :obj:`Parameter`: information about parameters
+            :obj:`list` of :obj:`ModelParameter`: information about parameters
         """
         pass  # pragma: no cover
 

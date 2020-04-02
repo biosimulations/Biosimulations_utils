@@ -7,7 +7,7 @@
 """
 
 from ..data_model import Format, JournalReference, License, Person, RemoteFile, Type
-from ..model.data_model import Model, Parameter
+from ..model.data_model import Model, ModelParameter
 import types
 
 __all__ = ['Simulation', 'Algorithm', 'AlgorithmParameter', 'ParameterChange']
@@ -153,7 +153,7 @@ class Simulation(object):
             license=License(val.get('license')) if val.get('license', None) else None,
             format=Format.from_json(val.get('format')) if val.get('format', None) else None,
             model=Model.from_json(val.get('model')) if val.get('model', None) else None,
-            model_parameter_changes=[ParameterChange.from_json(change, Parameter)
+            model_parameter_changes=[ParameterChange.from_json(change, ModelParameter)
                                      for change in val.get('modelParameterChanges', [])],
             start_time=val.get('startTime', None),
             end_time=val.get('endTime', None),
@@ -315,17 +315,17 @@ class AlgorithmParameter(object):
 
 
 class ParameterChange(object):
-    """ Parameter change
+    """ ModelParameter change
 
     Attributes:
-        parameter (:obj:`Parameter` or :obj:`AlgorithmParameter`): parameter
+        parameter (:obj:`ModelParameter` or :obj:`AlgorithmParameter`): parameter
         value (:obj:`object`): value
     """
 
     def __init__(self, parameter=None, value=None):
         """
         Args:
-            parameter (:obj:`Parameter` or :obj:`AlgorithmParameter`, optional): parameter
+            parameter (:obj:`ModelParameter` or :obj:`AlgorithmParameter`, optional): parameter
             value (:obj:`object`, optional): value
         """
         self.parameter = parameter

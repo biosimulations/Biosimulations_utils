@@ -9,7 +9,7 @@
 from .core import SimWriter, SimReader
 from .data_model import Simulation, Algorithm, AlgorithmParameter, ParameterChange
 from ..data_model import Format, JournalReference, License, Person
-from ..model.data_model import Model, Parameter, Variable
+from ..model.data_model import Model, ModelParameter, Variable
 from datetime import datetime
 from xml.sax import saxutils
 import dateutil.parser
@@ -733,7 +733,7 @@ class SedMlSimReader(SimReader):
                     param_name = node.children
 
         return ParameterChange(
-            parameter=Parameter(
+            parameter=ModelParameter(
                 id=param_id,
                 name=param_name,
                 target=change_sed.getTarget(),

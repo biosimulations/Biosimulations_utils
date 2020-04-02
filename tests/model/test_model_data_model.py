@@ -8,7 +8,7 @@
 
 from Biosimulations_format_utils.data_model import (Format, Identifier, JournalReference,
                                                     License, OntologyTerm, Person, RemoteFile, Taxon, Type)
-from Biosimulations_format_utils.model.data_model import Model, Parameter, Variable
+from Biosimulations_format_utils.model.data_model import Model, ModelParameter, Variable
 import unittest
 
 
@@ -36,15 +36,15 @@ class ModelDataModelTestCase(unittest.TestCase):
                 Person(first_name='Jane', middle_name='D', last_name='Doe'),
             ],
             license=License.cc0,
-            parameters=[Parameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
+            parameters=[ModelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
             variables=[Variable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
         )
         self.assertEqual(Model.from_json(model.to_json()), model)
 
     def test_Parameter(self):
-        param = Parameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])
-        self.assertEqual(Parameter.from_json(param.to_json()), param)
-        self.assertEqual(Parameter.sort_key(param), param.id)
+        param = ModelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])
+        self.assertEqual(ModelParameter.from_json(param.to_json()), param)
+        self.assertEqual(ModelParameter.sort_key(param), param.id)
 
     def test_Variable(self):
         var = Variable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])

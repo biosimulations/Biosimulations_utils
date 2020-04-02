@@ -10,7 +10,7 @@ from ..data_model import Format, Identifier, JournalReference, License, Ontology
 
 __all__ = [
     'Model',
-    'Parameter',
+    'ModelParameter',
     'Variable',
 ]
 
@@ -32,7 +32,7 @@ class Model(object):
         refs (:obj:`list` of :obj:`JournalReference`): references
         authors (:obj:`list` of :obj:`Person`): authors
         license (:obj:`License`): license
-        parameters (:obj:`list` of :obj:`Parameter`): parameters (e.g., initial conditions and rate constants)
+        parameters (:obj:`list` of :obj:`ModelParameter`): parameters (e.g., initial conditions and rate constants)
         variables (:obj:`list` of :obj:`Variable`): variables (e.g., model predictions)
     """
 
@@ -55,7 +55,7 @@ class Model(object):
             refs (:obj:`list` of :obj:`JournalReference`, optional): references
             authors (:obj:`list` of :obj:`Person`, optional): authors
             license (:obj:`License`, optional): license
-            parameters (:obj:`list` of :obj:`Parameter`, optional): parameters (e.g., initial conditions and rate constants)
+            parameters (:obj:`list` of :obj:`ModelParameter`, optional): parameters (e.g., initial conditions and rate constants)
             variables (:obj:`list` of :obj:`Variable`, optional): variables (e.g., model predictions)
         """
         self.id = id
@@ -97,7 +97,7 @@ class Model(object):
             and sorted(self.refs, key=JournalReference.sort_key) == sorted(other.refs, key=JournalReference.sort_key) \
             and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
             and self.license == other.license \
-            and sorted(self.parameters, key=Parameter.sort_key) == sorted(other.parameters, key=Parameter.sort_key) \
+            and sorted(self.parameters, key=ModelParameter.sort_key) == sorted(other.parameters, key=ModelParameter.sort_key) \
             and sorted(self.variables, key=Variable.sort_key) == sorted(other.variables, key=Variable.sort_key)
 
     def to_json(self):
@@ -148,12 +148,12 @@ class Model(object):
             refs=[JournalReference.from_json(ref) for ref in val.get('refs', [])],
             authors=[Person.from_json(author) for author in val.get('authors', [])],
             license=License(val.get('license')) if val.get('license', None) else None,
-            parameters=[Parameter.from_json(parameter) for parameter in val.get('parameters', [])],
+            parameters=[ModelParameter.from_json(parameter) for parameter in val.get('parameters', [])],
             variables=[Variable.from_json(variable) for variable in val.get('variables', [])],
         )
 
 
-class Parameter(object):
+class ModelParameter(object):
     """ A parameter of a model
 
     Attributes:
@@ -201,7 +201,7 @@ class Parameter(object):
         """ Determine if two parameters are semantically equal
 
         Args:
-            other (:obj:`Parameter`): other parameter
+            other (:obj:`ModelParameter`): other parameter
 
         Returns:
             :obj:`bool`
@@ -245,7 +245,7 @@ class Parameter(object):
             val (:obj:`dict`)
 
         Returns:
-            :obj:`Parameter`
+            :obj:`ModelParameter`
         """
         return cls(
             target=val.get('target', None),
@@ -265,7 +265,7 @@ class Parameter(object):
         """ Get a key to sort a parameter
 
         Args:
-            parameter (:obj:`Parameter`): parameter
+            parameter (:obj:`ModelParameter`): parameter
 
         Returns:
             :obj:`str`

@@ -434,7 +434,7 @@ class SedMlSimWriter(SimWriter):
             name (:obj:`str`): name
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             report_sed (:obj:`libsedml.SedReport`): SED report
-            data_gen_sed (:obj:`libsedml.SedDataGenerator): SED data generator
+            data_gen_sed (:obj:`libsedml.SedDataGenerator`): SED data generator
 
         Returns:
             :obj:`libsedml.SedDataSet`: SED data set

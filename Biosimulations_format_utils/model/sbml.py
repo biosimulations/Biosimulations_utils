@@ -10,13 +10,16 @@ from ..data_model import Format, OntologyTerm, Taxon, Type
 from ..utils import pretty_print_units
 from .core import ModelReader, ModelIoError
 from .data_model import Model, ModelParameter, Variable
+from PIL import Image
 import enum
 import ete3
 import libsbml
+import numpy
 import os
 import re
+import requests
 
-__all__ = ['SbmlModelReader']
+__all__ = ['SbmlModelReader', 'viz_model']
 
 
 class ModelFramework(enum.Enum):
@@ -686,3 +689,47 @@ class SbmlModelReader(ModelReader):
         for i_attr in range(node.getAttributesLength()):
             if node.getAttrPrefix(i_attr) == name.prefix and node.getAttrName(i_attr) == name.name:
                 return node.getAttrValue(i_attr)
+
+
+def viz_model(model_filename, img_filename):
+    """ Use `Minerva <https://minerva.pages.uni.lu/>`_ to visualize a model and save the visualization to a PNG file.
+
+    Args:
+        model_filename (:obj:`str`): path to the SBML-encoded model
+        img_filename (:obj:`str`): path to save the visualization of the model
+    """
+    # read the model
+    doc = libsbml.readSBMLFromFile(model_filename)
+    model = doc.getModel()
+
+    # remove layouts from the model
+    plugin = model.getPlugin('layout')
+    if plugin:
+        for i_layout in range(plugin.getNumLayouts()):
+            plugin.removeLayout(i_layout)
+    model_without_layout = libsbml.writeSBMLToString(doc)
+
+    # use Minerva to generate a visualization of the model
+    url = 'https://minerva-dev.lcsb.uni.lu/minerva/api/convert/image/{}:{}'.format('SBML', 'png')
+    response = requests.post(url, headers={'Content-Type': 'text/plain'}, data=model_without_layout)
+    response.raise_for_status()
+    with open(img_filename, 'wb') as file:
+        file.write(response.content)
+    img = Image.open(img_filename)
+
+    # make the background of the visualization transparent
+    img = img.convert('RGBA')
+    img_data = numpy.array(img)
+    img_rgb = img_data[:, :, :3]
+    white = [255, 255, 255]
+    transparent = [0, 0, 0, 0]
+    mask = numpy.all(img_rgb == white, axis=-1)
+    img_data[mask] = transparent
+    img = Image.fromarray(img_data)
+
+    # crop the visualization
+    img_bbox = img.getbbox()
+    cropped_img = img.crop(img_bbox)
+
+    # save the visualization
+    cropped_img.save(img_filename)

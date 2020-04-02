@@ -1,4 +1,6 @@
 ete3
+numpy
+pillow
 pint
 python_dateutil
 python_libsbml

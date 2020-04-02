@@ -10,8 +10,12 @@ from Biosimulations_format_utils.data_model import Format, Taxon, Type
 from Biosimulations_format_utils.model import ModelFormat, read_model
 from Biosimulations_format_utils.model.core import ModelIoError
 from Biosimulations_format_utils.model.data_model import ModelParameter, Variable
+from Biosimulations_format_utils.model.sbml import viz_model
 import importlib
 import libsbml
+import os
+import shutil
+import tempfile
 import unittest
 
 
@@ -345,3 +349,16 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         model = read_model(filename, format=ModelFormat.sbml)
         param = list(filter(lambda param: param.id == 'lambda_1', model.parameters))[0]
         self.assertEqual(param.units, '1.157 10^-4 1 / second')
+
+
+class VizModelTestCase(unittest.TestCase):
+    def setUp(self):
+        self.dirname = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.dirname)
+
+    def test_viz_model(self):
+        model_filename = 'tests/fixtures/MODEL1904090001-without-comp.sbml-L3V2.xml'
+        img_filename = os.path.join(self.dirname, 'model.png')
+        viz_model(model_filename, img_filename)

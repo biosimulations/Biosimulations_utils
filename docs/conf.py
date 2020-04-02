@@ -18,6 +18,8 @@
 #
 import datetime
 import os
+import re
+import sphinx_rtd_theme
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
@@ -73,7 +75,6 @@ author = u'Center for Reproducible Biomedical Modeling'
 # built documents.
 #
 # The short X.Y version.
-import re
 filename = os.path.join(os.path.dirname(__file__), "..", "Biosimulations_format_utils", "_version.py")
 if os.path.isfile(filename):
     verstrline = open(filename, "rt").read()
@@ -153,7 +154,7 @@ numfig_format = {
 image_converter_args = [
     '-density', '150',
     '-quality', '00',
-    ]
+]
 
 
 # -- linkcode options -----------------------------------------------------
@@ -164,9 +165,11 @@ def linkcode_resolve(domain, info):
         return None
     rel_filename = info['module'].replace('.', '/')
     if os.path.isfile(os.path.join(os.path.dirname(__file__), '..', rel_filename + '.py')):
-        return "https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/{}.py".format(rel_filename)
+        return ("https://github.com/reproducible-biomedical-modeling/"
+                "Biosimulations_format_utils/blob/master/{}.py").format(rel_filename)
     else:
-        return "https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/{}/__init__.py".format(rel_filename)
+        return ("https://github.com/reproducible-biomedical-modeling/"
+                "Biosimulations_format_utils/blob/master/{}/__init__.py").format(rel_filename)
 
 
 # -- napoleon options -----------------------------------------------------
@@ -183,8 +186,6 @@ napoleon_use_rtype = True
 
 
 # -- Options for HTML output ----------------------------------------------
-
-import sphinx_rtd_theme
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -308,21 +309,21 @@ htmlhelp_basename = 'Biosimulations_format_utils_doc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-     # The paper size ('letterpaper' or 'a4paper').
-     #
-     # 'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    # 'papersize': 'letterpaper',
 
-     # The font size ('10pt', '11pt' or '12pt').
-     #
-     # 'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #
+    # 'pointsize': '10pt',
 
-     # Additional stuff for the LaTeX preamble.
-     #
-     # 'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #
+    # 'preamble': '',
 
-     # Latex figure (float) alignment
-     #
-     # 'figure_align': 'htbp',
+    # Latex figure (float) alignment
+    #
+    # 'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

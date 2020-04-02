@@ -342,7 +342,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
     def test_run_unsupported_packages(self):
         filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'
         with self.assertRaisesRegex(ModelIoError, r'package\(s\) are not supported'):
-            model = read_model(filename, format=ModelFormat.sbml)
+            read_model(filename, format=ModelFormat.sbml)
 
     def test_run_units(self):
         filename = 'tests/fixtures/BIOMD0000000821.sbml-L2V4.xml'

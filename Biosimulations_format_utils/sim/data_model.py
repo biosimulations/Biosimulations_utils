@@ -8,7 +8,6 @@
 
 from ..data_model import Format, JournalReference, License, Person, RemoteFile, Type
 from ..model.data_model import Model, ModelParameter
-import types
 
 __all__ = ['Simulation', 'Algorithm', 'AlgorithmParameter', 'ParameterChange']
 
@@ -361,7 +360,7 @@ class ParameterChange(object):
 
         Args:
             val (:obj:`dict`)
-            ParameterType (:obj:`types.TypeType`): type of parameter
+            ParameterType (:obj:`type`): type of parameter
 
         Returns:
             :obj:`ParameterChange`

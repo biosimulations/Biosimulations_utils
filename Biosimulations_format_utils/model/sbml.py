@@ -9,7 +9,7 @@
 from ..data_model import Format, OntologyTerm, Taxon, Type
 from ..utils import pretty_print_units
 from .core import ModelReader, ModelIoError
-from .data_model import Model, ModelParameter, Variable
+from .data_model import Model, ModelParameter, Variable  # noqa: F401
 from PIL import Image
 import enum
 import ete3

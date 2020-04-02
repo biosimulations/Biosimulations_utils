@@ -119,7 +119,9 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(reader._get_obj_annotation(doc), [])
 
         doc.setAnnotation(
-            '<annotation><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description></rdf:Description></rdf:RDF></annotation>')
+            '<annotation><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
+            '<rdf:Description></rdf:Description>'
+            '</rdf:RDF></annotation>')
         self.assertEqual(reader._get_obj_annotation(doc), [])
 
     def test__call_sedml_error(self):

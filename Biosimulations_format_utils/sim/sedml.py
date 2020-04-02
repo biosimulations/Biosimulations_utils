@@ -12,7 +12,6 @@ from ..data_model import Format, JournalReference, License, Person
 from ..model.data_model import Model, ModelParameter, Variable
 from datetime import datetime
 from xml.sax import saxutils
-import dateutil.parser
 import enum
 import libsedml
 

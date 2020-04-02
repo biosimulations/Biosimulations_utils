@@ -10,7 +10,7 @@
 from ..data_model import Identifier, JournalReference, License, Person, RemoteFile
 from ..model import ModelFormat, read_model
 from ..model.core import ModelIoError
-from ..model.data_model import Model
+from ..model.data_model import Model  # noqa: F401
 import math
 import os
 import re

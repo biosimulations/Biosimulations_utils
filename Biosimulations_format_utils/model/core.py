@@ -6,8 +6,8 @@
 :License: MIT
 """
 
-from ..data_model import Format
-from .data_model import Model, ModelParameter, Variable
+from ..data_model import Format  # noqa: F401
+from .data_model import Model, ModelParameter, Variable  # noqa: F401
 import abc
 
 __all__ = ['ModelReader']

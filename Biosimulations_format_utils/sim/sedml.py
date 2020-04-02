@@ -8,7 +8,7 @@
 
 from .core import SimWriter, SimReader
 from .data_model import Simulation, Algorithm, AlgorithmParameter, ParameterChange
-from ..data_model import Format
+from ..data_model import Format, JournalReference, License, Person
 from ..model.data_model import Model, Parameter, Variable
 from datetime import datetime
 from xml.sax import saxutils
@@ -31,7 +31,8 @@ class SedMlSimWriter(SimWriter):
     def run(self, model_vars, sim, model_filename, sim_filename, level=1, version=3):
         """
         Args:
-            model_vars (:obj:`list` of :obj:`Variable`): List of variables in the model. Each variable should have the keys `id` and `target`
+            model_vars (:obj:`list` of :obj:`Variable`): List of variables in the model.
+                Each variable should have the keys `id` and `target`
             sim (:obj:`Simulation`): Simulation experiment
             model_filename (:obj:`str`): Path to the model definition
             sim_filename (:obj:`str`): Path to save simulation experiment in SED-ML format
@@ -96,59 +97,119 @@ class SedMlSimWriter(SimWriter):
             sim (:obj:`Simulation`): simulation experiment
             doc_sed (:obj:`libsedml.SedDocument`): SED document
         """
-        metadata = {}
+        metadata = []
+        namespaces = set()
 
         if sim.id:
-            metadata['id'] = XmlNode(
+            metadata.append(XmlNode(
                 prefix='dc',
                 name='title',
-                id='id',
-                type=RdfDataType.string,
-                value=sim.id,
-            )
+                children=sim.id,
+            ))
+            namespaces.add('dc')
 
         if sim.name:
-            metadata['name'] = XmlNode(
+            metadata.append(XmlNode(
                 prefix='dc',
                 name='description',
-                id='name',
-                type=RdfDataType.string,
-                value=sim.name,
-            )
+                type='name',
+                children=sim.name,
+            ))
+            namespaces.add('dc')
 
         if sim.description:
-            metadata['description'] = XmlNode(
+            metadata.append(XmlNode(
                 prefix='dc',
                 name='description',
-                id='description',
-                type=RdfDataType.string,
-                value=sim.description,
-            )
+                type='description',
+                children=sim.description,
+            ))
+            namespaces.add('dc')
 
         if sim.tags:
-            metadata['tags'] = [XmlNode('dc', 'description', None, RdfDataType.string, tag) for tag in sim.tags]
+            metadata.append(
+                XmlNode(prefix='dc', name='description', type='tags', children=[
+                    XmlNode(prefix='rdf', name='Bag', children=[
+                        XmlNode(prefix='rdf', name='li', children=[
+                            XmlNode(prefix='rdf', name='value', children=tag)
+                        ]) for tag in sim.tags
+                    ])
+                ]))
+            namespaces.add('dc')
+            namespaces.add('rdf')
 
         if sim.authors:
-            # todo
-            metadata['authors'] = [author.to_json() for author in sim.authors]
+            authors_xml = []
+            for author in sim.authors:
+                names_xml = []
+                if author.first_name:
+                    names_xml.append(XmlNode(prefix='vcard', name='Given', children=author.first_name))
+                if author.middle_name:
+                    names_xml.append(XmlNode(prefix='vcard', name='Other', children=author.middle_name))
+                if author.last_name:
+                    names_xml.append(XmlNode(prefix='vcard', name='Family', children=author.last_name))
+
+                authors_xml.append(XmlNode(prefix='rdf', name='li', children=[
+                    XmlNode(prefix='vcard', name='N', children=names_xml)
+                ]))
+
+            metadata.append(
+                XmlNode(prefix='dc', name='creator', children=[
+                    XmlNode(prefix='rdf', name='Bag', children=authors_xml)
+                ])
+            )
+            namespaces.add('dc')
+            namespaces.add('rdf')
+            namespaces.add('vcard')
 
         if sim.refs:
-            # todo
-            metadata['refs'] = [ref.to_json() for ref in sim.refs]
+            refs_xml = []
+            for ref in sim.refs:
+                props_xml = []
+                if ref.authors:
+                    props_xml.append(XmlNode(prefix='bibo', name='authorList', children=ref.authors))
+                if ref.title:
+                    props_xml.append(XmlNode(prefix='dc', name='title', children=ref.title))
+                if ref.journal:
+                    props_xml.append(XmlNode(prefix='bibo', name='journal', children=ref.journal))
+                if ref.volume:
+                    props_xml.append(XmlNode(prefix='bibo', name='volume', children=ref.volume))
+                if ref.num:
+                    props_xml.append(XmlNode(prefix='bibo', name='issue', children=ref.num))
+                if ref.pages:
+                    props_xml.append(XmlNode(prefix='bibo', name='pages', children=ref.pages))
+                if ref.year:
+                    props_xml.append(XmlNode(prefix='dc', name='date', children=ref.year))
+                if ref.doi:
+                    props_xml.append(XmlNode(prefix='bibo', name='doi', children=ref.doi))
+
+                refs_xml.append(XmlNode(prefix='rdf', name='li', children=[
+                    XmlNode(prefix='bibo', name='Article', children=props_xml)
+                ]))
+
+            metadata.append(
+                XmlNode(prefix='dcterms', name='references', children=[
+                    XmlNode(prefix='rdf', name='Bag', children=refs_xml)
+                ])
+            )
+            namespaces.add('dcterms')
+            namespaces.add('rdf')
+            namespaces.add('bibo')
 
         if sim.license:
-            metadata['license'] = XmlNode(
+            metadata.append(XmlNode(
                 prefix='dcterms',
                 name='license',
-                id='license',
-                type=RdfDataType.string,
-                value=sim.license.value,
-            )
+                children=sim.license.value,
+            ))
+            namespaces.add('dcterms')
 
-        metadata['creator'] = XmlNode('dcterms', 'creator', None, RdfDataType.string, 'BioSimulations')
-        metadata['created'] = XmlNode('dcterms', 'created', None, RdfDataType.date_time, datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+        metadata.append(XmlNode(prefix='dcterms', name='mediator', children='BioSimulations'))
+        metadata.append(XmlNode(prefix='dcterms', name='created',
+                                children=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')))
+        namespaces.add('dcterms')
 
-        self._add_annotation_to_obj(metadata, doc_sed, doc_sed)
+        self._add_annotation_to_obj(metadata, doc_sed, doc_sed, namespaces)
 
     def _add_model_to_doc(self, model, filename, doc_sed):
         """ Add a model to a SED document
@@ -198,25 +259,21 @@ class SedMlSimWriter(SimWriter):
 
         self._call_libsedml_method(doc_sed, change_sed, 'setTarget', change.parameter.target)
 
-        metadata = {}
+        metadata = []
         if change.parameter.id:
-            metadata['id'] = XmlNode(
+            metadata.append(XmlNode(
                 prefix='dc',
                 name='title',
-                id='id',
-                type=RdfDataType.string,
-                value=change.parameter.id,
-            )
+                children=change.parameter.id,
+            ))
         if change.parameter.name:
-            metadata['name'] = XmlNode(
+            metadata.append(XmlNode(
                 prefix='dc',
                 name='description',
-                id='name',
-                type=RdfDataType.string,
-                value=change.parameter.name,
-            )
+                children=change.parameter.name,
+            ))
         if metadata:
-            self._add_annotation_to_obj(metadata, doc_sed, change_sed)
+            self._add_annotation_to_obj(metadata, doc_sed, change_sed, set(['dc']))
 
         self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change.value))
         return change_sed
@@ -253,13 +310,11 @@ class SedMlSimWriter(SimWriter):
         alg_sed = sim_sed.createAlgorithm()
         self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.id)
         if algorithm.name:
-            self._add_annotation_to_obj({'name': XmlNode(
+            self._add_annotation_to_obj([XmlNode(
                 prefix='dc',
                 name='title',
-                id='name',
-                type=RdfDataType.string,
-                value=algorithm.name,
-            )}, doc_sed, alg_sed)
+                children=algorithm.name,
+            )], doc_sed, alg_sed, set(['dc']))
 
         return alg_sed
 
@@ -294,13 +349,11 @@ class SedMlSimWriter(SimWriter):
         change_sed = alg_sed.createAlgorithmParameter()
         self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID', change.parameter.kisao_id)
         if change.parameter.name:
-            self._add_annotation_to_obj({'name': XmlNode(
+            self._add_annotation_to_obj([XmlNode(
                 prefix='dc',
                 name='title',
-                id='name',
-                type=RdfDataType.string,
-                value=change.parameter.name,
-            )}, doc_sed, change_sed)
+                children=change.parameter.name,
+            )], doc_sed, change_sed, set(['dc']))
         self._call_libsedml_method(doc_sed, change_sed, 'setValue', str(change.value))
         return change_sed
 
@@ -429,69 +482,37 @@ class SedMlSimWriter(SimWriter):
         # save the SED document to a file
         libsedml.writeSedML(doc_sed, filename)
 
-    def _add_annotation_to_obj(self, annot, doc_sed, obj_sed):
+    def _add_annotation_to_obj(self, nodes, doc_sed, obj_sed, namespaces):
         """ Add annotation to a SED object
 
         Args:
-            annot (:obj:`object`): annotation
+            nodes (:obj:`list` of :obj:`XmlNode`): annotation
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             obj_sed (:obj:`libsedml.SedBase`): SED object
+            namespaces (:obj:`set` of :obj:`str`): list of namespaces
         """
-        if annot:
-            annot_xml = self._encode_obj_to_xml(annot)
+        if nodes:
+            namespaces.add('rdf')
+            namespaces_xml = []
+            if 'rdf' in namespaces:
+                namespaces_xml.append(' xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"')
+            if 'dc' in namespaces:
+                namespaces_xml.append(' xmlns:dc="http://purl.org/dc/elements/1.1/"')
+            if 'dcterms' in namespaces:
+                namespaces_xml.append(' xmlns:dcterms="http://purl.org/dc/terms/"')
+            if 'vcard' in namespaces:
+                namespaces_xml.append(' xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#"')
+            if 'bibo' in namespaces:
+                namespaces_xml.append(' xmlns:bibo="http://purl.org/ontology/bibo/"')
+
             self._call_libsedml_method(doc_sed, obj_sed, 'setAnnotation',
                                        ('<annotation>'
-                                        '  <rdf:RDF'
-                                        '    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"'
-                                        '    xmlns:dc="http://purl.org/dc/elements/1.1/"'
-                                        '    xmlns:dcterms="http://purl.org/dc/terms/"'
-                                        '  >'
+                                        '  <rdf:RDF{}>'
+                                        '    <rdf:Description>'
                                         '    {}'
+                                        '    </rdf:Description>'
                                         '  </rdf:RDF>'
-                                        '  </annotation>').format(''.join(annot_xml)))
-
-    def _encode_obj_to_xml(self, obj, id=None):
-        """ Encode an object into XML
-
-        Args:
-            obj (:obj:`object`): object
-
-        Returns:
-            :obj:`str`: XML representation of object
-        """
-        if id:
-            id_xml = ' rdf:ID="{}"'.format(id)
-        else:
-            id_xml = ''
-
-        if isinstance(obj, dict):
-            els_xml = []
-            for key, val in obj.items():
-                els_xml.append(self._encode_obj_to_xml(val, id=key))
-            return '<rdf:Description{}>{}</rdf:Description>'.format(id_xml, ''.join(els_xml))
-        elif isinstance(obj, set):
-            els_xml = []
-            for el in obj:
-                els_xml.append("<rdf:li>" + self._encode_obj_to_xml(el) + "</rdf:li>")
-            return '<rdf:Bag{}>{}</rdf:Bag>'.format(id_xml, ''.join(els_xml))
-        elif isinstance(obj, list):
-            els_xml = []
-            for el in obj:
-                els_xml.append("<rdf:li>" + self._encode_obj_to_xml(el) + "</rdf:li>")
-            return '<rdf:Seq{}>{}</rdf:Seq>'.format(id_xml, ''.join(els_xml))
-        elif isinstance(obj, XmlNode):
-            return obj.encode()
-        elif isinstance(obj, (int, float, str)):
-            if isinstance(obj, int):
-                type = RdfDataType.integer
-            elif isinstance(obj, float):
-                type = RdfDataType.float
-            else:
-                type = RdfDataType.string
-            return XmlNode(prefix='rdf', name='value', id=id, type=type, value=obj).encode()
-        else:
-            raise ValueError('Value must be a float, integer, string, dict, or list not {}'.format(
-                obj.__class__.__name__))
+                                        '  </annotation>').format(''.join(namespaces_xml), ''.join(node.encode() for node in nodes)))
 
     @staticmethod
     def _call_libsedml_method(doc_sed, obj_sed, method_name, *args, **kwargs):
@@ -561,7 +582,67 @@ class SedMlSimReader(SimReader):
                     ))
 
         # initialize simulation experiment with metadata
-        sim = Simulation.from_json(self._get_obj_annotation(doc_sed))
+        sim = Simulation()
+
+        metadata = self._get_obj_annotation(doc_sed)
+        for node in metadata:
+            if node.prefix == 'dc' and node.name == 'title' and isinstance(node.children, str):
+                sim.id = node.children
+            elif node.prefix == 'dc' and node.name == 'description' and node.type == 'name' and isinstance(node.children, str):
+                sim.name = node.children
+            elif node.prefix == 'dc' and node.name == 'description' and node.type == 'description' and isinstance(node.children, str):
+                sim.description = node.children
+            elif node.prefix == 'dc' and node.name == 'description' and node.type == 'tags':
+                assert len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag'
+                for child in node.children[0].children:
+                    assert child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1
+                    assert child.children[0].prefix == 'rdf' and child.children[0].name == 'value'
+                    assert isinstance(child.children[0].children, str)
+                    sim.tags.append(child.children[0].children)
+            elif node.prefix == 'dc' and node.name == 'creator':
+                assert len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag'
+                for child in node.children[0].children:
+                    assert child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1
+                    assert child.children[0].prefix == 'vcard' and child.children[0].name == 'N'
+                    author = Person()
+                    for prop in child.children[0].children:
+                        if prop.prefix == 'vcard' and prop.name == 'Given' and isinstance(prop.children, str):
+                            author.first_name = prop.children
+                        elif prop.prefix == 'vcard' and prop.name == 'Other' and isinstance(prop.children, str):
+                            author.middle_name = prop.children
+                        elif prop.prefix == 'vcard' and prop.name == 'Family' and isinstance(prop.children, str):
+                            author.last_name = prop.children
+                    sim.authors.append(author)
+            elif node.prefix == 'dcterms' and node.name == 'references':
+                assert len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag'
+                for child in node.children[0].children:
+                    assert child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1
+                    assert child.children[0].prefix == 'bibo' and child.children[0].name == 'Article'
+                    ref = JournalReference()
+                    for prop in child.children[0].children:
+                        if prop.prefix == 'bibo' and prop.name == 'authorList' and isinstance(prop.children, str):
+                            ref.authors = prop.children
+                        elif prop.prefix == 'dc' and prop.name == 'title' and isinstance(prop.children, str):
+                            ref.title = prop.children
+                        elif prop.prefix == 'bibo' and prop.name == 'journal' and isinstance(prop.children, str):
+                            ref.journal = prop.children
+                        elif prop.prefix == 'bibo' and prop.name == 'volume' and isinstance(prop.children, str):
+                            try:
+                                ref.volume = int(prop.children)
+                            except Exception:
+                                ref.volume = prop.children
+                        elif prop.prefix == 'bibo' and prop.name == 'issue' and isinstance(prop.children, str):
+                            ref.num = int(prop.children)
+                        elif prop.prefix == 'bibo' and prop.name == 'pages' and isinstance(prop.children, str):
+                            ref.pages = prop.children
+                        elif prop.prefix == 'dc' and prop.name == 'date' and isinstance(prop.children, str):
+                            ref.year = int(prop.children)
+                        elif prop.prefix == 'bibo' and prop.name == 'doi' and isinstance(prop.children, str):
+                            ref.doi = prop.children
+                    sim.refs.append(ref)
+            elif node.prefix == 'dcterms' and node.name == 'license' and isinstance(node.children, str):
+                sim.license = License(node.children)
+
         sim.format = Format(
             name="SED-ML",
             version="L{}V{}".format(doc_sed.getLevel(), doc_sed.getVersion()),
@@ -593,19 +674,31 @@ class SedMlSimReader(SimReader):
         # simulation algorithm
         alg_sed = sim_sed.getAlgorithm()
         alg_props = self._get_obj_annotation(alg_sed)
+        alg_name = None
+        for node in alg_props:
+            if node.prefix == 'dc' and node.name == 'title':
+                alg_name = node.children
+                break
+
         sim.algorithm = Algorithm(
             id=alg_sed.getKisaoID(),
-            name=alg_props.get('name', None),
+            name=alg_name,
         )
 
         # simulation algorithm parameters
         sim.algorithm_parameter_changes = []
         for change_sed in alg_sed.getListOfAlgorithmParameters():
             change_props = self._get_obj_annotation(change_sed)
+            param_name = None
+            for node in change_props:
+                if node.prefix == 'dc' and node.name == 'title':
+                    param_name = node.children
+                    break
+
             sim.algorithm_parameter_changes.append(ParameterChange(
                 parameter=AlgorithmParameter(
                     kisao_id=change_sed.getKisaoID(),
-                    name=change_props.get('name'),
+                    name=param_name,
                 ),
                 value=float(change_sed.getValue()),
             ))
@@ -630,11 +723,19 @@ class SedMlSimReader(SimReader):
             obj:`ParameterChange`: model parameter change
         """
         props = self._get_obj_annotation(change_sed)
+        param_id = None
+        param_name = None
+        for node in props:
+            if node.prefix == 'dc':
+                if node.name == 'title':
+                    param_id = node.children
+                elif node.name == 'description':
+                    param_name = node.children
 
         return ParameterChange(
             parameter=Parameter(
-                id=props.get('id', None),
-                name=props.get('name', None),
+                id=param_id,
+                name=param_name,
                 target=change_sed.getTarget(),
             ),
             value=float(change_sed.getNewValue())
@@ -647,7 +748,7 @@ class SedMlSimReader(SimReader):
             obj_sed (:obj:`libsedml.SedBase`): SED object
 
         Returns:
-            :obj:`dict`: dictionary of annotated properties and their values
+            :obj:`list` of :obj:`XmlNode`: list of annotations
         """
         annotations_xml = obj_sed.getAnnotation()
         if annotations_xml is None:
@@ -669,7 +770,12 @@ class SedMlSimReader(SimReader):
         if description_xml.getPrefix() != 'rdf' or description_xml.getName() != 'Description':
             raise ValueError('Unable to decode XML')
 
-        return self._decode_obj_from_xml(description_xml)
+        nodes = []
+        for i_child in range(description_xml.getNumChildren()):
+            child = description_xml.getChild(i_child)
+            nodes.append(self._decode_obj_from_xml(child))
+
+        return nodes
 
     def _decode_obj_from_xml(self, obj_xml):
         """ Decode an object from its XML representation
@@ -678,66 +784,28 @@ class SedMlSimReader(SimReader):
             obj_xml (:obj:`libsedml.XMLNode`): XML representation of an object
 
         Returns:
-            :obj:`object`: object
+            :obj:`XmlNode`: object
         """
-        if obj_xml.getPrefix() == 'rdf' and obj_xml.getName() == 'Description':
-            val = {}
-            for i_child in range(obj_xml.getNumChildren()):
-                child_xml = obj_xml.getChild(i_child)
+        node = XmlNode(
+            prefix=obj_xml.getPrefix(),
+            name=obj_xml.getName(),
+            type=None,
+            children=None,
+        )
 
-                id = None
-                for i_attr in range(child_xml.getAttributesLength()):
-                    if child_xml.getAttrPrefix(i_attr) == 'rdf' and child_xml.getAttrName(i_attr) == 'ID':
-                        id = child_xml.getAttrValue(i_attr)
-                        break
+        for i_attr in range(obj_xml.getAttributesLength()):
+            if obj_xml.getAttrPrefix(i_attr) == 'dc' and obj_xml.getAttrName(i_attr) == 'type':
+                node.type = obj_xml.getAttrValue(i_attr)
 
-                if id:
-                    val[id] = self._decode_obj_from_xml(child_xml)
-            return val
-
-        if obj_xml.getPrefix() == 'rdf' and obj_xml.getName() == 'Bag':
-            val = set()
-            for i_child in range(obj_xml.getNumChildren()):
-                child_xml = obj_xml.getChild(i_child)
-                assert child_xml.getPrefix() == 'rdf' and child_xml.getName() == 'li'
-                assert child_xml.getNumChildren() == 1
-                val.add(self._decode_obj_from_xml(child_xml.getChild(0)))
-            return val
-
-        elif obj_xml.getPrefix() == 'rdf' and obj_xml.getName() == 'Seq':
-            val = []
-            for i_child in range(obj_xml.getNumChildren()):
-                child_xml = obj_xml.getChild(i_child)
-                assert child_xml.getPrefix() == 'rdf' and child_xml.getName() == 'li'
-                assert child_xml.getNumChildren() == 1
-                val.append(self._decode_obj_from_xml(child_xml.getChild(0)))
-            return val
-
-        elif obj_xml.getPrefix() in ['dc', 'dcterms', 'rdf']:
-            type = None
-            for i_attr in range(obj_xml.getAttributesLength()):
-                if obj_xml.getAttrPrefix(i_attr) == 'rdf' and obj_xml.getAttrName(i_attr) == 'datatype':
-                    type = obj_xml.getAttrValue(i_attr)
-
-            if type is None:
-                raise ValueError('Unable to decode object')
-
-            assert obj_xml.getNumChildren() == 1
-            val = libsedml.XMLNode.convertXMLNodeToString(obj_xml.getChild(0))
-            if type == "http://www.w3.org/2001/XMLSchema#string":
-                val = saxutils.unescape(val)
-            elif type == "http://www.w3.org/2001/XMLSchema#integer":
-                val = int(val)
-            elif type == "http://www.w3.org/2001/XMLSchema#float":
-                val = float(val)
-            elif type == "http://www.w3.org/2001/XMLSchema#dateTime":
-                val = dateutil.parser.parse(val)
-            else:
-                raise ValueError("Data type must be float, integer, or string not {}".format(type))
-            return val
-
+        if obj_xml.getNumChildren() == 1 and not obj_xml.getChild(0).getPrefix() and not obj_xml.getChild(0).getName():
+            node.children = obj_xml.getChild(0).getCharacters()
         else:
-            raise ValueError('Unable to decode object')
+            node.children = []
+            for i_child in range(obj_xml.getNumChildren()):
+                child_xml = obj_xml.getChild(i_child)
+                node.children.append(self._decode_obj_from_xml(child_xml))
+
+        return node
 
 
 class RdfDataType(str, enum.Enum):
@@ -754,41 +822,39 @@ class XmlNode(object):
     Attributes:
         prefix (:obj:`str`): tag prefix
         name (:obj:`str`): tag name
-        id (:obj:`str`): RDF id
-        type (:obj:`RdfDataType`): RDF data type
-        value (:obj:`object`): value
+        type (:obj:`str`): term type
+        children (:obj:`int`, :obj:`float`, :obj:`str`, or :obj:`list` of :obj:`XmlNode`): children
     """
 
-    def __init__(self, prefix=None, name=None, id=None, type=None, value=None):
+    def __init__(self, prefix=None, name=None, type=None, children=None):
         """
         Args:
-            prefix (:obj:`str`): tag prefix
-            name (:obj:`str`): tag name
-            id (:obj:`str`): RDF id
-            type (:obj:`RdfDataType`): RDF data type
-            value (:obj:`object`): value
+            prefix (:obj:`str`, optional): tag prefix
+            name (:obj:`str`, optional): tag name
+            type (:obj:`str`, optional): term type
+            children (:obj:`int`, :obj:`float`, :obj:`str`, or :obj:`list` of :obj:`XmlNode`, optional): children
         """
         self.prefix = prefix
         self.name = name
-        self.id = id
         self.type = type
-        self.value = value
+        self.children = children
 
     def encode(self):
-        if self.id:
-            id = ' rdf:ID="{}"'.format(self.id)
+        if self.type:
+            type = ' dc:type="{}"'.format(self.type)
         else:
-            id = ''
+            type = ''
 
-        if self.type == RdfDataType.string:
-            value_xml = saxutils.escape(self.value)
+        if isinstance(self.children, list):
+            value_xml = ''.join(child.encode() for child in self.children)
+        elif isinstance(self.children, str):
+            value_xml = saxutils.escape(self.children)
         else:
-            value_xml = self.value
+            value_xml = self.children
 
         return ('<{}:{}'
-                '{}'
-                ' rdf:datatype="http://www.w3.org/2001/XMLSchema#{}">'
+                '{}>'
                 '{}'
                 '</{}:{}>').format(self.prefix, self.name,
-                                   id, self.type.value, value_xml,
+                                   type, value_xml,
                                    self.prefix, self.name)

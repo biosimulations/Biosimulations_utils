@@ -33,17 +33,6 @@ class ImportBioModels(object):
     BIOSIMULATIONS_ENDPOINT = 'https://api.biosimulations.dev'
     NUM_MODELS_PER_BATCH = 100
     MAX_RETRIES = 5
-    SKIP_MODELS = set([
-        'BIOMD0000000173',  # undefined 'time' units
-        # 'BIOMD0000000232', # unit kelvin undefined
-        # 'BIOMD0000000241', # unit kilogram undefined
-        # 'BIOMD0000000246', # unit hertz undefined
-        # 'BIOMD0000000255', # unit item undefined
-        # 'BIOMD0000000327', # units second, volt undefined
-        # 'BIOMD0000000504', # invalid PubMed publication id
-        # 'BIOMD0000000619', # unit gram undefined
-        # 'BIOMD0000000765', # invalid taxonomy id
-    ])
 
     def __init__(self, _max_models=float('inf'), _cache_dir=None):
         self._max_models = _max_models
@@ -84,8 +73,6 @@ class ImportBioModels(object):
             results = self.get_model_batch(num_results=self.NUM_MODELS_PER_BATCH, i_batch=i_batch)
             for model_result in results['models']:
                 print('  {}. {}: {}'.format(len(models) + 1, model_result['id'], model_result['name']))
-                if model_result['id'] in self.SKIP_MODELS:
-                    continue
                 try:
                     models.append(self.get_model(model_result['id']))
                 except ModelIoError:

@@ -91,7 +91,7 @@ class Model(object):
             and self.description == other.description \
             and self.format == other.format \
             and self.framework == other.framework \
-            and self.taxon == other.id \
+            and self.taxon == other.taxon \
             and sorted(self.tags) == sorted(other.tags) \
             and sorted(self.identifiers, key=Identifier.sort_key) == sorted(other.identifiers, key=Identifier.sort_key) \
             and sorted(self.refs, key=JournalReference.sort_key) == sorted(other.refs, key=JournalReference.sort_key) \

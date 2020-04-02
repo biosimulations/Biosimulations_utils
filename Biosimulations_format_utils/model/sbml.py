@@ -7,6 +7,7 @@
 """
 
 from ..data_model import Format, OntologyTerm, Taxon, Type
+from ..utils import pretty_print_units
 from .core import ModelReader, ModelIoError
 from .data_model import Model, Parameter, Variable
 import enum
@@ -167,10 +168,6 @@ class SbmlModelReader(ModelReader):
         if unsupported_packages:
             raise ModelIoError("{} package(s) are not supported".format(', '.join(unsupported_packages)))
 
-        supported_packages = packages.intersection(set(['fbc', 'multi', 'qual']))
-        if len(supported_packages) > 1:
-            raise ModelIoError("{} packages are not supported together".format(', '.join(supported_packages)))
-
         framework = ModelFramework.non_spatial_continuous
         model.framework = framework.value
 
@@ -193,8 +190,6 @@ class SbmlModelReader(ModelReader):
                         id=taxon_id,
                         name=taxon_name,
                     )
-                else:
-                    model.taxon = None
 
         return model
 
@@ -234,16 +229,14 @@ class SbmlModelReader(ModelReader):
         # local parameters of reactions
         for rxn_sbml in model_sbml.getListOfReactions():
             kin_law_sbml = rxn_sbml.getKineticLaw()
-            if not kin_law_sbml:
-                continue
+            if kin_law_sbml:
+                rxn_id = rxn_sbml.getId()
+                rxn_name = rxn_sbml.getName() or None
 
-            rxn_id = rxn_sbml.getId()
-            rxn_name = rxn_sbml.getName() or None
-
-            for param_sbml in kin_law_sbml.getListOfParameters():
-                assert rxn_id
-                parameters[(rxn_id, param_sbml.getId())] = self._read_parameter(
-                    param_sbml, model, rxn_sbml=rxn_sbml, rxn_id=rxn_id, rxn_name=rxn_name)
+                for param_sbml in kin_law_sbml.getListOfParameters():
+                    assert rxn_id
+                    parameters[(rxn_id, param_sbml.getId())] = self._read_parameter(
+                        param_sbml, model, rxn_sbml=rxn_sbml, rxn_id=rxn_id, rxn_name=rxn_name)
 
         # compartment sizes
         for comp_sbml in model_sbml.getListOfCompartments():
@@ -278,7 +271,9 @@ class SbmlModelReader(ModelReader):
 
             species_name = species_sbml.getName() or species_id
 
-            species_substance_units = units.get(species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits(), None)
+            species_substance_units = units.get(species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits(), None) \
+                or species_sbml.getSubstanceUnits() \
+                or model_sbml.getSubstanceUnits()
             if species_sbml.isSetInitialAmount():
                 species_initial_type = 'Amount'
                 species_initial_val = species_sbml.getInitialAmount()
@@ -290,7 +285,7 @@ class SbmlModelReader(ModelReader):
                 comp_sbml = self._get_compartment(model_sbml, species_sbml.getCompartment())
 
                 if species_substance_units:
-                    species_initial_units = self._pretty_print_units('({}) / ({})'.format(
+                    species_initial_units = pretty_print_units('({}) / ({})'.format(
                         species_substance_units,
                         self._format_unit_def(comp_sbml.getDerivedUnitDefinition())
                     ))
@@ -483,7 +478,7 @@ class SbmlModelReader(ModelReader):
         fbc_plugin_sbml = model_sbml.getPlugin('fbc')
 
         if fbc_plugin_sbml:
-            flux_units = self._pretty_print_units('({}) / ({})'.format(
+            flux_units = pretty_print_units('({}) / ({})'.format(
                 units.get(model_sbml.getExtentUnits(), None) or model_sbml.getExtentUnits(),
                 units.get(model_sbml.getTimeUnits(), None) or model_sbml.getTimeUnits(),
             ))
@@ -587,20 +582,6 @@ class SbmlModelReader(ModelReader):
             if comp_sbml.getId() == comp_id:
                 return comp_sbml
 
-    def _get_species(self, model_sbml, species_id):
-        """ Get a species
-
-        Args:
-            model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            species_id (:obj:`str`): species id
-
-        Returns:
-            :obj:`libsbml.Species`: species
-        """
-        for species_sbml in model_sbml.getListOfSpecies():
-            if species_sbml.getId() == species_id:
-                return species_sbml
-
     def _get_reaction(self, model_sbml, rxn_id):
         """ Get a reaction
 
@@ -631,7 +612,7 @@ class SbmlModelReader(ModelReader):
         if unit_def_str == 'indeterminable':
             return None
 
-        return self._pretty_print_units(unit_def_str.replace(', ', ' * '))
+        return pretty_print_units(unit_def_str.replace(', ', ' * '))
 
     def _calc_recommended_param_range(self, value, zero_fold=10., non_zero_fold=10.):
         """ Calculate a recommended range for the value of a parameter
@@ -705,4 +686,3 @@ class SbmlModelReader(ModelReader):
         for i_attr in range(node.getAttributesLength()):
             if node.getAttrPrefix(i_attr) == name.prefix and node.getAttrName(i_attr) == name.name:
                 return node.getAttrValue(i_attr)
-        return None

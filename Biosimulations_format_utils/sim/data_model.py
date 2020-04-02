@@ -280,7 +280,7 @@ class AlgorithmParameter(object):
             'name': self.name,
             'type': self.type.value if self.type else None,
             'value': self.value,
-            'kisao_id': self.kisao_id,
+            'kisaoId': self.kisao_id,
         }
 
     @classmethod

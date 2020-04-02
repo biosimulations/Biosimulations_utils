@@ -22,6 +22,7 @@ class ImportBioModelsTestCase(unittest.TestCase):
 
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
+        shutil.rmtree(self.dirname)
 
     def tearDown(self):
         shutil.rmtree(self.dirname)

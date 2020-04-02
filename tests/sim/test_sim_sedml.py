@@ -106,6 +106,21 @@ class WriteSedMlTestCase(unittest.TestCase):
         with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
             write_sim(None, sim, 'model.sbml.xml', None, SimFormat.sedml, level=1, version=3)
 
+    def test__get_obj_annotation(self):
+        reader = sedml.SedMlSimReader()
+
+        doc = libsedml.SedDocument()
+        self.assertEqual(reader._get_obj_annotation(doc), [])
+
+        doc.setAnnotation('<annotation></annotation>')
+        self.assertEqual(reader._get_obj_annotation(doc), [])
+
+        doc.setAnnotation('<annotation><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"></rdf:RDF></annotation>')
+        self.assertEqual(reader._get_obj_annotation(doc), [])
+
+        doc.setAnnotation('<annotation><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description></rdf:Description></rdf:RDF></annotation>')
+        self.assertEqual(reader._get_obj_annotation(doc), [])
+
     def test__call_sedml_error(self):
         doc = libsedml.SedDocument()
         with self.assertRaisesRegex(ValueError, 'libsedml error:'):

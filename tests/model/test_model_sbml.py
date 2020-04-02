@@ -226,6 +226,8 @@ class ReadSbmlModelTestCase(unittest.TestCase):
 
         params = list(filter(lambda param: param.group == 'Initial species amounts/concentrations', model.parameters))
         self.assertEqual(len(params), 5)
+        param = next(param for param in model.parameters if param.id == 'init_concentration_adp')
+        self.assertEqual(param.units, 'millimole / liter')
 
         params = list(filter(lambda param: param.group == 'Flux objective coefficients', model.parameters))
         self.assertEqual(len(params), 1)
@@ -327,6 +329,11 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             type=Type.integer,
             units='dimensionless',
         ))
+
+        filename = 'tests/fixtures/qual_example_4.2-with-max-level.sbml-L3V1.xml'
+        model = read_model(filename, format=ModelFormat.sbml)
+        param = next(param for param in model.parameters if param.id == 'init_level_A')
+        self.assertEqual(param.recommended_range[1], 5)
 
     def test_run_unsupported_packages(self):
         filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'

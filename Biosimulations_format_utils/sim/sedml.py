@@ -752,29 +752,20 @@ class SedMlSimReader(SimReader):
         """
         annotations_xml = obj_sed.getAnnotation()
         if annotations_xml is None:
-            return {}
+            return []
 
-        assert annotations_xml.getNumChildren() <= 1
-        if annotations_xml.getNumChildren() == 0:
-            return {}
-
-        annotation_xml = annotations_xml.getChild(0)
-        if annotation_xml.getPrefix() != 'rdf' or annotation_xml.getName() != 'RDF':
-            raise ValueError('Unable to decode XML')
-
-        assert annotation_xml.getNumChildren() <= 1
-        if annotation_xml.getNumChildren() == 0:
-            return {}
-
-        description_xml = annotation_xml.getChild(0)
-        if description_xml.getPrefix() != 'rdf' or description_xml.getName() != 'Description':
-            raise ValueError('Unable to decode XML')
+        assert annotations_xml.getPrefix() == '' and annotations_xml.getName() == 'annotation'
 
         nodes = []
-        for i_child in range(description_xml.getNumChildren()):
-            child = description_xml.getChild(i_child)
-            nodes.append(self._decode_obj_from_xml(child))
-
+        for i_child in range(annotations_xml.getNumChildren()):
+            rdf_xml = annotations_xml.getChild(i_child)
+            if rdf_xml.getPrefix() == 'rdf' and rdf_xml.getName() == 'RDF':
+                for i_child_2 in range(rdf_xml.getNumChildren()):
+                    description_xml = rdf_xml.getChild(i_child_2)
+                    if description_xml.getPrefix() == 'rdf' and description_xml.getName() == 'Description':
+                        for i_child_3 in range(description_xml.getNumChildren()):
+                            child = description_xml.getChild(i_child_3)
+                            nodes.append(self._decode_obj_from_xml(child))
         return nodes
 
     def _decode_obj_from_xml(self, obj_xml):

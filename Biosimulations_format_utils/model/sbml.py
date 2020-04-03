@@ -698,6 +698,9 @@ def viz_model(model_filename, img_filename):
     Args:
         model_filename (:obj:`str`): path to the SBML-encoded model
         img_filename (:obj:`str`): path to save the visualization of the model
+    
+    Returns:
+        :obj:`RemoteFile`: image
     """
     # read the model
     doc = libsbml.readSBMLFromFile(model_filename)
@@ -734,3 +737,5 @@ def viz_model(model_filename, img_filename):
 
     # save the visualization
     cropped_img.save(img_filename)
+
+    return RemoteFile(name=os.path.basename(img_filename), type='image/png', size=os.path.getsize(img_filename))

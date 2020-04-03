@@ -11,7 +11,6 @@ from Biosimulations_format_utils.model import ModelFormat
 from Biosimulations_format_utils.model.data_model import Model, Variable
 from Biosimulations_format_utils.sim import SimFormat, write_sim, read_sim, sedml
 from Biosimulations_format_utils.sim.data_model import Simulation
-import importlib
 import json
 import libsedml
 import os
@@ -21,10 +20,6 @@ import unittest
 
 
 class WriteSedMlTestCase(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        importlib.reload(libsedml)
-
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
 

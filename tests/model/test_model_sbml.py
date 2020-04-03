@@ -11,7 +11,6 @@ from Biosimulations_format_utils.model import ModelFormat, read_model
 from Biosimulations_format_utils.model.core import ModelIoError
 from Biosimulations_format_utils.model.data_model import ModelParameter, Variable
 from Biosimulations_format_utils.model.sbml import viz_model
-import importlib
 import libsbml
 import os
 import shutil
@@ -20,10 +19,6 @@ import unittest
 
 
 class ReadSbmlModelTestCase(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        importlib.reload(libsbml)
-
     def test_run_l2(self):
         filename = 'tests/fixtures/MODEL1204280027.sbml-L2V4.xml'
         model = read_model(filename, format=ModelFormat.sbml)
@@ -31,7 +26,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         # metadata
         self.assertEqual(model.file.name, 'MODEL1204280027.sbml-L2V4.xml')
         self.assertEqual(model.file.type, 'application/sbml+xml')
-        
+
         self.assertEqual(model.format, Format(
             name='SBML',
             version='L2V4',
@@ -364,4 +359,7 @@ class VizModelTestCase(unittest.TestCase):
     def test_viz_model(self):
         model_filename = 'tests/fixtures/MODEL1904090001-without-comp.sbml-L3V2.xml'
         img_filename = os.path.join(self.dirname, 'model.png')
-        viz_model(model_filename, img_filename)
+        image = viz_model(model_filename, img_filename)
+        self.assertEqual(image.name, 'model.png')
+        self.assertEqual(image.type, 'image/png')
+        self.assertGreater(image.size, 0)

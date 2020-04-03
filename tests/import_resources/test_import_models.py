@@ -8,7 +8,6 @@
 
 from Biosimulations_format_utils.data_model import Identifier, JournalReference, License, Person, Taxon
 from Biosimulations_format_utils.import_resources import import_models
-import importlib
 import libsbml
 import shutil
 import tempfile
@@ -16,10 +15,6 @@ import unittest
 
 
 class ImportBioModelsTestCase(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        importlib.reload(libsbml)
-
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
         shutil.rmtree(self.dirname)
@@ -30,11 +25,18 @@ class ImportBioModelsTestCase(unittest.TestCase):
     def test(self):
         models = import_models.ImportBioModels(_max_models=5, _cache_dir=self.dirname).run()
         self.assertEqual(len(models), 5)
+
         self.assertEqual(models[0].id, 'BIOMD0000000001')
         self.assertEqual(models[0].name, 'Edelstein1996 - EPSP ACh event')
+
         self.assertEqual(models[0].file.name, 'BIOMD0000000001_url.xml')
         self.assertEqual(models[0].file.type, 'application/sbml+xml')
-        self.assertEqual(models[0].image, None)
+        self.assertGreater(models[0].file.size, 0)
+
+        self.assertEqual(models[0].image.name, 'BIOMD0000000001_url.png')
+        self.assertEqual(models[0].image.type, 'image/png')
+        self.assertGreater(models[0].image.size, 0)
+
         self.assertEqual(models[0].description,
                          ('<div>\n'
                              '  <p>Model of a nicotinic Excitatory Post-Synaptic Potential in a\n'

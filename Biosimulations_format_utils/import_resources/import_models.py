@@ -11,12 +11,14 @@ from ..data_model import Identifier, JournalReference, License, Person, RemoteFi
 from ..model import ModelFormat, read_model
 from ..model.core import ModelIoError
 from ..model.data_model import Model  # noqa: F401
+from ..model.sbml import viz_model
 import math
 import os
 import re
 import requests
 import requests.adapters
 import requests_cache
+import warnings
 import xml.etree.ElementTree
 
 
@@ -67,6 +69,7 @@ class ImportBioModels(object):
             :obj:`list` of :obj:`Model`: list of metadata about each model
         """
         models = []
+        unimportable_models = []
         num_models = min(self._max_models, self.get_num_models())
         print('Importing {} models'.format(num_models))
         for i_batch in range(int(math.ceil(num_models / self.NUM_MODELS_PER_BATCH))):
@@ -74,11 +77,18 @@ class ImportBioModels(object):
             for model_result in results['models']:
                 print('  {}. {}: {}'.format(len(models) + 1, model_result['id'], model_result['name']))
                 try:
-                    models.append(self.get_model(model_result['id']))
+                    model = self.get_model(model_result['id'])
+                    model.image = self.viz_model(model)
+                    models.append(model)
                 except ModelIoError:
+                    unimportable_models.append(model_result['id'])
                     pass
                 if len(models) == self._max_models:
                     break
+
+        if unimportable_models:
+            warnings.warn('Unable import the following models:\n  {}'.format('\n  '.join(unimportable_models)), UserWarning)
+
         return models
 
     def get_num_models(self):
@@ -297,6 +307,24 @@ class ImportBioModels(object):
             })
         response.raise_for_status()
         return response.content
+
+    def viz_model(self, model):
+        """ Generate a visualization of a model
+
+        Args:
+            model (:obj:`Model`): model
+
+        Returns:
+            :obj:`RemoteFile`: image
+        """
+        model_basename = model.file.name
+        assert model_basename.endswith('.xml')
+        img_basename = model_basename[0:-4] + '.png'
+
+        model_path = os.path.join(self._cache_dir, model_basename)
+        img_path = os.path.join(self._cache_dir, img_basename)
+
+        return viz_model(model_path, img_path)
 
     def submit_models(self, models):
         """ Post models to BioSimulations

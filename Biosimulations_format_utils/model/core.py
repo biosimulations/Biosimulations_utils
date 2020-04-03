@@ -26,7 +26,7 @@ class ModelReader(abc.ABC):
             :obj:`Model`: model
         """
         model = Model()
-        model_orig = self._read_from_file(filename, model)        
+        model_orig = self._read_from_file(filename, model)
         self._read_format(model_orig, model)
         self._read_metadata(model_orig, model)
         units = self._read_units(model_orig, model)

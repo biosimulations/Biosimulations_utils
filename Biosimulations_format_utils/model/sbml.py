@@ -698,7 +698,7 @@ def viz_model(model_filename, img_filename):
     Args:
         model_filename (:obj:`str`): path to the SBML-encoded model
         img_filename (:obj:`str`): path to save the visualization of the model
-    
+
     Returns:
         :obj:`RemoteFile`: image
     """

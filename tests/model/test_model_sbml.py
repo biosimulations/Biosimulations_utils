@@ -11,7 +11,6 @@ from Biosimulations_format_utils.model import ModelFormat, read_model
 from Biosimulations_format_utils.model.core import ModelIoError
 from Biosimulations_format_utils.model.data_model import ModelParameter, Variable
 from Biosimulations_format_utils.model.sbml import viz_model
-import libsbml
 import os
 import shutil
 import tempfile

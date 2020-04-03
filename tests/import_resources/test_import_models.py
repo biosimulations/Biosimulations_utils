@@ -8,7 +8,6 @@
 
 from Biosimulations_format_utils.data_model import Identifier, JournalReference, License, Person, Taxon
 from Biosimulations_format_utils.import_resources import import_models
-import libsbml
 import shutil
 import tempfile
 import unittest

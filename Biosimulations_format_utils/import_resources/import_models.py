@@ -70,24 +70,31 @@ class ImportBioModels(object):
         """
         models = []
         unimportable_models = []
+        unvisualizable_models = []
         num_models = min(self._max_models, self.get_num_models())
         print('Importing {} models'.format(num_models))
         for i_batch in range(int(math.ceil(num_models / self.NUM_MODELS_PER_BATCH))):
             results = self.get_model_batch(num_results=self.NUM_MODELS_PER_BATCH, i_batch=i_batch)
-            for model_result in results['models']:
-                print('  {}. {}: {}'.format(len(models) + 1, model_result['id'], model_result['name']))
+            for i_model, model_result in enumerate(results['models']):
+                print('  {}. {}: {}'.format(i_batch * self.NUM_MODELS_PER_BATCH + i_model + 1, model_result['id'], model_result['name']))
                 try:
                     model = self.get_model(model_result['id'])
-                    model.image = self.viz_model(model)
                     models.append(model)
                 except ModelIoError:
                     unimportable_models.append(model_result['id'])
-                    pass
+
+                try:
+                    model.image = self.viz_model(model)
+                except ModelIoError:
+                    unvisualizable_models.append(model_result['id'])
+
                 if len(models) == self._max_models:
                     break
 
         if unimportable_models:
-            warnings.warn('Unable import the following models:\n  {}'.format('\n  '.join(unimportable_models)), UserWarning)
+            warnings.warn('Unable import the following models:\n  {}'.format('\n  '.join(sorted(unimportable_models))), UserWarning)
+        if unvisualizable_models:
+            warnings.warn('Unable visualize the following models:\n  {}'.format('\n  '.join(sorted(unvisualizable_models))), UserWarning)
 
         return models
 
@@ -234,7 +241,7 @@ class ImportBioModels(object):
             refs = []
 
         filename = self.get_model_files_metadata(id)['main'][0]['name']
-        local_path = os.path.join(self._cache_dir, filename)
+        local_path = os.path.join(self._cache_dir, id + '.xml')
         with open(local_path, 'wb') as file:
             file.write(self.get_model_file(id, filename))
 
@@ -317,14 +324,16 @@ class ImportBioModels(object):
         Returns:
             :obj:`RemoteFile`: image
         """
-        model_basename = model.file.name
-        assert model_basename.endswith('.xml')
-        img_basename = model_basename[0:-4] + '.png'
+        model_basename = model.id + '.xml'
+        img_basename = model.id + '.png'
 
         model_path = os.path.join(self._cache_dir, model_basename)
         img_path = os.path.join(self._cache_dir, img_basename)
 
-        return viz_model(model_path, img_path, requests_session=self._requests_session)
+        img = viz_model(model_path, img_path, requests_session=self._requests_session)
+        assert model.file.name.endswith('.xml')
+        img.name = model.file.name[0:-4] + '.png'
+        return img
 
     def submit_models(self, models):
         """ Post models to BioSimulations

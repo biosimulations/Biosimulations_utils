@@ -18,6 +18,7 @@ import numpy
 import os
 import re
 import requests
+import requests.exceptions
 import requests_cache.core  # noqa: F401
 
 __all__ = ['SbmlModelReader', 'viz_model']
@@ -707,43 +708,48 @@ def viz_model(model_filename, img_filename, requests_session=None):
     Returns:
         :obj:`RemoteFile`: image
     """
-    # read the model
-    doc = libsbml.readSBMLFromFile(model_filename)
-    model = doc.getModel()
+    if not os.path.isfile(img_filename):
+        # read the model
+        doc = libsbml.readSBMLFromFile(model_filename)
+        model = doc.getModel()
 
-    # remove layouts from the model
-    plugin = model.getPlugin('layout')
-    if plugin:
-        for i_layout in range(plugin.getNumLayouts()):
-            plugin.removeLayout(i_layout)
-    model_without_layout = libsbml.writeSBMLToString(doc)
+        # remove layouts from the model
+        plugin = model.getPlugin('layout')
+        if plugin:
+            for i_layout in range(plugin.getNumLayouts()):
+                plugin.removeLayout(i_layout)
+        model_without_layout = libsbml.writeSBMLToString(doc)
 
-    # use MINERVA to generate a visualization of the model
-    if requests_session is None:
-        requests_session = requests
+        # use MINERVA to generate a visualization of the model
+        if requests_session is None:
+            requests_session = requests
 
-    url = MINERVA_ENDPOINT.format('SBML', 'png')
-    response = requests_session.post(url, headers={'Content-Type': 'text/plain'}, data=model_without_layout)
-    response.raise_for_status()
-    with open(img_filename, 'wb') as file:
-        file.write(response.content)
-    img = Image.open(img_filename)
+        url = MINERVA_ENDPOINT.format('SBML', 'png')
+        response = requests_session.post(
+            url, headers={'Content-Type': 'application/sbml+xml; charset=utf-8'}, data=model_without_layout.encode('utf-8'))
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError:
+            raise ModelIoError('Unable to generate image for {}'.format(os.path.basename(model_filename)))
+        with open(img_filename, 'wb') as file:
+            file.write(response.content)
+        img = Image.open(img_filename)
 
-    # make the background of the visualization transparent
-    img = img.convert('RGBA')
-    img_data = numpy.array(img)
-    img_rgb = img_data[:, :, :3]
-    white = [255, 255, 255]
-    transparent = [0, 0, 0, 0]
-    mask = numpy.all(img_rgb == white, axis=-1)
-    img_data[mask] = transparent
-    img = Image.fromarray(img_data)
+        # make the background of the visualization transparent
+        img = img.convert('RGBA')
+        img_data = numpy.array(img)
+        img_rgb = img_data[:, :, :3]
+        white = [255, 255, 255]
+        transparent = [0, 0, 0, 0]
+        mask = numpy.all(img_rgb == white, axis=-1)
+        img_data[mask] = transparent
+        img = Image.fromarray(img_data)
 
-    # crop the visualization
-    img_bbox = img.getbbox()
-    cropped_img = img.crop(img_bbox)
+        # crop the visualization
+        img_bbox = img.getbbox()
+        cropped_img = img.crop(img_bbox)
 
-    # save the visualization
-    cropped_img.save(img_filename)
+        # save the visualization
+        cropped_img.save(img_filename)
 
     return RemoteFile(name=os.path.basename(img_filename), type='image/png', size=os.path.getsize(img_filename))

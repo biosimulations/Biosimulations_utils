@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<sbml xmlns="http://www.sbml.org/sbml/level3/version2/core" fbc:required="false" layout:required="false" level="3" metaid="meta_11b6620dad1b4403bab84b845495eff3" sboTerm="SBO:0000293" version="2" xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2" xmlns:layout="http://www.sbml.org/sbml/level3/version1/layout/version1">
+<sbml xmlns="http://www.sbml.org/sbml/level3/version2/core" comp:required="true" fbc:required="false" layout:required="false" level="3" metaid="meta_11b6620dad1b4403bab84b845495eff3" sboTerm="SBO:0000293" version="2" xmlns:comp="http://www.sbml.org/sbml/level3/version1/comp/version1" xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2" xmlns:layout="http://www.sbml.org/sbml/level3/version1/layout/version1">
   <annotation>
     <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
       <rdf:Description rdf:about="#meta_11b6620dad1b4403bab84b845495eff3">
@@ -12,6 +12,10 @@
 	
     </rdf:RDF>
   </annotation>
+  <comp:listOfModelDefinitions>
+    <comp:modelDefinition>
+    </comp:modelDefinition>
+  </comp:listOfModelDefinitions>
   <model areaUnits="m2" extentUnits="mmole" fbc:strict="false" id="tiny_example_12" lengthUnits="metre" metaid="meta_tiny_example_12" name="Keating2019 -  Minimal model demonstrating SBML Level 3 packages." substanceUnits="mmole" timeUnits="second" volumeUnits="litre">
     <notes>
       <body xmlns="http://www.w3.org/1999/xhtml">
@@ -54,6 +58,13 @@ Keating et al. 2019 SBML Level 3: an extensible format for the exchange and reus
 	</rdf:Description>
       </rdf:RDF>
     </annotation>
+      <comp:listOfPorts xmlns:comp="http://www.sbml.org/sbml/level3/version1/comp/version1">
+      <comp:port comp:id="c_port" comp:idRef="c" comp:name="c_port" metaid="c_port" sboTerm="SBO:0000599"/>
+      <comp:port comp:id="glc_port" comp:idRef="glc" comp:name="glc_port" metaid="glc_port" sboTerm="SBO:0000599"/>
+      <comp:port comp:id="atp_port" comp:idRef="atp" comp:name="atp_port" metaid="atp_port" sboTerm="SBO:0000599"/>
+      <comp:port comp:id="adp_port" comp:idRef="adp" comp:name="adp_port" metaid="adp_port" sboTerm="SBO:0000599"/>
+      <comp:port comp:id="phos_port" comp:idRef="phos" comp:name="phos_port" metaid="phos_port" sboTerm="SBO:0000599"/>
+    </comp:listOfPorts>
     <fbc:listOfObjectives xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2" fbc:activeObjective="atp_consume_max">
       <fbc:objective fbc:id="atp_consume_max" fbc:type="maximize">
         <fbc:listOfFluxObjectives>

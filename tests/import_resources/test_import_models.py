@@ -14,7 +14,7 @@ import tempfile
 import unittest
 
 
-class ImportBioModelsTestCase(unittest.TestCase):
+class BioModelsImporterTestCase(unittest.TestCase):
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
         shutil.rmtree(self.dirname)
@@ -23,7 +23,8 @@ class ImportBioModelsTestCase(unittest.TestCase):
         shutil.rmtree(self.dirname)
 
     def test(self):
-        models = import_models.ImportBioModels(_max_models=5, _cache_dir=self.dirname).run()
+        importer = import_models.BioModelsImporter(_max_models=5, _cache_dir=self.dirname)
+        models, stats = importer.run()
         self.assertEqual(len(models), 5)
 
         self.assertEqual(models[0].id, 'BIOMD0000000001')
@@ -72,5 +73,23 @@ class ImportBioModelsTestCase(unittest.TestCase):
         ))
         self.assertEqual(models[0].license, License.cc0)
 
+        self.assertEqual(stats, {
+            'framework': {
+                'non-spatial continuous framework': 5,
+            },
+            'layout': 0,
+            'taxon': {
+                'Amphibia': 2,
+                'Opisthokonta': 1,
+                'Tetronarce californica': 2,
+            },
+        })
+
         for model in models:
             self.assertEqual(Model.from_json(model.to_json()), model)
+
+        models_2, stats_2 = importer.read_data()
+        for model, model_2 in zip(models, models_2):
+            self.assertEqual(model_2, model)
+
+        self.assertEqual(stats_2, stats)

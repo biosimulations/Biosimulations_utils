@@ -202,7 +202,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         ])
 
     def test_run_ignore_parameters_set_by_assignment(self):
-        filename = 'tests/fixtures/MODEL1904090001-without-comp.sbml-L3V2.xml'
+        filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'
         model = read_model(filename, format=ModelFormat.sbml)
 
         # initial assignment
@@ -215,8 +215,12 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'does not exist'):
             read_model('__non_existant_file__', format=ModelFormat.sbml)
 
+    def test_run_comp_package_with_no_composed_models(self):
+        filename = 'tests/fixtures/BIOMD0000000613.xml'
+        read_model(filename, format=ModelFormat.sbml)
+
     def test_run_fbc_package(self):
-        filename = 'tests/fixtures/MODEL1904090001-without-comp.sbml-L3V2.xml'
+        filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'
         model = read_model(filename, format=ModelFormat.sbml)
 
         params = list(filter(lambda param: param.group == 'Other global parameters', model.parameters))
@@ -337,8 +341,12 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         self.assertEqual(param.recommended_range[1], 5)
 
     def test_run_unsupported_packages(self):
-        filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'
-        with self.assertRaisesRegex(ModelIoError, r'package\(s\) are not supported'):
+        filename = 'tests/fixtures/MODEL1904090001-with-model-defs.sbml-L3V2.xml'
+        with self.assertRaisesRegex(ModelIoError, r'package is not supported'):
+            read_model(filename, format=ModelFormat.sbml)
+
+        filename = 'tests/fixtures/MODEL1904090001-with-submodels.sbml-L3V2.xml'
+        with self.assertRaisesRegex(ModelIoError, r'package is not supported'):
             read_model(filename, format=ModelFormat.sbml)
 
     def test_run_units(self):
@@ -356,7 +364,7 @@ class VizModelTestCase(unittest.TestCase):
         shutil.rmtree(self.dirname)
 
     def test_viz_model(self):
-        model_filename = 'tests/fixtures/MODEL1904090001-without-comp.sbml-L3V2.xml'
+        model_filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'
         img_filename = os.path.join(self.dirname, 'model.png')
         image = viz_model(model_filename, img_filename)
         self.assertEqual(image.name, 'model.png')

@@ -12,6 +12,8 @@ from ..model import ModelFormat, read_model
 from ..model.core import ModelIoError
 from ..model.data_model import Model  # noqa: F401
 from ..model.sbml import viz_model
+import json
+import libsbml
 import math
 import os
 import re
@@ -22,7 +24,10 @@ import warnings
 import xml.etree.ElementTree
 
 
-class ImportBioModels(object):
+__all__ = ['BioModelsImporter']
+
+
+class BioModelsImporter(object):
     """ Import models from BioModels
 
     Attributes:
@@ -57,10 +62,13 @@ class ImportBioModels(object):
 
         Returns:
             :obj:`list` of :obj:`Model`: models
+            :obj:`dict`: statistics about the models
         """
         models = self.get_models()
         self.submit_models(models)
-        return models
+        stats = self.get_model_stats(models)
+        self.write_data(models, stats)
+        return (models, stats)
 
     def get_models(self):
         """ Get models from BioModels
@@ -345,3 +353,64 @@ class ImportBioModels(object):
             # Todo: submit models to BioSimulations
             # requests.post(self.BIOSIMULATIONS_ENDPOINT)
             pass
+
+    def write_data(self, models, stats):
+        """ Save models to a JSON file
+
+        Args:
+            models (:obj:`list` of :obj:`Model`): models
+        """
+        filename = os.path.join(self._cache_dir, 'biomodels.json')
+        with open(filename, 'w') as file:
+            json.dump([model.to_json() for model in models], file)
+
+        filename = os.path.join(self._cache_dir, 'biomodels.stats.json')
+        with open(filename, 'w') as file:
+            json.dump(stats, file)
+
+    def read_data(self):
+        """ Read models from a JSON file
+
+        Returns:
+            :obj:`list` of :obj:`Model`: models
+            :obj:`dict`: stats about the models
+        """
+        filename = os.path.join(self._cache_dir, 'biomodels.json')
+        with open(filename, 'r') as file:
+            models = [Model.from_json(model) for model in json.load(file)]
+
+        filename = os.path.join(self._cache_dir, 'biomodels.stats.json')
+        with open(filename, 'r') as file:
+            stats = json.load(file)
+
+        return (models, stats)
+
+    def get_model_stats(self, models):
+        """ Calculate statistics about the imported models
+
+        Returns:
+            :obj:`dict`: statistics about the imported models
+        """
+        stats = {
+            'framework': {},
+            'layout': 0,
+            'taxon': {},
+        }
+
+        for model in models:
+            framework = model.framework.name
+            if framework not in stats['framework']:
+                stats['framework'][framework] = 0
+            stats['framework'][framework] += 1
+
+            doc = libsbml.readSBMLFromFile(os.path.join(self._cache_dir, model.id + '.xml'))
+            plugin = doc.getModel().getPlugin('layout')
+            if plugin.getNumLayouts():
+                stats['layout'] += 1
+
+            if model.taxon:
+                if model.taxon.name not in stats['taxon']:
+                    stats['taxon'][model.taxon.name] = 0
+                stats['taxon'][model.taxon.name] += 1
+
+        return stats

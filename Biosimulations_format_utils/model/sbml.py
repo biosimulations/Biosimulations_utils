@@ -170,11 +170,29 @@ class SbmlModelReader(ModelReader):
             plugin_sbml = model_sbml.getPlugin(i_plugin)
             packages.add(plugin_sbml.getPackageName())
 
-        unsupported_packages = packages.difference(set(['annot', 'fbc', 'groups', 'layout', 'multi', 'qual', 'render', 'req']))
+        unsupported_packages = packages.difference(set(['annot', 'comp', 'fbc', 'groups', 'layout', 'multi', 'qual', 'render', 'req']))
         if unsupported_packages:
             raise ModelIoError("{} package(s) are not supported".format(', '.join(unsupported_packages)))
 
-        framework = ModelFramework.non_spatial_continuous
+        plugin = model_sbml.getSBMLDocument().getPlugin('comp')
+        if plugin:
+            if plugin.getNumModelDefinitions() or plugin.getNumExternalModelDefinitions():
+                raise ModelIoError('comp package is not supported')
+        plugin = model_sbml.getPlugin('comp')
+        if plugin:
+            if plugin.getNumSubmodels():
+                raise ModelIoError('comp package is not supported')
+
+        if len(packages.intersection(set(['fbc', 'multi', 'qual']))) > 1:
+            raise ModelIoError('Unable to determine modeling framework')
+        if 'fbc' in packages:
+            framework = ModelFramework.flux_balance
+        elif 'multi' in packages:
+            framework = ModelFramework.non_spatial_discrete
+        elif 'qual' in packages:
+            framework = ModelFramework.logical
+        else:
+            framework = ModelFramework.non_spatial_continuous
         model.framework = framework.value
 
         # taxon

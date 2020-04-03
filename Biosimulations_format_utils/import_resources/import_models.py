@@ -165,7 +165,7 @@ class ImportBioModels(object):
                 pub_xml = xml.etree.ElementTree.fromstring(response.content).find('PubmedArticle')
 
                 doi = None
-                if pub_xml:
+                if pub_xml is not None:
                     pub_ids_xml = pub_xml.find('PubmedData').find('ArticleIdList').findall('ArticleId')
                     for pub_id_xml in pub_ids_xml:
                         if pub_id_xml.get('IdType') == 'doi':
@@ -174,7 +174,7 @@ class ImportBioModels(object):
 
                 authors = []
                 authors_str = ''
-                if pub_xml:
+                if pub_xml is not None:
                     authors_str = []
                     authors_xml = pub_xml.find('MedlineCitation').find('Article').find('AuthorList').findall('Author')
                     for author_xml in authors_xml:
@@ -324,7 +324,7 @@ class ImportBioModels(object):
         model_path = os.path.join(self._cache_dir, model_basename)
         img_path = os.path.join(self._cache_dir, img_basename)
 
-        return viz_model(model_path, img_path)
+        return viz_model(model_path, img_path, requests_session=self._requests_session)
 
     def submit_models(self, models):
         """ Post models to BioSimulations

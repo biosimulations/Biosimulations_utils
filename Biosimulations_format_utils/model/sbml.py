@@ -18,6 +18,7 @@ import numpy
 import os
 import re
 import requests
+import requests_cache.core  # noqa: F401
 
 __all__ = ['SbmlModelReader', 'viz_model']
 
@@ -692,12 +693,16 @@ class SbmlModelReader(ModelReader):
                 return node.getAttrValue(i_attr)
 
 
-def viz_model(model_filename, img_filename):
-    """ Use `Minerva <https://minerva.pages.uni.lu/>`_ to visualize a model and save the visualization to a PNG file.
+MINERVA_ENDPOINT = 'https://minerva-dev.lcsb.uni.lu/minerva/api/convert/image/{}:{}'
+
+
+def viz_model(model_filename, img_filename, requests_session=None):
+    """ Use `MINERVA <https://minerva.pages.uni.lu/>`_ to visualize a model and save the visualization to a PNG file.
 
     Args:
         model_filename (:obj:`str`): path to the SBML-encoded model
         img_filename (:obj:`str`): path to save the visualization of the model
+        requests_session (:obj:`requests_cache.core.CachedSession`, optional): cached requests session
 
     Returns:
         :obj:`RemoteFile`: image
@@ -713,9 +718,12 @@ def viz_model(model_filename, img_filename):
             plugin.removeLayout(i_layout)
     model_without_layout = libsbml.writeSBMLToString(doc)
 
-    # use Minerva to generate a visualization of the model
-    url = 'https://minerva-dev.lcsb.uni.lu/minerva/api/convert/image/{}:{}'.format('SBML', 'png')
-    response = requests.post(url, headers={'Content-Type': 'text/plain'}, data=model_without_layout)
+    # use MINERVA to generate a visualization of the model
+    if requests_session is None:
+        requests_session = requests
+
+    url = MINERVA_ENDPOINT.format('SBML', 'png')
+    response = requests_session.post(url, headers={'Content-Type': 'text/plain'}, data=model_without_layout)
     response.raise_for_status()
     with open(img_filename, 'wb') as file:
         file.write(response.content)

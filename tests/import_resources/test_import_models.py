@@ -8,6 +8,7 @@
 
 from Biosimulations_format_utils.data_model import Identifier, JournalReference, License, Person, Taxon
 from Biosimulations_format_utils.import_resources import import_models
+from Biosimulations_format_utils.model.data_model import Model
 import shutil
 import tempfile
 import unittest
@@ -70,3 +71,6 @@ class ImportBioModelsTestCase(unittest.TestCase):
             middle_name="J"
         ))
         self.assertEqual(models[0].license, License.cc0)
+
+        for model in models:
+            self.assertEqual(Model.from_json(model.to_json()), model)

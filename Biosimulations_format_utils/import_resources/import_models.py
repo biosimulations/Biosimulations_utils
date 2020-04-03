@@ -347,7 +347,7 @@ class BioModelsImporter(object):
         """ Post models to BioSimulations
 
         Args:
-            models (:obj:`list` of :obj:`obj`):
+            models (:obj:`list` of :obj:`Model`):
         """
         for model in models:
             # Todo: submit models to BioSimulations

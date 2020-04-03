@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from ..data_model import Format, OntologyTerm, Taxon, Type
+from ..data_model import Format, OntologyTerm, RemoteFile, Taxon, Type
 from ..utils import pretty_print_units
 from .core import ModelReader, ModelIoError
 from .data_model import Model, ModelParameter, Variable  # noqa: F401
@@ -110,7 +110,7 @@ class XmlName(object):
 class SbmlModelReader(ModelReader):
     """ Read information about SBML-encoded models """
 
-    def _read_from_file(self, filename):
+    def _read_from_file(self, filename, model):
         """ Read a SBML-encoded model from a file
 
         Args:
@@ -119,9 +119,10 @@ class SbmlModelReader(ModelReader):
         Returns:
             :obj:`libsbml.Model`: SBML-encoded model
         """
-        reader = libsbml.SBMLReader()
         if not os.path.isfile(filename):
             raise ValueError('{} does not exist'.format(filename))
+        model.file = RemoteFile(name=os.path.basename(filename), type='application/sbml+xml', size=os.path.getsize(filename))
+        reader = libsbml.SBMLReader()
         doc = reader.readSBMLFromFile(filename)
         model_sbml = doc.getModel()
         return model_sbml
@@ -136,14 +137,14 @@ class SbmlModelReader(ModelReader):
         Returns:
             :obj:`Format`: format of the model
         """
-        model.format = format = Format(
+        model.format = Format(
             name='SBML',
             version='L{}V{}'.format(model_sbml.getLevel(), model_sbml.getVersion()),
             edam_id='format_2585',
             url='http://sbml.org',
         )
 
-        return format
+        return model.format
 
     def _read_metadata(self, model_sbml, model):
         """ Read the metadata of a model

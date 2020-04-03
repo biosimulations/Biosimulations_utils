@@ -25,9 +25,8 @@ class ModelReader(abc.ABC):
         Returns:
             :obj:`Model`: model
         """
-        model_orig = self._read_from_file(filename)
-
         model = Model()
+        model_orig = self._read_from_file(filename, model)        
         self._read_format(model_orig, model)
         self._read_metadata(model_orig, model)
         units = self._read_units(model_orig, model)
@@ -37,11 +36,12 @@ class ModelReader(abc.ABC):
         return model
 
     @abc.abstractmethod
-    def _read_from_file(self, filename):
+    def _read_from_file(self, filename, model):
         """ Read a model from a file
 
         Args:
             filename (:obj:`str`): path to a file which defines a model
+            model (:obj:`Model`): model
 
         Returns:
             :obj:`object`: model encoded in a format such as SBML

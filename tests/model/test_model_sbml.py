@@ -29,6 +29,9 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         model = read_model(filename, format=ModelFormat.sbml)
 
         # metadata
+        self.assertEqual(model.file.name, 'MODEL1204280027.sbml-L2V4.xml')
+        self.assertEqual(model.file.type, 'application/sbml+xml')
+        
         self.assertEqual(model.format, Format(
             name='SBML',
             version='L2V4',

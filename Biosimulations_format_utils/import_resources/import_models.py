@@ -405,7 +405,7 @@ class BioModelsImporter(object):
 
             doc = libsbml.readSBMLFromFile(os.path.join(self._cache_dir, model.id + '.xml'))
             plugin = doc.getModel().getPlugin('layout')
-            if plugin.getNumLayouts():
+            if plugin and plugin.getNumLayouts():
                 stats['layout'] += 1
 
             if model.taxon:

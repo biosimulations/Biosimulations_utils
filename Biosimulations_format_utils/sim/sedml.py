@@ -568,7 +568,7 @@ class SedMlSimReader(SimReader):
         sim_sed = doc_sed.getSimulation(0)
         self._assert(isinstance(sim_sed, libsedml.SedUniformTimeCourse), "Simulation must be a time course")
 
-        self._assert(doc_sed.getNumDataDescriptions() == 0, "Data descriptions are not supported")
+        # self._assert(doc_sed.getNumDataDescriptions() == 0, "Data descriptions are not supported")
 
         # model variables
         model_vars = []
@@ -595,53 +595,58 @@ class SedMlSimReader(SimReader):
             elif node.prefix == 'dc' and node.name == 'description' and node.type == 'description' and isinstance(node.children, str):
                 sim.description = node.children
             elif node.prefix == 'dc' and node.name == 'description' and node.type == 'tags':
-                self._assert(len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag')
-                for child in node.children[0].children:
-                    self._assert(child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1)
-                    self._assert(child.children[0].prefix == 'rdf' and child.children[0].name == 'value')
-                    self._assert(isinstance(child.children[0].children, str))
-                    sim.tags.append(child.children[0].children)
+                for child in node.children:
+                    if child.prefix == 'rdf' and child.name == 'Bag':
+                        for child_2 in child.children:
+                            if child_2.prefix == 'rdf' and child_2.name == 'li':
+                                for child_3 in child_2.children:
+                                    if child_3.prefix == 'rdf' and child_3.name == 'value' and isinstance(child_3.children, str):
+                                        sim.tags.append(child_3.children)
             elif node.prefix == 'dc' and node.name == 'creator':
-                self._assert(len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag')
-                for child in node.children[0].children:
-                    self._assert(child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1)
-                    self._assert(child.children[0].prefix == 'vcard' and child.children[0].name == 'N')
-                    author = Person()
-                    for prop in child.children[0].children:
-                        if prop.prefix == 'vcard' and prop.name == 'Given' and isinstance(prop.children, str):
-                            author.first_name = prop.children
-                        elif prop.prefix == 'vcard' and prop.name == 'Other' and isinstance(prop.children, str):
-                            author.middle_name = prop.children
-                        elif prop.prefix == 'vcard' and prop.name == 'Family' and isinstance(prop.children, str):
-                            author.last_name = prop.children
-                    sim.authors.append(author)
+                for child in node.children:
+                    if child.prefix == 'rdf' and child.name == 'Bag':
+                        for child_2 in child.children:
+                            if child_2.prefix == 'rdf' and child_2.name == 'li':
+                                for child_3 in child_2.children:
+                                    if child_3.prefix == 'vcard' and child_3.name == 'N':
+                                        author = Person()
+                                        for prop in child_3.children:
+                                            if prop.prefix == 'vcard' and prop.name == 'Given' and isinstance(prop.children, str):
+                                                author.first_name = prop.children
+                                            elif prop.prefix == 'vcard' and prop.name == 'Other' and isinstance(prop.children, str):
+                                                author.middle_name = prop.children
+                                            elif prop.prefix == 'vcard' and prop.name == 'Family' and isinstance(prop.children, str):
+                                                author.last_name = prop.children
+                                        sim.authors.append(author)
             elif node.prefix == 'dcterms' and node.name == 'references':
-                self._assert(len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag')
-                for child in node.children[0].children:
-                    self._assert(child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1)
-                    self._assert(child.children[0].prefix == 'bibo' and child.children[0].name == 'Article')
-                    ref = JournalReference()
-                    for prop in child.children[0].children:
-                        if prop.prefix == 'bibo' and prop.name == 'authorList' and isinstance(prop.children, str):
-                            ref.authors = prop.children
-                        elif prop.prefix == 'dc' and prop.name == 'title' and isinstance(prop.children, str):
-                            ref.title = prop.children
-                        elif prop.prefix == 'bibo' and prop.name == 'journal' and isinstance(prop.children, str):
-                            ref.journal = prop.children
-                        elif prop.prefix == 'bibo' and prop.name == 'volume' and isinstance(prop.children, str):
-                            try:
-                                ref.volume = int(prop.children)
-                            except Exception:
-                                ref.volume = prop.children
-                        elif prop.prefix == 'bibo' and prop.name == 'issue' and isinstance(prop.children, str):
-                            ref.num = int(prop.children)
-                        elif prop.prefix == 'bibo' and prop.name == 'pages' and isinstance(prop.children, str):
-                            ref.pages = prop.children
-                        elif prop.prefix == 'dc' and prop.name == 'date' and isinstance(prop.children, str):
-                            ref.year = int(prop.children)
-                        elif prop.prefix == 'bibo' and prop.name == 'doi' and isinstance(prop.children, str):
-                            ref.doi = prop.children
-                    sim.refs.append(ref)
+                for child in node.children:
+                    if child.prefix == 'rdf' and child.name == 'Bag':
+                        for child_2 in child.children:
+                            if child_2.prefix == 'rdf' and child_2.name == 'li':
+                                for child_3 in child_2.children:
+                                    if child_3.prefix == 'bibo' and child_3.name == 'Article':
+                                        ref = JournalReference()
+                                        for prop in child_3.children:
+                                            if prop.prefix == 'bibo' and prop.name == 'authorList' and isinstance(prop.children, str):
+                                                ref.authors = prop.children
+                                            elif prop.prefix == 'dc' and prop.name == 'title' and isinstance(prop.children, str):
+                                                ref.title = prop.children
+                                            elif prop.prefix == 'bibo' and prop.name == 'journal' and isinstance(prop.children, str):
+                                                ref.journal = prop.children
+                                            elif prop.prefix == 'bibo' and prop.name == 'volume' and isinstance(prop.children, str):
+                                                try:
+                                                    ref.volume = int(prop.children)
+                                                except Exception:
+                                                    ref.volume = prop.children
+                                            elif prop.prefix == 'bibo' and prop.name == 'issue' and isinstance(prop.children, str):
+                                                ref.num = int(prop.children)
+                                            elif prop.prefix == 'bibo' and prop.name == 'pages' and isinstance(prop.children, str):
+                                                ref.pages = prop.children
+                                            elif prop.prefix == 'dc' and prop.name == 'date' and isinstance(prop.children, str):
+                                                ref.year = int(prop.children)
+                                            elif prop.prefix == 'bibo' and prop.name == 'doi' and isinstance(prop.children, str):
+                                                ref.doi = prop.children
+                                        sim.refs.append(ref)
             elif node.prefix == 'dcterms' and node.name == 'license' and isinstance(node.children, str):
                 sim.license = License(node.children)
 
@@ -667,8 +672,8 @@ class SedMlSimReader(SimReader):
 
         # simulation timecourse
         sim.start_time = float(sim_sed.getInitialTime())
-        self._assert(float(sim_sed.getOutputStartTime()) == sim.start_time,
-                     "Simulation initial time and output start time must be equal")
+        self._assert(float(sim_sed.getOutputStartTime()) >= sim.start_time,
+                     "Output time must be at least the start time")
         sim.end_time = float(sim_sed.getOutputEndTime())
         sim.length = sim.end_time - sim.start_time
         sim.num_time_points = int(sim_sed.getNumberOfPoints())
@@ -752,18 +757,17 @@ class SedMlSimReader(SimReader):
         if annotations_xml is None:
             return []
 
-        self._assert(annotations_xml.getPrefix() == '' and annotations_xml.getName() == 'annotation')
-
         nodes = []
-        for i_child in range(annotations_xml.getNumChildren()):
-            rdf_xml = annotations_xml.getChild(i_child)
-            if rdf_xml.getPrefix() == 'rdf' and rdf_xml.getName() == 'RDF':
-                for i_child_2 in range(rdf_xml.getNumChildren()):
-                    description_xml = rdf_xml.getChild(i_child_2)
-                    if description_xml.getPrefix() == 'rdf' and description_xml.getName() == 'Description':
-                        for i_child_3 in range(description_xml.getNumChildren()):
-                            child = description_xml.getChild(i_child_3)
-                            nodes.append(self._decode_obj_from_xml(child))
+        if annotations_xml.getPrefix() == '' and annotations_xml.getName() == 'annotation':
+            for i_child in range(annotations_xml.getNumChildren()):
+                rdf_xml = annotations_xml.getChild(i_child)
+                if rdf_xml.getPrefix() == 'rdf' and rdf_xml.getName() == 'RDF':
+                    for i_child_2 in range(rdf_xml.getNumChildren()):
+                        description_xml = rdf_xml.getChild(i_child_2)
+                        if description_xml.getPrefix() == 'rdf' and description_xml.getName() == 'Description':
+                            for i_child_3 in range(description_xml.getNumChildren()):
+                                child = description_xml.getChild(i_child_3)
+                                nodes.append(self._decode_obj_from_xml(child))
         return nodes
 
     def _decode_obj_from_xml(self, obj_xml):

@@ -13,6 +13,7 @@ from ..model.core import ModelIoError
 from ..model.data_model import Model  # noqa: F401
 from ..model.sbml import viz_model
 from ..sim import SimFormat, read_sim
+from ..sim.core import SimIoError
 from ..sim.data_model import Simulation  # noqa: F401
 import copy
 import json
@@ -23,6 +24,7 @@ import re
 import requests
 import requests.adapters
 import requests_cache
+import shutil
 import warnings
 import xml.etree.ElementTree
 
@@ -298,20 +300,25 @@ class BioModelsImporter(object):
                     sim = read_sim(local_path, ModelFormat.sbml, SimFormat.sedml)
                     sim.id = '{}-sim-{}'.format(model.id, len(sims) + 1)
                     sim.name = file_metadata['name'][0:-6]
-                    sim.image = RemoteFile()
+                    if os.path.isfile(os.path.join(self._cache_dir, model.id + '.png')):
+                        sim.image = copy.deepcopy(model.image)
+                        sim.image.name = sim.id + '.png'
+                        shutil.copyfile(os.path.join(self._cache_dir, model.id + '.png'), os.path.join(self._cache_dir, sim.image.name))
                     sim.description = file_metadata['description']
                     sim.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
                     sim.refs = copy.deepcopy(model.refs)
                     sim.authors = copy.deepcopy(model.authors)
                     sim.license = License.cc0
                     sim.append(sim)
-                except Exception:
+                except SimIoError:
                     os.remove(local_path)
         if len(sims) == 1:
             sims[0].id = '{}-sim'.format(model.id)
             os.rename(
                 os.path.join(self._cache_dir, '{}-sim-{}.sedml'.format(model.id, 1)),
                 os.path.join(self._cache_dir, '{}-sim.sedml'.format(model.id)))
+            os.rename(os.path.join(self._cache_dir, sim.image.name), os.path.join(self._cache_dir, sims[0].id + '.png'))
+            sims[0].image.name = sims[0].id + '.png'
 
         return (model, sims)
 
@@ -424,7 +431,7 @@ class BioModelsImporter(object):
         with open(filename, 'r') as file:
             models = [Model.from_json(model) for model in json.load(file)]
 
-        filename = os.path.join(self._cache_dir, 'biomodels.sims.json')
+        filename = os.path.join(self._cache_dir, 'biomodels.simulations.json')
         with open(filename, 'r') as file:
             sims = [Simulation.from_json(sims) for sims in json.load(file)]
 

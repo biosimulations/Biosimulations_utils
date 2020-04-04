@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_format_utils.data_model import Identifier, JournalReference, License, Person, Taxon
-from Biosimulations_format_utils.import_resources import import_models
+from Biosimulations_format_utils.import_resources import biomodels
 from Biosimulations_format_utils.model.data_model import Model
 import shutil
 import tempfile
@@ -23,7 +23,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
         shutil.rmtree(self.dirname)
 
     def test(self):
-        importer = import_models.BioModelsImporter(_max_models=5, _cache_dir=self.dirname)
+        importer = biomodels.BioModelsImporter(_max_models=5, _cache_dir=self.dirname)
         models, stats = importer.run()
         self.assertEqual(len(models), 5)
 

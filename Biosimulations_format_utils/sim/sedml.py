@@ -554,18 +554,21 @@ class SedMlSimReader(SimReader):
             :obj:`list` of :obj:`Variable`: List of variables in the model. Each variable should have the keys `id` and `target`
             :obj:`Simulation`: Simulation experiment
             :obj:`str`: Path to the model definition
-            :obj:`int`: SED-ML level
-            :obj:`int`: SED-ML version
         """
         doc_sed = libsedml.readSedMLFromFile(filename)
 
-        assert doc_sed.getNumModels() == 1, "SED-ML document must have one model"
+        self._assert(doc_sed.getNumModels() == 1, "SED-ML document must have one model")
         model_sed = doc_sed.getModel(0)
 
-        assert doc_sed.getNumTasks() == 1, "SED-ML document must have one task"
+        self._assert(doc_sed.getNumTasks() == 1, "SED-ML document must have one task")
+        task_sed = doc_sed.getTask(0)
+        self._assert(isinstance(task_sed, libsedml.SedTask), "Task must be a single Task")
 
-        assert doc_sed.getNumSimulations() == 1, "SED-ML document must have one simulation"
+        self._assert(doc_sed.getNumSimulations() == 1, "SED-ML document must have one simulation")
         sim_sed = doc_sed.getSimulation(0)
+        self._assert(isinstance(sim_sed, libsedml.SedUniformTimeCourse), "Simulation must be a time course")
+
+        self._assert(doc_sed.getNumDataDescriptions() == 0, "Data descriptions are not supported")
 
         # model variables
         model_vars = []
@@ -592,17 +595,17 @@ class SedMlSimReader(SimReader):
             elif node.prefix == 'dc' and node.name == 'description' and node.type == 'description' and isinstance(node.children, str):
                 sim.description = node.children
             elif node.prefix == 'dc' and node.name == 'description' and node.type == 'tags':
-                assert len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag'
+                self._assert(len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag')
                 for child in node.children[0].children:
-                    assert child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1
-                    assert child.children[0].prefix == 'rdf' and child.children[0].name == 'value'
-                    assert isinstance(child.children[0].children, str)
+                    self._assert(child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1)
+                    self._assert(child.children[0].prefix == 'rdf' and child.children[0].name == 'value')
+                    self._assert(isinstance(child.children[0].children, str))
                     sim.tags.append(child.children[0].children)
             elif node.prefix == 'dc' and node.name == 'creator':
-                assert len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag'
+                self._assert(len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag')
                 for child in node.children[0].children:
-                    assert child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1
-                    assert child.children[0].prefix == 'vcard' and child.children[0].name == 'N'
+                    self._assert(child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1)
+                    self._assert(child.children[0].prefix == 'vcard' and child.children[0].name == 'N')
                     author = Person()
                     for prop in child.children[0].children:
                         if prop.prefix == 'vcard' and prop.name == 'Given' and isinstance(prop.children, str):
@@ -613,10 +616,10 @@ class SedMlSimReader(SimReader):
                             author.last_name = prop.children
                     sim.authors.append(author)
             elif node.prefix == 'dcterms' and node.name == 'references':
-                assert len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag'
+                self._assert(len(node.children) == 1 and node.children[0].prefix == 'rdf' and node.children[0].name == 'Bag')
                 for child in node.children[0].children:
-                    assert child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1
-                    assert child.children[0].prefix == 'bibo' and child.children[0].name == 'Article'
+                    self._assert(child.prefix == 'rdf' and child.name == 'li' and len(child.children) == 1)
+                    self._assert(child.children[0].prefix == 'bibo' and child.children[0].name == 'Article')
                     ref = JournalReference()
                     for prop in child.children[0].children:
                         if prop.prefix == 'bibo' and prop.name == 'authorList' and isinstance(prop.children, str):
@@ -657,15 +660,15 @@ class SedMlSimReader(SimReader):
         # model parameter changes
         sim.model_parameter_changes = []
         for change_sed in model_sed.getListOfChanges():
-            assert isinstance(change_sed, libsedml.SedChangeAttribute), \
-                "Changes must be attribute changes"
+            self._assert(isinstance(change_sed, libsedml.SedChangeAttribute),
+                         "Changes must be attribute changes")
             change = self._get_parameter_change_from_model(change_sed)
             sim.model_parameter_changes.append(change)
 
         # simulation timecourse
         sim.start_time = float(sim_sed.getInitialTime())
-        assert float(sim_sed.getOutputStartTime()) == sim.start_time, \
-            "Simulation initial time and output start time must be equal"
+        self._assert(float(sim_sed.getOutputStartTime()) == sim.start_time,
+                     "Simulation initial time and output start time must be equal")
         sim.end_time = float(sim_sed.getOutputEndTime())
         sim.length = sim.end_time - sim.start_time
         sim.num_time_points = int(sim_sed.getNumberOfPoints())
@@ -705,12 +708,8 @@ class SedMlSimReader(SimReader):
         # model filename
         model_filename = model_sed.getSource()
 
-        # level and version
-        level = doc_sed.getLevel()
-        version = doc_sed.getVersion()
-
         # return simulation experiment
-        return (model_vars, sim, model_filename, level, version)
+        return (model_vars, sim, model_filename)
 
     def _get_parameter_change_from_model(self, change_sed):
         """ Get a model parameter change from a SED change attribute
@@ -753,7 +752,7 @@ class SedMlSimReader(SimReader):
         if annotations_xml is None:
             return []
 
-        assert annotations_xml.getPrefix() == '' and annotations_xml.getName() == 'annotation'
+        self._assert(annotations_xml.getPrefix() == '' and annotations_xml.getName() == 'annotation')
 
         nodes = []
         for i_child in range(annotations_xml.getNumChildren()):

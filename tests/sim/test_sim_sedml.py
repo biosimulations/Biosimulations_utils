@@ -38,15 +38,14 @@ class WriteSedMlTestCase(unittest.TestCase):
         write_sim(model_vars, sim, model_filename, sim_filename,
                   SimFormat.sedml, level=1, version=3)
 
-        model_vars_2, sim_2, model_filename_2, level, version = read_sim(
+        model_vars_2, sim_2, model_filename_2 = read_sim(
             sim_filename, ModelFormat.sbml, SimFormat.sedml)
         self.assertEqual(
             set(s.id for s in model_vars_2),
             set(s.id for s in model_vars))
         self.assertEqual(model_filename_2, model_filename)
         self.assertEqual(sim_2, sim)
-        self.assertEqual(level, 1)
-        self.assertEqual(version, 3)
+        self.assertEqual(sim.format.version, 'L1V3')
 
         with self.assertRaisesRegex(NotImplementedError, 'not supported'):
             read_sim(None, ModelFormat.sbml, SimFormat.sessl)
@@ -123,3 +122,12 @@ class WriteSedMlTestCase(unittest.TestCase):
         doc = libsedml.SedDocument()
         with self.assertRaisesRegex(ValueError, 'libsedml error:'):
             sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setAnnotation', '<rdf')
+
+    def test_read_biomodels_sims(self):
+        _, sim, _ = read_sim('tests/fixtures/Simon2019.sedml', ModelFormat.sbml, SimFormat.sedml)
+        self.assertEqual(sim.model_parameter_changes, [])
+        self.assertEqual(sim.start_time, 0.)
+        self.assertEqual(sim.end_time, 1.)
+        self.assertEqual(sim.num_time_points, 100)
+        self.assertEqual(sim.algorithm.id, 'KISAO:0000019')
+        self.assertEqual(sim.algorithm_parameter_changes, [])

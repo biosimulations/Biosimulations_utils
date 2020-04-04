@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from ..data_model import Format, JournalReference, License, Person, RemoteFile, Type
+from ..data_model import Format, Identifier, JournalReference, License, Person, RemoteFile, Type
 from ..model.data_model import Model, ModelParameter
 
 __all__ = ['Simulation', 'Algorithm', 'AlgorithmParameter', 'ParameterChange']
@@ -21,6 +21,7 @@ class Simulation(object):
         image (:obj:`RemoteFile`): image file
         description (:obj:`str`): description
         tags (:obj:`list` of :obj:`str`): tags
+        identifiers (:obj:`list` of :obj:`Identifier`): identifiers
         refs (:obj:`list` of :obj:`JournalReference`): references
         authors (:obj:`list` of :obj:`Person`): authors
         license (:obj:`License`): license
@@ -35,7 +36,8 @@ class Simulation(object):
         algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`): simulation algorithm parameter changes
     """
 
-    def __init__(self, id=None, name=None, image=None, description=None, tags=None, refs=None, authors=None, license=None, format=None,
+    def __init__(self, id=None, name=None, image=None, description=None,
+                 tags=None, identifiers=None, refs=None, authors=None, license=None, format=None,
                  model=None, model_parameter_changes=None,
                  start_time=None, end_time=None, num_time_points=None,
                  algorithm=None, algorithm_parameter_changes=None, ):
@@ -46,6 +48,7 @@ class Simulation(object):
             image (:obj:`RemoteFile`, optional): image file
             description (:obj:`str`, optional): description
             tags (:obj:`list` of :obj:`str`, optional): tags
+            identifiers (:obj:`list` of :obj:`Identifier`, optional): identifiers
             refs (:obj:`list` of :obj:`JournalReference`, optional): references
             authors (:obj:`list` of :obj:`Person`, optional): authors
             license (:obj:`License`, optional): license
@@ -63,6 +66,7 @@ class Simulation(object):
         self.image = image
         self.description = description
         self.tags = tags or []
+        self.identifiers = identifiers or []
         self.refs = refs or []
         self.authors = authors or []
         self.license = license
@@ -91,6 +95,7 @@ class Simulation(object):
             and self.image == other.image \
             and self.description == other.description \
             and sorted(self.tags) == sorted(other.tags) \
+            and sorted(self.identifiers, key=Identifier.sort_key) == sorted(other.identifiers, key=Identifier.sort_key) \
             and sorted(self.refs, key=JournalReference.sort_key) == sorted(other.refs, key=JournalReference.sort_key) \
             and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
             and self.license == other.license \
@@ -117,6 +122,7 @@ class Simulation(object):
             'image': self.image.to_json() if self.image else None,
             'description': self.description,
             'tags': self.tags or [],
+            'identifiers': [identifier.to_json() for identifier in self.identifiers],
             'refs': [ref.to_json() for ref in self.refs],
             'authors': [author.to_json() for author in self.authors],
             'license': self.license.value if self.license else None,
@@ -147,6 +153,7 @@ class Simulation(object):
             image=RemoteFile.from_json(val.get('image')) if val.get('image', None) else None,
             description=val.get('description', None),
             tags=val.get('tags', []),
+            identifiers=[Identifier.from_json(identifier) for identifier in val.get('identifiers', [])],
             refs=[JournalReference.from_json(ref) for ref in val.get('refs', [])],
             authors=[Person.from_json(author) for author in val.get('authors', [])],
             license=License(val.get('license')) if val.get('license', None) else None,

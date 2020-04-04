@@ -9,6 +9,7 @@
 from Biosimulations_format_utils.data_model import Identifier, JournalReference, License, Person, Taxon
 from Biosimulations_format_utils.import_resources import biomodels
 from Biosimulations_format_utils.model.data_model import Model
+from Biosimulations_format_utils.sim.data_model import Simulation
 import shutil
 import tempfile
 import unittest
@@ -24,7 +25,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
 
     def test(self):
         importer = biomodels.BioModelsImporter(_max_models=5, _cache_dir=self.dirname)
-        models, stats = importer.run()
+        models, sims, stats = importer.run()
         self.assertEqual(len(models), 5)
 
         self.assertEqual(models[0].id, 'BIOMD0000000001')
@@ -87,9 +88,12 @@ class BioModelsImporterTestCase(unittest.TestCase):
 
         for model in models:
             self.assertEqual(Model.from_json(model.to_json()), model)
+        for sim in sims:
+            self.assertEqual(Simulation.from_json(sim.to_json()), sim)
 
-        models_2, stats_2 = importer.read_data()
+        models_2, sims_2, stats_2 = importer.read_data()
         for model, model_2 in zip(models, models_2):
             self.assertEqual(model_2, model)
-
+        for sim, sim_2 in zip(sims, sims_2):
+            self.assertEqual(sim_2, sim)
         self.assertEqual(stats_2, stats)

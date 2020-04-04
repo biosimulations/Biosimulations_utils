@@ -12,6 +12,9 @@ from ..model import ModelFormat, read_model
 from ..model.core import ModelIoError
 from ..model.data_model import Model  # noqa: F401
 from ..model.sbml import viz_model
+from ..sim import SimFormat, read_sim
+from ..sim.data_model import Simulation  # noqa: F401
+import copy
 import json
 import libsbml
 import math
@@ -62,21 +65,24 @@ class BioModelsImporter(object):
 
         Returns:
             :obj:`list` of :obj:`Model`: models
+            :obj:`list` of :obj:`Simulation`: simulations
             :obj:`dict`: statistics about the models
         """
-        models = self.get_models()
+        models, sims = self.get_models()
         self.submit_models(models)
         stats = self.get_model_stats(models)
-        self.write_data(models, stats)
-        return (models, stats)
+        self.write_data(models, sims, stats)
+        return (models, sims, stats)
 
     def get_models(self):
         """ Get models from BioModels
 
         Returns:
             :obj:`list` of :obj:`Model`: list of metadata about each model
+            :obj:`list` of :obj:`Simulation`: list of metadata about each simulation
         """
         models = []
+        sims = []
         unimportable_models = []
         unvisualizable_models = []
         num_models = min(self._max_models, self.get_num_models())
@@ -86,8 +92,9 @@ class BioModelsImporter(object):
             for i_model, model_result in enumerate(results['models']):
                 print('  {}. {}: {}'.format(i_batch * self.NUM_MODELS_PER_BATCH + i_model + 1, model_result['id'], model_result['name']))
                 try:
-                    model = self.get_model(model_result['id'])
+                    model, model_sims = self.get_model(model_result['id'])
                     models.append(model)
+                    sims.extend(model_sims)
                 except ModelIoError:
                     unimportable_models.append(model_result['id'])
 
@@ -104,7 +111,7 @@ class BioModelsImporter(object):
         if unvisualizable_models:
             warnings.warn('Unable visualize the following models:\n  {}'.format('\n  '.join(sorted(unvisualizable_models))), UserWarning)
 
-        return models
+        return (models, sims)
 
     def get_num_models(self):
         """ Get the number of models to import
@@ -146,9 +153,12 @@ class BioModelsImporter(object):
 
         Returns:
             :obj:`Model`: information about model
+            :obj:`list` of :obj:`Simulation`: information about simulations
         """
         metadata = self.get_model_metadata(id)
+        files_metadata = self.get_model_files_metadata(id)
 
+        # get information about model
         if 'publication' in metadata:
             doi = None
             authors = []
@@ -248,16 +258,16 @@ class BioModelsImporter(object):
             authors = []
             refs = []
 
-        filename = self.get_model_files_metadata(id)['main'][0]['name']
+        model_filename = files_metadata['main'][0]['name']
         local_path = os.path.join(self._cache_dir, id + '.xml')
         with open(local_path, 'wb') as file:
-            file.write(self.get_model_file(id, filename))
+            file.write(self.get_model_file(id, model_filename))
 
         model = read_model(local_path, format=ModelFormat.sbml)
         model.id = id
         model.name = metadata['name']
         model.file = RemoteFile(
-            name=filename,
+            name=model_filename,
             type='application/sbml+xml',
             size=os.path.getsize(local_path),
         )
@@ -275,7 +285,35 @@ class BioModelsImporter(object):
         model.refs = refs
         model.authors = authors
         model.license = License.cc0
-        return model
+
+        # get information about simulation(s)
+        sims = []
+        for file_metadata in files_metadata['additional']:
+            if file_metadata['name'].endswith('.sedml'):
+                local_path = os.path.join(self._cache_dir, '{}-sim-{}.sedml'.format(model.id, len(sims) + 1))
+                with open(local_path, 'wb') as file:
+                    file.write(self.get_model_file(id, file_metadata['name']))
+
+                try:
+                    sim = read_sim(local_path, ModelFormat.sbml, SimFormat.sedml)
+                    sim.id = '{}-sim-{}'.format(model.id, len(sims) + 1)
+                    sim.name = file_metadata['name'][0:-6]
+                    sim.image = RemoteFile()
+                    sim.description = file_metadata['description']
+                    sim.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
+                    sim.refs = copy.deepcopy(model.refs)
+                    sim.authors = copy.deepcopy(model.authors)
+                    sim.license = License.cc0
+                    sim.append(sim)
+                except Exception:
+                    os.remove(local_path)
+        if len(sims) == 1:
+            sims[0].id = '{}-sim'.format(model.id)
+            os.rename(
+                os.path.join(self._cache_dir, '{}-sim-{}.sedml'.format(model.id, 1)),
+                os.path.join(self._cache_dir, '{}-sim.sedml'.format(model.id)))
+
+        return (model, sims)
 
     def get_model_metadata(self, id):
         """ Get metadata about a model
@@ -354,36 +392,47 @@ class BioModelsImporter(object):
             # requests.post(self.BIOSIMULATIONS_ENDPOINT)
             pass
 
-    def write_data(self, models, stats):
-        """ Save models to a JSON file
+    def write_data(self, models, sims, stats):
+        """ Save models and simulations to JSON files
 
         Args:
             models (:obj:`list` of :obj:`Model`): models
+            sims (:obj:`list` of :obj:`Simulation`): simulations
+            stats (:obj:`dict`): statistics of the models
         """
-        filename = os.path.join(self._cache_dir, 'biomodels.json')
+        filename = os.path.join(self._cache_dir, 'biomodels.models.json')
         with open(filename, 'w') as file:
             json.dump([model.to_json() for model in models], file)
+
+        filename = os.path.join(self._cache_dir, 'biomodels.simulations.json')
+        with open(filename, 'w') as file:
+            json.dump([sim.to_json() for sim in sims], file)
 
         filename = os.path.join(self._cache_dir, 'biomodels.stats.json')
         with open(filename, 'w') as file:
             json.dump(stats, file)
 
     def read_data(self):
-        """ Read models from a JSON file
+        """ Read models and simulations from JSON files
 
         Returns:
             :obj:`list` of :obj:`Model`: models
+            :obj:`list` of :obj:`Simulation`: simulations
             :obj:`dict`: stats about the models
         """
-        filename = os.path.join(self._cache_dir, 'biomodels.json')
+        filename = os.path.join(self._cache_dir, 'biomodels.models.json')
         with open(filename, 'r') as file:
             models = [Model.from_json(model) for model in json.load(file)]
+
+        filename = os.path.join(self._cache_dir, 'biomodels.sims.json')
+        with open(filename, 'r') as file:
+            sims = [Simulation.from_json(sims) for sims in json.load(file)]
 
         filename = os.path.join(self._cache_dir, 'biomodels.stats.json')
         with open(filename, 'r') as file:
             stats = json.load(file)
 
-        return (models, stats)
+        return (models, sims, stats)
 
     def get_model_stats(self, models):
         """ Calculate statistics about the imported models

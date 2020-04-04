@@ -8,7 +8,7 @@
 
 import abc
 
-__all__ = ['SimWriter', 'SimReader']
+__all__ = ['SimWriter', 'SimReader', 'SimIoError']
 
 
 class SimWriter(abc.ABC):
@@ -16,4 +16,21 @@ class SimWriter(abc.ABC):
 
 
 class SimReader(abc.ABC):
+    @staticmethod
+    def _assert(success, message='Operation failed'):
+        """ Raise an error if :obj:`success` is :obj:`False`
+
+        Args:
+            success (:obj:`bool`)
+            message (:obj:`str`, optional): error message
+
+        Raises:
+            :obj:`SimIoError`
+        """
+        if not success:
+            raise SimIoError(message)
+
+
+class SimIoError(Exception):
+    """ Simulation IO error """
     pass

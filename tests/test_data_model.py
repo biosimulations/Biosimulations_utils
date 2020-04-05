@@ -61,8 +61,9 @@ class ApiConsistencyTestCase(unittest.TestCase):
         response.raise_for_status()
         cls.api_schemas = response.json()['components']['schemas']
 
-    @unittest.expectedFailure()
+    @unittest.expectedFailure
     def test_model(self):
+        # todo: align TypeScript data model with this Python data model and remove @unittest.expectedFailure()
         model = Model(
             id='model_1',
             name='model 1',
@@ -99,8 +100,9 @@ class ApiConsistencyTestCase(unittest.TestCase):
         if errors:
             raise Exception('Data model for `Model` is not consistent with API:\n  Model:\n    ' + '\n    '.join(errors))
 
-    @unittest.expectedFailure()
+    @unittest.expectedFailure
     def test_sim(self):
+        # todo: align TypeScript data model with this Python data model and remove @unittest.expectedFailure()
         with open('tests/fixtures/simulation.json', 'rb') as file:
             py = json.load(file)
 

@@ -6,6 +6,7 @@ Utilities for generating and parsing documents encoded in biomodeling standards 
 * [License](#license)
 * [Development team](#development-team)
 * [Questions and comments](#questions-and-comments)
+* [Documentation](https://reproducible-biomedical-modeling.github.io/Biosimulations_format_utils/)
 
 ## Installation
 

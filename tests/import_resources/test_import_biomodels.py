@@ -10,7 +10,7 @@ from Biosimulations_format_utils.data_model import Identifier, JournalReference,
 from Biosimulations_format_utils.import_resources import biomodels
 from Biosimulations_format_utils.model.data_model import Model
 from Biosimulations_format_utils.sim.data_model import Simulation
-import mock
+from unittest import mock
 import shutil
 import tempfile
 import unittest

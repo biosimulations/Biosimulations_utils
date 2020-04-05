@@ -165,9 +165,9 @@ class SedMlSimWriter(SimWriter):
             namespaces.add('rdf')
             namespaces.add('vcard')
 
-        if sim.refs:
+        if sim.references:
             refs_xml = []
-            for ref in sim.refs:
+            for ref in sim.references:
                 props_xml = []
                 if ref.authors:
                     props_xml.append(XmlNode(prefix='bibo', name='authorList', children=ref.authors))
@@ -685,7 +685,7 @@ class SedMlSimReader(SimReader):
                                                 ref.year = int(prop.children)
                                             elif prop.prefix == 'bibo' and prop.name == 'doi' and isinstance(prop.children, str):
                                                 ref.doi = prop.children
-                                        sim.refs.append(ref)
+                                        sim.references.append(ref)
             elif node.prefix == 'dcterms' and node.name == 'license' and isinstance(node.children, str):
                 sim.license = License(node.children)
 

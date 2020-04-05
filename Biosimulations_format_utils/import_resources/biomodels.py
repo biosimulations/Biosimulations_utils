@@ -256,7 +256,7 @@ class BioModelsImporter(object):
             else:
                 authors_str = ', '.join(authors_str[0:-1]) + ' & ' + authors_str[-1]
 
-            refs = [
+            references = [
                 JournalReference(
                     authors=authors_str,
                     title=metadata['publication']['title'],
@@ -270,7 +270,7 @@ class BioModelsImporter(object):
             ]
         else:
             authors = []
-            refs = []
+            references = []
 
         model_filename = files_metadata['main'][0]['name']
         local_path = os.path.join(self._cache_dir, id + '.xml')
@@ -296,7 +296,7 @@ class BioModelsImporter(object):
             except Exception:
                 pass
         model.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
-        model.refs = refs
+        model.references = references
         model.authors = authors
         model.license = License.cc0
 
@@ -320,7 +320,7 @@ class BioModelsImporter(object):
                     sim.name = file_metadata['name'][0:-6]
                     sim.description = file_metadata['description']
                     sim.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
-                    sim.refs = copy.deepcopy(model.refs)
+                    sim.references = copy.deepcopy(model.references)
                     sim.authors = copy.deepcopy(model.authors)
                     sim.license = License.cc0
                     sim.model.id = model.id

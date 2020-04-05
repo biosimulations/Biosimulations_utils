@@ -82,7 +82,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
             namespace="biomodels.db",
             id="BIOMD0000000001",
         )])
-        self.assertEqual(models[0].refs, [JournalReference(
+        self.assertEqual(models[0].references, [JournalReference(
             authors="S J Edelstein, O Schaad, E Henry, D Bertrand & J P Changeux",
             title="A kinetic mechanism for nicotinic acetylcholine receptors based on multiple allosteric transitions.",
             journal="Biological cybernetics",

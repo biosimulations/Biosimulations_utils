@@ -27,7 +27,7 @@ class ModelDataModelTestCase(unittest.TestCase):
             taxon=Taxon(id=9606, name='Homo sapiens'),
             tags=['a', 'b', 'c'],
             identifiers=[Identifier(namespace='biomodels.db', id='BIOMD0000000924')],
-            refs=[
+            references=[
                 JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
                                  volume=10, num=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
             ],

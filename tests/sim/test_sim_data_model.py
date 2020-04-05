@@ -21,7 +21,7 @@ class SimDataModelTestCase(unittest.TestCase):
             image=RemoteFile(name='model.png', type='image/png'),
             description='description',
             tags=['a', 'b', 'c'],
-            refs=[
+            references=[
                 JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
                                  volume=10, num=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
             ],
@@ -58,7 +58,7 @@ class SimDataModelTestCase(unittest.TestCase):
             image=RemoteFile(name='model.png', type='image/png'),
             description='description',
             tags=['a', 'b', 'c'],
-            refs=[
+            references=[
                 JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
                                  volume=10, num=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
             ],

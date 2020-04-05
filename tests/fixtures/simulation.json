@@ -15,7 +15,7 @@
   ],
   "description": "Description of simulation 1",
   "tags": ["tag-1", "tag-2"],
-  "refs": [
+  "references": [
     {
       "authors": "Doe JC & Doe JD",
       "title": "Title-1",

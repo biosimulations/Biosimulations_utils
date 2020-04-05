@@ -29,7 +29,7 @@ class Model(object):
         taxon (:obj:`Taxon`): taxon
         tags (:obj:`list` of :obj:`str`): tags
         identifiers (:obj:`list` of :obj:`Identifier`): identifiers
-        refs (:obj:`list` of :obj:`JournalReference`): references
+        references (:obj:`list` of :obj:`JournalReference`): references
         authors (:obj:`list` of :obj:`Person`): authors
         license (:obj:`License`): license
         parameters (:obj:`list` of :obj:`ModelParameter`): parameters (e.g., initial conditions and rate constants)
@@ -38,7 +38,7 @@ class Model(object):
 
     def __init__(self, id=None, name=None, file=None, image=None, description=None,
                  format=None, framework=None, taxon=None, tags=None,
-                 identifiers=None, refs=None, authors=None, license=None,
+                 identifiers=None, references=None, authors=None, license=None,
                  parameters=None, variables=None):
         """
         Args:
@@ -52,7 +52,7 @@ class Model(object):
             taxon (:obj:`Taxon`, optional): taxon
             tags (:obj:`list` of :obj:`str`, optional): tags
             identifiers (:obj:`list` of :obj:`Identifier`, optional): identifiers
-            refs (:obj:`list` of :obj:`JournalReference`, optional): references
+            references (:obj:`list` of :obj:`JournalReference`, optional): references
             authors (:obj:`list` of :obj:`Person`, optional): authors
             license (:obj:`License`, optional): license
             parameters (:obj:`list` of :obj:`ModelParameter`, optional): parameters (e.g., initial conditions and rate constants)
@@ -68,7 +68,7 @@ class Model(object):
         self.taxon = taxon
         self.tags = tags or []
         self.identifiers = identifiers or []
-        self.refs = refs or []
+        self.references = references or []
         self.authors = authors or []
         self.license = license
         self.parameters = parameters or []
@@ -94,7 +94,7 @@ class Model(object):
             and self.taxon == other.taxon \
             and sorted(self.tags) == sorted(other.tags) \
             and sorted(self.identifiers, key=Identifier.sort_key) == sorted(other.identifiers, key=Identifier.sort_key) \
-            and sorted(self.refs, key=JournalReference.sort_key) == sorted(other.refs, key=JournalReference.sort_key) \
+            and sorted(self.references, key=JournalReference.sort_key) == sorted(other.references, key=JournalReference.sort_key) \
             and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
             and self.license == other.license \
             and sorted(self.parameters, key=ModelParameter.sort_key) == sorted(other.parameters, key=ModelParameter.sort_key) \
@@ -117,7 +117,7 @@ class Model(object):
             'taxon': self.taxon.to_json() if self.taxon else None,
             'tags': self.tags or [],
             'identifiers': [identifier.to_json() for identifier in self.identifiers],
-            'refs': [ref.to_json() for ref in self.refs],
+            'references': [ref.to_json() for ref in self.references],
             'authors': [author.to_json() for author in self.authors],
             'license': self.license.value if self.license else None,
             'parameters': [parameter.to_json() for parameter in self.parameters],
@@ -145,7 +145,7 @@ class Model(object):
             taxon=Taxon.from_json(val.get('taxon')) if val.get('taxon', None) else None,
             tags=val.get('tags', []),
             identifiers=[Identifier.from_json(identifier) for identifier in val.get('identifiers', [])],
-            refs=[JournalReference.from_json(ref) for ref in val.get('refs', [])],
+            references=[JournalReference.from_json(ref) for ref in val.get('references', [])],
             authors=[Person.from_json(author) for author in val.get('authors', [])],
             license=License(val.get('license')) if val.get('license', None) else None,
             parameters=[ModelParameter.from_json(parameter) for parameter in val.get('parameters', [])],

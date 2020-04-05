@@ -534,16 +534,7 @@ class SedMlSimWriter(SimWriter):
         method = getattr(obj_sed, method_name)
         return_val = method(*args, **kwargs)
         if return_val != 0:
-            msgs = []
-            for i_error in range(doc_sed.getNumErrors()):
-                msgs.append(str(doc_sed.getError(i_error).getErrorId()))
-
-            if msgs:
-                msg = '\n  ' + '\n  '.join(msgs)
-            else:
-                msg = ''
-
-            raise ValueError('libsedml error: {}{}'.format(return_val, msg))
+            raise ValueError('libsedml error: {}'.format(doc_sed.getErrorLog().toString()))
         return return_val
 
 
@@ -558,6 +549,8 @@ class SedMlSimReader(SimReader):
             :obj:`list` of :obj:`Simulation`: simulations
         """
         doc_sed = libsedml.readSedMLFromFile(filename)
+        if doc_sed.getErrorLog().getNumFailsWithSeverity(libsedml.LIBSEDML_SEV_ERROR):
+            raise SimIoError('libsedml error: {}'.format(doc_sed.getErrorLog().toString()))
 
         models_sed = {}
         default_model_sed = None

@@ -128,6 +128,9 @@ class WriteSedMlTestCase(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'libsedml error:'):
             sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setAnnotation', '<rdf')
 
+        with self.assertRaisesRegex(SimIoError, 'libsedml error'):
+            sedml.SedMlSimReader().run('non-existant-file')
+
     def test_read_with_multiple_models_and_sims_and_unsupported_task(self):
         filename = 'tests/fixtures/Simon2019-with-multiple-models-and-sims.sedml'
         with self.assertWarnsRegex(SimIoWarning, 'is not supported'):

@@ -16,6 +16,7 @@ docs/source/
 docs/_build/
 docs/.doctrees/
 docs/html/_raw_sources/.doctrees/
+docs/**/.doctrees/
 docs/**/*.pickle
 
 # converted README for PyPI

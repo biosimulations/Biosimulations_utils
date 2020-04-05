@@ -6,7 +6,6 @@
 :License: MIT
 """
 
-
 from ..data_model import Identifier, JournalReference, License, Person, RemoteFile
 from ..model import ModelFormat, read_model
 from ..model.core import ModelIoError

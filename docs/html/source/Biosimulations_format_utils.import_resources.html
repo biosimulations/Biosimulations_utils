@@ -202,12 +202,12 @@
 <dd class="field-even"><p>MIT</p>
 </dd>
 </dl>
-<dl class="class">
+<dl class="py class">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter">
-<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_format_utils.import_resources.biomodels.</code><code class="sig-name descname">BioModelsImporter</code><span class="sig-paren">(</span><em class="sig-param">_max_models=inf</em>, <em class="sig-param">_cache_dir=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_format_utils.import_resources.biomodels.</code><code class="sig-name descname">BioModelsImporter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_max_models</span><span class="o">=</span><span class="default_value">inf</span></em>, <em class="sig-param"><span class="n">_cache_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Import models from BioModels</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter._max_models">
 <code class="sig-name descname">_max_models</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter._max_models" title="Permalink to this definition">¶</a></dt>
 <dd><p>maximum number of models to download from BioModels</p>
@@ -218,7 +218,7 @@
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter._cache_dir">
 <code class="sig-name descname">_cache_dir</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter._cache_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>directory to cache models from BioModels</p>
@@ -229,7 +229,7 @@
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter._requests_session">
 <code class="sig-name descname">_requests_session</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter._requests_session" title="Permalink to this definition">¶</a></dt>
 <dd><p>requests cached session</p>
@@ -240,34 +240,34 @@
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.BIOMODELS_ENDPOINT">
 <code class="sig-name descname">BIOMODELS_ENDPOINT</code><em class="property"> = 'https://www.ebi.ac.uk/biomodels'</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.BIOMODELS_ENDPOINT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.BIOSIMULATIONS_ENDPOINT">
 <code class="sig-name descname">BIOSIMULATIONS_ENDPOINT</code><em class="property"> = 'https://api.biosimulations.dev'</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.BIOSIMULATIONS_ENDPOINT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.MAX_RETRIES">
 <code class="sig-name descname">MAX_RETRIES</code><em class="property"> = 5</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.MAX_RETRIES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.NUM_MODELS_PER_BATCH">
 <code class="sig-name descname">NUM_MODELS_PER_BATCH</code><em class="property"> = 100</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.NUM_MODELS_PER_BATCH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.PUBMED_ENDPOINT">
 <code class="sig-name descname">PUBMED_ENDPOINT</code><em class="property"> = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.PUBMED_ENDPOINT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model">
-<code class="sig-name descname">get_model</code><span class="sig-paren">(</span><em class="sig-param">id</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -283,9 +283,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_batch">
-<code class="sig-name descname">get_model_batch</code><span class="sig-paren">(</span><em class="sig-param">num_results=10</em>, <em class="sig-param">i_batch=0</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_batch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_model_batch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_results</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">i_batch</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a batch of models</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -303,14 +303,14 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_file">
-<code class="sig-name descname">get_model_file</code><span class="sig-paren">(</span><em class="sig-param">id</em>, <em class="sig-param">filename</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_model_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_file" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_files_metadata">
-<code class="sig-name descname">get_model_files_metadata</code><span class="sig-paren">(</span><em class="sig-param">id</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_files_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_model_files_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_files_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get metadata about the files of a model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -325,9 +325,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_metadata">
-<code class="sig-name descname">get_model_metadata</code><span class="sig-paren">(</span><em class="sig-param">id</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_model_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_model_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get metadata about a model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -342,7 +342,7 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_models">
 <code class="sig-name descname">get_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_models" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get models from BioModels</p>
@@ -357,7 +357,7 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_num_models">
 <code class="sig-name descname">get_num_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_num_models" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of models to import</p>
@@ -371,9 +371,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_stats">
-<code class="sig-name descname">get_stats</code><span class="sig-paren">(</span><em class="sig-param">models</em>, <em class="sig-param">sims</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_stats" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">models</span></em>, <em class="sig-param"><span class="n">sims</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.get_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate statistics about the imported models</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -391,12 +391,12 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.init_requests_cache">
 <code class="sig-name descname">init_requests_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.init_requests_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.read_data">
 <code class="sig-name descname">read_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.read_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read models and simulations from JSON files</p>
@@ -412,7 +412,7 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve models from BioModels and submit to BioSimulations</p>
@@ -428,9 +428,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.submit_models">
-<code class="sig-name descname">submit_models</code><span class="sig-paren">(</span><em class="sig-param">models</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.submit_models" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">submit_models</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">models</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.submit_models" title="Permalink to this definition">¶</a></dt>
 <dd><p>Post models to BioSimulations</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -439,9 +439,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.viz_model">
-<code class="sig-name descname">viz_model</code><span class="sig-paren">(</span><em class="sig-param">model</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.viz_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">viz_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.viz_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a visualization of a model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -456,9 +456,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.write_data">
-<code class="sig-name descname">write_data</code><span class="sig-paren">(</span><em class="sig-param">models</em>, <em class="sig-param">sims</em>, <em class="sig-param">stats</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.write_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">models</span></em>, <em class="sig-param"><span class="n">sims</span></em>, <em class="sig-param"><span class="n">stats</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils/blob/master/Biosimulations_format_utils/import_resources/biomodels.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_format_utils.import_resources.biomodels.BioModelsImporter.write_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save models and simulations to JSON files</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

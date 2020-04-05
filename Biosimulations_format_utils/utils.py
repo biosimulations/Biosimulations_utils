@@ -42,3 +42,17 @@ def pretty_print_units(units_str):
             return '10^{} {}'.format(pow, units)
         else:
             return '{} 10^{} {}'.format(mag, pow, units)
+
+
+def assert_exception(success, exception):
+    """ Raise an error if :obj:`success` is :obj:`False`
+
+    Args:
+        success (:obj:`bool`)
+        exception (:obj:`Exception`)
+
+    Raises:
+        :obj:`Exception`
+    """
+    if not success:
+        raise exception

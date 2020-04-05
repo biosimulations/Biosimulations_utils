@@ -10,6 +10,7 @@ from Biosimulations_format_utils.data_model import Format
 from Biosimulations_format_utils.model import ModelFormat
 from Biosimulations_format_utils.model.data_model import Model, Variable
 from Biosimulations_format_utils.sim import SimFormat, write_sim, read_sim, sedml
+from Biosimulations_format_utils.sim.core import SimIoError, SimIoWarning
 from Biosimulations_format_utils.sim.data_model import TimecourseSimulation
 import json
 import libsedml
@@ -126,6 +127,16 @@ class WriteSedMlTestCase(unittest.TestCase):
         doc = libsedml.SedDocument()
         with self.assertRaisesRegex(ValueError, 'libsedml error:'):
             sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setAnnotation', '<rdf')
+
+    def test_read_with_multiple_models_and_sims_and_unsupported_task(self):
+        filename = 'tests/fixtures/Simon2019-with-multiple-models-and-sims.sedml'
+        with self.assertWarnsRegex(SimIoWarning, 'is not supported'):
+            read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+
+    def test_read_with_unsupported_simulation(self):
+        filename = 'tests/fixtures/Simon2019-with-one-step-sim.sedml'
+        with self.assertRaisesRegex(SimIoError, 'Unsupported simulation type'):
+            read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
 
     def test_read_biomodels_sims(self):
         sims = read_sim('tests/fixtures/Simon2019.sedml', ModelFormat.sbml, SimFormat.sedml)

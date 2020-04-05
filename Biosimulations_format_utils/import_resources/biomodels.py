@@ -108,6 +108,13 @@ class BioModelsImporter(object):
 
                 try:
                     model.image = self.viz_model(model)
+                    for sim in model_sims:
+                        sim.image = RemoteFile(
+                            name=sim.id + '.png',
+                            type='image/png',
+                            size=model.image.size)
+                        shutil.copyfile(os.path.join(self._cache_dir, model.id + '.png'), os.path.join(self._cache_dir, sim.image.name))
+
                 except ModelIoError:
                     unvisualizable_models.append(model_result['id'])
 
@@ -312,13 +319,6 @@ class BioModelsImporter(object):
                 for sim in model_sims:
                     sim.id = '{}-sim-{}'.format(model.id, len(sims) + 1)
                     sim.name = file_metadata['name'][0:-6]
-                    model_img = os.path.join(self._cache_dir, model.id + '.png')
-                    if os.path.isfile(model_img):
-                        sim.image = RemoteFile(
-                            name=sim.id + '.png',
-                            type='image/png',
-                            size=os.path.getsize(model_img))
-                        shutil.copyfile(model_img, os.path.join(self._cache_dir, sim.image.name))
                     sim.description = file_metadata['description']
                     sim.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
                     sim.refs = copy.deepcopy(model.refs)
@@ -333,8 +333,6 @@ class BioModelsImporter(object):
             os.rename(
                 os.path.join(self._cache_dir, '{}-{}.sedml'.format(model.id, 1)),
                 os.path.join(self._cache_dir, '{}.sedml'.format(model.id)))
-            os.rename(os.path.join(self._cache_dir, sim.image.name), os.path.join(self._cache_dir, sims[0].id + '.png'))
-            sims[0].image.name = sims[0].id + '.png'
 
         return (model, sims)
 

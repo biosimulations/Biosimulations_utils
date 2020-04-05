@@ -11,6 +11,7 @@ from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation
                          Algorithm, AlgorithmParameter, ParameterChange)
 from ..data_model import Format, JournalReference, License, Person, RemoteFile
 from ..model.data_model import Model, ModelParameter, Variable
+from ..utils import assert_exception
 from datetime import datetime
 from xml.sax import saxutils
 import enum
@@ -563,8 +564,8 @@ class SedMlSimReader(SimReader):
         default_model = None
         for i_model, model_sed in enumerate(doc_sed.getListOfModels()):
             for change_sed in model_sed.getListOfChanges():
-                self._assert(isinstance(change_sed, libsedml.SedChangeAttribute), "Changes must be attribute changes")
-            self._assert(model_sed.getId() not in models_sed, "Models must have unique ids")
+                assert_exception(isinstance(change_sed, libsedml.SedChangeAttribute), SimIoError("Changes must be attribute changes"))
+            assert_exception(model_sed.getId() not in models_sed, SimIoError("Models must have unique ids"))
             models_sed[model_sed.getId()] = model_sed
 
             model = Simulation()
@@ -580,7 +581,7 @@ class SedMlSimReader(SimReader):
         default_sim_sed = None
         default_sim = None
         for sim_sed in doc_sed.getListOfSimulations():
-            self._assert(sim_sed.getId() not in sims_sed, "Simulations must have unique ids")
+            assert_exception(sim_sed.getId() not in sims_sed, SimIoError("Simulations must have unique ids"))
             sims_sed[sim_sed.getId()] = sim_sed
 
             sim = self._create_sim(sim_sed)
@@ -609,13 +610,13 @@ class SedMlSimReader(SimReader):
 
             # model
             model_sed = models_sed.get(task_sed.getModelReference(), default_model_sed)
-            self._assert(model_sed is not None, "Model cannot be determined")
+            assert_exception(model_sed is not None, SimIoError("Model cannot be determined"))
             self._read_model(model_sed, sim)
             self._read_model_variables(task_sed, sim)
 
             # simulation
             sim_sed = sims_sed.get(task_sed.getSimulationReference(), default_sim_sed)
-            self._assert(sim_sed is not None, "Simulation cannot be determined")
+            assert_exception(sim_sed is not None, SimIoError("Simulation cannot be determined"))
             self._read_sim(sim_sed, sim)
 
             # append simulation to list of simulations
@@ -755,7 +756,7 @@ class SedMlSimReader(SimReader):
         elif isinstance(sim_sed, libsedml.SedSteadyState):
             return SteadyStateSimulation()
         else:
-            raise SimIoError('Unsupported simulation type')
+            raise SimIoError('Unsupported simulation type: {}'.format(sim_sed.__class__.__name__))
 
     def _read_sim(self, sim_sed, sim):
         """ Read a SED simulation
@@ -768,8 +769,8 @@ class SedMlSimReader(SimReader):
         if isinstance(sim_sed, libsedml.SedUniformTimeCourse):
             sim.start_time = float(sim_sed.getInitialTime())
             sim.output_start_time = float(sim_sed.getOutputStartTime())
-            self._assert(sim.output_start_time >= sim.start_time,
-                         "Output time must be at least the start time")
+            assert_exception(sim.output_start_time >= sim.start_time,
+                             SimIoError("Output time must be at least the start time"))
             sim.end_time = float(sim_sed.getOutputEndTime())
             sim.num_time_points = int(sim_sed.getNumberOfPoints())
 

@@ -12,23 +12,13 @@ __all__ = ['SimWriter', 'SimReader', 'SimIoError', 'SimIoWarning']
 
 
 class SimWriter(abc.ABC):
+    """ Base class for simulation writers """
     pass
 
 
 class SimReader(abc.ABC):
-    @staticmethod
-    def _assert(success, message='Operation failed'):
-        """ Raise an error if :obj:`success` is :obj:`False`
-
-        Args:
-            success (:obj:`bool`)
-            message (:obj:`str`, optional): error message
-
-        Raises:
-            :obj:`SimIoError`
-        """
-        if not success:
-            raise SimIoError(message)
+    """ Base class for simulation readers """
+    pass
 
 
 class SimIoError(Exception):

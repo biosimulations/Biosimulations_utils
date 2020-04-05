@@ -172,7 +172,8 @@ class SbmlModelReader(ModelReader):
 
         unsupported_packages = packages.difference(set(['annot', 'comp', 'fbc', 'groups', 'layout', 'multi', 'qual', 'render', 'req']))
         if unsupported_packages:
-            raise ModelIoError("{} package(s) are not supported".format(', '.join(unsupported_packages)))
+            raise ModelIoError("{} package(s) are not supported".format(', '.join(unsupported_packages))
+                               )  # pragma: no cover # unreachable with libSBML 5.18 which doesn't support additional packages
 
         plugin = model_sbml.getSBMLDocument().getPlugin('comp')
         if plugin:
@@ -748,7 +749,7 @@ def viz_model(model_filename, img_filename, requests_session=None):
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError:
-            raise ModelIoError('Unable to generate image for {}'.format(os.path.basename(model_filename)))
+            raise ModelIoError('Unable to generate image for {}: {}'.format(os.path.basename(model_filename), response.content))
         with open(img_filename, 'wb') as file:
             file.write(response.content)
         img = Image.open(img_filename)

@@ -10,6 +10,7 @@ from Biosimulations_format_utils.data_model import Identifier, JournalReference,
 from Biosimulations_format_utils.import_resources import biomodels
 from Biosimulations_format_utils.model.data_model import Model
 from Biosimulations_format_utils.sim.data_model import Simulation
+import mock
 import shutil
 import tempfile
 import unittest
@@ -24,9 +25,34 @@ class BioModelsImporterTestCase(unittest.TestCase):
         shutil.rmtree(self.dirname)
 
     def test(self):
-        importer = biomodels.BioModelsImporter(_max_models=5, _cache_dir=self.dirname)
-        models, sims, stats = importer.run()
-        self.assertEqual(len(models), 5)
+        importer = biomodels.BioModelsImporter(_max_models=6, _cache_dir=self.dirname)
+        return_value = {
+            'matches': 925,
+            'models': [
+                {'id': 'BIOMD0000000001', 'name': 'Edelstein1996 - EPSP ACh event'},
+                {'id': 'BIOMD0000000002', 'name': 'Edelstein1996 - EPSP ACh species'},
+                {'id': 'BIOMD0000000003', 'name': 'Goldbeter1991 - Min Mit Oscil'},
+                {
+                    'id': 'BIOMD0000000297',  # has time course simulation
+                    'name': 'Ciliberto2003_Morphogenesis_Checkpoint',
+                },
+                {
+                    'id': 'BIOMD0000000643',  # has time course and steady state simulations
+                    'name': 'Musante2017 - Switching behaviour of PP2A inhibition by ARPP-16 - mutual inhibitions',
+                },
+                {'id': 'BIOMD0000000075', 'name': 'Xu2003 - Phosphoinositide turnover'},  # unable to generate image
+                {'id': 'BIOMD0000000007', 'name': 'Novak1997 - Cell Cycle'},
+                {'id': 'BIOMD0000000008', 'name': 'Gardner1998 - Cell Cycle Goldbeter'},
+                {'id': 'BIOMD0000000009', 'name': 'Huang1996 - Ultrasensitivity in MAPK cascade'},
+                {
+                    'id': 'BIOMD0000000010',
+                    'name': 'Kholodenko2000 - Ultrasensitivity and negative feedback bring oscillations in MAPK cascade',
+                },
+            ],
+        }
+        with mock.patch.object(biomodels.BioModelsImporter, 'get_model_batch', return_value=return_value):
+            models, sims, stats = importer.run()
+        self.assertEqual(len(models), 6)
 
         self.assertEqual(models[0].id, 'BIOMD0000000001')
         self.assertEqual(models[0].name, 'Edelstein1996 - EPSP ACh event')
@@ -76,23 +102,25 @@ class BioModelsImporterTestCase(unittest.TestCase):
 
         self.assertEqual(stats, {
             'models': {
-                'total': 5,
+                'total': 6,
                 'frameworks': {
-                    'non-spatial continuous framework': 5,
+                    'non-spatial continuous framework': 6,
                 },
                 'layouts': 0,
                 'taxa': {
-                    'Amphibia': 2,
-                    'Opisthokonta': 1,
+                    'Amphibia': 1,
                     'Tetronarce californica': 2,
+                    'Schizosaccharomyces pombe': 1,
+                    'Mus musculus': 1,
+                    'Mus sp.': 1,
                 },
-                'simulated': 0,
+                'simulated': 2,
             },
             'sims': {
-                'total': 0,
-                'time course': 0,
+                'total': 3,
+                'time course': 2,
                 'one step': 0,
-                'steady-state': 0,
+                'steady-state': 1,
             }
         })
 

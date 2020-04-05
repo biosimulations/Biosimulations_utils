@@ -349,6 +349,10 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         with self.assertRaisesRegex(ModelIoError, r'package is not supported'):
             read_model(filename, format=ModelFormat.sbml)
 
+        filename = 'tests/fixtures/MODEL1904090001-with-qual.sbml-L3V2.xml'
+        with self.assertRaisesRegex(ModelIoError, r'Unable to determine modeling framework'):
+            read_model(filename, format=ModelFormat.sbml)
+
     def test_run_units(self):
         filename = 'tests/fixtures/BIOMD0000000821.sbml-L2V4.xml'
         model = read_model(filename, format=ModelFormat.sbml)
@@ -370,3 +374,9 @@ class VizModelTestCase(unittest.TestCase):
         self.assertEqual(image.name, 'model.png')
         self.assertEqual(image.type, 'image/png')
         self.assertGreater(image.size, 0)
+
+    def test_viz_model_error(self):
+        model_filename = 'tests/fixtures/BIOMD0000000075.xml'
+        img_filename = os.path.join(self.dirname, 'model.png')
+        with self.assertRaisesRegex(ModelIoError, 'Unable to generate image'):
+            viz_model(model_filename, img_filename)

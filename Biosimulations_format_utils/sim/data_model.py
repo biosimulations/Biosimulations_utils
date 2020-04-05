@@ -131,29 +131,32 @@ class Simulation(object):
         Returns:
             :obj:`Simulation`
         """
-        if 'startTime' in val or 'endTime' in val or 'numTimePoints' in val:
-            SimCls = TimecourseSimulation
-        else:
-            SimCls = SteadyStateSimulation
+        if cls == Simulation:
+            if 'startTime' in val or 'endTime' in val or 'numTimePoints' in val:
+                subcls = TimecourseSimulation
+            else:
+                subcls = SteadyStateSimulation
+            return subcls.from_json(val)
 
-        return SimCls(
-            id=val.get('id', None),
-            name=val.get('name', None),
-            image=RemoteFile.from_json(val.get('image')) if val.get('image', None) else None,
-            description=val.get('description', None),
-            tags=val.get('tags', []),
-            identifiers=[Identifier.from_json(identifier) for identifier in val.get('identifiers', [])],
-            refs=[JournalReference.from_json(ref) for ref in val.get('refs', [])],
-            authors=[Person.from_json(author) for author in val.get('authors', [])],
-            license=License(val.get('license')) if val.get('license', None) else None,
-            format=Format.from_json(val.get('format')) if val.get('format', None) else None,
-            model=Model.from_json(val.get('model')) if val.get('model', None) else None,
-            model_parameter_changes=[ParameterChange.from_json(change, ModelParameter)
-                                     for change in val.get('modelParameterChanges', [])],
-            algorithm=Algorithm.from_json(val.get('algorithm')) if val.get('algorithm', None) else None,
-            algorithm_parameter_changes=[ParameterChange.from_json(change, AlgorithmParameter)
-                                         for change in val.get('algorithmParameterChanges', [])]
-        )
+        else:
+            return cls(
+                id=val.get('id', None),
+                name=val.get('name', None),
+                image=RemoteFile.from_json(val.get('image')) if val.get('image', None) else None,
+                description=val.get('description', None),
+                tags=val.get('tags', []),
+                identifiers=[Identifier.from_json(identifier) for identifier in val.get('identifiers', [])],
+                refs=[JournalReference.from_json(ref) for ref in val.get('refs', [])],
+                authors=[Person.from_json(author) for author in val.get('authors', [])],
+                license=License(val.get('license')) if val.get('license', None) else None,
+                format=Format.from_json(val.get('format')) if val.get('format', None) else None,
+                model=Model.from_json(val.get('model')) if val.get('model', None) else None,
+                model_parameter_changes=[ParameterChange.from_json(change, ModelParameter)
+                                         for change in val.get('modelParameterChanges', [])],
+                algorithm=Algorithm.from_json(val.get('algorithm')) if val.get('algorithm', None) else None,
+                algorithm_parameter_changes=[ParameterChange.from_json(change, AlgorithmParameter)
+                                             for change in val.get('algorithmParameterChanges', [])]
+            )
 
 
 class TimecourseSimulation(Simulation):

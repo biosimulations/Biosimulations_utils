@@ -8,13 +8,13 @@
 
 from Biosimulations_format_utils.data_model import Format, JournalReference, License, Person, RemoteFile, Type
 from Biosimulations_format_utils.model.data_model import Model, ModelParameter
-from Biosimulations_format_utils.sim.data_model import Simulation, Algorithm, AlgorithmParameter, ParameterChange
+from Biosimulations_format_utils.sim.data_model import TimecourseSimulation, Algorithm, AlgorithmParameter, ParameterChange
 import unittest
 
 
 class SimDataModelTestCase(unittest.TestCase):
-    def test_Simulation(self):
-        sim = Simulation(
+    def test_TimecourseSimulation(self):
+        sim = TimecourseSimulation(
             id='model_1',
             name='model 1',
             image=RemoteFile(name='model.png', type='image/png'),
@@ -36,6 +36,7 @@ class SimDataModelTestCase(unittest.TestCase):
                                 value=5.3),
             ],
             start_time=0.,
+            output_start_time=1.,
             end_time=10.,
             num_time_points=100,
             algorithm=Algorithm(id='00001', name='integrator', parameters=[
@@ -46,7 +47,7 @@ class SimDataModelTestCase(unittest.TestCase):
                                 value=2.1),
             ]
         )
-        self.assertEqual(Simulation.from_json(sim.to_json()), sim)
+        self.assertEqual(TimecourseSimulation.from_json(sim.to_json()), sim)
 
     def test_Algorithm(self):
         alg = Algorithm(id='00001', name='integrator', parameters=[

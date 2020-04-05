@@ -53,7 +53,7 @@ class Format(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.name == other.name \
             and self.version == other.version \
             and self.edam_id == other.edam_id \
@@ -116,7 +116,7 @@ class Identifier(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.namespace == other.namespace \
             and self.id == other.id
 
@@ -214,7 +214,7 @@ class JournalReference(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.authors == other.authors \
             and self.title == other.title \
             and self.journal == other.journal \
@@ -319,7 +319,7 @@ class OntologyTerm(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.ontology == other.ontology \
             and self.id == other.id \
             and self.name == other.name \
@@ -388,7 +388,7 @@ class Person(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.first_name == other.first_name \
             and self.middle_name == other.middle_name \
             and self.last_name == other.last_name
@@ -463,7 +463,7 @@ class RemoteFile(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.name == other.name \
             and self.type == other.type \
             and self.size == other.size
@@ -523,7 +523,7 @@ class Taxon(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.id == other.id \
             and self.name == other.name
 

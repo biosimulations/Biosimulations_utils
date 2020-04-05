@@ -83,7 +83,7 @@ class Model(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.id == other.id \
             and self.name == other.name \
             and self.file == other.file \
@@ -206,7 +206,7 @@ class ModelParameter(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.target == other.target \
             and self.group == other.group \
             and self.id == other.id \
@@ -320,7 +320,7 @@ class Variable(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.target == other.target \
             and self.group == other.group \
             and self.id == other.id \

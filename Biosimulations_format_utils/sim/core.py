@@ -8,7 +8,7 @@
 
 import abc
 
-__all__ = ['SimWriter', 'SimReader', 'SimIoError']
+__all__ = ['SimWriter', 'SimReader', 'SimIoError', 'SimIoWarning']
 
 
 class SimWriter(abc.ABC):
@@ -33,4 +33,9 @@ class SimReader(abc.ABC):
 
 class SimIoError(Exception):
     """ Simulation IO error """
+    pass
+
+
+class SimIoWarning(UserWarning):
+    """ Simulation IO warning """
     pass

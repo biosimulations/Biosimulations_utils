@@ -66,8 +66,8 @@
     }
   ],
   "startTime": 0.0,
+  "outputStartTime": 1.0,
   "endTime": 10.0,
-  "length": 10.0,
   "numTimePoints": 100,
   "algorithm": {
     "id": "KISAO:0000019",

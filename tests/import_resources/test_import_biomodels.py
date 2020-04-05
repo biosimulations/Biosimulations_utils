@@ -75,15 +75,25 @@ class BioModelsImporterTestCase(unittest.TestCase):
         self.assertEqual(models[0].license, License.cc0)
 
         self.assertEqual(stats, {
-            'framework': {
-                'non-spatial continuous framework': 5,
+            'models': {
+                'total': 5,
+                'frameworks': {
+                    'non-spatial continuous framework': 5,
+                },
+                'layouts': 0,
+                'taxa': {
+                    'Amphibia': 2,
+                    'Opisthokonta': 1,
+                    'Tetronarce californica': 2,
+                },
+                'simulated': 0,
             },
-            'layout': 0,
-            'taxon': {
-                'Amphibia': 2,
-                'Opisthokonta': 1,
-                'Tetronarce californica': 2,
-            },
+            'sims': {
+                'total': 0,
+                'time course': 0,
+                'one step': 0,
+                'steady-state': 0,
+            }
         })
 
         for model in models:

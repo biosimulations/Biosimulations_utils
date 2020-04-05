@@ -10,7 +10,7 @@ from ..data_model import Format  # noqa: F401
 from .data_model import Model, ModelParameter, Variable  # noqa: F401
 import abc
 
-__all__ = ['ModelReader']
+__all__ = ['ModelReader', 'ModelIoError', 'ModelIoWarning']
 
 
 class ModelReader(abc.ABC):
@@ -116,4 +116,9 @@ class ModelReader(abc.ABC):
 
 class ModelIoError(Exception):
     """ Model IO error """
+    pass
+
+
+class ModelIoWarning(UserWarning):
+    """ Model IO warning """
     pass

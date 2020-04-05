@@ -6,14 +6,17 @@
 :License: MIT
 """
 
-from .core import SimWriter, SimReader
-from .data_model import Simulation, Algorithm, AlgorithmParameter, ParameterChange
-from ..data_model import Format, JournalReference, License, Person
+from .core import SimWriter, SimReader, SimIoError, SimIoWarning
+from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation,  # noqa: F401
+                         Algorithm, AlgorithmParameter, ParameterChange)
+from ..data_model import Format, JournalReference, License, Person, RemoteFile
 from ..model.data_model import Model, ModelParameter, Variable
 from datetime import datetime
 from xml.sax import saxutils
 import enum
 import libsedml
+import os
+import warnings
 
 __all__ = [
     'SedMlSimWriter',
@@ -290,7 +293,7 @@ class SedMlSimWriter(SimWriter):
         sim_sed = doc_sed.createUniformTimeCourse()
         self._call_libsedml_method(doc_sed, sim_sed, 'setId', 'simulation')
         self._call_libsedml_method(doc_sed, sim_sed, 'setInitialTime', sim.start_time)
-        self._call_libsedml_method(doc_sed, sim_sed, 'setOutputStartTime', sim.start_time)
+        self._call_libsedml_method(doc_sed, sim_sed, 'setOutputStartTime', sim.output_start_time)
         self._call_libsedml_method(doc_sed, sim_sed, 'setOutputEndTime', sim.end_time)
         self._call_libsedml_method(doc_sed, sim_sed, 'setNumberOfPoints', sim.num_time_points)
         return sim_sed
@@ -551,41 +554,83 @@ class SedMlSimReader(SimReader):
             filename (:obj:`str`): path to SED-ML document that describes a simulation experiment
 
         Returns:
-            :obj:`list` of :obj:`Variable`: List of variables in the model. Each variable should have the keys `id` and `target`
-            :obj:`Simulation`: Simulation experiment
-            :obj:`str`: Path to the model definition
+            :obj:`list` of :obj:`Simulation`: simulations
         """
         doc_sed = libsedml.readSedMLFromFile(filename)
 
-        self._assert(doc_sed.getNumModels() == 1, "SED-ML document must have one model")
-        model_sed = doc_sed.getModel(0)
+        models_sed = {}
+        default_model_sed = None
+        default_model = None
+        for i_model, model_sed in enumerate(doc_sed.getListOfModels()):
+            for change_sed in model_sed.getListOfChanges():
+                self._assert(isinstance(change_sed, libsedml.SedChangeAttribute), "Changes must be attribute changes")
+            self._assert(model_sed.getId() not in models_sed, "Models must have unique ids")
+            models_sed[model_sed.getId()] = model_sed
 
-        self._assert(doc_sed.getNumTasks() == 1, "SED-ML document must have one task")
-        task_sed = doc_sed.getTask(0)
-        self._assert(isinstance(task_sed, libsedml.SedTask), "Task must be a single Task")
+            model = Simulation()
+            self._read_model(model_sed, model)
+            if i_model == 0:
+                default_model_sed = model_sed
+                default_model = model
+            elif model != default_model:
+                default_model_sed = None
+                default_model = None
 
-        self._assert(doc_sed.getNumSimulations() == 1, "SED-ML document must have one simulation")
-        sim_sed = doc_sed.getSimulation(0)
-        self._assert(isinstance(sim_sed, libsedml.SedUniformTimeCourse), "Simulation must be a time course")
+        sims_sed = {}
+        default_sim_sed = None
+        default_sim = None
+        for sim_sed in doc_sed.getListOfSimulations():
+            self._assert(sim_sed.getId() not in sims_sed, "Simulations must have unique ids")
+            sims_sed[sim_sed.getId()] = sim_sed
 
-        # self._assert(doc_sed.getNumDataDescriptions() == 0, "Data descriptions are not supported")
-
-        # model variables
-        model_vars = []
-        for data_gen_sed in doc_sed.getListOfDataGenerators():
-            for var_sed in data_gen_sed.getListOfVariables():
-                var_id = var_sed.getId()
-                var_id = var_id[len('var_'):]
-
-                if var_id != 'time':
-                    model_vars.append(Variable(
-                        id=var_id,
-                        target=var_sed.getTarget(),
-                    ))
+            sim = self._create_sim(sim_sed)
+            self._read_sim(sim_sed, sim)
+            if i_model == 0:
+                default_sim_sed = sim_sed
+                default_sim = sim
+            elif sim != default_sim:
+                default_sim_sed = None
+                default_sim = None
 
         # initialize simulation experiment with metadata
-        sim = Simulation()
+        sims = []
+        for task_sed in doc_sed.getListOfTasks():
+            if not isinstance(task_sed, libsedml.SedTask):
+                warnings.warn(
+                    '{} {} of {} is not supported'.format(
+                        task_sed.__class__.__name__, task_sed.getId(), os.path.basename(filename)),
+                    SimIoWarning)
+                continue
 
+            sim = self._create_sim(sim_sed)
+
+            # metadata
+            self._read_metadata(doc_sed, sim)
+
+            # model
+            model_sed = models_sed.get(task_sed.getModelReference(), default_model_sed)
+            self._assert(model_sed is not None, "Model cannot be determined")
+            self._read_model(model_sed, sim)
+            self._read_model_variables(task_sed, sim)
+
+            # simulation
+            sim_sed = sims_sed.get(task_sed.getSimulationReference(), default_sim_sed)
+            self._assert(sim_sed is not None, "Simulation cannot be determined")
+            self._read_sim(sim_sed, sim)
+
+            # append simulation to list of simulations
+            sims.append(sim)
+
+        # return simulations
+        return sims
+
+    def _read_metadata(self, doc_sed, sim):
+        """ Read metadata from a SED document
+
+        Args:
+            doc_sed (:obj:`libsedml.SedDocument`): SED document
+            sim (:obj:`Simulation`): simulation
+        """
         metadata = self._get_obj_annotation(doc_sed)
         for node in metadata:
             if node.prefix == 'dc' and node.name == 'title' and isinstance(node.children, str):
@@ -655,30 +700,80 @@ class SedMlSimReader(SimReader):
             version="L{}V{}".format(doc_sed.getLevel(), doc_sed.getVersion()),
         )
 
+    def _read_model(self, model_sed, sim):
+        """ Read a SED model
+
+        Args:
+            model_sed (:obj:`libsedml.SedModel`): SED model
+            sim (:obj:`Simulation`): simulation
+        """
         # model
         sim.model = Model(
             format=Format(
                 name=self.MODEL_LANGUAGE_NAME,
-            )
+            ),
+            file=RemoteFile(name=model_sed.getSource(), type='application/sbml+xml'),
         )
 
-        # model parameter changes
+        # parameter changes
         sim.model_parameter_changes = []
         for change_sed in model_sed.getListOfChanges():
-            self._assert(isinstance(change_sed, libsedml.SedChangeAttribute),
-                         "Changes must be attribute changes")
             change = self._get_parameter_change_from_model(change_sed)
             sim.model_parameter_changes.append(change)
 
-        # simulation timecourse
-        sim.start_time = float(sim_sed.getInitialTime())
-        self._assert(float(sim_sed.getOutputStartTime()) >= sim.start_time,
-                     "Output time must be at least the start time")
-        sim.end_time = float(sim_sed.getOutputEndTime())
-        sim.length = sim.end_time - sim.start_time
-        sim.num_time_points = int(sim_sed.getNumberOfPoints())
+    def _read_model_variables(self, task_sed, sim):
+        """ Read model variables from SED data generators
 
-        # simulation algorithm
+        Args:
+            task_sed (:obj:`libsedml.Sed`): SED task
+            sim (:obj:`Simulation`): simulation
+        """
+        sim.model.variables = []
+        for data_gen_sed in task_sed.getSedDocument().getListOfDataGenerators():
+            for var_sed in data_gen_sed.getListOfVariables():
+                if var_sed.getTaskReference() == task_sed.getId():
+                    var_id = var_sed.getId()
+                    var_id = var_id[len('var_'):]
+
+                    if var_id != 'time':
+                        sim.model.variables.append(Variable(
+                            id=var_id,
+                            target=var_sed.getTarget(),
+                        ))
+
+    def _create_sim(self, sim_sed):
+        """ Create a simulation for a SED simulation
+
+        Args:
+            sim_sed (:obj:`libsedml.SedSimulation`): SED simulation
+
+        Returns
+            :obj:`Simulation`: simulation
+        """
+        if isinstance(sim_sed, libsedml.SedUniformTimeCourse):
+            return TimecourseSimulation()
+        elif isinstance(sim_sed, libsedml.SedSteadyState):
+            return SteadyStateSimulation()
+        else:
+            raise SimIoError('Unsupported simulation type')
+
+    def _read_sim(self, sim_sed, sim):
+        """ Read a SED simulation
+
+        Args:
+            sim_sed (:obj:`libsedml.SedSimulation`): SED simulation
+            sim (:obj:`Simulation`): simulation
+        """
+        # time course
+        if isinstance(sim_sed, libsedml.SedUniformTimeCourse):
+            sim.start_time = float(sim_sed.getInitialTime())
+            sim.output_start_time = float(sim_sed.getOutputStartTime())
+            self._assert(sim.output_start_time >= sim.start_time,
+                         "Output time must be at least the start time")
+            sim.end_time = float(sim_sed.getOutputEndTime())
+            sim.num_time_points = int(sim_sed.getNumberOfPoints())
+
+        # algorithm
         alg_sed = sim_sed.getAlgorithm()
         alg_props = self._get_obj_annotation(alg_sed)
         alg_name = None
@@ -692,7 +787,7 @@ class SedMlSimReader(SimReader):
             name=alg_name,
         )
 
-        # simulation algorithm parameters
+        # algorithm parameters
         sim.algorithm_parameter_changes = []
         for change_sed in alg_sed.getListOfAlgorithmParameters():
             change_props = self._get_obj_annotation(change_sed)
@@ -709,12 +804,6 @@ class SedMlSimReader(SimReader):
                 ),
                 value=float(change_sed.getValue()),
             ))
-
-        # model filename
-        model_filename = model_sed.getSource()
-
-        # return simulation experiment
-        return (model_vars, sim, model_filename)
 
     def _get_parameter_change_from_model(self, change_sed):
         """ Get a model parameter change from a SED change attribute

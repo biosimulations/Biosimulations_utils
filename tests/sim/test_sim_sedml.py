@@ -10,7 +10,7 @@ from Biosimulations_format_utils.data_model import Format
 from Biosimulations_format_utils.model import ModelFormat
 from Biosimulations_format_utils.model.data_model import Model, Variable
 from Biosimulations_format_utils.sim import SimFormat, write_sim, read_sim, sedml
-from Biosimulations_format_utils.sim.data_model import Simulation
+from Biosimulations_format_utils.sim.data_model import TimecourseSimulation
 import json
 import libsedml
 import os
@@ -32,20 +32,24 @@ class WriteSedMlTestCase(unittest.TestCase):
             Variable(id='species_2', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_2']"),
         ]
         with open('tests/fixtures/simulation.json', 'rb') as file:
-            sim = Simulation.from_json(json.load(file))
+            sim = TimecourseSimulation.from_json(json.load(file))
         model_filename = os.path.join(self.dirname, 'model.sbml.xml')
         sim_filename = os.path.join(self.dirname, 'simulation.sed-ml.xml')
         write_sim(model_vars, sim, model_filename, sim_filename,
                   SimFormat.sedml, level=1, version=3)
 
-        model_vars_2, sim_2, model_filename_2 = read_sim(
+        sims_2 = read_sim(
             sim_filename, ModelFormat.sbml, SimFormat.sedml)
+        self.assertEqual(len(sims_2), 1)
+        sim_2 = sims_2[0]
         self.assertEqual(
-            set(s.id for s in model_vars_2),
-            set(s.id for s in model_vars))
-        self.assertEqual(model_filename_2, model_filename)
+            set(v.id for v in sim_2.model.variables),
+            set(v.id for v in model_vars))
+        self.assertEqual(sim_2.model.file.name, model_filename)
+        sim_2.model.file = None
+        sim_2.model.variables = []
         self.assertEqual(sim_2, sim)
-        self.assertEqual(sim.format.version, 'L1V3')
+        self.assertEqual(sim_2.format.version, 'L1V3')
 
         with self.assertRaisesRegex(NotImplementedError, 'not supported'):
             read_sim(None, ModelFormat.sbml, SimFormat.sessl)
@@ -55,7 +59,7 @@ class WriteSedMlTestCase(unittest.TestCase):
 
     def test_gen_sedml_errors(self):
         # Other versions/levels of SED-ML are not supported
-        sim = Simulation(
+        sim = TimecourseSimulation(
             model=Model(
                 format=Format(
                     name='SBML'
@@ -70,7 +74,7 @@ class WriteSedMlTestCase(unittest.TestCase):
             write_sim(None, sim, None, None, SimFormat.sedml, level=1, version=3)
 
         # other simulation experiments formats (e.g., SESSL) are not supported
-        sim = Simulation(
+        sim = TimecourseSimulation(
             model=Model(
                 format=Format(
                     name='SBML'
@@ -86,7 +90,7 @@ class WriteSedMlTestCase(unittest.TestCase):
             write_sim(None, sim, None, None, SimFormat.sedml, level=1, version=3)
 
         # other simulation experiments formats (e.g., SESSL) are not supported
-        sim = Simulation(
+        sim = TimecourseSimulation(
             model=Model(
                 format=Format(
                     name='CellML'
@@ -124,9 +128,12 @@ class WriteSedMlTestCase(unittest.TestCase):
             sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setAnnotation', '<rdf')
 
     def test_read_biomodels_sims(self):
-        _, sim, _ = read_sim('tests/fixtures/Simon2019.sedml', ModelFormat.sbml, SimFormat.sedml)
+        sims = read_sim('tests/fixtures/Simon2019.sedml', ModelFormat.sbml, SimFormat.sedml)
+        self.assertEqual(len(sims), 1)
+        sim = sims[0]
         self.assertEqual(sim.model_parameter_changes, [])
         self.assertEqual(sim.start_time, 0.)
+        self.assertEqual(sim.output_start_time, 0.)
         self.assertEqual(sim.end_time, 1.)
         self.assertEqual(sim.num_time_points, 100)
         self.assertEqual(sim.algorithm.id, 'KISAO:0000019')

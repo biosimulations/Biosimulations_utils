@@ -50,10 +50,7 @@ def read_sim(filename, model_format, sim_format):
         sim_format (:obj:`SimFormat`): simulation experiment format
 
     Returns:
-        :obj:`list` of :obj:`dict`: List of variables in the model. Each variable will have the keys `id` and `target`.
-        :obj:`dict`: Simulation experiment
-        :obj:`str`: Path to the model definition
-        :obj:`dict`: simulation experiment format options (e.g., level, version)
+        :obj:`list` of :obj:`Simulation`: simulations
     """
     if sim_format == SimFormat.sedml:
         if model_format == ModelFormat.sbml:

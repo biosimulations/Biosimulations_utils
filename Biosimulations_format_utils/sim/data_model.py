@@ -9,7 +9,10 @@
 from ..data_model import Format, Identifier, JournalReference, License, Person, RemoteFile, Type
 from ..model.data_model import Model, ModelParameter
 
-__all__ = ['Simulation', 'Algorithm', 'AlgorithmParameter', 'ParameterChange']
+__all__ = [
+    'Simulation', 'TimecourseSimulation', 'SteadyStateSimulation',
+    'Algorithm', 'AlgorithmParameter', 'ParameterChange',
+]
 
 
 class Simulation(object):
@@ -28,10 +31,6 @@ class Simulation(object):
         format (:obj:`Format`): format
         model (:obj:`Model`): model
         model_parameter_changes (:obj:`list` of :obj:`ParameterChange`): model parameter changes
-        start_time (:obj:`float`): start time
-        end_time (:obj:`float`): end time
-        length (:obj:`float`): length
-        num_time_points (:obj:`int`): number of time points to record
         algorithm (:obj:`Algorithm`): simulation algorithm
         algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`): simulation algorithm parameter changes
     """
@@ -39,8 +38,7 @@ class Simulation(object):
     def __init__(self, id=None, name=None, image=None, description=None,
                  tags=None, identifiers=None, refs=None, authors=None, license=None, format=None,
                  model=None, model_parameter_changes=None,
-                 start_time=None, end_time=None, num_time_points=None,
-                 algorithm=None, algorithm_parameter_changes=None, ):
+                 algorithm=None, algorithm_parameter_changes=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -55,9 +53,6 @@ class Simulation(object):
             format (:obj:`Format`, optional): format
             model (:obj:`Model`, optional): model
             model_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): model parameter changes
-            start_time (:obj:`float`, optional): start time
-            end_time (:obj:`float`, optional): end time
-            num_time_points (:obj:`int`, optional): number of time points to record
             algorithm (:obj:`Algorithm`, optional): simulation algorithm
             algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes
         """
@@ -73,10 +68,6 @@ class Simulation(object):
         self.format = format
         self.model = model
         self.model_parameter_changes = model_parameter_changes or []
-        self.start_time = start_time
-        self.end_time = end_time
-        self.length = end_time - start_time if start_time is not None and end_time is not None else None
-        self.num_time_points = num_time_points
         self.algorithm = algorithm
         self.algorithm_parameter_changes = algorithm_parameter_changes or []
 
@@ -89,7 +80,7 @@ class Simulation(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.id == other.id \
             and self.name == other.name \
             and self.image == other.image \
@@ -103,9 +94,6 @@ class Simulation(object):
             and self.model == other.model \
             and sorted(self.model_parameter_changes, key=ParameterChange.sort_key) == \
             sorted(other.model_parameter_changes, key=ParameterChange.sort_key) \
-            and self.start_time == other.start_time \
-            and self.end_time == other.end_time \
-            and self.num_time_points == other.num_time_points \
             and self.algorithm == other.algorithm \
             and sorted(self.algorithm_parameter_changes, key=ParameterChange.sort_key) == \
             sorted(other.algorithm_parameter_changes, key=ParameterChange.sort_key)
@@ -129,10 +117,6 @@ class Simulation(object):
             'format': self.format.to_json() if self.format else None,
             'model': self.model.to_json() if self.model else None,
             'modelParameterChanges': [change.to_json() for change in self.model_parameter_changes],
-            'startTime': self.start_time,
-            'endTime': self.end_time,
-            'length': self.length,
-            'numTimePoints': self.num_time_points,
             'algorithm': self.algorithm.to_json() if self.algorithm else None,
             'algorithmParameterChanges': [change.to_json() for change in self.algorithm_parameter_changes],
         }
@@ -147,7 +131,12 @@ class Simulation(object):
         Returns:
             :obj:`Simulation`
         """
-        return cls(
+        if 'startTime' in val or 'endTime' in val or 'numTimePoints' in val:
+            SimCls = TimecourseSimulation
+        else:
+            SimCls = SteadyStateSimulation
+
+        return SimCls(
             id=val.get('id', None),
             name=val.get('name', None),
             image=RemoteFile.from_json(val.get('image')) if val.get('image', None) else None,
@@ -161,13 +150,107 @@ class Simulation(object):
             model=Model.from_json(val.get('model')) if val.get('model', None) else None,
             model_parameter_changes=[ParameterChange.from_json(change, ModelParameter)
                                      for change in val.get('modelParameterChanges', [])],
-            start_time=val.get('startTime', None),
-            end_time=val.get('endTime', None),
-            num_time_points=val.get('numTimePoints', None),
             algorithm=Algorithm.from_json(val.get('algorithm')) if val.get('algorithm', None) else None,
             algorithm_parameter_changes=[ParameterChange.from_json(change, AlgorithmParameter)
                                          for change in val.get('algorithmParameterChanges', [])]
         )
+
+
+class TimecourseSimulation(Simulation):
+    """ Timecourse simulation
+
+    Attributes:
+        start_time (:obj:`float`): start time
+        output_start_time (:obj:`float`): time to begin recording simulation results
+        end_time (:obj:`float`): end time
+        num_time_points (:obj:`int`): number of time points to record
+    """
+
+    def __init__(self, id=None, name=None, image=None, description=None,
+                 tags=None, identifiers=None, refs=None, authors=None, license=None, format=None,
+                 model=None, model_parameter_changes=None,
+                 start_time=None, output_start_time=None, end_time=None, num_time_points=None,
+                 algorithm=None, algorithm_parameter_changes=None):
+        """
+        Args:
+            id (:obj:`str`, optional): id
+            name (:obj:`str`, optional): name
+            image (:obj:`RemoteFile`, optional): image file
+            description (:obj:`str`, optional): description
+            tags (:obj:`list` of :obj:`str`, optional): tags
+            identifiers (:obj:`list` of :obj:`Identifier`, optional): identifiers
+            refs (:obj:`list` of :obj:`JournalReference`, optional): references
+            authors (:obj:`list` of :obj:`Person`, optional): authors
+            license (:obj:`License`, optional): license
+            format (:obj:`Format`, optional): format
+            model (:obj:`Model`, optional): model
+            model_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): model parameter changes
+            start_time (:obj:`float`, optional): start time
+            output_start_time (:obj:`float`, start): time to begin recording simulation results
+            end_time (:obj:`float`, optional): end time
+            num_time_points (:obj:`int`, optional): number of time points to record
+            algorithm (:obj:`Algorithm`, optional): simulation algorithm
+            algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes
+        """
+        super(TimecourseSimulation, self).__init__(id=id, name=name, image=image, description=description,
+                                                   tags=tags, identifiers=identifiers,
+                                                   refs=refs, authors=authors, license=license, format=format,
+                                                   model=model, model_parameter_changes=model_parameter_changes,
+                                                   algorithm=algorithm, algorithm_parameter_changes=algorithm_parameter_changes)
+        self.start_time = start_time
+        self.output_start_time = output_start_time
+        self.end_time = end_time
+        self.num_time_points = num_time_points
+
+    def __eq__(self, other):
+        """ Determine if two simulations are semantically equal
+
+        Args:
+            other (:obj:`TimecourseSimulation`): other algorithm
+
+        Returns:
+            :obj:`bool`
+        """
+        return super(TimecourseSimulation, self).__eq__(other) \
+            and self.start_time == other.start_time \
+            and self.output_start_time == other.output_start_time \
+            and self.end_time == other.end_time \
+            and self.num_time_points == other.num_time_points
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        val = super(TimecourseSimulation, self).to_json()
+        val['startTime'] = self.start_time
+        val['outputStartTime'] = self.output_start_time
+        val['endTime'] = self.end_time
+        val['numTimePoints'] = self.num_time_points
+        return val
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create simulation from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`TimecourseSimulation`
+        """
+        obj = super(TimecourseSimulation, cls).from_json(val)
+        obj.start_time = val.get('startTime', None)
+        obj.output_start_time = val.get('outputStartTime', None)
+        obj.end_time = val.get('endTime', None)
+        obj.num_time_points = val.get('numTimePoints', None)
+        return obj
+
+
+class SteadyStateSimulation(Simulation):
+    """ Steady-state simulation """
+    pass
 
 
 class Algorithm(object):
@@ -199,7 +282,7 @@ class Algorithm(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.id == other.id \
             and self.name == other.name \
             and sorted(self.parameters, key=AlgorithmParameter.sort_key) == sorted(other.parameters, key=AlgorithmParameter.sort_key)
@@ -268,7 +351,7 @@ class AlgorithmParameter(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.id == other.id \
             and self.name == other.name \
             and self.type == other.type \
@@ -346,7 +429,7 @@ class ParameterChange(object):
         Returns:
             :obj:`bool`
         """
-        return isinstance(other, self.__class__) \
+        return other.__class__ == self.__class__ \
             and self.parameter == other.parameter \
             and self.value == other.value
 

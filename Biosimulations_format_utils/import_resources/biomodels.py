@@ -13,8 +13,8 @@ from ..model.core import ModelIoError
 from ..model.data_model import Model  # noqa: F401
 from ..model.sbml import viz_model
 from ..sim import SimFormat, read_sim
-from ..sim.core import SimIoError
-from ..sim.data_model import Simulation  # noqa: F401
+from ..sim.core import SimIoWarning
+from ..sim.data_model import Simulation
 import copy
 import json
 import libsbml
@@ -70,9 +70,15 @@ class BioModelsImporter(object):
             :obj:`list` of :obj:`Simulation`: simulations
             :obj:`dict`: statistics about the models
         """
-        models, sims = self.get_models()
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            warnings.simplefilter('ignore')
+            warnings.simplefilter('always', SimIoWarning)
+            models, sims = self.get_models()
+        if caught_warnings:
+            warnings.warn('Unable to import all simlations:\n  ' + '\n  '.join(
+                str(w.message) for w in caught_warnings), UserWarning)
         self.submit_models(models)
-        stats = self.get_model_stats(models)
+        stats = self.get_stats(models, sims)
         self.write_data(models, sims, stats)
         return (models, sims, stats)
 
@@ -290,33 +296,43 @@ class BioModelsImporter(object):
 
         # get information about simulation(s)
         sims = []
+        num_sim_files = 0
         for file_metadata in files_metadata['additional']:
             if file_metadata['name'].endswith('.sedml'):
-                local_path = os.path.join(self._cache_dir, '{}-sim-{}.sedml'.format(model.id, len(sims) + 1))
+                num_sim_files += 1
+                local_path = os.path.join(self._cache_dir, '{}-{}.sedml'.format(model.id, num_sim_files))
                 with open(local_path, 'wb') as file:
                     file.write(self.get_model_file(id, file_metadata['name']))
 
-                try:
-                    sim = read_sim(local_path, ModelFormat.sbml, SimFormat.sedml)
+                model_sims = read_sim(local_path, ModelFormat.sbml, SimFormat.sedml)
+
+                model_files = set([sim.model.file.name for sim in model_sims]).difference(set(['model']))
+                assert len(model_files) <= 1, 'Each simulation must use the same model'
+
+                for sim in model_sims:
                     sim.id = '{}-sim-{}'.format(model.id, len(sims) + 1)
                     sim.name = file_metadata['name'][0:-6]
-                    if os.path.isfile(os.path.join(self._cache_dir, model.id + '.png')):
-                        sim.image = copy.deepcopy(model.image)
-                        sim.image.name = sim.id + '.png'
-                        shutil.copyfile(os.path.join(self._cache_dir, model.id + '.png'), os.path.join(self._cache_dir, sim.image.name))
+                    model_img = os.path.join(self._cache_dir, model.id + '.png')
+                    if os.path.isfile(model_img):
+                        sim.image = RemoteFile(
+                            name=sim.id + '.png',
+                            type='image/png',
+                            size=os.path.getsize(model_img))
+                        shutil.copyfile(model_img, os.path.join(self._cache_dir, sim.image.name))
                     sim.description = file_metadata['description']
                     sim.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
                     sim.refs = copy.deepcopy(model.refs)
                     sim.authors = copy.deepcopy(model.authors)
                     sim.license = License.cc0
-                    sim.append(sim)
-                except SimIoError:
-                    os.remove(local_path)
+                    sim.model.id = model.id
+                    sim.model.name = model.name
+                    sim.model.file = None
+                sims.extend(model_sims)
         if len(sims) == 1:
             sims[0].id = '{}-sim'.format(model.id)
             os.rename(
-                os.path.join(self._cache_dir, '{}-sim-{}.sedml'.format(model.id, 1)),
-                os.path.join(self._cache_dir, '{}-sim.sedml'.format(model.id)))
+                os.path.join(self._cache_dir, '{}-{}.sedml'.format(model.id, 1)),
+                os.path.join(self._cache_dir, '{}.sedml'.format(model.id)))
             os.rename(os.path.join(self._cache_dir, sim.image.name), os.path.join(self._cache_dir, sims[0].id + '.png'))
             sims[0].image.name = sims[0].id + '.png'
 
@@ -441,32 +457,54 @@ class BioModelsImporter(object):
 
         return (models, sims, stats)
 
-    def get_model_stats(self, models):
+    def get_stats(self, models, sims):
         """ Calculate statistics about the imported models
+
+        Args:
+            models (:obj:`list` of :obj:`Model`): models
+            sims (:obj:`list` of :obj:`Simulation`): simulations
 
         Returns:
             :obj:`dict`: statistics about the imported models
         """
         stats = {
-            'framework': {},
-            'layout': 0,
-            'taxon': {},
+            'models': {
+                'total': len(models),
+                'frameworks': {},
+                'layouts': 0,
+                'taxa': {},
+                'simulated': len(set(sim.model.id for sim in sims)),
+            },
+            'sims': {
+                'total': len(sims),
+                'time course': 0,
+                'one step': 0,
+                'steady-state': 0,
+            }
         }
 
         for model in models:
             framework = model.framework.name
-            if framework not in stats['framework']:
-                stats['framework'][framework] = 0
-            stats['framework'][framework] += 1
+            if framework not in stats['models']['frameworks']:
+                stats['models']['frameworks'][framework] = 0
+            stats['models']['frameworks'][framework] += 1
 
             doc = libsbml.readSBMLFromFile(os.path.join(self._cache_dir, model.id + '.xml'))
-            plugin = doc.getModel().getPlugin('layout')
+            plugin = doc.getModel().getPlugin('layouts')
             if plugin and plugin.getNumLayouts():
-                stats['layout'] += 1
+                stats['models']['layouts'] += 1
 
             if model.taxon:
-                if model.taxon.name not in stats['taxon']:
-                    stats['taxon'][model.taxon.name] = 0
-                stats['taxon'][model.taxon.name] += 1
+                if model.taxon.name not in stats['models']['taxa']:
+                    stats['models']['taxa'][model.taxon.name] = 0
+                stats['models']['taxa'][model.taxon.name] += 1
+
+        for sim in sims:
+            if sim.num_time_points is None:
+                stats['sims']['steady-state'] += 1
+            elif sim.num_time_points == 2:
+                stats['sims']['one step'] += 1
+            else:
+                stats['sims']['time course'] += 1
 
         return stats

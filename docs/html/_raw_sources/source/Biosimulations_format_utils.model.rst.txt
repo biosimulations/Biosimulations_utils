@@ -1,0 +1,42 @@
+Biosimulations\_format\_utils.model package
+===========================================
+
+Submodules
+----------
+
+Biosimulations\_format\_utils.model.core module
+-----------------------------------------------
+
+.. automodule:: Biosimulations_format_utils.model.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Biosimulations\_format\_utils.model.data\_model module
+------------------------------------------------------
+
+.. automodule:: Biosimulations_format_utils.model.data_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Biosimulations\_format\_utils.model.sbml module
+-----------------------------------------------
+
+.. automodule:: Biosimulations_format_utils.model.sbml
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+
+Module contents
+---------------
+
+.. automodule:: Biosimulations_format_utils.model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

@@ -1,0 +1,52 @@
+Biosimulations\_format\_utils package
+=====================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   Biosimulations_format_utils.import_resources
+   Biosimulations_format_utils.model
+   Biosimulations_format_utils.sim
+
+Submodules
+----------
+
+Biosimulations\_format\_utils.\_version module
+----------------------------------------------
+
+.. automodule:: Biosimulations_format_utils._version
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Biosimulations\_format\_utils.data\_model module
+------------------------------------------------
+
+.. automodule:: Biosimulations_format_utils.data_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Biosimulations\_format\_utils.utils module
+------------------------------------------
+
+.. automodule:: Biosimulations_format_utils.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+
+Module contents
+---------------
+
+.. automodule:: Biosimulations_format_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

@@ -19,5 +19,6 @@ docs/html/_raw_sources/.doctrees/
 docs/**/.doctrees/
 *.pickle
 **/*.doctree
+docs/html/_sources/.doctrees/
 # converted README for PyPI
 README.rst

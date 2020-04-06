@@ -22,18 +22,18 @@ class ConfigTestCase(unittest.TestCase):
         self.assertIn('owner', response[0])
         self.assertIn('created', response[0])
 
-    def test_login(self):
+    def test_login_logout(self):
         client = api_client.ApiClient(_dry_run=True)
         client.login()
         self.assertEqual(client._device_code, '')
-        self.assertEqual(client._auth, ' ')
+        self.assertEqual(client._auth, {'type': '', 'token': ''})
         client.logout()
         self.assertEqual(client._device_code, None)
         self.assertEqual(client._auth, None)
 
     def test_put(self):
         client = api_client.ApiClient(_dry_run=True)
-        client._auth = 'bearer ZZZ'
+        client._auth = {'type': 'bearer', 'token': 'ZZZ'}
         result = client.exec('post', '/models/new-model', {
             'id': 'new-model',
         })
@@ -66,3 +66,6 @@ class ConfigTestCase(unittest.TestCase):
 
         response = client.exec('get', '/models/' + id)
         assert response['name'] == name
+
+        # logout
+        client.logout()

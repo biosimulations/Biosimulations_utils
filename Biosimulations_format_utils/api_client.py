@@ -21,7 +21,7 @@ class ApiClient(object):
         config (:obj:`object`): package configuration
         _dry_run (:obj:`bool`): if :obj:`True`, do not execute HTTP requests
         _device_code (:obj:`str`): auth0 code for a device
-        _auth (:obj:str`): auth0 authorization header for a device for a user's account
+        _auth (:obj:`dict`): auth0 authorization type and token for a device for a user's account
     """
 
     def __init__(self, config=config, _dry_run=False):
@@ -42,8 +42,28 @@ class ApiClient(object):
 
     def logout(self):
         """ Logout of BioSimulations """
+        assert self._auth, "Must be logged into BioSimulations"
+
+        if self._dry_run:
+            patch = mock.patch('requests.post', return_value=mock.Mock(
+                raise_for_status=lambda: None,
+                content=b'',
+                json=lambda: collections.defaultdict(str),
+            ))
+            patch.start()
+
+        response = requests.post(self.config.auth0.endpoint + '/oauth/revoke', json={
+            'client_id': self.config.auth0.client_id,
+            'token': self._auth['token'],
+        })
+        response.raise_for_status()
+        assert response.content == b''
+
         self._device_code = None
         self._auth = None
+
+        if self._dry_run:
+            patch.stop()
 
     def _get_device_code(self):
         """ Get a device code to authorize access to a BioSimulations account """
@@ -97,7 +117,7 @@ class ApiClient(object):
         })
         response.raise_for_status()
         content = response.json()
-        self._auth = '{} {}'.format(content['token_type'], content['access_token'])
+        self._auth = {'type': content['token_type'], 'token': content['access_token']}
 
         if self._dry_run:
             patch.stop()
@@ -129,7 +149,7 @@ class ApiClient(object):
 
         if self._auth:
             opts['headers'] = {
-                'Authorization': self._auth,
+                'Authorization': '{} {}'.format(self._auth['type'], self._auth['token']),
             }
 
         response = request_func(self.config.api.endpoint + route, **opts)

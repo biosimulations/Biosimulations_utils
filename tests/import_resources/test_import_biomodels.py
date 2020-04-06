@@ -25,7 +25,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
         shutil.rmtree(self.dirname)
 
     def test(self):
-        importer = biomodels.BioModelsImporter(_max_models=6, _cache_dir=self.dirname)
+        importer = biomodels.BioModelsImporter(_max_models=6, _cache_dir=self.dirname, _dry_run=True)
         return_value = {
             'matches': 925,
             'models': [

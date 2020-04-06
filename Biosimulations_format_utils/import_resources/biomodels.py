@@ -6,6 +6,7 @@
 :License: MIT
 """
 
+from ..api_client import ApiClient
 from ..data_model import Identifier, JournalReference, License, Person, RemoteFile
 from ..model import ModelFormat, read_model
 from ..model.core import ModelIoError
@@ -37,6 +38,7 @@ class BioModelsImporter(object):
     Attributes:
         _max_models (:obj:`int`): maximum number of models to download from BioModels
         _cache_dir (:obj:`str`): directory to cache models from BioModels
+        _dry_run (:obj:`bool`): if :obj:`True`, do not post models to BioModels
         _requests_session (:obj:`requests_cache.core.CachedSession`): requests cached session
     """
     BIOMODELS_ENDPOINT = 'https://www.ebi.ac.uk/biomodels'
@@ -45,9 +47,16 @@ class BioModelsImporter(object):
     NUM_MODELS_PER_BATCH = 100
     MAX_RETRIES = 5
 
-    def __init__(self, _max_models=float('inf'), _cache_dir=None):
+    def __init__(self, _max_models=float('inf'), _cache_dir=None, _dry_run=False):
+        """
+        Args:
+            _max_models (:obj:`int`, optional): maximum number of models to download from BioModels
+            _cache_dir (:obj:`str`, optional): directory to cache models from BioModels
+            _dry_run (:obj:`bool`, optional): if :obj:`True`, do not post models to BioModels
+        """
         self._max_models = _max_models
         self._cache_dir = _cache_dir
+        self._dry_run = _dry_run
         self.init_requests_cache()
 
     def init_requests_cache(self):
@@ -76,7 +85,7 @@ class BioModelsImporter(object):
         if caught_warnings:
             warnings.warn('Unable to import all simlations:\n  ' + '\n  '.join(
                 str(w.message) for w in caught_warnings), UserWarning)
-        self.submit_models(models)
+        self.submit_models(models, sims)
         stats = self.get_stats(models, sims)
         self.write_data(models, sims, stats)
         return (models, sims, stats)
@@ -401,16 +410,21 @@ class BioModelsImporter(object):
         img.name = model.file.name[0:-4] + '.png'
         return img
 
-    def submit_models(self, models):
-        """ Post models to BioSimulations
+    def submit_models(self, models, sims):
+        """ Post models and simulations to BioSimulations
 
         Args:
             models (:obj:`list` of :obj:`Model`):
+            sims (:obj:`list` of :obj:`Simulation`): simulations
         """
+        api_client = ApiClient(_dry_run=self._dry_run)
+        api_client.login()
+
         for model in models:
-            # Todo: submit models to BioSimulations
-            # requests.post(self.BIOSIMULATIONS_ENDPOINT)
-            pass
+            api_client.exec('post', '/models/' + model.id, data=model.to_json())
+
+        for sim in sims:
+            api_client.exec('post', '/simulations/' + sim.id, data=sim.to_json())
 
     def write_data(self, models, sims, stats):
         """ Save models and simulations to JSON files

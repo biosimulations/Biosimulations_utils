@@ -52,7 +52,7 @@ def read_sim(filename, model_format, sim_format):
 
     Returns:
         :obj:`list` of :obj:`Simulation`: simulations
-        :obj:`list` of :obj:`Visualization`: visualizations
+        :obj:`Visualization`: visualization
     """
     if sim_format == SimFormat.sedml:
         if model_format == ModelFormat.sbml:

@@ -549,7 +549,7 @@ class SedMlSimReader(SimReader):
 
         Returns:
             :obj:`list` of :obj:`Simulation`: simulations
-            :obj:`list` of :obj:`Visualization`: visualizations
+            :obj:`Visualization`: visualization
         """
         doc_sed = libsedml.readSedMLFromFile(filename)
         if doc_sed.getErrorLog().getNumFailsWithSeverity(libsedml.LIBSEDML_SEV_ERROR):
@@ -618,7 +618,11 @@ class SedMlSimReader(SimReader):
 
             # append simulation to list of simulations
             sims.append(sim)
-            task_id_to_sim[task_sed.getId()] = sim
+            task_id = task_sed.getId()
+            if task_id in task_id_to_sim:
+                task_id_to_sim[task_id] = None
+            else:
+                task_id_to_sim[task_id] = sim
 
         # data generators
         data_gen_id_to_task_id = {}
@@ -627,21 +631,29 @@ class SedMlSimReader(SimReader):
         for data_gen_sed in doc_sed.getListOfDataGenerators():
             if data_gen_sed.getNumParameters() == 0 and data_gen_sed.getNumVariables() == 1 and data_gen_sed.getMath().isCiNumber():
                 var_sed = data_gen_sed.getVariable(0)
-                data_gen_id_to_task_id[data_gen_sed.getId()] = var_sed.getTaskReference()
-                if var_sed.getTarget():
-                    data_gen_id_to_var_target[data_gen_sed.getId()] = var_sed.getTarget()
-                elif var_sed.getSymbol() == 'urn:sedml:symbol:time':
-                    time_data_gen_ids.append(data_gen_sed.getId())
+                data_gen_id = data_gen_sed.getId()
+                if data_gen_id in data_gen_id_to_task_id:
+                    data_gen_id_to_task_id[data_gen_id] = None
+                    data_gen_id_to_var_target[data_gen_id] = None
+                else:
+                    data_gen_id_to_task_id[data_gen_id] = var_sed.getTaskReference()
+                    if var_sed.getTarget():
+                        data_gen_id_to_var_target[data_gen_id] = var_sed.getTarget()
+                    elif var_sed.getSymbol() == 'urn:sedml:symbol:time':
+                        time_data_gen_ids.append(data_gen_id)
 
         # visualizations (Output > Plot2D)
-        vizs = []
+        viz = Visualization()
         for output_sed in doc_sed.getListOfOutputs():
             if not isinstance(output_sed, libsedml.SedPlot2D):
                 warnings.warn('{} is not supported'.format(output_sed.__class__.__name__), SimIoWarning)
                 continue
 
-            if output_sed.getNumCurves() == 0:
-                continue
+            if len(set([(curve_sed.getXDataReference(), curve_sed.getLogX()) for curve_sed in output_sed.getListOfCurves()])) > 1:
+                raise SimIoError('Curves must have the same X axis')
+
+            if len(set([curve_sed.getLogY() for curve_sed in output_sed.getListOfCurves()])) > 1:
+                raise SimIoError('Curves must have the same Y axis')
 
             x_sim_results = []
             y_sim_results = []
@@ -649,8 +661,10 @@ class SedMlSimReader(SimReader):
                 x_data_gen_id = curve_sed.getXDataReference()
                 y_data_gen_id = curve_sed.getYDataReference()
 
-                x_task_id = data_gen_id_to_task_id[x_data_gen_id]
-                y_task_id = data_gen_id_to_task_id[y_data_gen_id]
+                x_task_id = data_gen_id_to_task_id.get(x_data_gen_id, None)
+                y_task_id = data_gen_id_to_task_id.get(y_data_gen_id, None)
+                if not x_task_id or not y_task_id:
+                    continue
 
                 x_sim = task_id_to_sim.get(x_task_id, None)
                 y_sim = task_id_to_sim.get(y_task_id, None)
@@ -670,33 +684,43 @@ class SedMlSimReader(SimReader):
                 x_sim_results.append(SimulationResult(simulation=x_sim, variable=x_var))
                 y_sim_results.append(SimulationResult(simulation=y_sim, variable=y_var))
 
-            viz = Visualization(layout=[
-                VisualizationLayoutElement(
-                    chart_type=ChartType(id='2d-line'),
-                    data=[
-                        VisualizationDataField(
-                            data_field=ChartTypeDataField(
-                                name='x',
-                                shape=ChartTypeDataFieldShape.array,
-                                type=ChartTypeDataFieldType.dynamic_simulation_result,
-                            ),
-                            simulation_results=x_sim_results,
+            if not x_sim_results:
+                continue
+
+            chart_type_id = 'line'
+            if output_sed.getCurve(0).getLogX():
+                chart_type_id += '-logX'
+            if output_sed.getCurve(0).getLogY():
+                chart_type_id += '-logY'
+
+            layout_el = VisualizationLayoutElement(
+                chart_type=ChartType(id=chart_type_id),
+                data=[
+                    VisualizationDataField(
+                        data_field=ChartTypeDataField(
+                            name='x',
+                            shape=ChartTypeDataFieldShape.array,
+                            type=ChartTypeDataFieldType.dynamic_simulation_result,
                         ),
-                        VisualizationDataField(
-                            data_field=ChartTypeDataField(
-                                name='y',
-                                shape=ChartTypeDataFieldShape.array,
-                                type=ChartTypeDataFieldType.dynamic_simulation_result,
-                            ),
-                            simulation_results=y_sim_results,
+                        simulation_results=x_sim_results[slice(0, 1)],
+                    ),
+                    VisualizationDataField(
+                        data_field=ChartTypeDataField(
+                            name='y',
+                            shape=ChartTypeDataFieldShape.array,
+                            type=ChartTypeDataFieldType.dynamic_simulation_result,
                         ),
-                    ],
-                ),
-            ])
-            vizs.append(viz)
+                        simulation_results=y_sim_results,
+                    ),
+                ],
+            )
+            viz.layout.append(layout_el)
+
+        if not viz.layout:
+            viz = None
 
         # return simulations and visualizations
-        return (sims, vizs)
+        return (sims, viz)
 
     def _read_metadata(self, doc_sed, sim):
         """ Read metadata from a SED document

@@ -328,13 +328,13 @@ class BioModelsImporter(object):
                 with open(local_path, 'wb') as file:
                     file.write(self.get_model_file(id, file_metadata['name']))
 
-                model_sims, model_vizs = read_sim(local_path, ModelFormat.sbml, SimFormat.sedml)
+                model_sims, model_viz = read_sim(local_path, ModelFormat.sbml, SimFormat.sedml)
 
                 model_files = set([sim.model.file.name for sim in model_sims]).difference(set(['model']))
                 assert len(model_files) <= 1, 'Each simulation must use the same model'
 
-                for i_sim, sim in enumerate(model_sims):
-                    sim.id = '{}-sim-{}'.format(model.id, i_sim + 1)
+                for sim in model_sims:
+                    sim.id = '{}-sim-{}'.format(model.id, len(sims))
                     sim.name = file_metadata['name'][0:-6]
                     sim.description = file_metadata['description']
                     sim.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
@@ -346,15 +346,15 @@ class BioModelsImporter(object):
                     sim.model.file = None
                     sims.append(sim)
 
-                for i_viz, viz in enumerate(model_vizs):
-                    viz.id = '{}-viz-{}'.format(model.id, i_viz + 1)
-                    viz.name = file_metadata['name'][0:-6]
-                    viz.description = file_metadata['description']
-                    viz.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
-                    viz.references = copy.deepcopy(model.references)
-                    viz.authors = copy.deepcopy(model.authors)
-                    viz.license = License.cc0
-                    vizs.append(viz)
+                if model_viz:
+                    model_viz.id = '{}-viz-{}'.format(model.id, len(vizs) + 1)
+                    model_viz.name = file_metadata['name'][0:-6]
+                    model_viz.description = file_metadata['description']
+                    model_viz.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
+                    model_viz.references = copy.deepcopy(model.references)
+                    model_viz.authors = copy.deepcopy(model.authors)
+                    model_viz.license = License.cc0
+                    vizs.append(model_viz)
 
         if len(sims) == 1:
             sims[0].id = '{}-sim'.format(model.id)
@@ -362,6 +362,7 @@ class BioModelsImporter(object):
                 os.path.join(self._cache_dir, '{}-{}.sedml'.format(model.id, 1)),
                 os.path.join(self._cache_dir, '{}.sedml'.format(model.id)))
 
+        if len(vizs) == 1:
             vizs[0].id = '{}-viz'.format(model.id)
 
         return (model, sims, vizs)

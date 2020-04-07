@@ -124,7 +124,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
                 'steady-state': 1,
             },
             'vizs': {
-                'total': 6,
+                'total': 1,
             },
         })
 

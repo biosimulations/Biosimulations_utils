@@ -157,13 +157,14 @@ class WriteSedMlTestCase(unittest.TestCase):
 
     def test_read_visualizations(self):
         filename = 'tests/fixtures/BIOMD0000000297.sedml'
-        sims, vizs = read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
-        self.assertEqual(len(vizs), 4)
+        sims, viz = read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+        self.assertEqual(len(viz.layout), 4)
 
+        viz.layout = viz.layout[slice(0, 1)]
         expected = Visualization(
             layout=[
                 VisualizationLayoutElement(
-                    chart_type=ChartType(id='2d-line'),
+                    chart_type=ChartType(id='line'),
                     data=[
                         VisualizationDataField(
                             data_field=ChartTypeDataField(
@@ -172,11 +173,6 @@ class WriteSedMlTestCase(unittest.TestCase):
                                 type=ChartTypeDataFieldType.dynamic_simulation_result,
                             ),
                             simulation_results=[
-                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
-                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
-                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
-                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
-                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
                                 SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
                             ],
                         ),
@@ -193,9 +189,9 @@ class WriteSedMlTestCase(unittest.TestCase):
                                 SimulationResult(simulation=sims[0], variable=ModelVariable(
                                     id='p1_BUD_task1',
                                     target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='BUD']")),
-                                SimulationResult(simulation=sims[0], variable=ModelVariable(
-                                    id='p1_Clb2_task1',
-                                    target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Clb2']")),
+                                # SimulationResult(simulation=sims[0], variable=ModelVariable(
+                                #    id='p1_Clb2_task1',
+                                #    target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Clb2']")),
                                 SimulationResult(simulation=sims[0], variable=ModelVariable(
                                     id='p1_Cln_task1',
                                     target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Cln']")),
@@ -211,4 +207,19 @@ class WriteSedMlTestCase(unittest.TestCase):
                 ),
             ],
         )
-        self.assertEqual(vizs[0], expected)
+        self.assertEqual(viz, expected)
+
+    def test_read_visualizations_with_log_axis(self):
+        filename = 'tests/fixtures/BIOMD0000000297-with-log-axis.sedml'
+        _, viz = read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+        self.assertEqual(viz.layout[0].chart_type.id, 'line-logX-logY')
+
+    def test_read_visualizations_with_inconsistent_x_axes(self):
+        filename = 'tests/fixtures/BIOMD0000000297-with-invalid-x-axis.sedml'
+        with self.assertRaisesRegex(SimIoError, 'Curves must have the same X axis'):
+            read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+
+    def test_read_visualizations_with_inconsistent_y_axes(self):
+        filename = 'tests/fixtures/BIOMD0000000297-with-invalid-y-axis.sedml'
+        with self.assertRaisesRegex(SimIoError, 'Curves must have the same Y axis'):
+            read_sim(filename, ModelFormat.sbml, SimFormat.sedml)

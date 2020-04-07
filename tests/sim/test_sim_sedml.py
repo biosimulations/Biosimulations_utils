@@ -214,6 +214,10 @@ class WriteSedMlTestCase(unittest.TestCase):
         _, viz = read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
         self.assertEqual(viz.layout[0].chart_type.id, 'line-logX-logY')
 
+    def test_read_visualizations_with_consistent_x_axes(self):
+        filename = 'tests/fixtures/BIOMD0000000739.sedml'
+        read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+
     def test_read_visualizations_with_inconsistent_x_axes(self):
         filename = 'tests/fixtures/BIOMD0000000297-with-invalid-x-axis.sedml'
         with self.assertRaisesRegex(SimIoError, 'Curves must have the same X axis'):

@@ -649,12 +649,6 @@ class SedMlSimReader(SimReader):
                 warnings.warn('{} is not supported'.format(output_sed.__class__.__name__), SimIoWarning)
                 continue
 
-            if len(set([(curve_sed.getXDataReference(), curve_sed.getLogX()) for curve_sed in output_sed.getListOfCurves()])) > 1:
-                raise SimIoError('Curves must have the same X axis')
-
-            if len(set([curve_sed.getLogY() for curve_sed in output_sed.getListOfCurves()])) > 1:
-                raise SimIoError('Curves must have the same Y axis')
-
             x_sim_results = []
             y_sim_results = []
             for curve_sed in output_sed.getListOfCurves():
@@ -684,6 +678,15 @@ class SedMlSimReader(SimReader):
                 x_sim_results.append(SimulationResult(simulation=x_sim, variable=x_var))
                 y_sim_results.append(SimulationResult(simulation=y_sim, variable=y_var))
 
+            if len(set([(curve_sed.getXDataReference(), curve_sed.getLogX()) for curve_sed in output_sed.getListOfCurves()])) == 1:
+                x_sim_results = x_sim_results[slice(0, 1)]
+            elif not all([sim_res.variable.target == 'urn:sedml:symbol:time' for sim_res in x_sim_results]) or \
+                    len(set([curve_sed.getLogX() for curve_sed in output_sed.getListOfCurves()])) > 1:
+                raise SimIoError('Curves must have the same X axis')
+
+            if len(set([curve_sed.getLogY() for curve_sed in output_sed.getListOfCurves()])) > 1:
+                raise SimIoError('Curves must have the same Y axis')
+
             if not x_sim_results:
                 continue
 
@@ -702,7 +705,7 @@ class SedMlSimReader(SimReader):
                             shape=ChartTypeDataFieldShape.array,
                             type=ChartTypeDataFieldType.dynamic_simulation_result,
                         ),
-                        simulation_results=x_sim_results[slice(0, 1)],
+                        simulation_results=x_sim_results,
                     ),
                     VisualizationDataField(
                         data_field=ChartTypeDataField(

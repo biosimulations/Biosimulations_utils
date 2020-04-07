@@ -7,6 +7,7 @@
 """
 
 from ..model import ModelFormat
+from ..viz.data_model import Visualization  # noqa: F401
 from .sbml import SbmlSedMlSimWriter, SbmlSedMlSimReader
 import wc_utils.util.enumerate
 
@@ -51,6 +52,7 @@ def read_sim(filename, model_format, sim_format):
 
     Returns:
         :obj:`list` of :obj:`Simulation`: simulations
+        :obj:`list` of :obj:`Visualization`: visualizations
     """
     if sim_format == SimFormat.sedml:
         if model_format == ModelFormat.sbml:

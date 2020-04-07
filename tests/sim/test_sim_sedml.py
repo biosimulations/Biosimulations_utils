@@ -6,12 +6,14 @@
 :License: MIT
 """
 
+from Biosimulations_format_utils.chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
 from Biosimulations_format_utils.data_model import Format
 from Biosimulations_format_utils.model import ModelFormat
 from Biosimulations_format_utils.model.data_model import Model, ModelVariable
 from Biosimulations_format_utils.sim import SimFormat, write_sim, read_sim, sedml
 from Biosimulations_format_utils.sim.core import SimIoError, SimIoWarning
-from Biosimulations_format_utils.sim.data_model import TimecourseSimulation
+from Biosimulations_format_utils.sim.data_model import TimecourseSimulation, SimulationResult
+from Biosimulations_format_utils.viz.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import json
 import libsedml
 import os
@@ -39,7 +41,7 @@ class WriteSedMlTestCase(unittest.TestCase):
         write_sim(model_vars, sim, model_filename, sim_filename,
                   SimFormat.sedml, level=1, version=3)
 
-        sims_2 = read_sim(
+        sims_2, _ = read_sim(
             sim_filename, ModelFormat.sbml, SimFormat.sedml)
         self.assertEqual(len(sims_2), 1)
         sim_2 = sims_2[0]
@@ -142,7 +144,7 @@ class WriteSedMlTestCase(unittest.TestCase):
             read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
 
     def test_read_biomodels_sims(self):
-        sims = read_sim('tests/fixtures/Simon2019.sedml', ModelFormat.sbml, SimFormat.sedml)
+        sims, _ = read_sim('tests/fixtures/Simon2019.sedml', ModelFormat.sbml, SimFormat.sedml)
         self.assertEqual(len(sims), 1)
         sim = sims[0]
         self.assertEqual(sim.model_parameter_changes, [])
@@ -152,3 +154,61 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(sim.num_time_points, 100)
         self.assertEqual(sim.algorithm.id, 'KISAO:0000019')
         self.assertEqual(sim.algorithm_parameter_changes, [])
+
+    def test_read_visualizations(self):
+        filename = 'tests/fixtures/BIOMD0000000297.sedml'
+        sims, vizs = read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+        self.assertEqual(len(vizs), 4)
+
+        expected = Visualization(
+            layout=[
+                VisualizationLayoutElement(
+                    chart_type=ChartType(id='2d-line'),
+                    data=[
+                        VisualizationDataField(
+                            data_field=ChartTypeDataField(
+                                name='x',
+                                shape=ChartTypeDataFieldShape.array,
+                                type=ChartTypeDataFieldType.dynamic_simulation_result,
+                            ),
+                            simulation_results=[
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
+                            ],
+                        ),
+                        VisualizationDataField(
+                            data_field=ChartTypeDataField(
+                                name='y',
+                                shape=ChartTypeDataFieldShape.array,
+                                type=ChartTypeDataFieldType.dynamic_simulation_result,
+                            ),
+                            simulation_results=[
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(
+                                    id='p1_BE_task1',
+                                    target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='BE']")),
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(
+                                    id='p1_BUD_task1',
+                                    target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='BUD']")),
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(
+                                    id='p1_Clb2_task1',
+                                    target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Clb2']")),
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(
+                                    id='p1_Cln_task1',
+                                    target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Cln']")),
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(
+                                    id='p1_SBF_a_task1',
+                                    target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='SBF_a']")),
+                                SimulationResult(simulation=sims[0], variable=ModelVariable(
+                                    id='p1_Sic1_task1',
+                                    target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Sic1']")),
+                            ],
+                        ),
+                    ],
+                ),
+            ],
+        )
+        self.assertEqual(vizs[0], expected)

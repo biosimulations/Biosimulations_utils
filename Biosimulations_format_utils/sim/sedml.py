@@ -8,9 +8,11 @@
 
 from .core import SimWriter, SimReader, SimIoError, SimIoWarning
 from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation,  # noqa: F401
-                         Algorithm, AlgorithmParameter, ParameterChange)
+                         Algorithm, AlgorithmParameter, ParameterChange, SimulationResult)
+from ..chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
 from ..data_model import Format, JournalReference, License, Person, RemoteFile
 from ..model.data_model import Model, ModelParameter, ModelVariable
+from ..viz.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 from ..utils import assert_exception
 from datetime import datetime
 from xml.sax import saxutils
@@ -547,6 +549,7 @@ class SedMlSimReader(SimReader):
 
         Returns:
             :obj:`list` of :obj:`Simulation`: simulations
+            :obj:`list` of :obj:`Visualization`: visualizations
         """
         doc_sed = libsedml.readSedMLFromFile(filename)
         if doc_sed.getErrorLog().getNumFailsWithSeverity(libsedml.LIBSEDML_SEV_ERROR):
@@ -588,6 +591,7 @@ class SedMlSimReader(SimReader):
 
         # initialize simulation experiment with metadata
         sims = []
+        task_id_to_sim = {}
         for task_sed in doc_sed.getListOfTasks():
             if not isinstance(task_sed, libsedml.SedTask):
                 warnings.warn(
@@ -614,9 +618,85 @@ class SedMlSimReader(SimReader):
 
             # append simulation to list of simulations
             sims.append(sim)
+            task_id_to_sim[task_sed.getId()] = sim
 
-        # return simulations
-        return sims
+        # data generators
+        data_gen_id_to_task_id = {}
+        data_gen_id_to_var_target = {}
+        time_data_gen_ids = []
+        for data_gen_sed in doc_sed.getListOfDataGenerators():
+            if data_gen_sed.getNumParameters() == 0 and data_gen_sed.getNumVariables() == 1 and data_gen_sed.getMath().isCiNumber():
+                var_sed = data_gen_sed.getVariable(0)
+                data_gen_id_to_task_id[data_gen_sed.getId()] = var_sed.getTaskReference()
+                if var_sed.getTarget():
+                    data_gen_id_to_var_target[data_gen_sed.getId()] = var_sed.getTarget()
+                elif var_sed.getSymbol() == 'urn:sedml:symbol:time':
+                    time_data_gen_ids.append(data_gen_sed.getId())
+
+        # visualizations (Output > Plot2D)
+        vizs = []
+        for output_sed in doc_sed.getListOfOutputs():
+            if not isinstance(output_sed, libsedml.SedPlot2D):
+                warnings.warn('{} is not supported'.format(output_sed.__class__.__name__), SimIoWarning)
+                continue
+
+            if output_sed.getNumCurves() == 0:
+                continue
+
+            x_sim_results = []
+            y_sim_results = []
+            for curve_sed in output_sed.getListOfCurves():
+                x_data_gen_id = curve_sed.getXDataReference()
+                y_data_gen_id = curve_sed.getYDataReference()
+
+                x_task_id = data_gen_id_to_task_id[x_data_gen_id]
+                y_task_id = data_gen_id_to_task_id[y_data_gen_id]
+
+                x_sim = task_id_to_sim.get(x_task_id, None)
+                y_sim = task_id_to_sim.get(y_task_id, None)
+                if not x_sim or not y_sim:
+                    continue
+
+                if x_data_gen_id in time_data_gen_ids:
+                    x_var = ModelVariable(id='time', target='urn:sedml:symbol:time')
+                else:
+                    x_var = next(var for var in x_sim.model.variables if var.target == data_gen_id_to_var_target[x_data_gen_id])
+
+                if y_data_gen_id in time_data_gen_ids:
+                    y_var = ModelVariable(id='time', target='urn:sedml:symbol:time')
+                else:
+                    y_var = next(var for var in y_sim.model.variables if var.target == data_gen_id_to_var_target[y_data_gen_id])
+
+                x_sim_results.append(SimulationResult(simulation=x_sim, variable=x_var))
+                y_sim_results.append(SimulationResult(simulation=y_sim, variable=y_var))
+
+            viz = Visualization(layout=[
+                VisualizationLayoutElement(
+                    chart_type=ChartType(id='2d-line'),
+                    data=[
+                        VisualizationDataField(
+                            data_field=ChartTypeDataField(
+                                name='x',
+                                shape=ChartTypeDataFieldShape.array,
+                                type=ChartTypeDataFieldType.dynamic_simulation_result,
+                            ),
+                            simulation_results=x_sim_results,
+                        ),
+                        VisualizationDataField(
+                            data_field=ChartTypeDataField(
+                                name='y',
+                                shape=ChartTypeDataFieldShape.array,
+                                type=ChartTypeDataFieldType.dynamic_simulation_result,
+                            ),
+                            simulation_results=y_sim_results,
+                        ),
+                    ],
+                ),
+            ])
+            vizs.append(viz)
+
+        # return simulations and visualizations
+        return (sims, vizs)
 
     def _read_metadata(self, doc_sed, sim):
         """ Read metadata from a SED document
@@ -724,16 +804,18 @@ class SedMlSimReader(SimReader):
         """
         sim.model.variables = []
         for data_gen_sed in task_sed.getSedDocument().getListOfDataGenerators():
-            for var_sed in data_gen_sed.getListOfVariables():
-                if var_sed.getTaskReference() == task_sed.getId():
-                    var_id = var_sed.getId()
-                    var_id = var_id[len('var_'):]
+            if data_gen_sed.getNumParameters() == 0 and data_gen_sed.getNumVariables() == 1 and data_gen_sed.getMath().isCiNumber():
+                for var_sed in data_gen_sed.getListOfVariables():
+                    if var_sed.getTarget() and var_sed.getTaskReference() == task_sed.getId():
+                        var_id = var_sed.getId()
+                        if var_id.startswith('var_'):
+                            var_id = var_id[len('var_'):]
 
-                    if var_id != 'time':
-                        sim.model.variables.append(ModelVariable(
-                            id=var_id,
-                            target=var_sed.getTarget(),
-                        ))
+                        if var_id != 'time':
+                            sim.model.variables.append(ModelVariable(
+                                id=var_id,
+                                target=var_sed.getTarget(),
+                            ))
 
     def _create_sim(self, sim_sed):
         """ Create a simulation for a SED simulation

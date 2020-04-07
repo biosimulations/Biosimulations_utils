@@ -15,6 +15,7 @@ from ..model.sbml import viz_model
 from ..sim import SimFormat, read_sim
 from ..sim.core import SimIoWarning
 from ..sim.data_model import Simulation
+from ..viz.data_model import Visualization
 import copy
 import json
 import libsbml
@@ -76,19 +77,20 @@ class BioModelsImporter(object):
         Returns:
             :obj:`list` of :obj:`Model`: models
             :obj:`list` of :obj:`Simulation`: simulations
+            :obj:`list` of :obj:`Visualization`: visualizations
             :obj:`dict`: statistics about the models
         """
         with warnings.catch_warnings(record=True) as caught_warnings:
             warnings.simplefilter('ignore')
             warnings.simplefilter('always', SimIoWarning)
-            models, sims = self.get_models()
+            models, sims, vizs = self.get_models()
         if caught_warnings:
             warnings.warn('Unable to import all simlations:\n  ' + '\n  '.join(
                 str(w.message) for w in caught_warnings), UserWarning)
-        self.submit_models(models, sims)
-        stats = self.get_stats(models, sims)
-        self.write_data(models, sims, stats)
-        return (models, sims, stats)
+        self.submit_models(models, sims, vizs)
+        stats = self.get_stats(models, sims, vizs)
+        self.write_data(models, sims, vizs, stats)
+        return (models, sims, vizs, stats)
 
     def get_models(self):
         """ Get models from BioModels
@@ -96,9 +98,11 @@ class BioModelsImporter(object):
         Returns:
             :obj:`list` of :obj:`Model`: list of metadata about each model
             :obj:`list` of :obj:`Simulation`: list of metadata about each simulation
+            :obj:`list` of :obj:`Visualization`: list of metadata about each visualization
         """
         models = []
         sims = []
+        vizs = []
         unimportable_models = []
         unvisualizable_models = []
         num_models = min(self._max_models, self.get_num_models())
@@ -108,9 +112,10 @@ class BioModelsImporter(object):
             for i_model, model_result in enumerate(results['models']):
                 print('  {}. {}: {}'.format(i_batch * self.NUM_MODELS_PER_BATCH + i_model + 1, model_result['id'], model_result['name']))
                 try:
-                    model, model_sims = self.get_model(model_result['id'])
+                    model, model_sims, model_vizs = self.get_model(model_result['id'])
                     models.append(model)
                     sims.extend(model_sims)
+                    vizs.extend(model_vizs)
                 except ModelIoError:
                     unimportable_models.append(model_result['id'])
 
@@ -126,6 +131,8 @@ class BioModelsImporter(object):
                 except ModelIoError:
                     unvisualizable_models.append(model_result['id'])
 
+                # todo: simulate models
+
                 if len(models) == self._max_models:
                     break
 
@@ -134,7 +141,7 @@ class BioModelsImporter(object):
         if unvisualizable_models:
             warnings.warn('Unable visualize the following models:\n  {}'.format('\n  '.join(sorted(unvisualizable_models))), UserWarning)
 
-        return (models, sims)
+        return (models, sims, vizs)
 
     def get_num_models(self):
         """ Get the number of models to import
@@ -177,6 +184,7 @@ class BioModelsImporter(object):
         Returns:
             :obj:`Model`: information about model
             :obj:`list` of :obj:`Simulation`: information about simulations
+            :obj:`list` of :obj:`Visualization`: information about visualizations
         """
         metadata = self.get_model_metadata(id)
         files_metadata = self.get_model_files_metadata(id)
@@ -311,6 +319,7 @@ class BioModelsImporter(object):
 
         # get information about simulation(s)
         sims = []
+        vizs = []
         num_sim_files = 0
         for file_metadata in files_metadata['additional']:
             if file_metadata['name'].endswith('.sedml'):
@@ -319,13 +328,13 @@ class BioModelsImporter(object):
                 with open(local_path, 'wb') as file:
                     file.write(self.get_model_file(id, file_metadata['name']))
 
-                model_sims = read_sim(local_path, ModelFormat.sbml, SimFormat.sedml)
+                model_sims, model_vizs = read_sim(local_path, ModelFormat.sbml, SimFormat.sedml)
 
                 model_files = set([sim.model.file.name for sim in model_sims]).difference(set(['model']))
                 assert len(model_files) <= 1, 'Each simulation must use the same model'
 
-                for sim in model_sims:
-                    sim.id = '{}-sim-{}'.format(model.id, len(sims) + 1)
+                for i_sim, sim in enumerate(model_sims):
+                    sim.id = '{}-sim-{}'.format(model.id, i_sim + 1)
                     sim.name = file_metadata['name'][0:-6]
                     sim.description = file_metadata['description']
                     sim.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
@@ -335,14 +344,27 @@ class BioModelsImporter(object):
                     sim.model.id = model.id
                     sim.model.name = model.name
                     sim.model.file = None
-                sims.extend(model_sims)
+                    sims.append(sim)
+
+                for i_viz, viz in enumerate(model_vizs):
+                    viz.id = '{}-viz-{}'.format(model.id, i_viz + 1)
+                    viz.name = file_metadata['name'][0:-6]
+                    viz.description = file_metadata['description']
+                    viz.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
+                    viz.references = copy.deepcopy(model.references)
+                    viz.authors = copy.deepcopy(model.authors)
+                    viz.license = License.cc0
+                    vizs.append(viz)
+
         if len(sims) == 1:
             sims[0].id = '{}-sim'.format(model.id)
             os.rename(
                 os.path.join(self._cache_dir, '{}-{}.sedml'.format(model.id, 1)),
                 os.path.join(self._cache_dir, '{}.sedml'.format(model.id)))
 
-        return (model, sims)
+            vizs[0].id = '{}-viz'.format(model.id)
+
+        return (model, sims, vizs)
 
     def get_model_metadata(self, id):
         """ Get metadata about a model
@@ -410,12 +432,13 @@ class BioModelsImporter(object):
         img.name = model.file.name[0:-4] + '.png'
         return img
 
-    def submit_models(self, models, sims):
+    def submit_models(self, models, sims, vizs):
         """ Post models and simulations to BioSimulations
 
         Args:
             models (:obj:`list` of :obj:`Model`):
             sims (:obj:`list` of :obj:`Simulation`): simulations
+            vizs (:obj:`list` of :obj:`Visualization`): visualization
         """
         api_client = ApiClient(_dry_run=self._dry_run)
         api_client.login()
@@ -426,12 +449,16 @@ class BioModelsImporter(object):
         for sim in sims:
             api_client.exec('post', '/simulations/' + sim.id, data=sim.to_json())
 
-    def write_data(self, models, sims, stats):
+        for viz in vizs:
+            api_client.exec('post', '/visualization/' + viz.id, data=viz.to_json())
+
+    def write_data(self, models, sims, vizs, stats):
         """ Save models and simulations to JSON files
 
         Args:
             models (:obj:`list` of :obj:`Model`): models
             sims (:obj:`list` of :obj:`Simulation`): simulations
+            vizs (:obj:`list` of :obj:`Visualization`): visualization
             stats (:obj:`dict`): statistics of the models
         """
         filename = os.path.join(self._cache_dir, 'biomodels.models.json')
@@ -442,16 +469,21 @@ class BioModelsImporter(object):
         with open(filename, 'w') as file:
             json.dump([sim.to_json() for sim in sims], file)
 
+        filename = os.path.join(self._cache_dir, 'biomodels.visualizations.json')
+        with open(filename, 'w') as file:
+            json.dump([viz.to_json() for viz in vizs], file)
+
         filename = os.path.join(self._cache_dir, 'biomodels.stats.json')
         with open(filename, 'w') as file:
             json.dump(stats, file)
 
     def read_data(self):
-        """ Read models and simulations from JSON files
+        """ Read models, simulations, and visualizations from JSON files
 
         Returns:
             :obj:`list` of :obj:`Model`: models
             :obj:`list` of :obj:`Simulation`: simulations
+            :obj:`list` of :obj:`Visualization`: visualizations
             :obj:`dict`: stats about the models
         """
         filename = os.path.join(self._cache_dir, 'biomodels.models.json')
@@ -460,20 +492,25 @@ class BioModelsImporter(object):
 
         filename = os.path.join(self._cache_dir, 'biomodels.simulations.json')
         with open(filename, 'r') as file:
-            sims = [Simulation.from_json(sims) for sims in json.load(file)]
+            sims = [Simulation.from_json(sim) for sim in json.load(file)]
+
+        filename = os.path.join(self._cache_dir, 'biomodels.visualizations.json')
+        with open(filename, 'r') as file:
+            vizs = [Visualization.from_json(viz) for viz in json.load(file)]
 
         filename = os.path.join(self._cache_dir, 'biomodels.stats.json')
         with open(filename, 'r') as file:
             stats = json.load(file)
 
-        return (models, sims, stats)
+        return (models, sims, vizs, stats)
 
-    def get_stats(self, models, sims):
+    def get_stats(self, models, sims, vizs):
         """ Calculate statistics about the imported models
 
         Args:
             models (:obj:`list` of :obj:`Model`): models
             sims (:obj:`list` of :obj:`Simulation`): simulations
+            vizs (:obj:`list` of :obj:`Visualization`): visualizations
 
         Returns:
             :obj:`dict`: statistics about the imported models
@@ -491,7 +528,10 @@ class BioModelsImporter(object):
                 'time course': 0,
                 'one step': 0,
                 'steady-state': 0,
-            }
+            },
+            'vizs': {
+                'total': len(vizs),
+            },
         }
 
         for model in models:

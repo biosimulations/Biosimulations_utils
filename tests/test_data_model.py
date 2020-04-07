@@ -119,7 +119,6 @@ class ApiConsistencyTestCase(unittest.TestCase):
         if errors:
             raise Exception('Data model for `Simulation` is not consistent with API:\n  Simulation:\n    ' + '\n    '.join(errors))
 
-    @unittest.expectedFailure
     def test_chart_type(self):
         py = ChartType(id='chart-type-1').to_json()
 
@@ -132,6 +131,7 @@ class ApiConsistencyTestCase(unittest.TestCase):
         if errors:
             raise Exception('Data model for `ChartType` is not consistent with API:\n  ChartType:\n    ' + '\n    '.join(errors))
 
+    @unittest.expectedFailure
     def test_viz(self):
         py = Visualization(
             id='viz_1',
@@ -244,13 +244,15 @@ class ApiConsistencyTestCase(unittest.TestCase):
                         if 'items' not in api[key]:
                             errors.append('{}: API does not use an array'.format(path + key))
                         elif 'properties' not in api[key]['items']:
+                            singular_key = infect_engine.singular_noun(key) or key
                             errors.append('{}'.format(path + key))
-                            errors.append('  {}: API does not use an array of dictionaries'.format(path + infect_engine.singular_noun(key)))
+                            errors.append('  {}: API does not use an array of dictionaries'.format(path + singular_key))
                         else:
                             prop_errors = self.get_differences_from_api(val[0], api[key]['items']['properties'], path=path + '    ')
                             if prop_errors:
+                                singular_key = infect_engine.singular_noun(key) or key
                                 errors.append('{}'.format(path + key))
-                                errors.append('  {}'.format(path + infect_engine.singular_noun(key)))
+                                errors.append('  {}'.format(path + singular_key))
                                 errors.extend(prop_errors)
                 elif isinstance(val, dict):
                     if 'properties' not in api[key]:

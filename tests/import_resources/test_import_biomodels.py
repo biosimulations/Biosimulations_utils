@@ -10,6 +10,7 @@ from Biosimulations_format_utils.data_model import Identifier, JournalReference,
 from Biosimulations_format_utils.import_resources import biomodels
 from Biosimulations_format_utils.model.data_model import Model
 from Biosimulations_format_utils.sim.data_model import Simulation
+from Biosimulations_format_utils.viz.data_model import Visualization
 from unittest import mock
 import shutil
 import tempfile
@@ -51,7 +52,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
             ],
         }
         with mock.patch.object(biomodels.BioModelsImporter, 'get_model_batch', return_value=return_value):
-            models, sims, stats = importer.run()
+            models, sims, vizs, stats = importer.run()
         self.assertEqual(len(models), 6)
 
         self.assertEqual(models[0].id, 'BIOMD0000000001')
@@ -121,17 +122,24 @@ class BioModelsImporterTestCase(unittest.TestCase):
                 'time course': 2,
                 'one step': 0,
                 'steady-state': 1,
-            }
+            },
+            'vizs': {
+                'total': 6,
+            },
         })
 
         for model in models:
             self.assertEqual(Model.from_json(model.to_json()), model)
         for sim in sims:
             self.assertEqual(Simulation.from_json(sim.to_json()), sim)
+        for viz in vizs:
+            self.assertEqual(Visualization.from_json(viz.to_json()), viz)
 
-        models_2, sims_2, stats_2 = importer.read_data()
+        models_2, sims_2, vizs_2, stats_2 = importer.read_data()
         for model, model_2 in zip(models, models_2):
             self.assertEqual(model_2, model)
         for sim, sim_2 in zip(sims, sims_2):
             self.assertEqual(sim_2, sim)
+        for viz, viz_2 in zip(vizs, vizs_2):
+            self.assertEqual(viz_2, viz)
         self.assertEqual(stats_2, stats)

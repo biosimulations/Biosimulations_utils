@@ -6,9 +6,13 @@
 :License: MIT
 """
 
+from Biosimulations_format_utils.chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
 from Biosimulations_format_utils.data_model import (Format, Identifier, JournalReference,
                                                     License, OntologyTerm, Person, RemoteFile, Taxon, Type)
-from Biosimulations_format_utils.model.data_model import Model, ModelParameter, Variable
+from Biosimulations_format_utils.model.data_model import Model, ModelParameter, ModelVariable
+from Biosimulations_format_utils.sim.data_model import TimecourseSimulation, SimulationResult
+from Biosimulations_format_utils.viz.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
+import inflect
 import json
 import requests
 import unittest
@@ -87,7 +91,7 @@ class ApiConsistencyTestCase(unittest.TestCase):
             ],
             license=License.cc0,
             parameters=[ModelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
-            variables=[Variable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
+            variables=[ModelVariable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
         )
         py = model.to_json()
 
@@ -115,8 +119,121 @@ class ApiConsistencyTestCase(unittest.TestCase):
         if errors:
             raise Exception('Data model for `Simulation` is not consistent with API:\n  Simulation:\n    ' + '\n    '.join(errors))
 
+    @unittest.expectedFailure
+    def test_chart_type(self):
+        py = ChartType(id='chart-type-1').to_json()
+
+        api = {}
+        for schema in self.api_schemas['Chart']['allOf']:
+            for key, val in schema['properties'].items():
+                api[key] = val
+
+        errors = self.get_differences_from_api(py, api)
+        if errors:
+            raise Exception('Data model for `ChartType` is not consistent with API:\n  ChartType:\n    ' + '\n    '.join(errors))
+
+    def test_viz(self):
+        py = Visualization(
+            id='viz_1',
+            name='viz 1',
+            image=RemoteFile(name='viz.png', type='image/png'),
+            description='description',
+            tags=['a', 'b', 'c'],
+            identifiers=[Identifier(namespace='biomodels.db', id='XXX')],
+            references=[
+                JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                 volume=10, num=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+            ],
+            authors=[
+                Person(first_name='John', middle_name='C', last_name='Doe'),
+                Person(first_name='Jane', middle_name='D', last_name='Doe'),
+            ],
+            license=License.cc0,
+            format=Format(name='Vega', version='5.10.1', url='https://vega.github.io/vega/'),
+            columns=3,
+            layout=[
+                VisualizationLayoutElement(
+                    chart_type=ChartType(id='line'),
+                    data=[
+                        VisualizationDataField(
+                            data_field=ChartTypeDataField(name='field 1', shape=ChartTypeDataFieldShape.array,
+                                                          type=ChartTypeDataFieldType.static),
+                            simulation_results=[
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-1'), variable=ModelVariable(id='var-2')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-1'), variable=ModelVariable(id='var-1')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-2'), variable=ModelVariable(id='var-2')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-2'), variable=ModelVariable(id='var-1')),
+                            ],
+                        ),
+                        VisualizationDataField(
+                            data_field=ChartTypeDataField(name='field 0', shape=ChartTypeDataFieldShape.array,
+                                                          type=ChartTypeDataFieldType.static),
+                            simulation_results=[
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-4'), variable=ModelVariable(id='var-4')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-3'), variable=ModelVariable(id='var-4')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-2'), variable=ModelVariable(id='var-4')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-1'), variable=ModelVariable(id='var-4')),
+                            ],
+                        ),
+                    ],
+                ),
+                VisualizationLayoutElement(
+                    chart_type=ChartType(id='area'),
+                    data=[
+                        VisualizationDataField(
+                            data_field=ChartTypeDataField(name='field 1', shape=ChartTypeDataFieldShape.array,
+                                                          type=ChartTypeDataFieldType.static),
+                            simulation_results=[
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-1'), variable=ModelVariable(id='var-2')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-1'), variable=ModelVariable(id='var-1')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-2'), variable=ModelVariable(id='var-2')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-2'), variable=ModelVariable(id='var-1')),
+                            ],
+                        ),
+                        VisualizationDataField(
+                            data_field=ChartTypeDataField(name='field 0', shape=ChartTypeDataFieldShape.array,
+                                                          type=ChartTypeDataFieldType.static),
+                            simulation_results=[
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-4'), variable=ModelVariable(id='var-4')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-3'), variable=ModelVariable(id='var-4')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-2'), variable=ModelVariable(id='var-4')),
+                                SimulationResult(simulation=TimecourseSimulation(
+                                    id='sim-1'), variable=ModelVariable(id='var-4')),
+                            ],
+                        ),
+                    ],
+                )
+            ],
+        ).to_json()
+
+        api = {}
+        for schema in self.api_schemas['Visualization']['allOf']:
+            for key, val in schema['properties'].items():
+                api[key] = val
+
+        errors = self.get_differences_from_api(py, api)
+        if errors:
+            raise Exception('Data model for `Visualization` is not consistent with API:\n  Visualization:\n    ' + '\n    '.join(errors))
+
     def get_differences_from_api(self, py, api, path=''):
         errors = []
+
+        infect_engine = inflect.engine()
 
         for key, val in py.items():
             if key not in api:
@@ -128,12 +245,12 @@ class ApiConsistencyTestCase(unittest.TestCase):
                             errors.append('{}: API does not use an array'.format(path + key))
                         elif 'properties' not in api[key]['items']:
                             errors.append('{}'.format(path + key))
-                            errors.append('  {}: API does not use an array of dictionaries'.format(path + key[0:-1]))
+                            errors.append('  {}: API does not use an array of dictionaries'.format(path + infect_engine.singular_noun(key)))
                         else:
                             prop_errors = self.get_differences_from_api(val[0], api[key]['items']['properties'], path=path + '    ')
                             if prop_errors:
                                 errors.append('{}'.format(path + key))
-                                errors.append('  {}'.format(path + key[0:-1]))
+                                errors.append('  {}'.format(path + infect_engine.singular_noun(key)))
                                 errors.extend(prop_errors)
                 elif isinstance(val, dict):
                     if 'properties' not in api[key]:

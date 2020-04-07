@@ -9,7 +9,7 @@
 from ..data_model import Format, OntologyTerm, RemoteFile, Taxon, Type
 from ..utils import pretty_print_units
 from .core import ModelReader, ModelIoError
-from .data_model import Model, ModelParameter, Variable  # noqa: F401
+from .data_model import Model, ModelParameter, ModelVariable  # noqa: F401
 from PIL import Image
 import enum
 import ete3
@@ -349,6 +349,7 @@ class SbmlModelReader(ModelReader):
                 type = Type.float
                 init_value = math_sbml.getReal()
             elif math_type in [libsbml.AST_RATIONAL]:
+                # todo: support rational numbers
                 continue
             else:
                 continue
@@ -387,6 +388,7 @@ class SbmlModelReader(ModelReader):
                     type = Type.float
                     value = math_sbml.getReal()
                 elif math_type in [libsbml.AST_RATIONAL]:
+                    # todo: support rational numbers
                     continue
                 else:
                     continue
@@ -571,7 +573,7 @@ class SbmlModelReader(ModelReader):
             units (:obj:`dict`): dictionary that maps the ids of units to their definitions
 
         Returns:
-            :obj:`list` of :obj:`Variable`: information about the variables of the model
+            :obj:`list` of :obj:`ModelVariable`: information about the variables of the model
         """
         model.variables = vars = []
 
@@ -590,7 +592,7 @@ class SbmlModelReader(ModelReader):
             obj_id = obj_sbml.getId()
             assert obj_id
 
-            vars.append(Variable(
+            vars.append(ModelVariable(
                 target="/sbml:sbml/sbml:model/fbc:listOfObjectives/fbc:objective[@fbc:id='{}']".format(obj_id),
                 group='Objectives',
                 id=obj_id,
@@ -604,7 +606,7 @@ class SbmlModelReader(ModelReader):
             # reaction fluxes
             for rxn_sbml in model_sbml.getListOfReactions():
                 rxn_id = rxn_sbml.getId()
-                vars.append(Variable(
+                vars.append(ModelVariable(
                     target="/sbml:sbml/sbml:model/sbml:listOfReactions/{}:{}[@id='{}']".format(
                         rxn_sbml.getPrefix() or 'sbml', rxn_sbml.getElementName(), rxn_id),
                     group='Reaction fluxes',
@@ -627,7 +629,7 @@ class SbmlModelReader(ModelReader):
                 for species_sbml in qual_plugin.getListOfQualitativeSpecies():
                     species_id = species_sbml.getId()
 
-                    vars.append(Variable(
+                    vars.append(ModelVariable(
                         target=("/sbml:sbml/sbml:model/qual:listOfQualitativeSpecies"
                                 "/qual:qualitativeSpecies[@qual:id='{}']").format(species_id),
                         group='Species levels',
@@ -650,12 +652,12 @@ class SbmlModelReader(ModelReader):
             model (:obj:`Model`): model
 
         Returns:
-            :obj:`Variable`: information about the species
+            :obj:`ModelVariable`: information about the species
         """
         id = species_sbml.getId()
         assert id
 
-        var = Variable(
+        var = ModelVariable(
             target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(id),
             group='Species amounts/concentrations',
             id=id,

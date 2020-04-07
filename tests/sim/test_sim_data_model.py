@@ -7,9 +7,10 @@
 """
 
 from Biosimulations_format_utils.data_model import Format, JournalReference, License, Person, RemoteFile, Type
-from Biosimulations_format_utils.model.data_model import Model, ModelParameter
+from Biosimulations_format_utils.model.data_model import Model, ModelParameter, ModelVariable
 from Biosimulations_format_utils.sim.data_model import (
-    Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange)
+    Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange,
+    SimulationResult)
 import unittest
 
 
@@ -100,3 +101,8 @@ class SimDataModelTestCase(unittest.TestCase):
                                  value=2.1)
         self.assertEqual(ParameterChange.from_json(change.to_json(), AlgorithmParameter), change)
         self.assertEqual(ParameterChange.sort_key(change), (('param_1', 'param 1', 'float', 1.2, '00001'), 2.1))
+
+    def test_SimulationResult(self):
+        result = SimulationResult(simulation=TimecourseSimulation(id='sim'), variable=ModelVariable(id='var'))
+        self.assertEqual(SimulationResult.from_json(result.to_json()), result)
+        self.assertEqual(SimulationResult.sort_key(result), ('sim', 'var'))

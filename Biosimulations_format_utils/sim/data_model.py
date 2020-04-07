@@ -7,11 +7,12 @@
 """
 
 from ..data_model import Format, Identifier, JournalReference, License, Person, RemoteFile, Type
-from ..model.data_model import Model, ModelParameter
+from ..model.data_model import Model, ModelParameter, ModelVariable
 
 __all__ = [
     'Simulation', 'TimecourseSimulation', 'SteadyStateSimulation',
     'Algorithm', 'AlgorithmParameter', 'ParameterChange',
+    'SimulationResult',
 ]
 
 
@@ -474,3 +475,72 @@ class ParameterChange(object):
             :obj:`tuple`
         """
         return (change.parameter.sort_key(change.parameter), change.value)
+
+
+class SimulationResult(object):
+    """ Simulation result
+
+    Attributes:
+        simulation (:obj:`Simulation`): simulation
+        variable (:obj:`ModelVariable`): model variable
+    """
+
+    def __init__(self, simulation=None, variable=None):
+        """
+        Args:
+            simulation (:obj:`Simulation`): simulation
+            variable (:obj:`ModelVariable`): model variable
+        """
+        self.simulation = simulation
+        self.variable = variable
+
+    def __eq__(self, other):
+        """ Determine if two simulation results are semantically equal
+
+        Args:
+            other (:obj:`SimulationResult`): other simulation result
+
+        Returns:
+            :obj:`bool`
+        """
+        return other.__class__ == self.__class__ \
+            and self.simulation == other.simulation \
+            and self.variable == other.variable
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'simulation': self.simulation.to_json() if self.simulation else None,
+            'variable': self.variable.to_json() if self.variable else None,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create simulation result from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`SimulationResult`
+        """
+        return cls(
+            simulation=Simulation.from_json(val.get('simulation')) if val.get('simulation', None) else None,
+            variable=ModelVariable.from_json(val.get('variable')) if val.get('variable', None) else None,
+        )
+
+    @staticmethod
+    def sort_key(result):
+        """ Get a key to sort a simulation result
+
+        Args:
+            result (:obj:`SimulationResult`): simulation result
+
+        Returns:
+            :obj:`tuple`
+        """
+        return (result.simulation.id, result.variable.id)

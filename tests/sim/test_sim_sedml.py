@@ -8,7 +8,7 @@
 
 from Biosimulations_format_utils.data_model import Format
 from Biosimulations_format_utils.model import ModelFormat
-from Biosimulations_format_utils.model.data_model import Model, Variable
+from Biosimulations_format_utils.model.data_model import Model, ModelVariable
 from Biosimulations_format_utils.sim import SimFormat, write_sim, read_sim, sedml
 from Biosimulations_format_utils.sim.core import SimIoError, SimIoWarning
 from Biosimulations_format_utils.sim.data_model import TimecourseSimulation
@@ -29,8 +29,8 @@ class WriteSedMlTestCase(unittest.TestCase):
 
     def test_gen_sedml(self):
         model_vars = [
-            Variable(id='species_1', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_1']"),
-            Variable(id='species_2', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_2']"),
+            ModelVariable(id='species_1', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_1']"),
+            ModelVariable(id='species_2', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_2']"),
         ]
         with open('tests/fixtures/simulation.json', 'rb') as file:
             sim = TimecourseSimulation.from_json(json.load(file))

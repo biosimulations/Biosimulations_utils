@@ -7,7 +7,7 @@
 """
 
 from ..data_model import Format  # noqa: F401
-from .data_model import Model, ModelParameter, Variable  # noqa: F401
+from .data_model import Model, ModelParameter, ModelVariable  # noqa: F401
 import abc
 
 __all__ = ['ModelReader', 'ModelIoError', 'ModelIoWarning']
@@ -109,7 +109,7 @@ class ModelReader(abc.ABC):
             model (:obj:`Model`): model
 
         Returns:
-            :obj:`list` of :obj:`Variable`: information about the variables of the model
+            :obj:`list` of :obj:`ModelVariable`: information about the variables of the model
         """
         pass  # pragma: no cover
 

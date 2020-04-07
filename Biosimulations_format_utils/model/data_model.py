@@ -11,7 +11,7 @@ from ..data_model import Format, Identifier, JournalReference, License, Ontology
 __all__ = [
     'Model',
     'ModelParameter',
-    'Variable',
+    'ModelVariable',
 ]
 
 
@@ -33,7 +33,7 @@ class Model(object):
         authors (:obj:`list` of :obj:`Person`): authors
         license (:obj:`License`): license
         parameters (:obj:`list` of :obj:`ModelParameter`): parameters (e.g., initial conditions and rate constants)
-        variables (:obj:`list` of :obj:`Variable`): variables (e.g., model predictions)
+        variables (:obj:`list` of :obj:`ModelVariable`): variables (e.g., model predictions)
     """
 
     def __init__(self, id=None, name=None, file=None, image=None, description=None,
@@ -56,7 +56,7 @@ class Model(object):
             authors (:obj:`list` of :obj:`Person`, optional): authors
             license (:obj:`License`, optional): license
             parameters (:obj:`list` of :obj:`ModelParameter`, optional): parameters (e.g., initial conditions and rate constants)
-            variables (:obj:`list` of :obj:`Variable`, optional): variables (e.g., model predictions)
+            variables (:obj:`list` of :obj:`ModelVariable`, optional): variables (e.g., model predictions)
         """
         self.id = id
         self.name = name
@@ -98,7 +98,7 @@ class Model(object):
             and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
             and self.license == other.license \
             and sorted(self.parameters, key=ModelParameter.sort_key) == sorted(other.parameters, key=ModelParameter.sort_key) \
-            and sorted(self.variables, key=Variable.sort_key) == sorted(other.variables, key=Variable.sort_key)
+            and sorted(self.variables, key=ModelVariable.sort_key) == sorted(other.variables, key=ModelVariable.sort_key)
 
     def to_json(self):
         """ Export to JSON
@@ -149,7 +149,7 @@ class Model(object):
             authors=[Person.from_json(author) for author in val.get('authors', [])],
             license=License(val.get('license')) if val.get('license', None) else None,
             parameters=[ModelParameter.from_json(parameter) for parameter in val.get('parameters', [])],
-            variables=[Variable.from_json(variable) for variable in val.get('variables', [])],
+            variables=[ModelVariable.from_json(variable) for variable in val.get('variables', [])],
         )
 
 
@@ -273,7 +273,7 @@ class ModelParameter(object):
         return parameter.id
 
 
-class Variable(object):
+class ModelVariable(object):
     """ A variable of a model
 
     Attributes:
@@ -315,7 +315,7 @@ class Variable(object):
         """ Determine if two variables are semantically equal
 
         Args:
-            other (:obj:`Variable`): other variable
+            other (:obj:`ModelVariable`): other variable
 
         Returns:
             :obj:`bool`
@@ -355,7 +355,7 @@ class Variable(object):
             val (:obj:`dict`)
 
         Returns:
-            :obj:`Variable`
+            :obj:`ModelVariable`
         """
         return cls(
             target=val.get('target', None),
@@ -373,7 +373,7 @@ class Variable(object):
         """ Get a key to sort a variable
 
         Args:
-            variable (:obj:`Variable`): variable
+            variable (:obj:`ModelVariable`): variable
 
         Returns:
             :obj:`str`

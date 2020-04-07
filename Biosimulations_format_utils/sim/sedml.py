@@ -10,7 +10,7 @@ from .core import SimWriter, SimReader, SimIoError, SimIoWarning
 from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation,  # noqa: F401
                          Algorithm, AlgorithmParameter, ParameterChange)
 from ..data_model import Format, JournalReference, License, Person, RemoteFile
-from ..model.data_model import Model, ModelParameter, Variable
+from ..model.data_model import Model, ModelParameter, ModelVariable
 from ..utils import assert_exception
 from datetime import datetime
 from xml.sax import saxutils
@@ -34,7 +34,7 @@ class SedMlSimWriter(SimWriter):
     def run(self, model_vars, sim, model_filename, sim_filename, level=1, version=3):
         """
         Args:
-            model_vars (:obj:`list` of :obj:`Variable`): List of variables in the model.
+            model_vars (:obj:`list` of :obj:`ModelVariable`): List of variables in the model.
                 Each variable should have the keys `id` and `target`
             sim (:obj:`Simulation`): Simulation experiment
             model_filename (:obj:`str`): Path to the model definition
@@ -453,7 +453,7 @@ class SedMlSimWriter(SimWriter):
         """ Add simulation predictions to a SED report
 
         Args:
-            vars (:obj:`list` of :obj:`Variable`): variables predicted by a model
+            vars (:obj:`list` of :obj:`ModelVariable`): variables predicted by a model
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             task_sed (:obj:`libsedml.SedTask`): SED task
             report_sed (:obj:`libsedml.SedReport`): SED report
@@ -730,7 +730,7 @@ class SedMlSimReader(SimReader):
                     var_id = var_id[len('var_'):]
 
                     if var_id != 'time':
-                        sim.model.variables.append(Variable(
+                        sim.model.variables.append(ModelVariable(
                             id=var_id,
                             target=var_sed.getTarget(),
                         ))

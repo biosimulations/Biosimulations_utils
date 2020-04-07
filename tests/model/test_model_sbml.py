@@ -9,7 +9,7 @@
 from Biosimulations_format_utils.data_model import Format, Taxon, Type
 from Biosimulations_format_utils.model import ModelFormat, read_model
 from Biosimulations_format_utils.model.core import ModelIoError
-from Biosimulations_format_utils.model.data_model import ModelParameter, Variable
+from Biosimulations_format_utils.model.data_model import ModelParameter, ModelVariable
 from Biosimulations_format_utils.model.sbml import viz_model
 import importlib
 import libsbml
@@ -128,7 +128,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         # variables
         self.assertEqual(len(model.variables), 24)
         var = next(var for var in model.variables if var.id == 'species_1')
-        self.assertEqual(var, Variable(
+        self.assertEqual(var, ModelVariable(
             target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_1']",
             group='Species amounts/concentrations',
             id='species_1',
@@ -303,7 +303,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
 
         vars = list(filter(lambda var: var.group == 'Objectives', model.variables))
         self.assertEqual(len(vars), 1)
-        self.assertEqual(vars[0], Variable(
+        self.assertEqual(vars[0], ModelVariable(
             target="/sbml:sbml/sbml:model/fbc:listOfObjectives/fbc:objective[@fbc:id='atp_consume_max']",
             group='Objectives',
             id='atp_consume_max',
@@ -317,7 +317,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
         vars = list(filter(lambda var: var.group == 'Reaction fluxes', model.variables))
         self.assertEqual(len(vars), 4)
         var = next(var for var in vars if var.id == 'GK')
-        self.assertEqual(var, Variable(
+        self.assertEqual(var, ModelVariable(
             target="/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='GK']",
             group='Reaction fluxes',
             id='GK',
@@ -375,7 +375,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
 
         self.assertEqual(len(model.variables), 4)
         var = next(var for var in model.variables if var.id == 'A')
-        self.assertEqual(var, Variable(
+        self.assertEqual(var, ModelVariable(
             target="/sbml:sbml/sbml:model/qual:listOfQualitativeSpecies/qual:qualitativeSpecies[@qual:id='A']",
             group='Species levels',
             id='A',

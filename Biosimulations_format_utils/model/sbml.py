@@ -336,6 +336,81 @@ class SbmlModelReader(ModelReader):
                 units=species_initial_units,
             )
 
+        # initial assignments
+        for init_assignment_sbml in model_sbml.getListOfInitialAssignments():
+            symbol_id = init_assignment_sbml.getSymbol()
+            symbol_sbml = model_sbml.getElementBySId(symbol_id)
+            math_sbml = init_assignment_sbml.getMath()
+            math_type = math_sbml.getType()
+            if math_type in [libsbml.AST_INTEGER]:
+                type = Type.integer
+                init_value = math_sbml.getInteger()
+            elif math_type in [libsbml.AST_REAL, libsbml.AST_REAL_E]:
+                type = Type.float
+                init_value = math_sbml.getReal()
+            elif math_type in [libsbml.AST_RATIONAL]:
+                continue
+            else:
+                continue
+            parameters["init_assignment_{}".format(symbol_id)] = ModelParameter(
+                target='/' + '/'.join([
+                    "sbml:sbml",
+                    "sbml:model",
+                    "sbml:listOfInitialAssignments",
+                    "sbml:initialAssignment[@symbol='{}']".format(symbol_id),
+                    "mathml:math",
+                    "mathml:cn",
+                    "text",
+                ]),
+                group='Initial assignments',
+                id="init_assignment_{}".format(symbol_id),
+                name='Initial assignment of {}'.format(symbol_sbml.getName() or symbol_id),
+                description=None,
+                identifiers=[],
+                type=type,
+                value=init_value,
+                recommended_range=self._calc_recommended_param_range(init_value),
+                units=self._format_unit_def(symbol_sbml.getDerivedUnitDefinition()),
+            )
+
+        # assignment rules
+        for rule_sbml in model_sbml.getListOfRules():
+            if rule_sbml.isScalar():
+                var_id = rule_sbml.getVariable()
+                var_sbml = model_sbml.getElementBySId(var_id)
+                math_sbml = rule_sbml.getMath()
+                math_type = math_sbml.getType()
+                if math_type in [libsbml.AST_INTEGER]:
+                    type = Type.integer
+                    value = math_sbml.getInteger()
+                elif math_type in [libsbml.AST_REAL, libsbml.AST_REAL_E]:
+                    type = Type.float
+                    value = math_sbml.getReal()
+                elif math_type in [libsbml.AST_RATIONAL]:
+                    continue
+                else:
+                    continue
+                parameters["assignment_{}".format(var_id)] = ModelParameter(
+                    target='/' + '/'.join([
+                        "sbml:sbml",
+                        "sbml:model",
+                        "sbml:listOfRules",
+                        "sbml:assignmentRule[@variable='{}']".format(var_id),
+                        "mathml:math",
+                        "mathml:cn",
+                        "text",
+                    ]),
+                    group='Assignments',
+                    id="assignment_{}".format(var_id),
+                    name='Assignment of {}'.format(var_sbml.getName() or var_id),
+                    description=None,
+                    identifiers=[],
+                    type=type,
+                    value=value,
+                    recommended_range=self._calc_recommended_param_range(value),
+                    units=self._format_unit_def(var_sbml.getDerivedUnitDefinition()),
+                )
+
         # fbc package
         plugin_sbml = model_sbml.getPlugin('fbc')
         if plugin_sbml:

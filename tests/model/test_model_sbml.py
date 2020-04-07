@@ -11,6 +11,8 @@ from Biosimulations_format_utils.model import ModelFormat, read_model
 from Biosimulations_format_utils.model.core import ModelIoError
 from Biosimulations_format_utils.model.data_model import ModelParameter, Variable
 from Biosimulations_format_utils.model.sbml import viz_model
+import importlib
+import libsbml
 import os
 import shutil
 import tempfile
@@ -18,6 +20,11 @@ import unittest
 
 
 class ReadSbmlModelTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # work around errors from "swig/python detected a memory leak of type 'ASTNodeType_t *', no destructor found."
+        importlib.reload(libsbml)
+
     def test_run_l2(self):
         filename = 'tests/fixtures/MODEL1204280027.sbml-L2V4.xml'
         model = read_model(filename, format=ModelFormat.sbml)
@@ -100,7 +107,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             type=Type.float,
             value=1.0,
             recommended_range=[0.1, 10.],
-            units='10^-3 liter',
+            units='mliter',
         )])
 
         init_species_params = list(filter(lambda param: param.group == 'Initial species amounts/concentrations', model.parameters))
@@ -129,7 +136,7 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             description=None,
             identifiers=[],
             type=Type.float,
-            units='10^-6 mole / liter',
+            units='µmole / liter',
         ))
 
         # errors
@@ -200,6 +207,50 @@ class ReadSbmlModelTestCase(unittest.TestCase):
                 units=None
             ),
         ])
+
+    def test_run_initial_assignment_parameters(self):
+        # model with numerical initial assignments
+        filename = 'tests/fixtures/BIOMD0000000232.xml'
+        model = read_model(filename, format=ModelFormat.sbml)
+        assignment = next(param for param in model.parameters if param.id == 'init_assignment_DeltaPsi')
+        self.assertEqual(assignment, ModelParameter(
+            target=("/sbml:sbml/sbml:model/sbml:listOfInitialAssignments"
+                    "/sbml:initialAssignment[@symbol='DeltaPsi']/mathml:math/mathml:cn/text"),
+            group='Initial assignments',
+            id='init_assignment_DeltaPsi',
+            name='Initial assignment of DeltaPsi',
+            description=None,
+            identifiers=[],
+            type=Type.integer,
+            value=150,
+            recommended_range=[15, 1500],
+            units="mvolt",
+        ))
+
+        # model with non-numerical initial assignments
+        filename = 'tests/fixtures/BIOMD0000000232.xml'
+        model = read_model(filename, format=ModelFormat.sbml)
+        self.assertEqual(next((param for param in model.parameters if param.id == 'assignment_V_phos'), None), None)
+
+    def test_run_assignment_rule_parameters(self):
+        # model with numerical and non-numerical assignment rules
+        filename = 'tests/fixtures/BIOMD0000000195.xml'
+        model = read_model(filename, format=ModelFormat.sbml)
+        assignment = next(param for param in model.parameters if param.id == 'assignment_Mad')
+        self.assertEqual(assignment, ModelParameter(
+            target=("/sbml:sbml/sbml:model/sbml:listOfRules"
+                    "/sbml:assignmentRule[@variable='Mad']/mathml:math/mathml:cn/text"),
+            group='Assignments',
+            id='assignment_Mad',
+            name='Assignment of Mad',
+            description=None,
+            identifiers=[],
+            type=Type.float,
+            value=1.,
+            recommended_range=[0.1, 10.],
+            units="dimensionless",
+        ))
+        self.assertEqual(next((param for param in model.parameters if param.id == 'assignment_CycB'), None), None)
 
     def test_run_ignore_parameters_set_by_assignment(self):
         filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'

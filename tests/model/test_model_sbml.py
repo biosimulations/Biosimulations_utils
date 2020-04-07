@@ -348,6 +348,8 @@ class ReadSbmlModelTestCase(unittest.TestCase):
             units=None,
         ))
 
+        self.assertEqual(next((param for param in model.parameters if param.id == 'init_size_membrane'), None), None)
+
     def test_run_qual_package(self):
         filename = 'tests/fixtures/qual_example_4.2.sbml-L3V1.xml'
         model = read_model(filename, format=ModelFormat.sbml)

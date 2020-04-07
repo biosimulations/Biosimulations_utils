@@ -265,6 +265,12 @@ class SbmlModelReader(ModelReader):
 
         # compartment sizes
         for comp_sbml in model_sbml.getListOfCompartments():
+            # ignore compartments with multi:isType="true"
+            comp_multi_smbl = comp_sbml.getPlugin('multi')
+            if comp_multi_smbl is not None and comp_multi_smbl.getIsType():
+                continue
+
+            # ignore compartments that don't have a set size
             if not comp_sbml.isSetSize():
                 continue
 

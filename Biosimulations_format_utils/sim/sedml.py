@@ -535,7 +535,7 @@ class SedMlSimWriter(SimWriter):
         """
         method = getattr(obj_sed, method_name)
         return_val = method(*args, **kwargs)
-        if return_val != 0:
+        if return_val != 0 or doc_sed.getErrorLog().getNumFailsWithSeverity(libsedml.LIBSEDML_SEV_ERROR):
             raise ValueError('libsedml error: {}'.format(doc_sed.getErrorLog().toString()))
         return return_val
 
@@ -620,6 +620,7 @@ class SedMlSimReader(SimReader):
             sims.append(sim)
             task_id = task_sed.getId()
             if task_id in task_id_to_sim:
+                warnings.warn('Tasks of {} must have unique ids'.format(os.path.basename(filename)), SimIoWarning)
                 task_id_to_sim[task_id] = None
             else:
                 task_id_to_sim[task_id] = sim
@@ -633,6 +634,7 @@ class SedMlSimReader(SimReader):
                 var_sed = data_gen_sed.getVariable(0)
                 data_gen_id = data_gen_sed.getId()
                 if data_gen_id in data_gen_id_to_task_id:
+                    warnings.warn('Data generators of {} must have unique ids'.format(os.path.basename(filename)), SimIoWarning)
                     data_gen_id_to_task_id[data_gen_id] = None
                     data_gen_id_to_var_target[data_gen_id] = None
                 else:
@@ -646,7 +648,7 @@ class SedMlSimReader(SimReader):
         viz = Visualization()
         for output_sed in doc_sed.getListOfOutputs():
             if not isinstance(output_sed, libsedml.SedPlot2D):
-                warnings.warn('{} is not supported'.format(output_sed.__class__.__name__), SimIoWarning)
+                warnings.warn('{} of {} is not supported'.format(output_sed.__class__.__name__, os.path.basename(filename)), SimIoWarning)
                 continue
 
             x_sim_results = []
@@ -658,11 +660,13 @@ class SedMlSimReader(SimReader):
                 x_task_id = data_gen_id_to_task_id.get(x_data_gen_id, None)
                 y_task_id = data_gen_id_to_task_id.get(y_data_gen_id, None)
                 if not x_task_id or not y_task_id:
+                    warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimIoWarning)
                     continue
 
                 x_sim = task_id_to_sim.get(x_task_id, None)
                 y_sim = task_id_to_sim.get(y_task_id, None)
                 if not x_sim or not y_sim:
+                    warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimIoWarning)
                     continue
 
                 if x_data_gen_id in time_data_gen_ids:

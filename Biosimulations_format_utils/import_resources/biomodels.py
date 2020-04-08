@@ -13,7 +13,7 @@ from ..model.core import ModelIoError
 from ..model.data_model import Model  # noqa: F401
 from ..model.sbml import viz_model
 from ..sim import SimFormat, read_sim
-from ..sim.core import SimIoWarning
+from ..sim.core import SimIoError, SimIoWarning
 from ..sim.data_model import Simulation
 from ..viz.data_model import Visualization
 import copy
@@ -83,10 +83,15 @@ class BioModelsImporter(object):
         with warnings.catch_warnings(record=True) as caught_warnings:
             warnings.simplefilter('ignore')
             warnings.simplefilter('always', SimIoWarning)
+            warnings.simplefilter('always', BiomodelsIoWarning)
             models, sims, vizs = self.get_models()
         if caught_warnings:
-            warnings.warn('Unable to import all simlations:\n  ' + '\n  '.join(
-                str(w.message) for w in caught_warnings), UserWarning)
+            for caught_warning in caught_warnings:
+                if caught_warning.category == BiomodelsIoWarning:
+                    warnings.warn(str(caught_warning.message), UserWarning)
+
+            warnings.warn('Unable to import all simulations:\n  ' + '\n  '.join(
+                str(w.message) for w in caught_warnings if w.category == SimIoWarning), UserWarning)
         self.submit_models(models, sims, vizs)
         stats = self.get_stats(models, sims, vizs)
         self.write_data(models, sims, vizs, stats)
@@ -104,6 +109,7 @@ class BioModelsImporter(object):
         sims = []
         vizs = []
         unimportable_models = []
+        unimportable_sims = []
         unvisualizable_models = []
         num_models = min(self._max_models, self.get_num_models())
         print('Importing {} models'.format(num_models))
@@ -118,6 +124,8 @@ class BioModelsImporter(object):
                     vizs.extend(model_vizs)
                 except ModelIoError:
                     unimportable_models.append(model_result['id'])
+                except SimIoError:
+                    unimportable_sims.append(model_result['id'])
 
                 try:
                     model.image = self.viz_model(model)
@@ -137,9 +145,13 @@ class BioModelsImporter(object):
                     break
 
         if unimportable_models:
-            warnings.warn('Unable import the following models:\n  {}'.format('\n  '.join(sorted(unimportable_models))), UserWarning)
+            warnings.warn('Unable import the following models:\n  {}'.format('\n  '.join(sorted(unimportable_models))), BiomodelsIoWarning)
+        if unimportable_sims:
+            warnings.warn('Unable import simulations for the following models:\n  {}'.format(
+                '\n  '.join(sorted(unimportable_sims))), BiomodelsIoWarning)
         if unvisualizable_models:
-            warnings.warn('Unable visualize the following models:\n  {}'.format('\n  '.join(sorted(unvisualizable_models))), UserWarning)
+            warnings.warn('Unable visualize the following models:\n  {}'.format(
+                '\n  '.join(sorted(unvisualizable_models))), BiomodelsIoWarning)
 
         return (models, sims, vizs)
 
@@ -560,3 +572,8 @@ class BioModelsImporter(object):
                 stats['sims']['time course'] += 1
 
         return stats
+
+
+class BiomodelsIoWarning(UserWarning):
+    """ BioModels IO warning """
+    pass

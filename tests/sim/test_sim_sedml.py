@@ -220,10 +220,10 @@ class WriteSedMlTestCase(unittest.TestCase):
 
     def test_read_visualizations_with_inconsistent_x_axes(self):
         filename = 'tests/fixtures/BIOMD0000000297-with-invalid-x-axis.sedml'
-        with self.assertRaisesRegex(SimIoError, 'Curves must have the same X axis'):
+        with self.assertWarnsRegex(SimIoWarning, 'Curves must have the same X axis'):
             read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
 
     def test_read_visualizations_with_inconsistent_y_axes(self):
         filename = 'tests/fixtures/BIOMD0000000297-with-invalid-y-axis.sedml'
-        with self.assertRaisesRegex(SimIoError, 'Curves must have the same Y axis'):
+        with self.assertWarnsRegex(SimIoWarning, 'Curves must have the same Y axis'):
             read_sim(filename, ModelFormat.sbml, SimFormat.sedml)

@@ -686,10 +686,12 @@ class SedMlSimReader(SimReader):
                 x_sim_results = x_sim_results[slice(0, 1)]
             elif not all([sim_res.variable.target == 'urn:sedml:symbol:time' for sim_res in x_sim_results]) or \
                     len(set([curve_sed.getLogX() for curve_sed in output_sed.getListOfCurves()])) > 1:
-                raise SimIoError('Curves must have the same X axis')
+                warnings.warn('Curves must have the same X axis', SimIoWarning)
+                continue
 
             if len(set([curve_sed.getLogY() for curve_sed in output_sed.getListOfCurves()])) > 1:
-                raise SimIoError('Curves must have the same Y axis')
+                warnings.warn('Curves must have the same Y axis', SimIoWarning)
+                continue
 
             if not x_sim_results:
                 continue

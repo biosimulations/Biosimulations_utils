@@ -819,7 +819,7 @@ def viz_model(model_filename, img_filename, requests_session=None):
         plugin = model.getPlugin('layout')
         if plugin:
             for i_layout in range(plugin.getNumLayouts()):
-                plugin.removeLayout(i_layout)        
+                plugin.removeLayout(i_layout)
 
         # remove units from model
         for unit_def in model.getListOfUnitDefinitions():

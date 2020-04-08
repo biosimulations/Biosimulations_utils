@@ -819,8 +819,20 @@ def viz_model(model_filename, img_filename, requests_session=None):
         plugin = model.getPlugin('layout')
         if plugin:
             for i_layout in range(plugin.getNumLayouts()):
-                plugin.removeLayout(i_layout)
-        model_without_layout = libsbml.writeSBMLToString(doc)
+                plugin.removeLayout(i_layout)        
+
+        # remove units from model
+        for unit_def in model.getListOfUnitDefinitions():
+            for unit in range(unit_def.getNumUnits()):
+                unit_def.removeUnit(0)
+            unit = unit_def.createUnit()
+            unit.setExponent(0)
+            unit.setKind(libsbml.UNIT_KIND_DIMENSIONLESS)
+            unit.setMultiplier(1)
+            unit.setScale(0)
+
+        # encode corrected model to XML
+        corrected_model = libsbml.writeSBMLToString(doc)
 
         # use MINERVA to generate a visualization of the model
         if requests_session is None:
@@ -828,7 +840,7 @@ def viz_model(model_filename, img_filename, requests_session=None):
 
         url = MINERVA_ENDPOINT.format('SBML', 'png')
         response = requests_session.post(
-            url, headers={'Content-Type': 'application/sbml+xml; charset=utf-8'}, data=model_without_layout.encode('utf-8'))
+            url, headers={'Content-Type': 'application/sbml+xml; charset=utf-8'}, data=corrected_model.encode('utf-8'))
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError:

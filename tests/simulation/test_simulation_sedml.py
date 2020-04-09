@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_format_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from Biosimulations_format_utils.data_model import Format
+from Biosimulations_format_utils.data_model import Format, OntologyTerm
 from Biosimulations_format_utils.biomodel.data_model import BiomodelFormat, Biomodel, BiomodelVariable
 from Biosimulations_format_utils.simulation import write_simulation, read_simulation, sedml
 from Biosimulations_format_utils.simulation.core import SimulationIoError, SimulationIoWarning
@@ -151,7 +151,9 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(sim.output_start_time, 0.)
         self.assertEqual(sim.end_time, 1.)
         self.assertEqual(sim.num_time_points, 100)
-        self.assertEqual(sim.algorithm.kisao_id, 'KISAO:0000019')
+        self.assertEqual(sim.algorithm.kisao_term, OntologyTerm(
+            ontology='KISAO',
+            id='0000019'))
         self.assertEqual(sim.algorithm_parameter_changes, [])
 
     def test_read_visualizations(self):

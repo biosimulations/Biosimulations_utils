@@ -172,8 +172,9 @@ class SbmlBiomodelReader(BiomodelReader):
 
         unsupported_packages = packages.difference(set(['annot', 'comp', 'fbc', 'groups', 'layout', 'multi', 'qual', 'render', 'req']))
         if unsupported_packages:
-            raise BiomodelIoError("{} package(s) are not supported".format(', '.join(unsupported_packages))
-                               )  # pragma: no cover # unreachable with libSBML 5.18 which doesn't support additional packages
+            raise BiomodelIoError("{} package(s) are not supported".format(
+                ', '.join(unsupported_packages))
+            )  # pragma: no cover # unreachable with libSBML 5.18 which doesn't support additional packages
 
         plugin = model_sbml.getSBMLDocument().getPlugin('comp')
         if plugin:

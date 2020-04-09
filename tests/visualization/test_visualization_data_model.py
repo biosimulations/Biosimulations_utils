@@ -39,8 +39,9 @@ class ChartDataModelTestCase(unittest.TestCase):
                     chart=Chart(id='line'),
                     data=[
                         VisualizationDataField(
-                            data_field=ChartDataField(name='field 1', shape=ChartDataFieldShape.array,
-                                                          type=ChartDataFieldType.static),
+                            data_field=ChartDataField(name='field 1',
+                                                      shape=ChartDataFieldShape.array,
+                                                      type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-1'), variable=BiomodelVariable(id='var-2')),
@@ -53,8 +54,9 @@ class ChartDataModelTestCase(unittest.TestCase):
                             ],
                         ),
                         VisualizationDataField(
-                            data_field=ChartDataField(name='field 0', shape=ChartDataFieldShape.array,
-                                                          type=ChartDataFieldType.static),
+                            data_field=ChartDataField(name='field 0',
+                                                      shape=ChartDataFieldShape.array,
+                                                      type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-4'), variable=BiomodelVariable(id='var-4')),
@@ -72,8 +74,9 @@ class ChartDataModelTestCase(unittest.TestCase):
                     chart=Chart(id='area'),
                     data=[
                         VisualizationDataField(
-                            data_field=ChartDataField(name='field 1', shape=ChartDataFieldShape.array,
-                                                          type=ChartDataFieldType.static),
+                            data_field=ChartDataField(name='field 1',
+                                                      shape=ChartDataFieldShape.array,
+                                                      type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-1'), variable=BiomodelVariable(id='var-2')),
@@ -86,8 +89,9 @@ class ChartDataModelTestCase(unittest.TestCase):
                             ],
                         ),
                         VisualizationDataField(
-                            data_field=ChartDataField(name='field 0', shape=ChartDataFieldShape.array,
-                                                          type=ChartDataFieldType.static),
+                            data_field=ChartDataField(name='field 0',
+                                                      shape=ChartDataFieldShape.array,
+                                                      type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-4'), variable=BiomodelVariable(id='var-4')),

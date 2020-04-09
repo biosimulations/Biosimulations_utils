@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.data_model import Format, JournalReference, License, Person, RemoteFile, Type
+from Biosimulations_format_utils.data_model import Format, JournalReference, License, OntologyTerm, Person, RemoteFile, Type
 from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
 from Biosimulations_format_utils.biomodel.sbml import BiomodelingFramework
 from Biosimulations_format_utils.simulation.data_model import (
@@ -42,14 +42,14 @@ class SimulationDataModelTestCase(unittest.TestCase):
             output_start_time=1.,
             end_time=10.,
             num_time_points=100,
-            algorithm=Algorithm(id='00001', name='integrator', kisao_id='KISAO:00001', parameters=[
+            algorithm=Algorithm(id='00001', name='integrator', kisao_term=OntologyTerm(ontology='KISAO', id='00001'), parameters=[
                 AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2,
-                                   recommended_range=[0.12, 12.], kisao_id='KISAO:00001'),
+                                   recommended_range=[0.12, 12.], kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
             ]),
             algorithm_parameter_changes=[
                 ParameterChange(parameter=AlgorithmParameter(id='param_1', name='param 1', type=Type.float,
                                                              value=1.2, recommended_range=[0.12, 12.],
-                                                             kisao_id='KISAO:00001'),
+                                                             kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
                                 value=2.1),
             ]
         )
@@ -78,13 +78,17 @@ class SimulationDataModelTestCase(unittest.TestCase):
                 ParameterChange(parameter=BiomodelParameter(id='param_1', name='param 1', type=Type.float, value=3.5),
                                 value=5.3),
             ],
-            algorithm=Algorithm(id='00001', name='integrator', kisao_id='KISAO:00001', parameters=[
+            algorithm=Algorithm(id='00001', name='integrator', kisao_term=OntologyTerm(ontology='KISAO', id='00001'), parameters=[
                 AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2,
-                                   recommended_range=[0.12, 12.], kisao_id='KISAO:00001'),
+                                   recommended_range=[0.12, 12.], kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
             ]),
             algorithm_parameter_changes=[
-                ParameterChange(parameter=AlgorithmParameter(id='param_1', name='param 1', type=Type.float,
-                                                             value=1.2, recommended_range=[0.12, 12.], kisao_id='KISAO:00001'),
+                ParameterChange(parameter=AlgorithmParameter(id='param_1',
+                                                             name='param 1',
+                                                             type=Type.float,
+                                                             value=1.2,
+                                                             recommended_range=[0.12, 12.],
+                                                             kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
                                 value=2.1),
             ]
         )
@@ -95,8 +99,11 @@ class SimulationDataModelTestCase(unittest.TestCase):
         alg = Algorithm(
             id='00001',
             name='integrator',
-            kisao_id='KISAO:00001',
-            synonymous_kisao_ids=['KISAO:00002', 'KISAO:00003'],
+            kisao_term=OntologyTerm(ontology='KISAO', id='00001'),
+            ontology_terms=[
+                OntologyTerm(ontology='KISAO', id='00002'),
+                OntologyTerm(ontology='KISAO', id='00003'),
+            ],
             modeling_frameworks=[
                 BiomodelingFramework.logical.value,
                 BiomodelingFramework.flux_balance.value,
@@ -105,24 +112,38 @@ class SimulationDataModelTestCase(unittest.TestCase):
                 Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
             ],
             parameters=[
-                AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2,
-                                   recommended_range=[0.12, 12.], kisao_id='KISAO:00001'),
+                AlgorithmParameter(id='param_1',
+                                   name='param 1',
+                                   type=Type.float,
+                                   value=1.2,
+                                   recommended_range=[0.12, 12.],
+                                   kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
             ],
         )
         self.assertEqual(Algorithm.from_json(alg.to_json()), alg)
 
     def test_AlgorithmParameter(self):
-        param = AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2,
-                                   recommended_range=[0.12, 12.], kisao_id='KISAO:00001')
+        param = AlgorithmParameter(id='param_1',
+                                   name='param 1',
+                                   type=Type.float,
+                                   value=1.2,
+                                   recommended_range=[0.12, 12.],
+                                   kisao_term=OntologyTerm(ontology='KISAO', id='00001'))
         self.assertEqual(AlgorithmParameter.from_json(param.to_json()), param)
-        self.assertEqual(AlgorithmParameter.sort_key(param), ('param_1', 'param 1', 'float', 1.2, (0.12, 12.), 'KISAO:00001'))
+        self.assertEqual(AlgorithmParameter.sort_key(param), ('param_1', 'param 1',
+                                                              'float', 1.2, (0.12, 12.), ('KISAO', '00001', None, None, None)))
 
     def test_ParameterChange(self):
-        change = ParameterChange(parameter=AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2,
-                                                              recommended_range=[0.12, 12.], kisao_id='KISAO:00001'),
+        change = ParameterChange(parameter=AlgorithmParameter(id='param_1',
+                                                              name='param 1',
+                                                              type=Type.float,
+                                                              value=1.2,
+                                                              recommended_range=[0.12, 12.],
+                                                              kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
                                  value=2.1)
         self.assertEqual(ParameterChange.from_json(change.to_json(), AlgorithmParameter), change)
-        self.assertEqual(ParameterChange.sort_key(change), (('param_1', 'param 1', 'float', 1.2, (0.12, 12.), 'KISAO:00001'), 2.1))
+        self.assertEqual(ParameterChange.sort_key(change), (('param_1', 'param 1', 'float',
+                                                             1.2, (0.12, 12.), ('KISAO', '00001', None, None, None)), 2.1))
 
     def test_SimulationResult(self):
         result = SimulationResult(simulation=TimecourseSimulation(id='sim'), variable=BiomodelVariable(id='var'))

@@ -10,7 +10,7 @@ from .core import SimulationWriter, SimulationReader, SimulationIoError, Simulat
 from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation,  # noqa: F401
                          Algorithm, AlgorithmParameter, ParameterChange, SimulationResult)
 from ..chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from ..data_model import Format, JournalReference, License, Person, RemoteFile
+from ..data_model import Format, JournalReference, License, OntologyTerm, Person, RemoteFile
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
 from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 from ..utils import assert_exception
@@ -313,7 +313,9 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedAlgorithm`: SED simulation algorithm
         """
         alg_sed = sim_sed.createAlgorithm()
-        self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.kisao_id)
+        print(algorithm.kisao_term)
+        if algorithm.kisao_term:
+            self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.kisao_term.ontology + ':' + algorithm.kisao_term.id)
         if algorithm.id:
             self._add_annotation_to_obj([XmlNode(
                 prefix='dc',
@@ -358,7 +360,10 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedAlgorithmParameter`: SED simulation algorithm paremeter change
         """
         change_sed = alg_sed.createAlgorithmParameter()
-        self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID', change.parameter.kisao_id)
+        print(change.parameter.kisao_term)
+        if change.parameter.kisao_term:
+            self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID',
+                                       change.parameter.kisao_term.ontology + ':' + change.parameter.kisao_term.id)
         if change.parameter.id:
             self._add_annotation_to_obj([XmlNode(
                 prefix='dc',
@@ -907,10 +912,22 @@ class SedMlSimulationReader(SimulationReader):
             elif node.prefix == 'dc' and node.name == 'description':
                 alg_name = node.children
 
+        kisao_term_onto_id = alg_sed.getKisaoID()
+        if kisao_term_onto_id:
+            kisao_term_onto, _, kisao_term_id = kisao_term_onto_id.partition(':')
+            assert kisao_term_onto == 'KISAO'
+            assert kisao_term_id
+            kisao_term = OntologyTerm(
+                ontology=kisao_term_onto,
+                id=kisao_term_id,
+            )
+        else:
+            kisao_term = None
+
         sim.algorithm = Algorithm(
             id=alg_id,
             name=alg_name,
-            kisao_id=alg_sed.getKisaoID(),
+            kisao_term=kisao_term,
         )
 
         # algorithm parameters
@@ -925,11 +942,22 @@ class SedMlSimulationReader(SimulationReader):
                 elif node.prefix == 'dc' and node.name == 'description':
                     param_name = node.children
 
+            kisao_term_onto_id = change_sed.getKisaoID()
+            if kisao_term_onto_id:
+                kisao_term_onto, _, kisao_term_id = kisao_term_onto_id.partition(':')
+                assert kisao_term_onto == 'KISAO'
+                assert kisao_term_id
+                kisao_term = OntologyTerm(
+                    ontology=kisao_term_onto,
+                    id=kisao_term_id,
+                )
+            else:
+                kisao_term = None
             sim.algorithm_parameter_changes.append(ParameterChange(
                 parameter=AlgorithmParameter(
                     id=param_id,
                     name=param_name,
-                    kisao_id=change_sed.getKisaoID(),
+                    kisao_term=kisao_term,
                 ),
                 value=float(change_sed.getValue()),
             ))

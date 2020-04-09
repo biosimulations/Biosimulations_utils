@@ -290,22 +290,22 @@ class Algorithm(object):
     Attributes:
         id (:obj:`str`): id
         name (:obj:`str`): name
-        kisao_id (:obj:`str`): KiSAO id
-        synonymous_kisao_ids (:obj:`list` of :obj:`str`): list of sematically equivalent
+        kisao_term (:obj:`OntologyTerm`): KiSAO id
+        ontology_terms (:obj:`list` of :obj:`OntologyTerm`): list of sematically equivalent
             KiSAO ids for the parent simulator of an algorithm
         modeling_frameworks (:obj:`list` of :obj:`OntologyTerm`): supported modeling frameworks
         model_formats (:obj:`list` of :obj:`Format`): supoorted model formats
         parameters (:obj:`list` of :obj:`AlgorithmParameter`): parameters
     """
 
-    def __init__(self, id=None, name=None, kisao_id=None, synonymous_kisao_ids=None,
+    def __init__(self, id=None, name=None, kisao_term=None, ontology_terms=None,
                  modeling_frameworks=None, model_formats=None, parameters=None):
         """
         Args:
             id (:obj:`str`, optional): id
             name (:obj:`str`, optional): name
-            kisao_id (:obj:`str`, optional): KiSAO id
-            synonymous_kisao_ids (:obj:`list` of :obj:`str`, optional): list of sematically equivalent
+            kisao_term (:obj:`OntologyTerm`, optional): KiSAO id
+            ontology_terms (:obj:`list` of :obj:`OntologyTerm`, optional): list of sematically equivalent
                 KiSAO ids for the parent simulator of an algorithm
             modeling_frameworks (:obj:`list` of :obj:`OntologyTerm`, optional): supported modeling frameworks
             model_formats (:obj:`list` of :obj:`Format`, optional): supoorted model formats
@@ -313,8 +313,8 @@ class Algorithm(object):
         """
         self.id = id
         self.name = name
-        self.kisao_id = kisao_id
-        self.synonymous_kisao_ids = synonymous_kisao_ids or []
+        self.kisao_term = kisao_term
+        self.ontology_terms = ontology_terms or []
         self.modeling_frameworks = modeling_frameworks or []
         self.model_formats = model_formats or []
         self.parameters = parameters or []
@@ -331,8 +331,8 @@ class Algorithm(object):
         return other.__class__ == self.__class__ \
             and self.id == other.id \
             and self.name == other.name \
-            and self.kisao_id == other.kisao_id \
-            and sorted(self.synonymous_kisao_ids) == sorted(other.synonymous_kisao_ids) \
+            and self.kisao_term == other.kisao_term \
+            and sorted(self.ontology_terms, key=OntologyTerm.sort_key) == sorted(other.ontology_terms, key=OntologyTerm.sort_key) \
             and sorted(self.modeling_frameworks, key=OntologyTerm.sort_key) == \
             sorted(other.modeling_frameworks, key=OntologyTerm.sort_key) \
             and sorted(self.model_formats, key=Format.sort_key) == sorted(other.model_formats, key=Format.sort_key) \
@@ -347,8 +347,8 @@ class Algorithm(object):
         return {
             'id': self.id,
             'name': self.name,
-            'kisaoId': self.kisao_id,
-            'synonymousKisaoIds': self.synonymous_kisao_ids,
+            'kisaoTerm': self.kisao_term.to_json() if self.kisao_term else None,
+            'ontologyTerms': [term.to_json() for term in self.ontology_terms],
             'modelingFrameworks': [framework.to_json() for framework in self.modeling_frameworks],
             'modelFormats': [format.to_json() for format in self.model_formats],
             'parameters': [param.to_json() for param in self.parameters],
@@ -367,8 +367,8 @@ class Algorithm(object):
         return cls(
             id=val.get('id', None),
             name=val.get('name', None),
-            kisao_id=val.get('kisaoId', None),
-            synonymous_kisao_ids=val.get('synonymousKisaoIds', []),
+            kisao_term=OntologyTerm.from_json(val.get('kisaoTerm')) if val.get('kisaoTerm', None) else None,
+            ontology_terms=[OntologyTerm.from_json(term) for term in val.get('ontologyTerms', [])],
             modeling_frameworks=[OntologyTerm.from_json(framework) for framework in val.get('modelingFrameworks', [])],
             model_formats=[Format.from_json(format) for format in val.get('modelFormats', [])],
             parameters=[AlgorithmParameter.from_json(param) for param in val.get('parameters', [])],
@@ -384,10 +384,10 @@ class AlgorithmParameter(object):
         type (:obj:`Type`): type
         value (:obj:`object`): value
         recommended_range (:obj:`list` of :obj:`object`): recommend minimum and maximum values
-        kisao_id (:obj:`str`): KiSAO id
+        kisao_term (:obj:`OntologyTerm`): KiSAO term
     """
 
-    def __init__(self, id=None, name=None, type=None, value=None, recommended_range=None, kisao_id=None):
+    def __init__(self, id=None, name=None, type=None, value=None, recommended_range=None, kisao_term=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -395,14 +395,14 @@ class AlgorithmParameter(object):
             type (:obj:`Type`, optional): type
             value (:obj:`object`, optional): value
             recommended_range (:obj:`list` of :obj:`object`, optional): recommend minimum and maximum values
-            kisao_id (:obj:`str`, optional): KiSAO id
+            kisao_term (:obj:`OntologyTerm`, optional): KiSAO term
         """
         self.id = id
         self.name = name
         self.type = type
         self.value = value
         self.recommended_range = recommended_range or []
-        self.kisao_id = kisao_id
+        self.kisao_term = kisao_term
 
     def __eq__(self, other):
         """ Determine if two algorithm parameters are semantically equal
@@ -419,7 +419,7 @@ class AlgorithmParameter(object):
             and self.type == other.type \
             and self.value == other.value \
             and self.recommended_range == other.recommended_range \
-            and self.kisao_id == other.kisao_id
+            and self.kisao_term == other.kisao_term
 
     def to_json(self):
         """ Export to JSON
@@ -433,7 +433,7 @@ class AlgorithmParameter(object):
             'type': self.type.value if self.type else None,
             'value': self.value,
             'recommendedRange': self.recommended_range,
-            'kisaoId': self.kisao_id,
+            'kisaoTerm': self.kisao_term.to_json() if self.kisao_term else None,
         }
 
     @classmethod
@@ -452,7 +452,7 @@ class AlgorithmParameter(object):
             type=Type(val.get('type')) if val.get('type', None) else None,
             value=val.get('value', None),
             recommended_range=val.get('recommendedRange', []),
-            kisao_id=val.get('kisaoId', None),
+            kisao_term=OntologyTerm.from_json(val.get('kisaoTerm')) if val.get('kisaoTerm', None) else None,
         )
 
     @staticmethod
@@ -471,7 +471,7 @@ class AlgorithmParameter(object):
             parameter.type.value if parameter.type else None,
             parameter.value,
             tuple(parameter.recommended_range),
-            parameter.kisao_id,
+            parameter.kisao_term.sort_key(parameter.kisao_term),
         )
 
 

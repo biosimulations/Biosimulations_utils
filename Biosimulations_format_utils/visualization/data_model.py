@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from ..chart_type.data_model import ChartType, ChartTypeDataField
+from ..chart.data_model import Chart, ChartDataField
 from ..data_model import Format, Identifier, JournalReference, License, Person, RemoteFile
 from ..simulation.data_model import SimulationResult
 
@@ -141,17 +141,17 @@ class VisualizationLayoutElement(object):
     """ Element of a visualization (i.e. a cell in a grid of visualizations)
 
     Attributes:
-        chart_type (:obj:`ChartType`): chart type
+        chart (:obj:`Chart`): chart type
         data (:obj:`list` of :obj:`VisualizationDataField`): data to paint chart type
     """
 
-    def __init__(self, chart_type=None, data=None):
+    def __init__(self, chart=None, data=None):
         """
         Args:
-            chart_type (:obj:`ChartType`, optional): chart type
+            chart (:obj:`Chart`, optional): chart type
             data (:obj:`list` of :obj:`VisualizationDataField`, optional): data to paint chart type
         """
-        self.chart_type = chart_type
+        self.chart = chart
         self.data = data or []
 
     def __eq__(self, other):
@@ -164,7 +164,7 @@ class VisualizationLayoutElement(object):
             :obj:`bool`
         """
         return other.__class__ == self.__class__ \
-            and self.chart_type == other.chart_type \
+            and self.chart == other.chart \
             and sorted(self.data, key=VisualizationDataField.sort_key) == sorted(other.data, key=VisualizationDataField.sort_key)
 
     def to_json(self):
@@ -174,7 +174,7 @@ class VisualizationLayoutElement(object):
             :obj:`dict`
         """
         return {
-            'chartType': self.chart_type.to_json() if self.chart_type else None,
+            'chartType': self.chart.to_json() if self.chart else None,
             'data': [d.to_json() for d in self.data],
         }
 
@@ -189,7 +189,7 @@ class VisualizationLayoutElement(object):
             :obj:`VisualizationLayoutElement`
         """
         return cls(
-            chart_type=ChartType.from_json(val.get('chartType')) if val.get('chartType', None) else None,
+            chart=Chart.from_json(val.get('chartType')) if val.get('chartType', None) else None,
             data=[VisualizationDataField.from_json(d) for d in val.get('data', [])],
         )
 
@@ -203,20 +203,20 @@ class VisualizationLayoutElement(object):
         Returns:
             :obj:`tuple`
         """
-        return (el.chart_type.id, tuple(sorted([VisualizationDataField.sort_key(d) for d in el.data])))
+        return (el.chart.id, tuple(sorted([VisualizationDataField.sort_key(d) for d in el.data])))
 
 
 class VisualizationDataField(object):
     """
     Attributes:
-        data_field (:obj:`ChartTypeDataField`): data field
+        data_field (:obj:`ChartDataField`): data field
         simulation_results (:obj:`list` of :obj:`SimulationResult`): simulation results
     """
 
     def __init__(self, data_field=None, simulation_results=None):
         """
         Args:
-            data_field (:obj:`ChartTypeDataField`, optional): data field
+            data_field (:obj:`ChartDataField`, optional): data field
             simulation_results (:obj:`list` of :obj:`SimulationResult`, optional): simulation results
         """
         self.data_field = data_field
@@ -258,7 +258,7 @@ class VisualizationDataField(object):
             :obj:`VisualizationDataField`
         """
         return cls(
-            data_field=ChartTypeDataField.from_json(val.get('dataField')) if val.get('dataField', None) else None,
+            data_field=ChartDataField.from_json(val.get('dataField')) if val.get('dataField', None) else None,
             simulation_results=[SimulationResult.from_json(r) for r in val.get('simulationResults', [])],
         )
 
@@ -273,6 +273,6 @@ class VisualizationDataField(object):
             :obj:`tuple`
         """
         return (
-            ChartTypeDataField.sort_key(field.data_field),
+            ChartDataField.sort_key(field.data_field),
             tuple(sorted([SimulationResult.sort_key(r) for r in field.simulation_results])),
         )

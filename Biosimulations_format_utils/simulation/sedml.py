@@ -9,7 +9,7 @@
 from .core import SimulationWriter, SimulationReader, SimulationIoError, SimulationIoWarning
 from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation,  # noqa: F401
                          Algorithm, AlgorithmParameter, ParameterChange, SimulationResult)
-from ..chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
+from ..chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from ..data_model import Format, JournalReference, License, Person, RemoteFile
 from ..model.data_model import Model, ModelParameter, ModelVariable
 from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
@@ -710,28 +710,28 @@ class SedMlSimulationReader(SimulationReader):
             if not x_sim_results:
                 continue
 
-            chart_type_id = 'line'
+            chart_id = 'line'
             if output_sed.getCurve(0).getLogX():
-                chart_type_id += '-logX'
+                chart_id += '-logX'
             if output_sed.getCurve(0).getLogY():
-                chart_type_id += '-logY'
+                chart_id += '-logY'
 
             layout_el = VisualizationLayoutElement(
-                chart_type=ChartType(id=chart_type_id),
+                chart=Chart(id=chart_id),
                 data=[
                     VisualizationDataField(
-                        data_field=ChartTypeDataField(
+                        data_field=ChartDataField(
                             name='x',
-                            shape=ChartTypeDataFieldShape.array,
-                            type=ChartTypeDataFieldType.dynamic_simulation_result,
+                            shape=ChartDataFieldShape.array,
+                            type=ChartDataFieldType.dynamic_simulation_result,
                         ),
                         simulation_results=x_sim_results,
                     ),
                     VisualizationDataField(
-                        data_field=ChartTypeDataField(
+                        data_field=ChartDataField(
                             name='y',
-                            shape=ChartTypeDataFieldShape.array,
-                            type=ChartTypeDataFieldType.dynamic_simulation_result,
+                            shape=ChartDataFieldShape.array,
+                            type=ChartDataFieldType.dynamic_simulation_result,
                         ),
                         simulation_results=y_sim_results,
                     ),

@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
+from Biosimulations_format_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_format_utils.data_model import (Format, Identifier, JournalReference,
                                                     License, OntologyTerm, Person, RemoteFile, Taxon, Type)
 from Biosimulations_format_utils.model.data_model import Model, ModelParameter, ModelVariable
@@ -122,8 +122,8 @@ class ApiConsistencyTestCase(unittest.TestCase):
         if errors:
             raise Exception('Data model for `Simulation` is not consistent with API:\n  Simulation:\n    ' + '\n    '.join(errors))
 
-    def test_chart_type(self):
-        py = ChartType(id='chart-type-1').to_json()
+    def test_chart(self):
+        py = Chart(id='chart-type-1').to_json()
 
         api = {}
         for schema in self.api_schemas['Chart']['allOf']:
@@ -132,7 +132,7 @@ class ApiConsistencyTestCase(unittest.TestCase):
 
         errors = self.get_differences_from_api(py, api)
         if errors:
-            raise Exception('Data model for `ChartType` is not consistent with API:\n  ChartType:\n    ' + '\n    '.join(errors))
+            raise Exception('Data model for `Chart` is not consistent with API:\n  Chart:\n    ' + '\n    '.join(errors))
 
     @unittest.expectedFailure
     def test_viz(self):
@@ -156,11 +156,11 @@ class ApiConsistencyTestCase(unittest.TestCase):
             columns=3,
             layout=[
                 VisualizationLayoutElement(
-                    chart_type=ChartType(id='line'),
+                    chart=Chart(id='line'),
                     data=[
                         VisualizationDataField(
-                            data_field=ChartTypeDataField(name='field 1', shape=ChartTypeDataFieldShape.array,
-                                                          type=ChartTypeDataFieldType.static),
+                            data_field=ChartDataField(name='field 1', shape=ChartDataFieldShape.array,
+                                                          type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-1'), variable=ModelVariable(id='var-2')),
@@ -173,8 +173,8 @@ class ApiConsistencyTestCase(unittest.TestCase):
                             ],
                         ),
                         VisualizationDataField(
-                            data_field=ChartTypeDataField(name='field 0', shape=ChartTypeDataFieldShape.array,
-                                                          type=ChartTypeDataFieldType.static),
+                            data_field=ChartDataField(name='field 0', shape=ChartDataFieldShape.array,
+                                                          type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-4'), variable=ModelVariable(id='var-4')),
@@ -189,11 +189,11 @@ class ApiConsistencyTestCase(unittest.TestCase):
                     ],
                 ),
                 VisualizationLayoutElement(
-                    chart_type=ChartType(id='area'),
+                    chart=Chart(id='area'),
                     data=[
                         VisualizationDataField(
-                            data_field=ChartTypeDataField(name='field 1', shape=ChartTypeDataFieldShape.array,
-                                                          type=ChartTypeDataFieldType.static),
+                            data_field=ChartDataField(name='field 1', shape=ChartDataFieldShape.array,
+                                                          type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-1'), variable=ModelVariable(id='var-2')),
@@ -206,8 +206,8 @@ class ApiConsistencyTestCase(unittest.TestCase):
                             ],
                         ),
                         VisualizationDataField(
-                            data_field=ChartTypeDataField(name='field 0', shape=ChartTypeDataFieldShape.array,
-                                                          type=ChartTypeDataFieldType.static),
+                            data_field=ChartDataField(name='field 0', shape=ChartDataFieldShape.array,
+                                                          type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-4'), variable=ModelVariable(id='var-4')),

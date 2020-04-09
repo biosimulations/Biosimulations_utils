@@ -9,11 +9,11 @@
 import enum
 
 __all__ = [
-    'ChartType', 'ChartTypeDataField', 'ChartTypeDataFieldShape', 'ChartTypeDataFieldType',
+    'Chart', 'ChartDataField', 'ChartDataFieldShape', 'ChartDataFieldType',
 ]
 
 
-class ChartType(object):
+class Chart(object):
     """ Chart type
 
     Attributes:
@@ -31,7 +31,7 @@ class ChartType(object):
         """ Determine if two chart types are semantically equal
 
         Args:
-            other (:obj:`ChartType`): other chart type
+            other (:obj:`Chart`): other chart type
 
         Returns:
             :obj:`bool`
@@ -57,28 +57,28 @@ class ChartType(object):
             val (:obj:`dict`)
 
         Returns:
-            :obj:`ChartType`
+            :obj:`Chart`
         """
         return cls(
             id=val.get('id', None)
         )
 
 
-class ChartTypeDataField(object):
+class ChartDataField(object):
     """ Chart type data field
 
     Attributes:
         name (:obj:`str`): name
-        shape (:obj:`ChartTypeDataFieldShape`): shape
-        type (:obj:`ChartTypeDataFieldType`): type
+        shape (:obj:`ChartDataFieldShape`): shape
+        type (:obj:`ChartDataFieldType`): type
     """
 
     def __init__(self, name=None, shape=None, type=None):
         """
         Args:
             name (:obj:`str`, optional): name
-            shape (:obj:`ChartTypeDataFieldShape`, optional): shape
-            type (:obj:`ChartTypeDataFieldType`, optional): type
+            shape (:obj:`ChartDataFieldShape`, optional): shape
+            type (:obj:`ChartDataFieldType`, optional): type
         """
         self.name = name
         self.shape = shape
@@ -88,7 +88,7 @@ class ChartTypeDataField(object):
         """ Determine if two chart types are semantically equal
 
         Args:
-            other (:obj:`ChartType`): other chart type
+            other (:obj:`Chart`): other chart type
 
         Returns:
             :obj:`bool`
@@ -118,12 +118,12 @@ class ChartTypeDataField(object):
             val (:obj:`dict`)
 
         Returns:
-            :obj:`ChartTypeDataField`
+            :obj:`ChartDataField`
         """
         return cls(
             name=val.get('name', None),
-            shape=ChartTypeDataFieldShape(val.get('shape')) if val.get('shape', None) else None,
-            type=ChartTypeDataFieldType(val.get('type')) if val.get('type', None) else None,
+            shape=ChartDataFieldShape(val.get('shape')) if val.get('shape', None) else None,
+            type=ChartDataFieldType(val.get('type')) if val.get('type', None) else None,
         )
 
     @staticmethod
@@ -131,7 +131,7 @@ class ChartTypeDataField(object):
         """ Get a key to sort a field
 
         Args:
-            field (:obj:`ChartTypeDataField`): field
+            field (:obj:`ChartDataField`): field
 
         Returns:
             :obj:`tuple`
@@ -139,13 +139,13 @@ class ChartTypeDataField(object):
         return (field.name, field.shape.value if field.shape else None, field.type.value if field.type else None)
 
 
-class ChartTypeDataFieldShape(str, enum.Enum):
+class ChartDataFieldShape(str, enum.Enum):
     """ Chart type data field shape """
     scalar = 'scalar'
     array = 'array'
 
 
-class ChartTypeDataFieldType(str, enum.Enum):
+class ChartDataFieldType(str, enum.Enum):
     """ Chart type data field type """
     dynamic_simulation_result = 'dynamicSimulationResult'
     static = 'static'

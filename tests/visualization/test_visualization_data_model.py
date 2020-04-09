@@ -7,14 +7,14 @@
 """
 
 from Biosimulations_format_utils.data_model import Format, Identifier, JournalReference, License, Person, RemoteFile
-from Biosimulations_format_utils.chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
+from Biosimulations_format_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_format_utils.model.data_model import ModelVariable
 from Biosimulations_format_utils.simulation.data_model import TimecourseSimulation, SimulationResult
 from Biosimulations_format_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import unittest
 
 
-class ChartTypeDataModelTestCase(unittest.TestCase):
+class ChartDataModelTestCase(unittest.TestCase):
     def test_Visualization(self):
         viz = Visualization(
             id='viz_1',
@@ -36,11 +36,11 @@ class ChartTypeDataModelTestCase(unittest.TestCase):
             columns=3,
             layout=[
                 VisualizationLayoutElement(
-                    chart_type=ChartType(id='line'),
+                    chart=Chart(id='line'),
                     data=[
                         VisualizationDataField(
-                            data_field=ChartTypeDataField(name='field 1', shape=ChartTypeDataFieldShape.array,
-                                                          type=ChartTypeDataFieldType.static),
+                            data_field=ChartDataField(name='field 1', shape=ChartDataFieldShape.array,
+                                                          type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-1'), variable=ModelVariable(id='var-2')),
@@ -53,8 +53,8 @@ class ChartTypeDataModelTestCase(unittest.TestCase):
                             ],
                         ),
                         VisualizationDataField(
-                            data_field=ChartTypeDataField(name='field 0', shape=ChartTypeDataFieldShape.array,
-                                                          type=ChartTypeDataFieldType.static),
+                            data_field=ChartDataField(name='field 0', shape=ChartDataFieldShape.array,
+                                                          type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-4'), variable=ModelVariable(id='var-4')),
@@ -69,11 +69,11 @@ class ChartTypeDataModelTestCase(unittest.TestCase):
                     ],
                 ),
                 VisualizationLayoutElement(
-                    chart_type=ChartType(id='area'),
+                    chart=Chart(id='area'),
                     data=[
                         VisualizationDataField(
-                            data_field=ChartTypeDataField(name='field 1', shape=ChartTypeDataFieldShape.array,
-                                                          type=ChartTypeDataFieldType.static),
+                            data_field=ChartDataField(name='field 1', shape=ChartDataFieldShape.array,
+                                                          type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-1'), variable=ModelVariable(id='var-2')),
@@ -86,8 +86,8 @@ class ChartTypeDataModelTestCase(unittest.TestCase):
                             ],
                         ),
                         VisualizationDataField(
-                            data_field=ChartTypeDataField(name='field 0', shape=ChartTypeDataFieldShape.array,
-                                                          type=ChartTypeDataFieldType.static),
+                            data_field=ChartDataField(name='field 0', shape=ChartDataFieldShape.array,
+                                                          type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
                                     id='sim-4'), variable=ModelVariable(id='var-4')),
@@ -107,10 +107,10 @@ class ChartTypeDataModelTestCase(unittest.TestCase):
 
     def test_VisualizationLayoutElement(self):
         el = VisualizationLayoutElement(
-            chart_type=ChartType(id='line'),
+            chart=Chart(id='line'),
             data=[
                 VisualizationDataField(
-                    data_field=ChartTypeDataField(name='field 1', shape=ChartTypeDataFieldShape.array, type=ChartTypeDataFieldType.static),
+                    data_field=ChartDataField(name='field 1', shape=ChartDataFieldShape.array, type=ChartDataFieldType.static),
                     simulation_results=[
                         SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=ModelVariable(id='var-2')),
                         SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=ModelVariable(id='var-1')),
@@ -119,7 +119,7 @@ class ChartTypeDataModelTestCase(unittest.TestCase):
                     ],
                 ),
                 VisualizationDataField(
-                    data_field=ChartTypeDataField(name='field 0', shape=ChartTypeDataFieldShape.array, type=ChartTypeDataFieldType.static),
+                    data_field=ChartDataField(name='field 0', shape=ChartDataFieldShape.array, type=ChartDataFieldType.static),
                     simulation_results=[
                         SimulationResult(simulation=TimecourseSimulation(id='sim-4'), variable=ModelVariable(id='var-4')),
                         SimulationResult(simulation=TimecourseSimulation(id='sim-3'), variable=ModelVariable(id='var-4')),
@@ -146,7 +146,7 @@ class ChartTypeDataModelTestCase(unittest.TestCase):
 
     def test_VisualizationDataField(self):
         field = VisualizationDataField(
-            data_field=ChartTypeDataField(name='field 1', shape=ChartTypeDataFieldShape.array, type=ChartTypeDataFieldType.static),
+            data_field=ChartDataField(name='field 1', shape=ChartDataFieldShape.array, type=ChartDataFieldType.static),
             simulation_results=[
                 SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=ModelVariable(id='var-2')),
                 SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=ModelVariable(id='var-1')),

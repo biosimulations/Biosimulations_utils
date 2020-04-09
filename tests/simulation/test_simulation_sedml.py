@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
+from Biosimulations_format_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_format_utils.data_model import Format
 from Biosimulations_format_utils.model.data_model import ModelFormat, Model, ModelVariable
 from Biosimulations_format_utils.simulation import write_simulation, read_simulation, sedml
@@ -163,23 +163,23 @@ class WriteSedMlTestCase(unittest.TestCase):
         expected = Visualization(
             layout=[
                 VisualizationLayoutElement(
-                    chart_type=ChartType(id='line'),
+                    chart=Chart(id='line'),
                     data=[
                         VisualizationDataField(
-                            data_field=ChartTypeDataField(
+                            data_field=ChartDataField(
                                 name='x',
-                                shape=ChartTypeDataFieldShape.array,
-                                type=ChartTypeDataFieldType.dynamic_simulation_result,
+                                shape=ChartDataFieldShape.array,
+                                type=ChartDataFieldType.dynamic_simulation_result,
                             ),
                             simulation_results=[
                                 SimulationResult(simulation=sims[0], variable=ModelVariable(id='time', target='urn:sedml:symbol:time')),
                             ],
                         ),
                         VisualizationDataField(
-                            data_field=ChartTypeDataField(
+                            data_field=ChartDataField(
                                 name='y',
-                                shape=ChartTypeDataFieldShape.array,
-                                type=ChartTypeDataFieldType.dynamic_simulation_result,
+                                shape=ChartDataFieldShape.array,
+                                type=ChartDataFieldType.dynamic_simulation_result,
                             ),
                             simulation_results=[
                                 SimulationResult(simulation=sims[0], variable=ModelVariable(
@@ -211,7 +211,7 @@ class WriteSedMlTestCase(unittest.TestCase):
     def test_read_visualizations_with_log_axis(self):
         filename = 'tests/fixtures/BIOMD0000000297-with-log-axis.sedml'
         _, viz = read_simulation(filename, ModelFormat.sbml, SimulationFormat.sedml)
-        self.assertEqual(viz.layout[0].chart_type.id, 'line-logX-logY')
+        self.assertEqual(viz.layout[0].chart.id, 'line-logX-logY')
 
     def test_read_visualizations_with_consistent_x_axes(self):
         filename = 'tests/fixtures/BIOMD0000000739.sedml'

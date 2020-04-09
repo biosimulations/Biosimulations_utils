@@ -6,16 +6,16 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
+from Biosimulations_format_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 import unittest
 
 
-class ChartTypeDataModelTestCase(unittest.TestCase):
-    def test_ChartType(self):
-        chart_type = ChartType(id='chart type 1')
-        self.assertEqual(ChartType.from_json(chart_type.to_json()), chart_type)
+class ChartDataModelTestCase(unittest.TestCase):
+    def test_Chart(self):
+        chart = Chart(id='chart type 1')
+        self.assertEqual(Chart.from_json(chart.to_json()), chart)
 
-    def test_ChartTypeDataField(self):
-        field = ChartTypeDataField(name='field 1', shape=ChartTypeDataFieldShape.array, type=ChartTypeDataFieldType.static)
-        self.assertEqual(ChartTypeDataField.from_json(field.to_json()), field)
-        self.assertEqual(ChartTypeDataField.sort_key(field), ('field 1', 'array', 'static'))
+    def test_ChartDataField(self):
+        field = ChartDataField(name='field 1', shape=ChartDataFieldShape.array, type=ChartDataFieldType.static)
+        self.assertEqual(ChartDataField.from_json(field.to_json()), field)
+        self.assertEqual(ChartDataField.sort_key(field), ('field 1', 'array', 'static'))

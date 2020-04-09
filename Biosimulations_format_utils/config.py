@@ -21,7 +21,7 @@ auth0 = attrdict.AttrDict({
 })
 
 scope_methods = ['read', 'write']
-scope_modules = ['Projects', 'Models', 'Simulations', 'Visualization', 'Files', 'Profile']
+scope_modules = ['Projects', 'Biomodels', 'Simulations', 'Visualization', 'Files', 'Profile']
 scopes = []
 for method in scope_methods:
     for module in scope_modules:

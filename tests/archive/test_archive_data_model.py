@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_format_utils.data_model import Person
-from Biosimulations_format_utils.model.data_model import ModelFormat
+from Biosimulations_format_utils.biomodel.data_model import BiomodelFormat
 from Biosimulations_format_utils.archive.data_model import Archive, ArchiveFile, ArchiveFormat
 import datetime
 import unittest
@@ -19,7 +19,7 @@ class ArchiveDataModelTestCase(unittest.TestCase):
         archive1 = Archive(
             files=[
                 ArchiveFile(filename='./models/model.xml',
-                            format=ModelFormat.sbml,
+                            format=BiomodelFormat.sbml,
                             description='Description',
                             authors=[Person(first_name='John', last_name='Doe')],
                             created=now,
@@ -35,7 +35,7 @@ class ArchiveDataModelTestCase(unittest.TestCase):
         archive2 = Archive(
             files=[
                 ArchiveFile(filename='./models/model.xml',
-                            format=ModelFormat.sbml, description='Description',
+                            format=BiomodelFormat.sbml, description='Description',
                             authors=[Person(first_name='John', last_name='Doe')],
                             created=now,
                             updated=now),
@@ -50,7 +50,7 @@ class ArchiveDataModelTestCase(unittest.TestCase):
         archive3 = Archive(
             files=[
                 ArchiveFile(filename='./models/model.xml',
-                            format=ModelFormat.sbml,
+                            format=BiomodelFormat.sbml,
                             description='Description',
                             authors=[Person(first_name='John', last_name='Doe')],
                             created=now,
@@ -68,17 +68,17 @@ class ArchiveDataModelTestCase(unittest.TestCase):
     def test_ArchiveFile(self):
         now = datetime.datetime.now()
         file1 = ArchiveFile(filename='./models/model.xml',
-                            format=ModelFormat.sbml, description='Description',
+                            format=BiomodelFormat.sbml, description='Description',
                             authors=[Person(first_name='John', last_name='Doe')],
                             created=now,
                             updated=now)
         file2 = ArchiveFile(filename='./models/model.xml',
-                            format=ModelFormat.sbml, description='Description',
+                            format=BiomodelFormat.sbml, description='Description',
                             authors=[Person(first_name='John', last_name='Doe')],
                             created=now,
                             updated=now)
         file3 = ArchiveFile(filename='./models/model2.xml',
-                            format=ModelFormat.sbml, description='Description',
+                            format=BiomodelFormat.sbml, description='Description',
                             authors=[Person(first_name='John', last_name='Doe')],
                             created=now,
                             updated=now)

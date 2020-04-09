@@ -9,7 +9,7 @@
 from .core import ArchiveWriter, ArchiveReader, ArchiveIoError
 from .data_model import Archive, ArchiveFile, ArchiveFormat
 from ..data_model import Format, Person
-from ..model.data_model import ModelFormat, ModelFormatSpecificationUrl
+from ..biomodel.data_model import BiomodelFormat, BiomodelFormatSpecificationUrl
 from ..simulation.data_model import SimulationFormat, SimulationFormatSpecificationUrl
 import dateutil.parser
 import libcombine
@@ -112,8 +112,8 @@ class CombineArchiveReader(ArchiveReader):
                 format = Format(spec_url=file_comb.getFormat())
 
                 try:
-                    model_format_spec_url = ModelFormatSpecificationUrl(format.spec_url)
-                    model_format = ModelFormat[model_format_spec_url.name].value
+                    model_format_spec_url = BiomodelFormatSpecificationUrl(format.spec_url)
+                    model_format = BiomodelFormat[model_format_spec_url.name].value
                     format.id = model_format.id
                     format.name = model_format.name
                     format.edam_id = model_format.edam_id

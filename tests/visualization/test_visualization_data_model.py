@@ -8,7 +8,7 @@
 
 from Biosimulations_format_utils.data_model import Format, Identifier, JournalReference, License, Person, RemoteFile
 from Biosimulations_format_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from Biosimulations_format_utils.model.data_model import ModelVariable
+from Biosimulations_format_utils.biomodel.data_model import BiomodelVariable
 from Biosimulations_format_utils.simulation.data_model import TimecourseSimulation, SimulationResult
 from Biosimulations_format_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import unittest
@@ -43,13 +43,13 @@ class ChartDataModelTestCase(unittest.TestCase):
                                                           type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-2')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-2')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-1')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-1')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-2')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-2')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-1')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-1')),
                             ],
                         ),
                         VisualizationDataField(
@@ -57,13 +57,13 @@ class ChartDataModelTestCase(unittest.TestCase):
                                                           type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-4'), variable=ModelVariable(id='var-4')),
+                                    id='sim-4'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-3'), variable=ModelVariable(id='var-4')),
+                                    id='sim-3'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-4')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-4')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-4')),
                             ],
                         ),
                     ],
@@ -76,13 +76,13 @@ class ChartDataModelTestCase(unittest.TestCase):
                                                           type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-2')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-2')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-1')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-1')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-2')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-2')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-1')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-1')),
                             ],
                         ),
                         VisualizationDataField(
@@ -90,13 +90,13 @@ class ChartDataModelTestCase(unittest.TestCase):
                                                           type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-4'), variable=ModelVariable(id='var-4')),
+                                    id='sim-4'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-3'), variable=ModelVariable(id='var-4')),
+                                    id='sim-3'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-4')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-4')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-4')),
                             ],
                         ),
                     ],
@@ -112,19 +112,19 @@ class ChartDataModelTestCase(unittest.TestCase):
                 VisualizationDataField(
                     data_field=ChartDataField(name='field 1', shape=ChartDataFieldShape.array, type=ChartDataFieldType.static),
                     simulation_results=[
-                        SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=ModelVariable(id='var-2')),
-                        SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=ModelVariable(id='var-1')),
-                        SimulationResult(simulation=TimecourseSimulation(id='sim-2'), variable=ModelVariable(id='var-2')),
-                        SimulationResult(simulation=TimecourseSimulation(id='sim-2'), variable=ModelVariable(id='var-1')),
+                        SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=BiomodelVariable(id='var-2')),
+                        SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=BiomodelVariable(id='var-1')),
+                        SimulationResult(simulation=TimecourseSimulation(id='sim-2'), variable=BiomodelVariable(id='var-2')),
+                        SimulationResult(simulation=TimecourseSimulation(id='sim-2'), variable=BiomodelVariable(id='var-1')),
                     ],
                 ),
                 VisualizationDataField(
                     data_field=ChartDataField(name='field 0', shape=ChartDataFieldShape.array, type=ChartDataFieldType.static),
                     simulation_results=[
-                        SimulationResult(simulation=TimecourseSimulation(id='sim-4'), variable=ModelVariable(id='var-4')),
-                        SimulationResult(simulation=TimecourseSimulation(id='sim-3'), variable=ModelVariable(id='var-4')),
-                        SimulationResult(simulation=TimecourseSimulation(id='sim-2'), variable=ModelVariable(id='var-4')),
-                        SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=ModelVariable(id='var-4')),
+                        SimulationResult(simulation=TimecourseSimulation(id='sim-4'), variable=BiomodelVariable(id='var-4')),
+                        SimulationResult(simulation=TimecourseSimulation(id='sim-3'), variable=BiomodelVariable(id='var-4')),
+                        SimulationResult(simulation=TimecourseSimulation(id='sim-2'), variable=BiomodelVariable(id='var-4')),
+                        SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=BiomodelVariable(id='var-4')),
                     ],
                 ),
             ],
@@ -148,10 +148,10 @@ class ChartDataModelTestCase(unittest.TestCase):
         field = VisualizationDataField(
             data_field=ChartDataField(name='field 1', shape=ChartDataFieldShape.array, type=ChartDataFieldType.static),
             simulation_results=[
-                SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=ModelVariable(id='var-2')),
-                SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=ModelVariable(id='var-1')),
-                SimulationResult(simulation=TimecourseSimulation(id='sim-2'), variable=ModelVariable(id='var-2')),
-                SimulationResult(simulation=TimecourseSimulation(id='sim-2'), variable=ModelVariable(id='var-1')),
+                SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=BiomodelVariable(id='var-2')),
+                SimulationResult(simulation=TimecourseSimulation(id='sim-1'), variable=BiomodelVariable(id='var-1')),
+                SimulationResult(simulation=TimecourseSimulation(id='sim-2'), variable=BiomodelVariable(id='var-2')),
+                SimulationResult(simulation=TimecourseSimulation(id='sim-2'), variable=BiomodelVariable(id='var-1')),
             ],
         )
         self.assertEqual(VisualizationDataField.from_json(field.to_json()), field)

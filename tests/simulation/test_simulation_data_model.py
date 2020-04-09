@@ -7,15 +7,15 @@
 """
 
 from Biosimulations_format_utils.data_model import Format, JournalReference, License, Person, RemoteFile, Type
-from Biosimulations_format_utils.model.data_model import Model, ModelParameter, ModelVariable
-from Biosimulations_format_utils.model.sbml import ModelingFramework
+from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
+from Biosimulations_format_utils.biomodel.sbml import BiomodelingFramework
 from Biosimulations_format_utils.simulation.data_model import (
     Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange,
     SimulationResult)
 import unittest
 
 
-class SimDataModelTestCase(unittest.TestCase):
+class SimulationDataModelTestCase(unittest.TestCase):
     def test_TimecourseSimulation(self):
         sim = TimecourseSimulation(
             id='model_1',
@@ -33,9 +33,9 @@ class SimDataModelTestCase(unittest.TestCase):
             ],
             license=License.cc0,
             format=Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
-            model=Model(id='model_1', name='model 1'),
+            model=Biomodel(id='model_1', name='model 1'),
             model_parameter_changes=[
-                ParameterChange(parameter=ModelParameter(id='param_1', name='param 1', type=Type.float, value=3.5),
+                ParameterChange(parameter=BiomodelParameter(id='param_1', name='param 1', type=Type.float, value=3.5),
                                 value=5.3),
             ],
             start_time=0.,
@@ -73,9 +73,9 @@ class SimDataModelTestCase(unittest.TestCase):
             ],
             license=License.cc0,
             format=Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
-            model=Model(id='model_1', name='model 1'),
+            model=Biomodel(id='model_1', name='model 1'),
             model_parameter_changes=[
-                ParameterChange(parameter=ModelParameter(id='param_1', name='param 1', type=Type.float, value=3.5),
+                ParameterChange(parameter=BiomodelParameter(id='param_1', name='param 1', type=Type.float, value=3.5),
                                 value=5.3),
             ],
             algorithm=Algorithm(id='00001', name='integrator', kisao_id='KISAO:00001', parameters=[
@@ -98,8 +98,8 @@ class SimDataModelTestCase(unittest.TestCase):
             kisao_id='KISAO:00001',
             synonymous_kisao_ids=['KISAO:00002', 'KISAO:00003'],
             modeling_frameworks=[
-                ModelingFramework.logical.value,
-                ModelingFramework.flux_balance.value,
+                BiomodelingFramework.logical.value,
+                BiomodelingFramework.flux_balance.value,
             ],
             model_formats=[
                 Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
@@ -125,6 +125,6 @@ class SimDataModelTestCase(unittest.TestCase):
         self.assertEqual(ParameterChange.sort_key(change), (('param_1', 'param 1', 'float', 1.2, (0.12, 12.), 'KISAO:00001'), 2.1))
 
     def test_SimulationResult(self):
-        result = SimulationResult(simulation=TimecourseSimulation(id='sim'), variable=ModelVariable(id='var'))
+        result = SimulationResult(simulation=TimecourseSimulation(id='sim'), variable=BiomodelVariable(id='var'))
         self.assertEqual(SimulationResult.from_json(result.to_json()), result)
         self.assertEqual(SimulationResult.sort_key(result), ('sim', 'var'))

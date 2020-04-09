@@ -7,7 +7,7 @@
 """
 
 from .data_model import SimulationFormat
-from ..model.data_model import ModelFormat
+from ..biomodel.data_model import BiomodelFormat
 from ..visualization.data_model import Visualization  # noqa: F401
 from .sbml import SbmlSedMlSimulationWriter, SbmlSedMlSimulationReader
 
@@ -25,9 +25,9 @@ def write_simulation(model_vars, sim, model_filename, sim_filename, sim_format, 
         sim_format (:obj:`SimulationFormat`): simulation experiment format
         sim_format_opts (:obj:`dict`): options to the simulation experiment format (e.g., level, version)
     """
-    model_format = ModelFormat[sim.model.format.name]
+    model_format = BiomodelFormat[sim.model.format.name]
     if sim_format == SimulationFormat.sedml:
-        if model_format == ModelFormat.sbml:
+        if model_format == BiomodelFormat.sbml:
             Writer = SbmlSedMlSimulationWriter
         else:
             raise NotImplementedError('Model format {} is not supported'.format(model_format.name))
@@ -41,7 +41,7 @@ def read_simulation(filename, model_format, sim_format):
 
     Args:
         filename (:obj:`str`): path to save simulation
-        model_format (:obj:`ModelFormat`): model format
+        model_format (:obj:`BiomodelFormat`): model format
         sim_format (:obj:`SimulationFormat`): simulation experiment format
 
     Returns:
@@ -49,7 +49,7 @@ def read_simulation(filename, model_format, sim_format):
         :obj:`Visualization`: visualization
     """
     if sim_format == SimulationFormat.sedml:
-        if model_format == ModelFormat.sbml:
+        if model_format == BiomodelFormat.sbml:
             Reader = SbmlSedMlSimulationReader
         else:
             raise NotImplementedError('Model format {} is not supported'.format(model_format.name))

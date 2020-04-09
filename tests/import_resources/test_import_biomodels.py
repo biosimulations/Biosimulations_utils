@@ -8,7 +8,7 @@
 
 from Biosimulations_format_utils.data_model import Identifier, JournalReference, License, Person, Taxon
 from Biosimulations_format_utils.import_resources import biomodels
-from Biosimulations_format_utils.model.data_model import Model
+from Biosimulations_format_utils.biomodel.data_model import Biomodel
 from Biosimulations_format_utils.simulation.data_model import Simulation
 from Biosimulations_format_utils.visualization.data_model import Visualization
 from unittest import mock
@@ -129,7 +129,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
         })
 
         for model in models:
-            self.assertEqual(Model.from_json(model.to_json()), model)
+            self.assertEqual(Biomodel.from_json(model.to_json()), model)
         for sim in sims:
             self.assertEqual(Simulation.from_json(sim.to_json()), sim)
         for viz in vizs:

@@ -7,7 +7,7 @@
 """
 
 from ..data_model import Format, Identifier, JournalReference, License, OntologyTerm, Person, RemoteFile, Type
-from ..model.data_model import Model, ModelParameter, ModelVariable
+from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
 import wc_utils.util.enumerate
 
 __all__ = [
@@ -57,7 +57,7 @@ class Simulation(object):
         authors (:obj:`list` of :obj:`Person`): authors
         license (:obj:`License`): license
         format (:obj:`Format`): format
-        model (:obj:`Model`): model
+        model (:obj:`Biomodel`): model
         model_parameter_changes (:obj:`list` of :obj:`ParameterChange`): model parameter changes
         algorithm (:obj:`Algorithm`): simulation algorithm
         algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`): simulation algorithm parameter changes
@@ -79,7 +79,7 @@ class Simulation(object):
             authors (:obj:`list` of :obj:`Person`, optional): authors
             license (:obj:`License`, optional): license
             format (:obj:`Format`, optional): format
-            model (:obj:`Model`, optional): model
+            model (:obj:`Biomodel`, optional): model
             model_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): model parameter changes
             algorithm (:obj:`Algorithm`, optional): simulation algorithm
             algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes
@@ -178,8 +178,8 @@ class Simulation(object):
                 authors=[Person.from_json(author) for author in val.get('authors', [])],
                 license=License(val.get('license')) if val.get('license', None) else None,
                 format=Format.from_json(val.get('format')) if val.get('format', None) else None,
-                model=Model.from_json(val.get('model')) if val.get('model', None) else None,
-                model_parameter_changes=[ParameterChange.from_json(change, ModelParameter)
+                model=Biomodel.from_json(val.get('model')) if val.get('model', None) else None,
+                model_parameter_changes=[ParameterChange.from_json(change, BiomodelParameter)
                                          for change in val.get('modelParameterChanges', [])],
                 algorithm=Algorithm.from_json(val.get('algorithm')) if val.get('algorithm', None) else None,
                 algorithm_parameter_changes=[ParameterChange.from_json(change, AlgorithmParameter)
@@ -214,7 +214,7 @@ class TimecourseSimulation(Simulation):
             authors (:obj:`list` of :obj:`Person`, optional): authors
             license (:obj:`License`, optional): license
             format (:obj:`Format`, optional): format
-            model (:obj:`Model`, optional): model
+            model (:obj:`Biomodel`, optional): model
             model_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): model parameter changes
             start_time (:obj:`float`, optional): start time
             output_start_time (:obj:`float`, start): time to begin recording simulation results
@@ -476,17 +476,17 @@ class AlgorithmParameter(object):
 
 
 class ParameterChange(object):
-    """ ModelParameter change
+    """ BiomodelParameter change
 
     Attributes:
-        parameter (:obj:`ModelParameter` or :obj:`AlgorithmParameter`): parameter
+        parameter (:obj:`BiomodelParameter` or :obj:`AlgorithmParameter`): parameter
         value (:obj:`object`): value
     """
 
     def __init__(self, parameter=None, value=None):
         """
         Args:
-            parameter (:obj:`ModelParameter` or :obj:`AlgorithmParameter`, optional): parameter
+            parameter (:obj:`BiomodelParameter` or :obj:`AlgorithmParameter`, optional): parameter
             value (:obj:`object`, optional): value
         """
         self.parameter = parameter
@@ -550,14 +550,14 @@ class SimulationResult(object):
 
     Attributes:
         simulation (:obj:`Simulation`): simulation
-        variable (:obj:`ModelVariable`): model variable
+        variable (:obj:`BiomodelVariable`): model variable
     """
 
     def __init__(self, simulation=None, variable=None):
         """
         Args:
             simulation (:obj:`Simulation`): simulation
-            variable (:obj:`ModelVariable`): model variable
+            variable (:obj:`BiomodelVariable`): model variable
         """
         self.simulation = simulation
         self.variable = variable
@@ -598,7 +598,7 @@ class SimulationResult(object):
         """
         return cls(
             simulation=Simulation.from_json(val.get('simulation')) if val.get('simulation', None) else None,
-            variable=ModelVariable.from_json(val.get('variable')) if val.get('variable', None) else None,
+            variable=BiomodelVariable.from_json(val.get('variable')) if val.get('variable', None) else None,
         )
 
     @staticmethod

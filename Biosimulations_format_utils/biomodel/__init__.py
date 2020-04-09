@@ -6,24 +6,24 @@
 :License: MIT
 """
 
-from .data_model import ModelFormat
-from .sbml import SbmlModelReader
+from .data_model import BiomodelFormat
+from .sbml import SbmlBiomodelReader
 
-__all__ = ['read_model']
+__all__ = ['read_biomodel']
 
 
-def read_model(filename, format):
+def read_biomodel(filename, format):
     """ Read a model from a file
 
     Args:
         filename (:obj:`str`): path to a file which defines a model
-        format (:obj:`ModelFormat`): model format
+        format (:obj:`BiomodelFormat`): model format
 
     Returns:
         :obj:`dict`: model
     """
-    if format == ModelFormat.sbml:
-        Reader = SbmlModelReader
+    if format == BiomodelFormat.sbml:
+        Reader = SbmlBiomodelReader
     else:
         raise NotImplementedError("Model format {} is not supported".format(format.name))
     return Reader().run(filename)

@@ -9,7 +9,7 @@
 from Biosimulations_format_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_format_utils.data_model import (Format, Identifier, JournalReference,
                                                     License, OntologyTerm, Person, RemoteFile, Taxon, Type)
-from Biosimulations_format_utils.model.data_model import Model, ModelParameter, ModelVariable
+from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
 from Biosimulations_format_utils.simulation.data_model import TimecourseSimulation, SimulationResult
 from Biosimulations_format_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import inflect
@@ -71,7 +71,7 @@ class ApiConsistencyTestCase(unittest.TestCase):
     @unittest.expectedFailure
     def test_model(self):
         # todo: align TypeScript data model with this Python data model and remove @unittest.expectedFailure()
-        model = Model(
+        model = Biomodel(
             id='model_1',
             name='model 1',
             file=RemoteFile(name='model.xml', type='application/sbml+xml'),
@@ -93,19 +93,19 @@ class ApiConsistencyTestCase(unittest.TestCase):
                 Person(first_name='Jane', middle_name='D', last_name='Doe'),
             ],
             license=License.cc0,
-            parameters=[ModelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
-            variables=[ModelVariable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
+            parameters=[BiomodelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
+            variables=[BiomodelVariable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
         )
         py = model.to_json()
 
         api = {}
-        for schema in self.api_schemas['Model']['allOf']:
+        for schema in self.api_schemas['Biomodel']['allOf']:
             for key, val in schema['properties'].items():
                 api[key] = val
 
         errors = self.get_differences_from_api(py, api)
         if errors:
-            raise Exception('Data model for `Model` is not consistent with API:\n  Model:\n    ' + '\n    '.join(errors))
+            raise Exception('Data model for `Biomodel` is not consistent with API:\n  Biomodel:\n    ' + '\n    '.join(errors))
 
     @unittest.expectedFailure
     def test_sim(self):
@@ -163,13 +163,13 @@ class ApiConsistencyTestCase(unittest.TestCase):
                                                           type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-2')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-2')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-1')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-1')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-2')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-2')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-1')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-1')),
                             ],
                         ),
                         VisualizationDataField(
@@ -177,13 +177,13 @@ class ApiConsistencyTestCase(unittest.TestCase):
                                                           type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-4'), variable=ModelVariable(id='var-4')),
+                                    id='sim-4'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-3'), variable=ModelVariable(id='var-4')),
+                                    id='sim-3'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-4')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-4')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-4')),
                             ],
                         ),
                     ],
@@ -196,13 +196,13 @@ class ApiConsistencyTestCase(unittest.TestCase):
                                                           type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-2')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-2')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-1')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-1')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-2')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-2')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-1')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-1')),
                             ],
                         ),
                         VisualizationDataField(
@@ -210,13 +210,13 @@ class ApiConsistencyTestCase(unittest.TestCase):
                                                           type=ChartDataFieldType.static),
                             simulation_results=[
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-4'), variable=ModelVariable(id='var-4')),
+                                    id='sim-4'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-3'), variable=ModelVariable(id='var-4')),
+                                    id='sim-3'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-2'), variable=ModelVariable(id='var-4')),
+                                    id='sim-2'), variable=BiomodelVariable(id='var-4')),
                                 SimulationResult(simulation=TimecourseSimulation(
-                                    id='sim-1'), variable=ModelVariable(id='var-4')),
+                                    id='sim-1'), variable=BiomodelVariable(id='var-4')),
                             ],
                         ),
                     ],

@@ -8,8 +8,8 @@
 
 from ..data_model import Format, OntologyTerm, RemoteFile, Taxon, Type
 from ..utils import pretty_print_units
-from .core import ModelReader, ModelIoError
-from .data_model import Model, ModelParameter, ModelVariable  # noqa: F401
+from .core import BiomodelReader, BiomodelIoError
+from .data_model import Biomodel, BiomodelParameter, BiomodelVariable  # noqa: F401
 from PIL import Image
 import enum
 import ete3
@@ -21,10 +21,10 @@ import requests
 import requests.exceptions
 import requests_cache.core  # noqa: F401
 
-__all__ = ['SbmlModelReader', 'visualize_model']
+__all__ = ['SbmlBiomodelReader', 'visualize_biomodel']
 
 
-class ModelingFramework(enum.Enum):
+class BiomodelingFramework(enum.Enum):
     flux_balance = OntologyTerm(
         ontology='SBO',
         id='0000624',
@@ -109,7 +109,7 @@ class XmlName(object):
         self.name = name
 
 
-class SbmlModelReader(ModelReader):
+class SbmlBiomodelReader(BiomodelReader):
     """ Read information about SBML-encoded models """
 
     def _read_from_file(self, filename, model):
@@ -134,7 +134,7 @@ class SbmlModelReader(ModelReader):
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
             :obj:`Format`: format of the model
@@ -153,10 +153,10 @@ class SbmlModelReader(ModelReader):
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
-            :obj:`Model`: model with additional metadata
+            :obj:`Biomodel`: model with additional metadata
         """
         annot_xml = model_sbml.getAnnotation()
         desc_xml = self._get_xml_child_by_names(annot_xml, [
@@ -172,28 +172,28 @@ class SbmlModelReader(ModelReader):
 
         unsupported_packages = packages.difference(set(['annot', 'comp', 'fbc', 'groups', 'layout', 'multi', 'qual', 'render', 'req']))
         if unsupported_packages:
-            raise ModelIoError("{} package(s) are not supported".format(', '.join(unsupported_packages))
+            raise BiomodelIoError("{} package(s) are not supported".format(', '.join(unsupported_packages))
                                )  # pragma: no cover # unreachable with libSBML 5.18 which doesn't support additional packages
 
         plugin = model_sbml.getSBMLDocument().getPlugin('comp')
         if plugin:
             if plugin.getNumModelDefinitions() or plugin.getNumExternalModelDefinitions():
-                raise ModelIoError('comp package is not supported')
+                raise BiomodelIoError('comp package is not supported')
         plugin = model_sbml.getPlugin('comp')
         if plugin:
             if plugin.getNumSubmodels():
-                raise ModelIoError('comp package is not supported')
+                raise BiomodelIoError('comp package is not supported')
 
         if len(packages.intersection(set(['fbc', 'multi', 'qual']))) > 1:
-            raise ModelIoError('Unable to determine modeling framework')
+            raise BiomodelIoError('Unable to determine modeling framework')
         if 'fbc' in packages:
-            framework = ModelingFramework.flux_balance
+            framework = BiomodelingFramework.flux_balance
         elif 'multi' in packages:
-            framework = ModelingFramework.non_spatial_discrete
+            framework = BiomodelingFramework.non_spatial_discrete
         elif 'qual' in packages:
-            framework = ModelingFramework.logical
+            framework = BiomodelingFramework.logical
         else:
-            framework = ModelingFramework.non_spatial_continuous
+            framework = BiomodelingFramework.non_spatial_continuous
         model.framework = framework.value
 
         # taxon
@@ -223,7 +223,7 @@ class SbmlModelReader(ModelReader):
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
             :obj:`dict`: dictionary that maps the ids of units to their definitions
@@ -239,11 +239,11 @@ class SbmlModelReader(ModelReader):
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
             units (:obj:`dict`): dictionary that maps the ids of units to their definitions
 
         Returns:
-            :obj:`list` of :obj:`ModelParameter`: information about parameters
+            :obj:`list` of :obj:`BiomodelParameter`: information about parameters
         """
         parameters = {}
 
@@ -279,7 +279,7 @@ class SbmlModelReader(ModelReader):
             comp_name = comp_sbml.getName() or comp_id
 
             value = comp_sbml.getSize()
-            parameters[comp_id] = ModelParameter(
+            parameters[comp_id] = BiomodelParameter(
                 target="/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@id='{}']/@size".format(comp_id),
                 group='Initial compartment sizes',
                 id="init_size_{}".format(comp_id),
@@ -323,7 +323,7 @@ class SbmlModelReader(ModelReader):
                 else:
                     species_initial_units = None
 
-            parameters[species_id] = ModelParameter(
+            parameters[species_id] = BiomodelParameter(
                 target='/' + '/'.join([
                     "sbml:sbml",
                     "sbml:model",
@@ -359,7 +359,7 @@ class SbmlModelReader(ModelReader):
                 continue
             else:
                 continue
-            parameters["init_assignment_{}".format(symbol_id)] = ModelParameter(
+            parameters["init_assignment_{}".format(symbol_id)] = BiomodelParameter(
                 target='/' + '/'.join([
                     "sbml:sbml",
                     "sbml:model",
@@ -398,7 +398,7 @@ class SbmlModelReader(ModelReader):
                     continue
                 else:
                     continue
-                parameters["assignment_{}".format(var_id)] = ModelParameter(
+                parameters["assignment_{}".format(var_id)] = BiomodelParameter(
                     target='/' + '/'.join([
                         "sbml:sbml",
                         "sbml:model",
@@ -432,7 +432,7 @@ class SbmlModelReader(ModelReader):
                 rxn_sbml = self._get_reaction(model_sbml, rxn_id)
                 rxn_name = rxn_sbml.getName() or rxn_id
                 value = flux_obj_sbml.getCoefficient()
-                parameters[species_id] = ModelParameter(
+                parameters[species_id] = BiomodelParameter(
                     target='/' + '/'.join([
                         "sbml:sbml",
                         "sbml:model",
@@ -464,7 +464,7 @@ class SbmlModelReader(ModelReader):
                 else:
                     max_level = max(1, init_level)
 
-                parameters[species_id] = ModelParameter(
+                parameters[species_id] = BiomodelParameter(
                     target='/' + '/'.join([
                         "sbml:sbml",
                         "sbml:model",
@@ -503,19 +503,19 @@ class SbmlModelReader(ModelReader):
         """ Read information about a SBML parameter
 
         Args:
-            param_sbml (:obj:`libsbml.ModelParameter`): SBML parameter
-            model (:obj:`Model`): model
+            param_sbml (:obj:`libsbml.BiomodelParameter`): SBML parameter
+            model (:obj:`Biomodel`): model
             rxn_sbml (:obj:`libsbml.Reaction`, optional): SBML reaction
             rxn_id (:obj:`str`, optional): id of the parent reaction (used by local parameters)
             rxn_name (:obj:`str`, optional): name of the parent reaction (used by local parameters)
 
         Returns:
-            :obj:`ModelParameter`: information about the parameter
+            :obj:`BiomodelParameter`: information about the parameter
         """
         assert param_sbml.getId()
 
         value = param_sbml.getValue()
-        param = ModelParameter(
+        param = BiomodelParameter(
             target=None,
             group=None,
             id=param_sbml.getId(),
@@ -575,11 +575,11 @@ class SbmlModelReader(ModelReader):
 
         Args:
             model_sbml (:obj:`libsbml.Model`): SBML-encoded model
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
             units (:obj:`dict`): dictionary that maps the ids of units to their definitions
 
         Returns:
-            :obj:`list` of :obj:`ModelVariable`: information about the variables of the model
+            :obj:`list` of :obj:`BiomodelVariable`: information about the variables of the model
         """
         model.variables = vars = []
 
@@ -598,7 +598,7 @@ class SbmlModelReader(ModelReader):
             obj_id = obj_sbml.getId()
             assert obj_id
 
-            vars.append(ModelVariable(
+            vars.append(BiomodelVariable(
                 target="/sbml:sbml/sbml:model/fbc:listOfObjectives/fbc:objective[@fbc:id='{}']".format(obj_id),
                 group='Objectives',
                 id=obj_id,
@@ -612,7 +612,7 @@ class SbmlModelReader(ModelReader):
             # reaction fluxes
             for rxn_sbml in model_sbml.getListOfReactions():
                 rxn_id = rxn_sbml.getId()
-                vars.append(ModelVariable(
+                vars.append(BiomodelVariable(
                     target="/sbml:sbml/sbml:model/sbml:listOfReactions/{}:{}[@id='{}']".format(
                         rxn_sbml.getPrefix() or 'sbml', rxn_sbml.getElementName(), rxn_id),
                     group='Reaction fluxes',
@@ -635,7 +635,7 @@ class SbmlModelReader(ModelReader):
                 for species_sbml in qual_plugin.getListOfQualitativeSpecies():
                     species_id = species_sbml.getId()
 
-                    vars.append(ModelVariable(
+                    vars.append(BiomodelVariable(
                         target=("/sbml:sbml/sbml:model/qual:listOfQualitativeSpecies"
                                 "/qual:qualitativeSpecies[@qual:id='{}']").format(species_id),
                         group='Species levels',
@@ -653,17 +653,17 @@ class SbmlModelReader(ModelReader):
         """ Read information about a SBML species
 
         Args:
-            model_sbml (:obj:`libsbml.Model`): SBML-encoded model
+            model_sbml (:obj:`libsbml.Biomodel`): SBML-encoded model
             species_sbml (:obj:`libsbml.Species`): SBML species
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
-            :obj:`ModelVariable`: information about the species
+            :obj:`BiomodelVariable`: information about the species
         """
         id = species_sbml.getId()
         assert id
 
-        var = ModelVariable(
+        var = BiomodelVariable(
             target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='{}']".format(id),
             group='Species amounts/concentrations',
             id=id,
@@ -799,7 +799,7 @@ class SbmlModelReader(ModelReader):
 MINERVA_ENDPOINT = 'https://minerva-dev.lcsb.uni.lu/minerva/api/convert/image/{}:{}'
 
 
-def visualize_model(model_filename, img_filename, requests_session=None):
+def visualize_biomodel(model_filename, img_filename, requests_session=None):
     """ Use `MINERVA <https://minerva.pages.uni.lu/>`_ to visualize a model and save the visualization to a PNG file.
 
     Args:
@@ -844,7 +844,7 @@ def visualize_model(model_filename, img_filename, requests_session=None):
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError:
-            raise ModelIoError('Unable to generate image for {}: {}'.format(os.path.basename(model_filename), response.content))
+            raise BiomodelIoError('Unable to generate image for {}: {}'.format(os.path.basename(model_filename), response.content))
         with open(img_filename, 'wb') as file:
             file.write(response.content)
         img = Image.open(img_filename)

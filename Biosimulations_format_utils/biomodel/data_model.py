@@ -10,15 +10,15 @@ from ..data_model import Format, Identifier, JournalReference, License, Ontology
 import wc_utils.util.enumerate
 
 __all__ = [
-    'ModelFormat',
-    'ModelFormatSpecificationUrl',
-    'Model',
-    'ModelParameter',
-    'ModelVariable',
+    'BiomodelFormat',
+    'BiomodelFormatSpecificationUrl',
+    'Biomodel',
+    'BiomodelParameter',
+    'BiomodelVariable',
 ]
 
 
-class ModelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
+class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
     """ Model format metadata """
     BNGL = Format(
         id='BNGL',
@@ -77,8 +77,8 @@ class ModelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
     )
 
 
-class ModelFormatSpecificationUrl(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
-    """ Model format """
+class BiomodelFormatSpecificationUrl(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
+    """ Biomodel format """
     BNGL = 'https://bionetgen.org/'
     CellML = 'http://identifiers.org/combine.specifications/cellml'
     Kappa = 'https://kappalanguage.org/'
@@ -88,7 +88,7 @@ class ModelFormatSpecificationUrl(str, wc_utils.util.enumerate.CaseInsensitiveEn
     SBML = 'http://identifiers.org/combine.specifications/sbml'
 
 
-class Model(object):
+class Biomodel(object):
     """ A biomodel
 
     Attributes:
@@ -105,8 +105,8 @@ class Model(object):
         references (:obj:`list` of :obj:`JournalReference`): references
         authors (:obj:`list` of :obj:`Person`): authors
         license (:obj:`License`): license
-        parameters (:obj:`list` of :obj:`ModelParameter`): parameters (e.g., initial conditions and rate constants)
-        variables (:obj:`list` of :obj:`ModelVariable`): variables (e.g., model predictions)
+        parameters (:obj:`list` of :obj:`BiomodelParameter`): parameters (e.g., initial conditions and rate constants)
+        variables (:obj:`list` of :obj:`BiomodelVariable`): variables (e.g., model predictions)
     """
 
     def __init__(self, id=None, name=None, file=None, image=None, description=None,
@@ -128,8 +128,8 @@ class Model(object):
             references (:obj:`list` of :obj:`JournalReference`, optional): references
             authors (:obj:`list` of :obj:`Person`, optional): authors
             license (:obj:`License`, optional): license
-            parameters (:obj:`list` of :obj:`ModelParameter`, optional): parameters (e.g., initial conditions and rate constants)
-            variables (:obj:`list` of :obj:`ModelVariable`, optional): variables (e.g., model predictions)
+            parameters (:obj:`list` of :obj:`BiomodelParameter`, optional): parameters (e.g., initial conditions and rate constants)
+            variables (:obj:`list` of :obj:`BiomodelVariable`, optional): variables (e.g., model predictions)
         """
         self.id = id
         self.name = name
@@ -151,7 +151,7 @@ class Model(object):
         """ Determine if two models are semantically equal
 
         Args:
-            other (:obj:`Model`): other model
+            other (:obj:`Biomodel`): other model
 
         Returns:
             :obj:`bool`
@@ -170,8 +170,8 @@ class Model(object):
             and sorted(self.references, key=JournalReference.sort_key) == sorted(other.references, key=JournalReference.sort_key) \
             and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
             and self.license == other.license \
-            and sorted(self.parameters, key=ModelParameter.sort_key) == sorted(other.parameters, key=ModelParameter.sort_key) \
-            and sorted(self.variables, key=ModelVariable.sort_key) == sorted(other.variables, key=ModelVariable.sort_key)
+            and sorted(self.parameters, key=BiomodelParameter.sort_key) == sorted(other.parameters, key=BiomodelParameter.sort_key) \
+            and sorted(self.variables, key=BiomodelVariable.sort_key) == sorted(other.variables, key=BiomodelVariable.sort_key)
 
     def to_json(self):
         """ Export to JSON
@@ -205,7 +205,7 @@ class Model(object):
             val (:obj:`dict`)
 
         Returns:
-            :obj:`Model`
+            :obj:`Biomodel`
         """
         return cls(
             id=val.get('id', None),
@@ -221,12 +221,12 @@ class Model(object):
             references=[JournalReference.from_json(ref) for ref in val.get('references', [])],
             authors=[Person.from_json(author) for author in val.get('authors', [])],
             license=License(val.get('license')) if val.get('license', None) else None,
-            parameters=[ModelParameter.from_json(parameter) for parameter in val.get('parameters', [])],
-            variables=[ModelVariable.from_json(variable) for variable in val.get('variables', [])],
+            parameters=[BiomodelParameter.from_json(parameter) for parameter in val.get('parameters', [])],
+            variables=[BiomodelVariable.from_json(variable) for variable in val.get('variables', [])],
         )
 
 
-class ModelParameter(object):
+class BiomodelParameter(object):
     """ A parameter of a model
 
     Attributes:
@@ -274,7 +274,7 @@ class ModelParameter(object):
         """ Determine if two parameters are semantically equal
 
         Args:
-            other (:obj:`ModelParameter`): other parameter
+            other (:obj:`BiomodelParameter`): other parameter
 
         Returns:
             :obj:`bool`
@@ -318,7 +318,7 @@ class ModelParameter(object):
             val (:obj:`dict`)
 
         Returns:
-            :obj:`ModelParameter`
+            :obj:`BiomodelParameter`
         """
         return cls(
             target=val.get('target', None),
@@ -338,7 +338,7 @@ class ModelParameter(object):
         """ Get a key to sort a parameter
 
         Args:
-            parameter (:obj:`ModelParameter`): parameter
+            parameter (:obj:`BiomodelParameter`): parameter
 
         Returns:
             :obj:`str`
@@ -346,7 +346,7 @@ class ModelParameter(object):
         return parameter.id
 
 
-class ModelVariable(object):
+class BiomodelVariable(object):
     """ A variable of a model
 
     Attributes:
@@ -388,7 +388,7 @@ class ModelVariable(object):
         """ Determine if two variables are semantically equal
 
         Args:
-            other (:obj:`ModelVariable`): other variable
+            other (:obj:`BiomodelVariable`): other variable
 
         Returns:
             :obj:`bool`
@@ -428,7 +428,7 @@ class ModelVariable(object):
             val (:obj:`dict`)
 
         Returns:
-            :obj:`ModelVariable`
+            :obj:`BiomodelVariable`
         """
         return cls(
             target=val.get('target', None),
@@ -446,7 +446,7 @@ class ModelVariable(object):
         """ Get a key to sort a variable
 
         Args:
-            variable (:obj:`ModelVariable`): variable
+            variable (:obj:`BiomodelVariable`): variable
 
         Returns:
             :obj:`str`

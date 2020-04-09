@@ -11,7 +11,7 @@ from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation
                          Algorithm, AlgorithmParameter, ParameterChange, SimulationResult)
 from ..chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from ..data_model import Format, JournalReference, License, Person, RemoteFile
-from ..model.data_model import Model, ModelParameter, ModelVariable
+from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
 from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 from ..utils import assert_exception
 from datetime import datetime
@@ -36,7 +36,7 @@ class SedMlSimulationWriter(SimulationWriter):
     def run(self, model_vars, sim, model_filename, sim_filename, level=1, version=3):
         """
         Args:
-            model_vars (:obj:`list` of :obj:`ModelVariable`): List of variables in the model.
+            model_vars (:obj:`list` of :obj:`BiomodelVariable`): List of variables in the model.
                 Each variable should have the keys `id` and `target`
             sim (:obj:`Simulation`): Simulation experiment
             model_filename (:obj:`str`): Path to the model definition
@@ -467,7 +467,7 @@ class SedMlSimulationWriter(SimulationWriter):
         """ Add simulation predictions to a SED report
 
         Args:
-            vars (:obj:`list` of :obj:`ModelVariable`): variables predicted by a model
+            vars (:obj:`list` of :obj:`BiomodelVariable`): variables predicted by a model
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             task_sed (:obj:`libsedml.SedTask`): SED task
             report_sed (:obj:`libsedml.SedReport`): SED report
@@ -684,12 +684,12 @@ class SedMlSimulationReader(SimulationReader):
                     continue
 
                 if x_data_gen_id in time_data_gen_ids:
-                    x_var = ModelVariable(id='time', target='urn:sedml:symbol:time')
+                    x_var = BiomodelVariable(id='time', target='urn:sedml:symbol:time')
                 else:
                     x_var = next(var for var in x_sim.model.variables if var.target == data_gen_id_to_var_target[x_data_gen_id])
 
                 if y_data_gen_id in time_data_gen_ids:
-                    y_var = ModelVariable(id='time', target='urn:sedml:symbol:time')
+                    y_var = BiomodelVariable(id='time', target='urn:sedml:symbol:time')
                 else:
                     y_var = next(var for var in y_sim.model.variables if var.target == data_gen_id_to_var_target[y_data_gen_id])
 
@@ -829,7 +829,7 @@ class SedMlSimulationReader(SimulationReader):
             sim (:obj:`Simulation`): simulation
         """
         # model
-        sim.model = Model(
+        sim.model = Biomodel(
             format=Format(
                 name=self.MODEL_LANGUAGE_NAME,
             ),
@@ -859,7 +859,7 @@ class SedMlSimulationReader(SimulationReader):
                             var_id = var_id[len('var_'):]
 
                         if var_id != 'time':
-                            sim.model.variables.append(ModelVariable(
+                            sim.model.variables.append(BiomodelVariable(
                                 id=var_id,
                                 target=var_sed.getTarget(),
                             ))
@@ -954,7 +954,7 @@ class SedMlSimulationReader(SimulationReader):
                     param_name = node.children
 
         return ParameterChange(
-            parameter=ModelParameter(
+            parameter=BiomodelParameter(
                 id=param_id,
                 name=param_name,
                 target=change_sed.getTarget(),

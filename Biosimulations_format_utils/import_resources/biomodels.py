@@ -8,10 +8,10 @@
 
 from ..api_client import ApiClient
 from ..data_model import Identifier, JournalReference, License, Person, RemoteFile
-from ..model import read_model
-from ..model.core import ModelIoError
-from ..model.data_model import ModelFormat, Model  # noqa: F401
-from ..model.sbml import visualize_model
+from ..biomodel import read_biomodel
+from ..biomodel.core import BiomodelIoError
+from ..biomodel.data_model import BiomodelFormat, Biomodel  # noqa: F401
+from ..biomodel.sbml import visualize_biomodel
 from ..simulation import read_simulation
 from ..simulation.core import SimulationIoError, SimulationIoWarning
 from ..simulation.data_model import SimulationFormat, Simulation
@@ -75,7 +75,7 @@ class BioModelsImporter(object):
         """ Retrieve models from BioModels and submit to BioSimulations
 
         Returns:
-            :obj:`list` of :obj:`Model`: models
+            :obj:`list` of :obj:`Biomodel`: models
             :obj:`list` of :obj:`Simulation`: simulations
             :obj:`list` of :obj:`Visualization`: visualizations
             :obj:`dict`: statistics about the models
@@ -101,7 +101,7 @@ class BioModelsImporter(object):
         """ Get models from BioModels
 
         Returns:
-            :obj:`list` of :obj:`Model`: list of metadata about each model
+            :obj:`list` of :obj:`Biomodel`: list of metadata about each model
             :obj:`list` of :obj:`Simulation`: list of metadata about each simulation
             :obj:`list` of :obj:`Visualization`: list of metadata about each visualization
         """
@@ -122,13 +122,13 @@ class BioModelsImporter(object):
                     models.append(model)
                     sims.extend(model_sims)
                     vizs.extend(model_vizs)
-                except ModelIoError:
+                except BiomodelIoError:
                     unimportable_models.append(model_result['id'])
                 except SimulationIoError:
                     unimportable_sims.append(model_result['id'])
 
                 try:
-                    model.image = self.visualize_model(model)
+                    model.image = self.visualize_biomodel(model)
                     for sim in model_sims:
                         sim.image = RemoteFile(
                             name=sim.id + '.png',
@@ -136,7 +136,7 @@ class BioModelsImporter(object):
                             size=model.image.size)
                         shutil.copyfile(os.path.join(self._cache_dir, model.id + '.png'), os.path.join(self._cache_dir, sim.image.name))
 
-                except ModelIoError:
+                except BiomodelIoError:
                     unvisualizable_models.append(model_result['id'])
 
                 # todo: simulate models
@@ -194,7 +194,7 @@ class BioModelsImporter(object):
             id (:obj:`str`): model id
 
         Returns:
-            :obj:`Model`: information about model
+            :obj:`Biomodel`: information about model
             :obj:`list` of :obj:`Simulation`: information about simulations
             :obj:`list` of :obj:`Visualization`: information about visualizations
         """
@@ -306,7 +306,7 @@ class BioModelsImporter(object):
         with open(local_path, 'wb') as file:
             file.write(self.get_model_file(id, model_filename))
 
-        model = read_model(local_path, format=ModelFormat.sbml)
+        model = read_biomodel(local_path, format=BiomodelFormat.sbml)
         model.id = id
         model.name = metadata['name']
         model.file = RemoteFile(
@@ -340,7 +340,7 @@ class BioModelsImporter(object):
                 with open(local_path, 'wb') as file:
                     file.write(self.get_model_file(id, file_metadata['name']))
 
-                model_sims, model_viz = read_simulation(local_path, ModelFormat.sbml, SimulationFormat.sedml)
+                model_sims, model_viz = read_simulation(local_path, BiomodelFormat.sbml, SimulationFormat.sedml)
 
                 model_files = set([sim.model.file.name for sim in model_sims]).difference(set(['model']))
                 assert len(model_files) <= 1, 'Each simulation must use the same model'
@@ -425,11 +425,11 @@ class BioModelsImporter(object):
         response.raise_for_status()
         return response.content
 
-    def visualize_model(self, model):
+    def visualize_biomodel(self, model):
         """ Generate a visualization of a model
 
         Args:
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
             :obj:`RemoteFile`: image
@@ -440,7 +440,7 @@ class BioModelsImporter(object):
         model_path = os.path.join(self._cache_dir, model_basename)
         img_path = os.path.join(self._cache_dir, img_basename)
 
-        img = visualize_model(model_path, img_path, requests_session=self._requests_session)
+        img = visualize_biomodel(model_path, img_path, requests_session=self._requests_session)
         assert model.file.name.endswith('.xml')
         img.name = model.file.name[0:-4] + '.png'
         return img
@@ -449,7 +449,7 @@ class BioModelsImporter(object):
         """ Post models and simulations to BioSimulations
 
         Args:
-            models (:obj:`list` of :obj:`Model`):
+            models (:obj:`list` of :obj:`Biomodel`):
             sims (:obj:`list` of :obj:`Simulation`): simulations
             vizs (:obj:`list` of :obj:`Visualization`): visualization
         """
@@ -469,7 +469,7 @@ class BioModelsImporter(object):
         """ Save models and simulations to JSON files
 
         Args:
-            models (:obj:`list` of :obj:`Model`): models
+            models (:obj:`list` of :obj:`Biomodel`): models
             sims (:obj:`list` of :obj:`Simulation`): simulations
             vizs (:obj:`list` of :obj:`Visualization`): visualization
             stats (:obj:`dict`): statistics of the models
@@ -494,14 +494,14 @@ class BioModelsImporter(object):
         """ Read models, simulations, and visualizations from JSON files
 
         Returns:
-            :obj:`list` of :obj:`Model`: models
+            :obj:`list` of :obj:`Biomodel`: models
             :obj:`list` of :obj:`Simulation`: simulations
             :obj:`list` of :obj:`Visualization`: visualizations
             :obj:`dict`: stats about the models
         """
         filename = os.path.join(self._cache_dir, 'biomodels.models.json')
         with open(filename, 'r') as file:
-            models = [Model.from_json(model) for model in json.load(file)]
+            models = [Biomodel.from_json(model) for model in json.load(file)]
 
         filename = os.path.join(self._cache_dir, 'biomodels.simulations.json')
         with open(filename, 'r') as file:
@@ -521,7 +521,7 @@ class BioModelsImporter(object):
         """ Calculate statistics about the imported models
 
         Args:
-            models (:obj:`list` of :obj:`Model`): models
+            models (:obj:`list` of :obj:`Biomodel`): models
             sims (:obj:`list` of :obj:`Simulation`): simulations
             vizs (:obj:`list` of :obj:`Visualization`): visualizations
 

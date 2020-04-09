@@ -7,13 +7,13 @@
 """
 
 from ..data_model import Format  # noqa: F401
-from .data_model import Model, ModelParameter, ModelVariable  # noqa: F401
+from .data_model import Biomodel, BiomodelParameter, BiomodelVariable  # noqa: F401
 import abc
 
-__all__ = ['ModelReader', 'ModelIoError', 'ModelIoWarning']
+__all__ = ['BiomodelReader', 'BiomodelIoError', 'BiomodelIoWarning']
 
 
-class ModelReader(abc.ABC):
+class BiomodelReader(abc.ABC):
     """ Read information about models """
 
     def run(self, filename):
@@ -23,9 +23,9 @@ class ModelReader(abc.ABC):
             filename (:obj:`str`): path to a file which defines a model
 
         Returns:
-            :obj:`Model`: model
+            :obj:`Biomodel`: model
         """
-        model = Model()
+        model = Biomodel()
         model_orig = self._read_from_file(filename, model)
         self._read_format(model_orig, model)
         self._read_metadata(model_orig, model)
@@ -41,7 +41,7 @@ class ModelReader(abc.ABC):
 
         Args:
             filename (:obj:`str`): path to a file which defines a model
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
             :obj:`object`: model encoded in a format such as SBML
@@ -54,7 +54,7 @@ class ModelReader(abc.ABC):
 
         Args:
             model_orig (:obj:`object`): original model encoded in a format such as SBML
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
             :obj:`Format`: format of the model
@@ -67,10 +67,10 @@ class ModelReader(abc.ABC):
 
         Args:
             model_orig (:obj:`object`): original model encoded in a format such as SBML
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
-            :obj:`Model`: model with additional metadata
+            :obj:`Biomodel`: model with additional metadata
         """
         pass  # pragma: no cover
 
@@ -80,7 +80,7 @@ class ModelReader(abc.ABC):
 
         Args:
             model_orig (:obj:`object`): original model encoded in a format such as SBML
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
             :obj:`dict`: dictionary that maps the ids of units to their definitions
@@ -93,10 +93,10 @@ class ModelReader(abc.ABC):
 
         Args:
             model_orig (:obj:`object`): original model encoded in a format such as SBML
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
-            :obj:`list` of :obj:`ModelParameter`: information about parameters
+            :obj:`list` of :obj:`BiomodelParameter`: information about parameters
         """
         pass  # pragma: no cover
 
@@ -106,19 +106,19 @@ class ModelReader(abc.ABC):
 
         Args:
             model_orig (:obj:`object`): original model encoded in a format such as SBML
-            model (:obj:`Model`): model
+            model (:obj:`Biomodel`): model
 
         Returns:
-            :obj:`list` of :obj:`ModelVariable`: information about the variables of the model
+            :obj:`list` of :obj:`BiomodelVariable`: information about the variables of the model
         """
         pass  # pragma: no cover
 
 
-class ModelIoError(Exception):
+class BiomodelIoError(Exception):
     """ Model IO error """
     pass
 
 
-class ModelIoWarning(UserWarning):
+class BiomodelIoWarning(UserWarning):
     """ Model IO warning """
     pass

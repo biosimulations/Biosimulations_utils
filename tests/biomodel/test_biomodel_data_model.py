@@ -8,13 +8,13 @@
 
 from Biosimulations_format_utils.data_model import (Format, Identifier, JournalReference,
                                                     License, OntologyTerm, Person, RemoteFile, Taxon, Type)
-from Biosimulations_format_utils.model.data_model import Model, ModelParameter, ModelVariable
+from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
 import unittest
 
 
-class ModelDataModelTestCase(unittest.TestCase):
-    def test_Model(self):
-        model = Model(
+class BiomodelDataModelTestCase(unittest.TestCase):
+    def test_Biomodel(self):
+        model = Biomodel(
             id='model_1',
             name='model 1',
             file=RemoteFile(name='model.xml', type='application/sbml+xml'),
@@ -36,17 +36,17 @@ class ModelDataModelTestCase(unittest.TestCase):
                 Person(first_name='Jane', middle_name='D', last_name='Doe'),
             ],
             license=License.cc0,
-            parameters=[ModelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
-            variables=[ModelVariable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
+            parameters=[BiomodelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
+            variables=[BiomodelVariable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
         )
-        self.assertEqual(Model.from_json(model.to_json()), model)
+        self.assertEqual(Biomodel.from_json(model.to_json()), model)
 
     def test_Parameter(self):
-        param = ModelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])
-        self.assertEqual(ModelParameter.from_json(param.to_json()), param)
-        self.assertEqual(ModelParameter.sort_key(param), param.id)
+        param = BiomodelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])
+        self.assertEqual(BiomodelParameter.from_json(param.to_json()), param)
+        self.assertEqual(BiomodelParameter.sort_key(param), param.id)
 
     def test_Variable(self):
-        var = ModelVariable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])
-        self.assertEqual(ModelVariable.from_json(var.to_json()), var)
-        self.assertEqual(ModelVariable.sort_key(var), var.id)
+        var = BiomodelVariable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])
+        self.assertEqual(BiomodelVariable.from_json(var.to_json()), var)
+        self.assertEqual(BiomodelVariable.sort_key(var), var.id)

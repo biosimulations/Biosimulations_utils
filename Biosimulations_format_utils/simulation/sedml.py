@@ -572,7 +572,8 @@ class SedMlSimulationReader(SimulationReader):
         default_model = None
         for i_model, model_sed in enumerate(doc_sed.getListOfModels()):
             for change_sed in model_sed.getListOfChanges():
-                assert_exception(isinstance(change_sed, libsedml.SedChangeAttribute), SimulationIoError("Changes must be attribute changes"))
+                assert_exception(isinstance(change_sed, libsedml.SedChangeAttribute),
+                                 SimulationIoError("Changes must be attribute changes"))
             assert_exception(model_sed.getId() not in models_sed, SimulationIoError("Models must have unique ids"))
             models_sed[model_sed.getId()] = model_sed
 
@@ -660,7 +661,8 @@ class SedMlSimulationReader(SimulationReader):
         viz = Visualization()
         for output_sed in doc_sed.getListOfOutputs():
             if not isinstance(output_sed, libsedml.SedPlot2D):
-                warnings.warn('{} of {} is not supported'.format(output_sed.__class__.__name__, os.path.basename(filename)), SimulationIoWarning)
+                warnings.warn('{} of {} is not supported'.format(
+                    output_sed.__class__.__name__, os.path.basename(filename)), SimulationIoWarning)
                 continue
 
             x_sim_results = []

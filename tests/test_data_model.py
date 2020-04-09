@@ -20,9 +20,10 @@ import unittest
 
 class DataModelTestCase(unittest.TestCase):
     def test_Format(self):
-        format = Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org')
+        format = Format(id='SBML', name='Systems Biology Markup Langugae', version='L3V2', edam_id='format_2585',
+                        url='http://sbml.org', spec_url='http://identifiers.org/combine.specifications/sbml')
         self.assertEqual(Format.from_json(format.to_json()), format)
-        self.assertEqual(Format.sort_key(format), (format.name, format.version, format.edam_id, format.url))
+        self.assertEqual(Format.sort_key(format), (format.id, format.name, format.version, format.edam_id, format.url, format.spec_url))
 
     def test_Identifier(self):
         id = Identifier(namespace='biomodels.db', id='BIOMD0000000924')

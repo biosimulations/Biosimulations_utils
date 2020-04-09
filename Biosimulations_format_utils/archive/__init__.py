@@ -7,12 +7,12 @@
 """
 
 from .data_model import ArchiveFormat, Archive  # noqa: F401
-from .omex import OmexArchiveWriter, OmexArchiveReader
+from .combine import CombineArchiveWriter, CombineArchiveReader
 
 __all__ = ['write_archive', 'read_archive']
 
 
-def write_archive(archive, in_dir, out_file, format=ArchiveFormat.omex):
+def write_archive(archive, in_dir, out_file, format=ArchiveFormat.combine):
     """ Write an archive
 
     Args:
@@ -21,14 +21,14 @@ def write_archive(archive, in_dir, out_file, format=ArchiveFormat.omex):
         out_file (:obj:`str`): path to save archive
         format (:obj:`ArchiveFormat`, optional): archive format
     """
-    if format == ArchiveFormat.omex:
-        Writer = OmexArchiveWriter
+    if format == ArchiveFormat.combine:
+        Writer = CombineArchiveWriter
     else:
         raise NotImplementedError("Format {} is not supported".format(format.name))
     Writer().run(archive, in_dir, out_file)
 
 
-def read_archive(in_file, out_dir, format=ArchiveFormat.omex):
+def read_archive(in_file, out_dir, format=ArchiveFormat.combine):
     """ Read an archive
 
     Args:
@@ -39,8 +39,8 @@ def read_archive(in_file, out_dir, format=ArchiveFormat.omex):
     Returns:
         obj:`Archive`: description of archive
     """
-    if format == ArchiveFormat.omex:
-        Reader = OmexArchiveReader
+    if format == ArchiveFormat.combine:
+        Reader = CombineArchiveReader
     else:
         raise NotImplementedError("Format {} is not supported".format(format.name))
     return Reader().run(in_file, out_dir)

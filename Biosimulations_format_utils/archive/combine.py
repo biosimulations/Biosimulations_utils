@@ -7,19 +7,19 @@
 """
 
 from .core import ArchiveWriter, ArchiveReader, ArchiveIoError
-from .data_model import Archive, ArchiveFile
-from ..data_model import Person
-from ..model.data_model import ModelFormat
-from ..simulation.data_model import SimulationFormat
+from .data_model import Archive, ArchiveFile, ArchiveFormat
+from ..data_model import Format, Person
+from ..model.data_model import ModelFormat, ModelFormatSpecificationUrl
+from ..simulation.data_model import SimulationFormat, SimulationFormatSpecificationUrl
 import dateutil.parser
 import libcombine
 import os
 
 
-__all__ = ['OmexArchiveWriter', 'OmexArchiveReader']
+__all__ = ['CombineArchiveWriter', 'CombineArchiveReader']
 
 
-class OmexArchiveWriter(ArchiveWriter):
+class CombineArchiveWriter(ArchiveWriter):
     """ Writer for COMBINE/OMEX archives """
 
     def run(self, archive, in_dir, out_file):
@@ -41,7 +41,7 @@ class OmexArchiveWriter(ArchiveWriter):
             assert archive_comb.addFile(
                 os.path.join(in_dir, file.filename),
                 file.filename,
-                file.format.value if file.format else '',
+                file.format.spec_url if file.format else '',
                 file is archive.master_file
             )
             self._write_metadata(file, archive_comb, file.filename)
@@ -78,7 +78,7 @@ class OmexArchiveWriter(ArchiveWriter):
         archive_comb.addMetadata(filename, desc_comb)
 
 
-class OmexArchiveReader(ArchiveReader):
+class CombineArchiveReader(ArchiveReader):
     """ Reader for COMBINE/OMEX archives """
 
     NONE_DATETIME = '2000-01-01T00:00:00Z'
@@ -98,7 +98,7 @@ class OmexArchiveReader(ArchiveReader):
             raise ArchiveIoError("Invalid OMEX archive")
 
         # instantiate archive
-        archive = Archive()
+        archive = Archive(format=ArchiveFormat.combine.value)
 
         # read metadata
         self._read_metadata(archive_comb, '.', archive)
@@ -109,17 +109,34 @@ class OmexArchiveReader(ArchiveReader):
             file_comb = archive_comb.getEntryByLocation(filename)
 
             if file_comb.isSetFormat():
-                format_comb = file_comb.getFormat()
+                format = Format(spec_url=file_comb.getFormat())
+
                 try:
-                    format_comb = ModelFormat(format_comb)
-                except Exception:
-                    format_comb = SimulationFormat(format_comb)
+                    model_format_spec_url = ModelFormatSpecificationUrl(format.spec_url)
+                    model_format = ModelFormat[model_format_spec_url.name].value
+                    format.id = model_format.id
+                    format.name = model_format.name
+                    format.edam_id = model_format.edam_id
+                    format.url = model_format.url
+                except ValueError:
+                    pass
+
+                try:
+                    sim_format_spec_url = SimulationFormatSpecificationUrl(format.spec_url)
+                    sim_format = SimulationFormat[sim_format_spec_url.name].value
+                    format.id = sim_format.id
+                    format.name = sim_format.name
+                    format.edam_id = sim_format.edam_id
+                    format.url = sim_format.url
+                except ValueError:
+                    pass
+
             else:
-                format_comb = None
+                format = None
 
             file = ArchiveFile(
                 filename=filename,
-                format=format_comb,
+                format=format,
             )
             self._read_metadata(archive_comb, filename, file)
             archive.files.append(file)

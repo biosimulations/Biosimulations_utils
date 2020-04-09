@@ -6,18 +6,27 @@
 :License: MIT
 """
 
-from ..data_model import Person
-from ..model.data_model import ModelFormat  # noqa: F401
-from ..simulation.data_model import SimulationFormat  # noqa: F401
+from ..data_model import Format, Person
 import datetime
 import wc_utils.util.enumerate
 
-__all__ = ['ArchiveFormat', 'Archive', 'ArchiveFile']
+__all__ = ['ArchiveFormat', 'ArchiveFormatSpecificationUrl', 'Archive', 'ArchiveFile']
 
 
-class ArchiveFormat(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
+class ArchiveFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
+    """ Simulation format metadata """
+    COMBINE = Format(
+        id='COMBINE',
+        name='COMBINE',
+        edam_id='format_3686',
+        url='https://combinearchive.org/',
+        spec_url='http://identifiers.org/combine.specifications/omex',
+    )
+
+
+class ArchiveFormatSpecificationUrl(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
     """ Simulation experiment formats """
-    OMEX = 'http://identifiers.org/combine.specifications/omex'
+    COMBINE = 'http://identifiers.org/combine.specifications/omex'
 
 
 class Archive(object):
@@ -28,17 +37,19 @@ class Archive(object):
         files (:obj:`list` of `:obj:`ArchiveFile`): files in archive
         description (:obj:`str`): description
         authors (:obj:`list` of :obj:`Person`): authors of the archive
+        format (:obj:`Format`): format
         created (:obj:`datetime.datetime`): date archive was created
         updated (:obj:`datetime.datetime`): date archive was last updated
     """
 
-    def __init__(self, master_file=None, files=None, description=None, authors=None, created=None, updated=None):
+    def __init__(self, master_file=None, files=None, description=None, authors=None, format=None, created=None, updated=None):
         """
         Args:
             master_file (:obj:`ArchiveFile`, optional): master file of archive
             files (:obj:`list` of `:obj:`ArchiveFile`, optional): files in archive
             description (:obj:`str`, optional): description
             authors (:obj:`list` of :obj:`Person`, optional): authors of the archive
+            format (:obj:`Format`): format
             created (:obj:`datetime.datetime`, optional): date archive was created
             updated (:obj:`datetime.datetime`, optional): date archive was last updated
         """
@@ -46,6 +57,7 @@ class Archive(object):
         self.files = files or []
         self.description = description
         self.authors = authors or []
+        self.format = format
         self.created = created or datetime.datetime.now()
         self.updated = updated or self.created
 
@@ -63,6 +75,7 @@ class Archive(object):
             and sorted(self.files, key=ArchiveFile.sort_key) == sorted(other.files, key=ArchiveFile.sort_key) \
             and self.description == other.description \
             and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
+            and self.format == other.format \
             and self.created == other.created \
             and self.updated == other.updated
 
@@ -72,7 +85,7 @@ class ArchiveFile(object):
 
     Attributes:
         filename (:obj:`str`): path to file within archive (e.g., `./models/model.xml`)
-        format (:obj:`ModelFormat` or :obj:`SimulationFormat`): model or simulation format
+        format (:obj:`Format`): model or simulation format
         description (:obj:`str`): description
         authors (:obj:`list` of :obj:`Person`): authors of the file
         created (:obj:`datetime.datetime`): date file was created
@@ -83,7 +96,7 @@ class ArchiveFile(object):
         """
         Args:
             filename (:obj:`str`, optional): path to file within archive (e.g., `./models/model.xml`)
-            format (:obj:`ModelFormat` or :obj:`SimulationFormat`, optional): model or simulation format
+            format (:obj:`Format`, optional): model or simulation format
             description (:obj:`str`, optional): description
             authors (:obj:`list` of :obj:`Person`, optional): authors of the archive
             created (:obj:`datetime.datetime`, optional): date archive was created

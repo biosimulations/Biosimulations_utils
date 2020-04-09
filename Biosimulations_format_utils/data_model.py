@@ -25,24 +25,30 @@ class Format(object):
     """ A format
 
     Attributes:
-        name (:obj:`str`): name (e.g., SBML)
+        id (:obj:`str`): name (e.g., SBML)
+        name (:obj:`str`): name (e.g., Systems Biology Markup Language)
         version (:obj:`str`): version (e.g., L3V2)
         edam_id (:obj:`str`): EDAM identifier
         url (:obj:`str`): URL
+        spec_url (:obj:`str`): URL for specification
     """
 
-    def __init__(self, name=None, version=None, edam_id=None, url=None):
+    def __init__(self, id=None, name=None, version=None, edam_id=None, url=None, spec_url=None):
         """
         Args:
-            name (:obj:`str`, optional): name (e.g., SBML)
+            id (:obj:`str`, optional): name (e.g., SBML)
+            name (:obj:`str`, optional): name (e.g., Systems Biology Markup Language)
             version (:obj:`str`, optional): version (e.g., L3V2)
             edam_id (:obj:`str`, optional): EDAM identifier
             url (:obj:`str`, optional): URL
+            spec_url (:obj:`str`): URL for specification
         """
+        self.id = id
         self.name = name
         self.version = version
         self.edam_id = edam_id
         self.url = url
+        self.spec_url = spec_url
 
     def __eq__(self, other):
         """ Determine if two formats are semantically equal
@@ -54,10 +60,12 @@ class Format(object):
             :obj:`bool`
         """
         return other.__class__ == self.__class__ \
+            and self.id == other.id \
             and self.name == other.name \
             and self.version == other.version \
             and self.edam_id == other.edam_id \
-            and self.url == other.url
+            and self.url == other.url \
+            and self.spec_url == other.spec_url
 
     def to_json(self):
         """ Export to JSON
@@ -66,10 +74,12 @@ class Format(object):
             :obj:`dict`
         """
         return {
+            'id': self.id,
             'name': self.name,
             'version': self.version,
             'edamId': self.edam_id,
             'url': self.url,
+            'specUrl': self.spec_url,
         }
 
     @classmethod
@@ -83,10 +93,12 @@ class Format(object):
             :obj:`Format`
         """
         return cls(
+            id=val.get('id', None),
             name=val.get('name', None),
             version=val.get('version', None),
             edam_id=val.get('edamId', None),
             url=val.get('url', None),
+            spec_url=val.get('specUrl', None),
         )
 
     @staticmethod
@@ -99,7 +111,7 @@ class Format(object):
         Returns:
             :obj:`tuple`
         """
-        return (format.name, format.version, format.edam_id, format.url)
+        return (format.id, format.name, format.version, format.edam_id, format.url, format.spec_url)
 
 
 class Identifier(object):

@@ -11,13 +11,73 @@ import wc_utils.util.enumerate
 
 __all__ = [
     'ModelFormat',
+    'ModelFormatSpecificationUrl',
     'Model',
     'ModelParameter',
     'ModelVariable',
 ]
 
 
-class ModelFormat(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
+class ModelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
+    """ Model format metadata """
+    BNGL = Format(
+        id='BNGL',
+        name='BioNetGen Language',
+        edam_id=None,
+        url='https://bionetgen.org/',
+        spec_url='https://bionetgen.org/',
+    )
+
+    CellML = Format(
+        id='CellML',
+        name='CellML',
+        edam_id='format_3240',
+        url='https://bionetgen.org/',
+        spec_url='http://identifiers.org/combine.specifications/cellml',
+    )
+
+    Kappa = Format(
+        id='Kappa',
+        name='Kappa',
+        edam_id=None,
+        url='https://bionetgen.org/',
+        spec_url='https://bionetgen.org/',
+    )
+
+    MML = Format(
+        id='MML',
+        name='Multiscale Modeling Language ',
+        edam_id=None,
+        url='https://doi.org/10.1016/j.procs.2010.04.089',
+        spec_url='https://doi.org/10.1016/j.procs.2010.04.089',
+    )
+
+    NeuroML = Format(
+        id='NeuroML',
+        name='NeuroML',
+        edam_id=None,
+        url='https://bionetgen.org/',
+        spec_url='http://identifiers.org/combine.specifications/neuroml',
+    )
+
+    pharmML = Format(
+        id='pharmML',
+        name='Pharmacometrics Markup Language',
+        edam_id=None,
+        url='http://www.pharmml.org/',
+        spec_url='http://www.pharmml.org/',
+    )
+
+    SBML = Format(
+        id='SBML',
+        name='Systems Biology Markup Language',
+        edam_id='format_2585',
+        url='http://sbml.org/',
+        spec_url='http://identifiers.org/combine.specifications/sbml',
+    )
+
+
+class ModelFormatSpecificationUrl(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
     """ Model format """
     BNGL = 'https://bionetgen.org/'
     CellML = 'http://identifiers.org/combine.specifications/cellml'

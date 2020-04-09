@@ -11,14 +11,33 @@ from ..model.data_model import Model, ModelParameter, ModelVariable
 import wc_utils.util.enumerate
 
 __all__ = [
-    'SimulationFormat',
+    'SimulationFormat', 'SimulationFormatSpecificationUrl',
     'Simulation', 'TimecourseSimulation', 'SteadyStateSimulation',
     'Algorithm', 'AlgorithmParameter', 'ParameterChange',
     'SimulationResult',
 ]
 
 
-class SimulationFormat(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
+class SimulationFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
+    """ Simulation format metadata """
+    SEDML = Format(
+        id='SEDML',
+        name='Simulation Experiment Description Markup Language',
+        edam_id='format_3685',
+        url='https://sed-ml.org/',
+        spec_url='http://identifiers.org/combine.specifications/sed-ml',
+    )
+
+    SESSL = Format(
+        id='SESSL',
+        name='Simulation Experiment Specification via a Scala Layer',
+        edam_id=None,
+        url='http://sessl.org',
+        spec_url='http://sessl.org',
+    )
+
+
+class SimulationFormatSpecificationUrl(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
     """ Simulation experiment formats """
     SEDML = 'http://identifiers.org/combine.specifications/sed-ml'
     SESSL = 'http://sessl.org'

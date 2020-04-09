@@ -38,7 +38,7 @@ class WriteSedMlTestCase(unittest.TestCase):
         model_filename = os.path.join(self.dirname, 'model.sbml.xml')
         sim_filename = os.path.join(self.dirname, 'simulation.sed-ml.xml')
         write_simulation(model_vars, sim, model_filename, sim_filename,
-                  SimulationFormat.sedml, level=1, version=3)
+                         SimulationFormat.sedml, level=1, version=3)
 
         sims_2, _ = read_simulation(
             sim_filename, ModelFormat.sbml, SimulationFormat.sedml)

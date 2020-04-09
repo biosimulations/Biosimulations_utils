@@ -9,7 +9,7 @@
 from Biosimulations_format_utils.data_model import Format, JournalReference, License, Person, RemoteFile, Type
 from Biosimulations_format_utils.model.data_model import Model, ModelParameter, ModelVariable
 from Biosimulations_format_utils.model.sbml import ModelingFramework
-from Biosimulations_format_utils.sim.data_model import (
+from Biosimulations_format_utils.simulation.data_model import (
     Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange,
     SimulationResult)
 import unittest

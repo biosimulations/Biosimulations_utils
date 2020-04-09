@@ -11,7 +11,7 @@ from Biosimulations_format_utils.archive.core import ArchiveIoError
 from Biosimulations_format_utils.archive.data_model import Archive, ArchiveFile
 from Biosimulations_format_utils.data_model import Person
 from Biosimulations_format_utils.model.data_model import ModelFormat
-from Biosimulations_format_utils.sim.data_model import SimFormat
+from Biosimulations_format_utils.simulation.data_model import SimFormat
 from unittest import mock
 import datetime
 import dateutil.tz

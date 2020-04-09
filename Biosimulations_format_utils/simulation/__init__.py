@@ -8,7 +8,7 @@
 
 from .data_model import SimFormat
 from ..model.data_model import ModelFormat
-from ..viz.data_model import Visualization  # noqa: F401
+from ..visualization.data_model import Visualization  # noqa: F401
 from .sbml import SbmlSedMlSimWriter, SbmlSedMlSimReader
 
 __all__ = ['write_sim', 'read_sim']

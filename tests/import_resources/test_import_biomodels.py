@@ -9,8 +9,8 @@
 from Biosimulations_format_utils.data_model import Identifier, JournalReference, License, Person, Taxon
 from Biosimulations_format_utils.import_resources import biomodels
 from Biosimulations_format_utils.model.data_model import Model
-from Biosimulations_format_utils.sim.data_model import Simulation
-from Biosimulations_format_utils.viz.data_model import Visualization
+from Biosimulations_format_utils.simulation.data_model import Simulation
+from Biosimulations_format_utils.visualization.data_model import Visualization
 from unittest import mock
 import shutil
 import tempfile

@@ -9,8 +9,8 @@
 from Biosimulations_format_utils.data_model import Format, Identifier, JournalReference, License, Person, RemoteFile
 from Biosimulations_format_utils.chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
 from Biosimulations_format_utils.model.data_model import ModelVariable
-from Biosimulations_format_utils.sim.data_model import TimecourseSimulation, SimulationResult
-from Biosimulations_format_utils.viz.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
+from Biosimulations_format_utils.simulation.data_model import TimecourseSimulation, SimulationResult
+from Biosimulations_format_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import unittest
 
 

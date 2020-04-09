@@ -8,7 +8,7 @@
 
 from ..data_model import Person
 from ..model.data_model import ModelFormat  # noqa: F401
-from ..sim.data_model import SimFormat  # noqa: F401
+from ..simulation.data_model import SimFormat  # noqa: F401
 import datetime
 import wc_utils.util.enumerate
 

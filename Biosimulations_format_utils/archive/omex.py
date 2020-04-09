@@ -10,7 +10,7 @@ from .core import ArchiveWriter, ArchiveReader, ArchiveIoError
 from .data_model import Archive, ArchiveFile
 from ..data_model import Person
 from ..model.data_model import ModelFormat
-from ..sim.data_model import SimFormat
+from ..simulation.data_model import SimFormat
 import dateutil.parser
 import libcombine
 import os

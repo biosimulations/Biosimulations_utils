@@ -12,7 +12,7 @@ from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation
 from ..chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
 from ..data_model import Format, JournalReference, License, Person, RemoteFile
 from ..model.data_model import Model, ModelParameter, ModelVariable
-from ..viz.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
+from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 from ..utils import assert_exception
 from datetime import datetime
 from xml.sax import saxutils

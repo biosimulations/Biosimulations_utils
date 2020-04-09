@@ -12,10 +12,10 @@ from ..model import read_model
 from ..model.core import ModelIoError
 from ..model.data_model import ModelFormat, Model  # noqa: F401
 from ..model.sbml import viz_model
-from ..sim import read_sim
-from ..sim.core import SimIoError, SimIoWarning
-from ..sim.data_model import SimFormat, Simulation
-from ..viz.data_model import Visualization
+from ..simulation import read_sim
+from ..simulation.core import SimIoError, SimIoWarning
+from ..simulation.data_model import SimFormat, Simulation
+from ..visualization.data_model import Visualization
 import copy
 import json
 import libsbml

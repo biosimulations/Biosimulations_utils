@@ -8,7 +8,7 @@
 
 from ..chart_type.data_model import ChartType, ChartTypeDataField
 from ..data_model import Format, Identifier, JournalReference, License, Person, RemoteFile
-from ..sim.data_model import SimulationResult
+from ..simulation.data_model import SimulationResult
 
 __all__ = [
     'Visualization', 'VisualizationLayoutElement', 'VisualizationDataField',

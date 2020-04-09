@@ -6,21 +6,10 @@
 :License: MIT
 """
 
+from .data_model import ModelFormat
 from .sbml import SbmlModelReader
-import wc_utils.util.enumerate
 
-__all__ = ['ModelFormat', 'read_model']
-
-
-class ModelFormat(int, wc_utils.util.enumerate.CaseInsensitiveEnum):
-    """ Model format """
-    BNGL = 1  # BNGL
-    CellML = 2  # CellML
-    Kappa = 3  # Kappa
-    MML = 4  # Multiscale Modeling Language
-    NeuroML = 5  # NeuroML
-    pharmML = 6  # pharmML
-    SBML = 7  # SBML
+__all__ = ['read_model']
 
 
 def read_model(filename, format):

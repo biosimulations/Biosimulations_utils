@@ -8,12 +8,20 @@
 
 from ..data_model import Format, Identifier, JournalReference, License, OntologyTerm, Person, RemoteFile, Type
 from ..model.data_model import Model, ModelParameter, ModelVariable
+import wc_utils.util.enumerate
 
 __all__ = [
+    'SimFormat',
     'Simulation', 'TimecourseSimulation', 'SteadyStateSimulation',
     'Algorithm', 'AlgorithmParameter', 'ParameterChange',
     'SimulationResult',
 ]
+
+
+class SimFormat(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
+    """ Simulation experiment formats """
+    SEDML = 'http://identifiers.org/combine.specifications/sed-ml'
+    SESSL = 'http://sessl.org'
 
 
 class Simulation(object):
@@ -268,11 +276,11 @@ class Algorithm(object):
             KiSAO ids for the parent simulator of an algorithm
         modeling_frameworks (:obj:`list` of :obj:`OntologyTerm`): supported modeling frameworks
         model_formats (:obj:`list` of :obj:`Format`): supoorted model formats
-        parameters (:obj:`list` of :obj:`AlgorithmParameter`): parameters        
+        parameters (:obj:`list` of :obj:`AlgorithmParameter`): parameters
     """
 
-    def __init__(self, id=None, name=None, kisao_id=None, synonymous_kisao_ids=None, 
-        modeling_frameworks=None, model_formats=None, parameters=None):
+    def __init__(self, id=None, name=None, kisao_id=None, synonymous_kisao_ids=None,
+                 modeling_frameworks=None, model_formats=None, parameters=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -306,7 +314,8 @@ class Algorithm(object):
             and self.name == other.name \
             and self.kisao_id == other.kisao_id \
             and sorted(self.synonymous_kisao_ids) == sorted(other.synonymous_kisao_ids) \
-            and sorted(self.modeling_frameworks, key=OntologyTerm.sort_key) == sorted(other.modeling_frameworks, key=OntologyTerm.sort_key) \
+            and sorted(self.modeling_frameworks, key=OntologyTerm.sort_key) == \
+            sorted(other.modeling_frameworks, key=OntologyTerm.sort_key) \
             and sorted(self.model_formats, key=Format.sort_key) == sorted(other.model_formats, key=Format.sort_key) \
             and sorted(self.parameters, key=AlgorithmParameter.sort_key) == sorted(other.parameters, key=AlgorithmParameter.sort_key)
 

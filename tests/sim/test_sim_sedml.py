@@ -8,11 +8,10 @@
 
 from Biosimulations_format_utils.chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
 from Biosimulations_format_utils.data_model import Format
-from Biosimulations_format_utils.model import ModelFormat
-from Biosimulations_format_utils.model.data_model import Model, ModelVariable
-from Biosimulations_format_utils.sim import SimFormat, write_sim, read_sim, sedml
+from Biosimulations_format_utils.model.data_model import ModelFormat, Model, ModelVariable
+from Biosimulations_format_utils.sim import write_sim, read_sim, sedml
 from Biosimulations_format_utils.sim.core import SimIoError, SimIoWarning
-from Biosimulations_format_utils.sim.data_model import TimecourseSimulation, SimulationResult
+from Biosimulations_format_utils.sim.data_model import SimFormat, TimecourseSimulation, SimulationResult
 from Biosimulations_format_utils.viz.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import json
 import libsedml

@@ -6,18 +6,12 @@
 :License: MIT
 """
 
-from ..model import ModelFormat
+from .data_model import SimFormat
+from ..model.data_model import ModelFormat
 from ..viz.data_model import Visualization  # noqa: F401
 from .sbml import SbmlSedMlSimWriter, SbmlSedMlSimReader
-import wc_utils.util.enumerate
 
-__all__ = ['SimFormat', 'write_sim', 'read_sim']
-
-
-class SimFormat(int, wc_utils.util.enumerate.CaseInsensitiveEnum):
-    """ Simulation experiment formats """
-    SEDML = 1  # SED-ML
-    SESSL = 2  # SESSL
+__all__ = ['write_sim', 'read_sim']
 
 
 def write_sim(model_vars, sim, model_filename, sim_filename, sim_format, **sim_format_opts):

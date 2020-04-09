@@ -8,13 +8,13 @@
 
 from ..api_client import ApiClient
 from ..data_model import Identifier, JournalReference, License, Person, RemoteFile
-from ..model import ModelFormat, read_model
+from ..model import read_model
 from ..model.core import ModelIoError
-from ..model.data_model import Model  # noqa: F401
+from ..model.data_model import ModelFormat, Model  # noqa: F401
 from ..model.sbml import viz_model
-from ..sim import SimFormat, read_sim
+from ..sim import read_sim
 from ..sim.core import SimIoError, SimIoWarning
-from ..sim.data_model import Simulation
+from ..sim.data_model import SimFormat, Simulation
 from ..viz.data_model import Visualization
 import copy
 import json

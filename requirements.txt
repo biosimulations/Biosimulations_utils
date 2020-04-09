@@ -4,8 +4,11 @@ ete3
 numpy
 pillow
 pint
+python_dateutil
+python_libcombine
 python_libsbml
 python_libsedml >= 2
 requests
 requests_cache
+tzlocal
 wc_utils

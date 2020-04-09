@@ -7,12 +7,25 @@
 """
 
 from ..data_model import Format, Identifier, JournalReference, License, OntologyTerm, Person, RemoteFile, Taxon, Type
+import wc_utils.util.enumerate
 
 __all__ = [
+    'ModelFormat',
     'Model',
     'ModelParameter',
     'ModelVariable',
 ]
+
+
+class ModelFormat(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
+    """ Model format """
+    BNGL = 'https://bionetgen.org/'
+    CellML = 'http://identifiers.org/combine.specifications/cellml'
+    Kappa = 'https://kappalanguage.org/'
+    MML = 'https://doi.org/10.1016/j.procs.2010.04.089'
+    NeuroML = 'http://identifiers.org/combine.specifications/neuroml'
+    pharmML = 'http://www.pharmml.org/'
+    SBML = 'http://identifiers.org/combine.specifications/sbml'
 
 
 class Model(object):

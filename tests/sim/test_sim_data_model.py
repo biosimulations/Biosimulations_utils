@@ -8,6 +8,7 @@
 
 from Biosimulations_format_utils.data_model import Format, JournalReference, License, Person, RemoteFile, Type
 from Biosimulations_format_utils.model.data_model import Model, ModelParameter, ModelVariable
+from Biosimulations_format_utils.model.sbml import ModelingFramework
 from Biosimulations_format_utils.sim.data_model import (
     Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange,
     SimulationResult)
@@ -41,11 +42,14 @@ class SimDataModelTestCase(unittest.TestCase):
             output_start_time=1.,
             end_time=10.,
             num_time_points=100,
-            algorithm=Algorithm(id='00001', name='integrator', parameters=[
-                AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2, kisao_id='00001'),
+            algorithm=Algorithm(id='00001', name='integrator', kisao_id='KISAO:00001', parameters=[
+                AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2,
+                                   recommended_range=[0.12, 12.], kisao_id='KISAO:00001'),
             ]),
             algorithm_parameter_changes=[
-                ParameterChange(parameter=AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2, kisao_id='00001'),
+                ParameterChange(parameter=AlgorithmParameter(id='param_1', name='param 1', type=Type.float,
+                                                             value=1.2, recommended_range=[0.12, 12.],
+                                                             kisao_id='KISAO:00001'),
                                 value=2.1),
             ]
         )
@@ -74,11 +78,13 @@ class SimDataModelTestCase(unittest.TestCase):
                 ParameterChange(parameter=ModelParameter(id='param_1', name='param 1', type=Type.float, value=3.5),
                                 value=5.3),
             ],
-            algorithm=Algorithm(id='00001', name='integrator', parameters=[
-                AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2, kisao_id='00001'),
+            algorithm=Algorithm(id='00001', name='integrator', kisao_id='KISAO:00001', parameters=[
+                AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2,
+                                   recommended_range=[0.12, 12.], kisao_id='KISAO:00001'),
             ]),
             algorithm_parameter_changes=[
-                ParameterChange(parameter=AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2, kisao_id='00001'),
+                ParameterChange(parameter=AlgorithmParameter(id='param_1', name='param 1', type=Type.float,
+                                                             value=1.2, recommended_range=[0.12, 12.], kisao_id='KISAO:00001'),
                                 value=2.1),
             ]
         )
@@ -86,21 +92,37 @@ class SimDataModelTestCase(unittest.TestCase):
         self.assertEqual(Simulation.from_json(sim.to_json()), sim)
 
     def test_Algorithm(self):
-        alg = Algorithm(id='00001', name='integrator', parameters=[
-            AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2, kisao_id='00001'),
-        ])
+        alg = Algorithm(
+            id='00001',
+            name='integrator',
+            kisao_id='KISAO:00001',
+            synonymous_kisao_ids=['KISAO:00002', 'KISAO:00003'],
+            modeling_frameworks=[
+                ModelingFramework.logical.value,
+                ModelingFramework.flux_balance.value,
+            ],
+            model_formats=[
+                Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
+            ],
+            parameters=[
+                AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2,
+                                   recommended_range=[0.12, 12.], kisao_id='KISAO:00001'),
+            ],
+        )
         self.assertEqual(Algorithm.from_json(alg.to_json()), alg)
 
     def test_AlgorithmParameter(self):
-        param = AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2, kisao_id='00001')
+        param = AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2,
+                                   recommended_range=[0.12, 12.], kisao_id='KISAO:00001')
         self.assertEqual(AlgorithmParameter.from_json(param.to_json()), param)
-        self.assertEqual(AlgorithmParameter.sort_key(param), ('param_1', 'param 1', 'float', 1.2, '00001'))
+        self.assertEqual(AlgorithmParameter.sort_key(param), ('param_1', 'param 1', 'float', 1.2, (0.12, 12.), 'KISAO:00001'))
 
     def test_ParameterChange(self):
-        change = ParameterChange(parameter=AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2, kisao_id='00001'),
+        change = ParameterChange(parameter=AlgorithmParameter(id='param_1', name='param 1', type=Type.float, value=1.2,
+                                                              recommended_range=[0.12, 12.], kisao_id='KISAO:00001'),
                                  value=2.1)
         self.assertEqual(ParameterChange.from_json(change.to_json(), AlgorithmParameter), change)
-        self.assertEqual(ParameterChange.sort_key(change), (('param_1', 'param 1', 'float', 1.2, '00001'), 2.1))
+        self.assertEqual(ParameterChange.sort_key(change), (('param_1', 'param 1', 'float', 1.2, (0.12, 12.), 'KISAO:00001'), 2.1))
 
     def test_SimulationResult(self):
         result = SimulationResult(simulation=TimecourseSimulation(id='sim'), variable=ModelVariable(id='var'))

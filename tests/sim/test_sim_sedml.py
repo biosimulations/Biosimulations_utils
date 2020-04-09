@@ -152,7 +152,7 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(sim.output_start_time, 0.)
         self.assertEqual(sim.end_time, 1.)
         self.assertEqual(sim.num_time_points, 100)
-        self.assertEqual(sim.algorithm.id, 'KISAO:0000019')
+        self.assertEqual(sim.algorithm.kisao_id, 'KISAO:0000019')
         self.assertEqual(sim.algorithm_parameter_changes, [])
 
     def test_read_visualizations(self):

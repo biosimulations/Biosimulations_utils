@@ -89,6 +89,18 @@ class Format(object):
             url=val.get('url', None),
         )
 
+    @staticmethod
+    def sort_key(format):
+        """ Get a key to sort a format
+
+        Args:
+            format (:obj:`Format`): format
+
+        Returns:
+            :obj:`tuple`
+        """
+        return (format.name, format.version, format.edam_id, format.url)
+
 
 class Identifier(object):
     """ An identifier of a concept
@@ -357,6 +369,18 @@ class OntologyTerm(object):
             description=val.get('description', None),
             iri=val.get('iri', None),
         )
+
+    @staticmethod
+    def sort_key(term):
+        """ Get a key to sort an ontology term
+
+        Args:
+            term (:obj:`OntologyTerm`): term
+
+        Returns:
+            :obj:`tuple`
+        """
+        return (term.ontology, term.id, term.name, term.description, term.iri)
 
 
 class Person(object):

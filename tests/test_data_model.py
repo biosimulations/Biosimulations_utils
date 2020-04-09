@@ -22,6 +22,7 @@ class DataModelTestCase(unittest.TestCase):
     def test_Format(self):
         format = Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org')
         self.assertEqual(Format.from_json(format.to_json()), format)
+        self.assertEqual(Format.sort_key(format), (format.name, format.version, format.edam_id, format.url))
 
     def test_Identifier(self):
         id = Identifier(namespace='biomodels.db', id='BIOMD0000000924')
@@ -41,6 +42,7 @@ class DataModelTestCase(unittest.TestCase):
                             description='KLU is a software package and an algorithm ...',
                             iri='http://www.biomodels.net/kisao/KISAO#KISAO_0000497')
         self.assertEqual(OntologyTerm.from_json(term.to_json()), term)
+        self.assertEqual(OntologyTerm.sort_key(term), (term.ontology, term.id, term.name, term.description, term.iri))
 
     def test_Person(self):
         person = Person(first_name='John', middle_name='C', last_name='Doe')

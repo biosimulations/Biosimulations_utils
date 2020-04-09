@@ -70,7 +70,7 @@
   "endTime": 10.0,
   "numTimePoints": 100,
   "algorithm": {
-    "id": "KISAO:0000019",
+    "kisaoId": "KISAO:0000019",
     "name": "CVODE"
   },
   "algorithmParameterChanges": [

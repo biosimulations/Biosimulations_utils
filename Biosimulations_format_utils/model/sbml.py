@@ -24,7 +24,7 @@ import requests_cache.core  # noqa: F401
 __all__ = ['SbmlModelReader', 'viz_model']
 
 
-class ModelFramework(enum.Enum):
+class ModelingFramework(enum.Enum):
     flux_balance = OntologyTerm(
         ontology='SBO',
         id='0000624',
@@ -187,13 +187,13 @@ class SbmlModelReader(ModelReader):
         if len(packages.intersection(set(['fbc', 'multi', 'qual']))) > 1:
             raise ModelIoError('Unable to determine modeling framework')
         if 'fbc' in packages:
-            framework = ModelFramework.flux_balance
+            framework = ModelingFramework.flux_balance
         elif 'multi' in packages:
-            framework = ModelFramework.non_spatial_discrete
+            framework = ModelingFramework.non_spatial_discrete
         elif 'qual' in packages:
-            framework = ModelFramework.logical
+            framework = ModelingFramework.logical
         else:
-            framework = ModelFramework.non_spatial_continuous
+            framework = ModelingFramework.non_spatial_continuous
         model.framework = framework.value
 
         # taxon

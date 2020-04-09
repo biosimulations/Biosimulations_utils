@@ -313,11 +313,17 @@ class SedMlSimWriter(SimWriter):
             :obj:`libsedml.SedAlgorithm`: SED simulation algorithm
         """
         alg_sed = sim_sed.createAlgorithm()
-        self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.id)
-        if algorithm.name:
+        self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.kisao_id)
+        if algorithm.id:
             self._add_annotation_to_obj([XmlNode(
                 prefix='dc',
                 name='title',
+                children=algorithm.id,
+            )], doc_sed, alg_sed, set(['dc']))
+        if algorithm.name:
+            self._add_annotation_to_obj([XmlNode(
+                prefix='dc',
+                name='description',
                 children=algorithm.name,
             )], doc_sed, alg_sed, set(['dc']))
 
@@ -353,10 +359,16 @@ class SedMlSimWriter(SimWriter):
         """
         change_sed = alg_sed.createAlgorithmParameter()
         self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID', change.parameter.kisao_id)
-        if change.parameter.name:
+        if change.parameter.id:
             self._add_annotation_to_obj([XmlNode(
                 prefix='dc',
                 name='title',
+                children=change.parameter.id,
+            )], doc_sed, change_sed, set(['dc']))
+        if change.parameter.name:
+            self._add_annotation_to_obj([XmlNode(
+                prefix='dc',
+                name='description',
                 children=change.parameter.name,
             )], doc_sed, change_sed, set(['dc']))
         self._call_libsedml_method(doc_sed, change_sed, 'setValue', str(change.value))
@@ -885,31 +897,37 @@ class SedMlSimReader(SimReader):
         # algorithm
         alg_sed = sim_sed.getAlgorithm()
         alg_props = self._get_obj_annotation(alg_sed)
+        alg_id = None
         alg_name = None
         for node in alg_props:
             if node.prefix == 'dc' and node.name == 'title':
+                alg_id = node.children
+            elif node.prefix == 'dc' and node.name == 'description':
                 alg_name = node.children
-                break
 
         sim.algorithm = Algorithm(
-            id=alg_sed.getKisaoID(),
+            id=alg_id,
             name=alg_name,
+            kisao_id=alg_sed.getKisaoID(),
         )
 
         # algorithm parameters
         sim.algorithm_parameter_changes = []
         for change_sed in alg_sed.getListOfAlgorithmParameters():
             change_props = self._get_obj_annotation(change_sed)
+            param_id = None
             param_name = None
             for node in change_props:
                 if node.prefix == 'dc' and node.name == 'title':
+                    param_id = node.children
+                elif node.prefix == 'dc' and node.name == 'description':
                     param_name = node.children
-                    break
 
             sim.algorithm_parameter_changes.append(ParameterChange(
                 parameter=AlgorithmParameter(
-                    kisao_id=change_sed.getKisaoID(),
+                    id=param_id,
                     name=param_name,
+                    kisao_id=change_sed.getKisaoID(),
                 ),
                 value=float(change_sed.getValue()),
             ))

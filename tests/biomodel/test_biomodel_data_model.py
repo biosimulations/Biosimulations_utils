@@ -29,7 +29,7 @@ class BiomodelDataModelTestCase(unittest.TestCase):
             identifiers=[Identifier(namespace='biomodels.db', id='BIOMD0000000924')],
             references=[
                 JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                 volume=10, num=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                                 volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
             ],
             authors=[
                 Person(first_name='John', middle_name='C', last_name='Doe'),

@@ -202,20 +202,20 @@ class JournalReference(object):
         title (:obj:`str`): title
         journal (:obj:`str`): journal
         volume (:obj:`int` or :obj:`str`): volume
-        num (:obj:`int`): issue number
+        issue (:obj:`int`): issue number
         pages (:obj:`str`): pages
         year (:obj:`int`): year
         doi (:obj:`str`): DOI
     """
 
-    def __init__(self, authors=None, title=None, journal=None, volume=None, num=None, pages=None, year=None, doi=None):
+    def __init__(self, authors=None, title=None, journal=None, volume=None, issue=None, pages=None, year=None, doi=None):
         """
         Args:
             authors (:obj:`str`, optional): authors
             title (:obj:`str`, optional): title
             journal (:obj:`str`, optional): journal
             volume (:obj:`int` or :obj:`str`, optional): volume
-            num (:obj:`int`, optional): issue number
+            issue (:obj:`int`, optional): issue number
             pages (:obj:`str`, optional): pages
             year (:obj:`int`, optional): year
             doi (:obj:`str`, optional): DOI
@@ -224,7 +224,7 @@ class JournalReference(object):
         self.title = title
         self.journal = journal
         self.volume = volume
-        self.num = num
+        self.issue = issue
         self.pages = pages
         self.year = year
         self.doi = doi
@@ -243,7 +243,7 @@ class JournalReference(object):
             and self.title == other.title \
             and self.journal == other.journal \
             and self.volume == other.volume \
-            and self.num == other.num \
+            and self.issue == other.issue \
             and self.pages == other.pages \
             and self.year == other.year \
             and self.doi == other.doi
@@ -259,7 +259,7 @@ class JournalReference(object):
             'title': self.title,
             'journal': self.journal,
             'volume': self.volume,
-            'num': self.num,
+            'issue': self.issue,
             'pages': self.pages,
             'year': self.year,
             'doi': self.doi,
@@ -280,7 +280,7 @@ class JournalReference(object):
             title=val.get('title', None),
             journal=val.get('journal', None),
             volume=val.get('volume', None),
-            num=val.get('num', None),
+            issue=val.get('issue', None),
             pages=val.get('pages', None),
             year=val.get('year', None),
             doi=val.get('doi', None),
@@ -301,7 +301,7 @@ class JournalReference(object):
             ref.title,
             ref.journal,
             ref.volume,
-            ref.num,
+            ref.issue,
             ref.pages,
             ref.year,
             ref.doi,

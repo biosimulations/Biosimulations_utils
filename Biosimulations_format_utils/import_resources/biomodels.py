@@ -291,7 +291,7 @@ class BioModelsImporter(object):
                     title=metadata['publication']['title'],
                     journal=metadata['publication']['journal'],
                     volume=metadata['publication'].get('volume', None),
-                    num=metadata['publication'].get('issue', None),
+                    issue=metadata['publication'].get('issue', None),
                     pages=metadata['publication'].get('pages', None),
                     year=metadata['publication'].get('year', None),
                     doi=doi,

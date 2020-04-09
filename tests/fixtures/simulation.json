@@ -21,7 +21,7 @@
       "title": "Title-1",
       "journal": "Journal-1",
       "volume": 1,
-      "num": 1,
+      "issue": 1,
       "pages": "1-10",
       "year": 2019,
       "doi": "10.1016/XXXX"
@@ -31,7 +31,7 @@
       "title": "Title-2",
       "journal": "Journal-2",
       "volume": "Database issue",
-      "num": 2,
+      "issue": 2,
       "pages": "11-20",
       "year": 2020,
       "doi": "10.1016/XXXX"

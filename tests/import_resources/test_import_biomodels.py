@@ -88,7 +88,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
             title="A kinetic mechanism for nicotinic acetylcholine receptors based on multiple allosteric transitions.",
             journal="Biological cybernetics",
             volume="75",
-            num=None,
+            issue=None,
             pages="361-379",
             year=1996,
             doi="10.1007/s004220050302",

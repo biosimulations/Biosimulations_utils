@@ -179,8 +179,8 @@ class SedMlSimulationWriter(SimulationWriter):
                     props_xml.append(XmlNode(prefix='bibo', name='journal', children=ref.journal))
                 if ref.volume:
                     props_xml.append(XmlNode(prefix='bibo', name='volume', children=ref.volume))
-                if ref.num:
-                    props_xml.append(XmlNode(prefix='bibo', name='issue', children=ref.num))
+                if ref.issue:
+                    props_xml.append(XmlNode(prefix='bibo', name='issue', children=ref.issue))
                 if ref.pages:
                     props_xml.append(XmlNode(prefix='bibo', name='pages', children=ref.pages))
                 if ref.year:
@@ -805,7 +805,7 @@ class SedMlSimulationReader(SimulationReader):
                                                 except Exception:
                                                     ref.volume = prop.children
                                             elif prop.prefix == 'bibo' and prop.name == 'issue' and isinstance(prop.children, str):
-                                                ref.num = int(prop.children)
+                                                ref.issue = int(prop.children)
                                             elif prop.prefix == 'bibo' and prop.name == 'pages' and isinstance(prop.children, str):
                                                 ref.pages = prop.children
                                             elif prop.prefix == 'dc' and prop.name == 'date' and isinstance(prop.children, str):

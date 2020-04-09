@@ -33,10 +33,10 @@ class DataModelTestCase(unittest.TestCase):
 
     def test_JournalReference(self):
         ref = JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                               volume=10, num=3, pages='1-10', year=2020, doi='10.1016/XXXX')
+                               volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX')
         self.assertEqual(JournalReference.from_json(ref.to_json()), ref)
         self.assertEqual(JournalReference.sort_key(ref), (ref.authors, ref.title,
-                                                          ref.journal, ref.volume, ref.num, ref.pages, ref.year, ref.doi))
+                                                          ref.journal, ref.volume, ref.issue, ref.pages, ref.year, ref.doi))
 
     def test_OntologyTerm(self):
         term = OntologyTerm(ontology='KISAO', id='0000497', name='KLU',
@@ -86,7 +86,7 @@ class ApiConsistencyTestCase(unittest.TestCase):
             identifiers=[Identifier(namespace='biomodels.db', id='BIOMD0000000924')],
             references=[
                 JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                 volume=10, num=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                                 volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
             ],
             authors=[
                 Person(first_name='John', middle_name='C', last_name='Doe'),
@@ -145,7 +145,7 @@ class ApiConsistencyTestCase(unittest.TestCase):
             identifiers=[Identifier(namespace='biomodels.db', id='XXX')],
             references=[
                 JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                 volume=10, num=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                                 volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
             ],
             authors=[
                 Person(first_name='John', middle_name='C', last_name='Doe'),

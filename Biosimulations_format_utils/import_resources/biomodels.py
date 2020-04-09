@@ -11,10 +11,10 @@ from ..data_model import Identifier, JournalReference, License, Person, RemoteFi
 from ..model import read_model
 from ..model.core import ModelIoError
 from ..model.data_model import ModelFormat, Model  # noqa: F401
-from ..model.sbml import viz_model
-from ..simulation import read_sim
-from ..simulation.core import SimIoError, SimIoWarning
-from ..simulation.data_model import SimFormat, Simulation
+from ..model.sbml import visualize_model
+from ..simulation import read_simulation
+from ..simulation.core import SimulationIoError, SimulationIoWarning
+from ..simulation.data_model import SimulationFormat, Simulation
 from ..visualization.data_model import Visualization
 import copy
 import json
@@ -82,7 +82,7 @@ class BioModelsImporter(object):
         """
         with warnings.catch_warnings(record=True) as caught_warnings:
             warnings.simplefilter('ignore')
-            warnings.simplefilter('always', SimIoWarning)
+            warnings.simplefilter('always', SimulationIoWarning)
             warnings.simplefilter('always', BiomodelsIoWarning)
             models, sims, vizs = self.get_models()
         if caught_warnings:
@@ -91,7 +91,7 @@ class BioModelsImporter(object):
                     warnings.warn(str(caught_warning.message), UserWarning)
 
             warnings.warn('Unable to import all simulations:\n  ' + '\n  '.join(
-                str(w.message) for w in caught_warnings if w.category == SimIoWarning), UserWarning)
+                str(w.message) for w in caught_warnings if w.category == SimulationIoWarning), UserWarning)
         self.submit_models(models, sims, vizs)
         stats = self.get_stats(models, sims, vizs)
         self.write_data(models, sims, vizs, stats)
@@ -124,11 +124,11 @@ class BioModelsImporter(object):
                     vizs.extend(model_vizs)
                 except ModelIoError:
                     unimportable_models.append(model_result['id'])
-                except SimIoError:
+                except SimulationIoError:
                     unimportable_sims.append(model_result['id'])
 
                 try:
-                    model.image = self.viz_model(model)
+                    model.image = self.visualize_model(model)
                     for sim in model_sims:
                         sim.image = RemoteFile(
                             name=sim.id + '.png',
@@ -340,7 +340,7 @@ class BioModelsImporter(object):
                 with open(local_path, 'wb') as file:
                     file.write(self.get_model_file(id, file_metadata['name']))
 
-                model_sims, model_viz = read_sim(local_path, ModelFormat.sbml, SimFormat.sedml)
+                model_sims, model_viz = read_simulation(local_path, ModelFormat.sbml, SimulationFormat.sedml)
 
                 model_files = set([sim.model.file.name for sim in model_sims]).difference(set(['model']))
                 assert len(model_files) <= 1, 'Each simulation must use the same model'
@@ -425,7 +425,7 @@ class BioModelsImporter(object):
         response.raise_for_status()
         return response.content
 
-    def viz_model(self, model):
+    def visualize_model(self, model):
         """ Generate a visualization of a model
 
         Args:
@@ -440,7 +440,7 @@ class BioModelsImporter(object):
         model_path = os.path.join(self._cache_dir, model_basename)
         img_path = os.path.join(self._cache_dir, img_basename)
 
-        img = viz_model(model_path, img_path, requests_session=self._requests_session)
+        img = visualize_model(model_path, img_path, requests_session=self._requests_session)
         assert model.file.name.endswith('.xml')
         img.name = model.file.name[0:-4] + '.png'
         return img

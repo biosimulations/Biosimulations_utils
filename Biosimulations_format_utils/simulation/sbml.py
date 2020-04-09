@@ -6,21 +6,21 @@
 :License: MIT
 """
 
-from .sedml import SedMlSimWriter, SedMlSimReader
+from .sedml import SedMlSimulationWriter, SedMlSimulationReader
 
-__all__ = ['SbmlSedMlSimWriter', 'SbmlSedMlSimReader']
+__all__ = ['SbmlSedMlSimulationWriter', 'SbmlSedMlSimulationReader']
 
 MODEL_LANGUAGE_URN = 'urn:sedml:sbml'
 MODEL_LANGUAGE_NAME = 'SBML'
 
 
-class SbmlSedMlSimWriter(SedMlSimWriter):
+class SbmlSedMlSimulationWriter(SedMlSimulationWriter):
     """ Writer for SED-ML for SBML models """
     MODEL_LANGUAGE_URN = MODEL_LANGUAGE_URN
     MODEL_LANGUAGE_NAME = MODEL_LANGUAGE_NAME
 
 
-class SbmlSedMlSimReader(SedMlSimReader):
+class SbmlSedMlSimulationReader(SedMlSimulationReader):
     """ Reader for SED-ML for SBML models """
     MODEL_LANGUAGE_URN = MODEL_LANGUAGE_URN
     MODEL_LANGUAGE_NAME = MODEL_LANGUAGE_NAME

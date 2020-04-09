@@ -10,7 +10,7 @@ from Biosimulations_format_utils.data_model import Format, Taxon, Type
 from Biosimulations_format_utils.model import read_model
 from Biosimulations_format_utils.model.core import ModelIoError
 from Biosimulations_format_utils.model.data_model import ModelFormat, ModelParameter, ModelVariable
-from Biosimulations_format_utils.model.sbml import viz_model
+from Biosimulations_format_utils.model.sbml import visualize_model
 import importlib
 import libsbml
 import os
@@ -420,15 +420,15 @@ class VizModelTestCase(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dirname)
 
-    def test_viz_model(self):
+    def test_visualize_model(self):
         model_filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'
         img_filename = os.path.join(self.dirname, 'model.png')
-        image = viz_model(model_filename, img_filename)
+        image = visualize_model(model_filename, img_filename)
         self.assertEqual(image.name, 'model.png')
         self.assertEqual(image.type, 'image/png')
         self.assertGreater(image.size, 0)
 
-    def test_viz_model_with_bad_units(self):
+    def test_visualize_model_with_bad_units(self):
         model_filename = 'tests/fixtures/BIOMD0000000075.xml'
         img_filename = os.path.join(self.dirname, 'model.png')
-        viz_model(model_filename, img_filename)
+        visualize_model(model_filename, img_filename)

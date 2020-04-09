@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from .core import SimWriter, SimReader, SimIoError, SimIoWarning
+from .core import SimulationWriter, SimulationReader, SimulationIoError, SimulationIoWarning
 from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation,  # noqa: F401
                          Algorithm, AlgorithmParameter, ParameterChange, SimulationResult)
 from ..chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
@@ -22,12 +22,12 @@ import os
 import warnings
 
 __all__ = [
-    'SedMlSimWriter',
-    'SedMlSimReader',
+    'SedMlSimulationWriter',
+    'SedMlSimulationReader',
 ]
 
 
-class SedMlSimWriter(SimWriter):
+class SedMlSimulationWriter(SimulationWriter):
     """ Base class for SED-ML generator for each model format """
 
     MODEL_LANGUAGE_URN = None
@@ -552,7 +552,7 @@ class SedMlSimWriter(SimWriter):
         return return_val
 
 
-class SedMlSimReader(SimReader):
+class SedMlSimulationReader(SimulationReader):
     def run(self, filename):
         """ Base class for reading a simulation experiment from a SED document
 
@@ -565,15 +565,15 @@ class SedMlSimReader(SimReader):
         """
         doc_sed = libsedml.readSedMLFromFile(filename)
         if doc_sed.getErrorLog().getNumFailsWithSeverity(libsedml.LIBSEDML_SEV_ERROR):
-            raise SimIoError('libsedml error: {}'.format(doc_sed.getErrorLog().toString()))
+            raise SimulationIoError('libsedml error: {}'.format(doc_sed.getErrorLog().toString()))
 
         models_sed = {}
         default_model_sed = None
         default_model = None
         for i_model, model_sed in enumerate(doc_sed.getListOfModels()):
             for change_sed in model_sed.getListOfChanges():
-                assert_exception(isinstance(change_sed, libsedml.SedChangeAttribute), SimIoError("Changes must be attribute changes"))
-            assert_exception(model_sed.getId() not in models_sed, SimIoError("Models must have unique ids"))
+                assert_exception(isinstance(change_sed, libsedml.SedChangeAttribute), SimulationIoError("Changes must be attribute changes"))
+            assert_exception(model_sed.getId() not in models_sed, SimulationIoError("Models must have unique ids"))
             models_sed[model_sed.getId()] = model_sed
 
             model = Simulation()
@@ -589,7 +589,7 @@ class SedMlSimReader(SimReader):
         default_sim_sed = None
         default_sim = None
         for sim_sed in doc_sed.getListOfSimulations():
-            assert_exception(sim_sed.getId() not in sims_sed, SimIoError("Simulations must have unique ids"))
+            assert_exception(sim_sed.getId() not in sims_sed, SimulationIoError("Simulations must have unique ids"))
             sims_sed[sim_sed.getId()] = sim_sed
 
             sim = self._create_sim(sim_sed)
@@ -609,7 +609,7 @@ class SedMlSimReader(SimReader):
                 warnings.warn(
                     '{} {} of {} is not supported'.format(
                         task_sed.__class__.__name__, task_sed.getId(), os.path.basename(filename)),
-                    SimIoWarning)
+                    SimulationIoWarning)
                 continue
 
             sim = self._create_sim(sim_sed)
@@ -619,20 +619,20 @@ class SedMlSimReader(SimReader):
 
             # model
             model_sed = models_sed.get(task_sed.getModelReference(), default_model_sed)
-            assert_exception(model_sed is not None, SimIoError("Model cannot be determined"))
+            assert_exception(model_sed is not None, SimulationIoError("Model cannot be determined"))
             self._read_model(model_sed, sim)
             self._read_model_variables(task_sed, sim)
 
             # simulation
             sim_sed = sims_sed.get(task_sed.getSimulationReference(), default_sim_sed)
-            assert_exception(sim_sed is not None, SimIoError("Simulation cannot be determined"))
+            assert_exception(sim_sed is not None, SimulationIoError("Simulation cannot be determined"))
             self._read_sim(sim_sed, sim)
 
             # append simulation to list of simulations
             sims.append(sim)
             task_id = task_sed.getId()
             if task_id in task_id_to_sim:
-                warnings.warn('Tasks of {} must have unique ids'.format(os.path.basename(filename)), SimIoWarning)
+                warnings.warn('Tasks of {} must have unique ids'.format(os.path.basename(filename)), SimulationIoWarning)
                 task_id_to_sim[task_id] = None
             else:
                 task_id_to_sim[task_id] = sim
@@ -646,7 +646,7 @@ class SedMlSimReader(SimReader):
                 var_sed = data_gen_sed.getVariable(0)
                 data_gen_id = data_gen_sed.getId()
                 if data_gen_id in data_gen_id_to_task_id:
-                    warnings.warn('Data generators of {} must have unique ids'.format(os.path.basename(filename)), SimIoWarning)
+                    warnings.warn('Data generators of {} must have unique ids'.format(os.path.basename(filename)), SimulationIoWarning)
                     data_gen_id_to_task_id[data_gen_id] = None
                     data_gen_id_to_var_target[data_gen_id] = None
                 else:
@@ -660,7 +660,7 @@ class SedMlSimReader(SimReader):
         viz = Visualization()
         for output_sed in doc_sed.getListOfOutputs():
             if not isinstance(output_sed, libsedml.SedPlot2D):
-                warnings.warn('{} of {} is not supported'.format(output_sed.__class__.__name__, os.path.basename(filename)), SimIoWarning)
+                warnings.warn('{} of {} is not supported'.format(output_sed.__class__.__name__, os.path.basename(filename)), SimulationIoWarning)
                 continue
 
             x_sim_results = []
@@ -672,13 +672,13 @@ class SedMlSimReader(SimReader):
                 x_task_id = data_gen_id_to_task_id.get(x_data_gen_id, None)
                 y_task_id = data_gen_id_to_task_id.get(y_data_gen_id, None)
                 if not x_task_id or not y_task_id:
-                    warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimIoWarning)
+                    warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimulationIoWarning)
                     continue
 
                 x_sim = task_id_to_sim.get(x_task_id, None)
                 y_sim = task_id_to_sim.get(y_task_id, None)
                 if not x_sim or not y_sim:
-                    warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimIoWarning)
+                    warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimulationIoWarning)
                     continue
 
                 if x_data_gen_id in time_data_gen_ids:
@@ -698,11 +698,11 @@ class SedMlSimReader(SimReader):
                 x_sim_results = x_sim_results[slice(0, 1)]
             elif not all([sim_res.variable.target == 'urn:sedml:symbol:time' for sim_res in x_sim_results]) or \
                     len(set([curve_sed.getLogX() for curve_sed in output_sed.getListOfCurves()])) > 1:
-                warnings.warn('Curves must have the same X axis', SimIoWarning)
+                warnings.warn('Curves must have the same X axis', SimulationIoWarning)
                 continue
 
             if len(set([curve_sed.getLogY() for curve_sed in output_sed.getListOfCurves()])) > 1:
-                warnings.warn('Curves must have the same Y axis', SimIoWarning)
+                warnings.warn('Curves must have the same Y axis', SimulationIoWarning)
                 continue
 
             if not x_sim_results:
@@ -876,7 +876,7 @@ class SedMlSimReader(SimReader):
         elif isinstance(sim_sed, libsedml.SedSteadyState):
             return SteadyStateSimulation()
         else:
-            raise SimIoError('Unsupported simulation type: {}'.format(sim_sed.__class__.__name__))
+            raise SimulationIoError('Unsupported simulation type: {}'.format(sim_sed.__class__.__name__))
 
     def _read_sim(self, sim_sed, sim):
         """ Read a SED simulation
@@ -890,7 +890,7 @@ class SedMlSimReader(SimReader):
             sim.start_time = float(sim_sed.getInitialTime())
             sim.output_start_time = float(sim_sed.getOutputStartTime())
             assert_exception(sim.output_start_time >= sim.start_time,
-                             SimIoError("Output time must be at least the start time"))
+                             SimulationIoError("Output time must be at least the start time"))
             sim.end_time = float(sim_sed.getOutputEndTime())
             sim.num_time_points = int(sim_sed.getNumberOfPoints())
 

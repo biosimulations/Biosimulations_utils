@@ -11,14 +11,14 @@ from ..model.data_model import Model, ModelParameter, ModelVariable
 import wc_utils.util.enumerate
 
 __all__ = [
-    'SimFormat',
+    'SimulationFormat',
     'Simulation', 'TimecourseSimulation', 'SteadyStateSimulation',
     'Algorithm', 'AlgorithmParameter', 'ParameterChange',
     'SimulationResult',
 ]
 
 
-class SimFormat(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
+class SimulationFormat(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
     """ Simulation experiment formats """
     SEDML = 'http://identifiers.org/combine.specifications/sed-ml'
     SESSL = 'http://sessl.org'

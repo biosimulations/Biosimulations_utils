@@ -9,9 +9,9 @@
 from Biosimulations_format_utils.chart_type.data_model import ChartType, ChartTypeDataField, ChartTypeDataFieldShape, ChartTypeDataFieldType
 from Biosimulations_format_utils.data_model import Format
 from Biosimulations_format_utils.model.data_model import ModelFormat, Model, ModelVariable
-from Biosimulations_format_utils.simulation import write_sim, read_sim, sedml
-from Biosimulations_format_utils.simulation.core import SimIoError, SimIoWarning
-from Biosimulations_format_utils.simulation.data_model import SimFormat, TimecourseSimulation, SimulationResult
+from Biosimulations_format_utils.simulation import write_simulation, read_simulation, sedml
+from Biosimulations_format_utils.simulation.core import SimulationIoError, SimulationIoWarning
+from Biosimulations_format_utils.simulation.data_model import SimulationFormat, TimecourseSimulation, SimulationResult
 from Biosimulations_format_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import json
 import libsedml
@@ -37,11 +37,11 @@ class WriteSedMlTestCase(unittest.TestCase):
             sim = TimecourseSimulation.from_json(json.load(file))
         model_filename = os.path.join(self.dirname, 'model.sbml.xml')
         sim_filename = os.path.join(self.dirname, 'simulation.sed-ml.xml')
-        write_sim(model_vars, sim, model_filename, sim_filename,
-                  SimFormat.sedml, level=1, version=3)
+        write_simulation(model_vars, sim, model_filename, sim_filename,
+                  SimulationFormat.sedml, level=1, version=3)
 
-        sims_2, _ = read_sim(
-            sim_filename, ModelFormat.sbml, SimFormat.sedml)
+        sims_2, _ = read_simulation(
+            sim_filename, ModelFormat.sbml, SimulationFormat.sedml)
         self.assertEqual(len(sims_2), 1)
         sim_2 = sims_2[0]
         self.assertEqual(
@@ -54,10 +54,10 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(sim_2.format.version, 'L1V3')
 
         with self.assertRaisesRegex(NotImplementedError, 'not supported'):
-            read_sim(None, ModelFormat.sbml, SimFormat.sessl)
+            read_simulation(None, ModelFormat.sbml, SimulationFormat.sessl)
 
         with self.assertRaisesRegex(NotImplementedError, 'not supported'):
-            read_sim(None, ModelFormat.cellml, SimFormat.sedml)
+            read_simulation(None, ModelFormat.cellml, SimulationFormat.sedml)
 
     def test_gen_sedml_errors(self):
         # Other versions/levels of SED-ML are not supported
@@ -73,7 +73,7 @@ class WriteSedMlTestCase(unittest.TestCase):
             )
         )
         with self.assertRaisesRegex(ValueError, 'Format must be SED-ML'):
-            write_sim(None, sim, None, None, SimFormat.sedml, level=1, version=3)
+            write_simulation(None, sim, None, None, SimulationFormat.sedml, level=1, version=3)
 
         # other simulation experiments formats (e.g., SESSL) are not supported
         sim = TimecourseSimulation(
@@ -87,9 +87,9 @@ class WriteSedMlTestCase(unittest.TestCase):
             )
         )
         with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
-            write_sim(None, sim, None, None, SimFormat.sessl, level=1, version=3)
+            write_simulation(None, sim, None, None, SimulationFormat.sessl, level=1, version=3)
         with self.assertRaisesRegex(ValueError, 'Format must be SED-ML'):
-            write_sim(None, sim, None, None, SimFormat.sedml, level=1, version=3)
+            write_simulation(None, sim, None, None, SimulationFormat.sedml, level=1, version=3)
 
         # other simulation experiments formats (e.g., SESSL) are not supported
         sim = TimecourseSimulation(
@@ -104,10 +104,10 @@ class WriteSedMlTestCase(unittest.TestCase):
             ),
         )
         with self.assertRaisesRegex(NotImplementedError, 'is not supported'):
-            write_sim(None, sim, 'model.sbml.xml', None, SimFormat.sedml, level=1, version=3)
+            write_simulation(None, sim, 'model.sbml.xml', None, SimulationFormat.sedml, level=1, version=3)
 
     def test__get_obj_annotation(self):
-        reader = sedml.SedMlSimReader()
+        reader = sedml.SedMlSimulationReader()
 
         doc = libsedml.SedDocument()
         self.assertEqual(reader._get_obj_annotation(doc), [])
@@ -127,23 +127,23 @@ class WriteSedMlTestCase(unittest.TestCase):
     def test__call_sedml_error(self):
         doc = libsedml.SedDocument()
         with self.assertRaisesRegex(ValueError, 'libsedml error:'):
-            sedml.SedMlSimWriter._call_libsedml_method(doc, doc, 'setAnnotation', '<rdf')
+            sedml.SedMlSimulationWriter._call_libsedml_method(doc, doc, 'setAnnotation', '<rdf')
 
-        with self.assertRaisesRegex(SimIoError, 'libsedml error'):
-            sedml.SedMlSimReader().run('non-existant-file')
+        with self.assertRaisesRegex(SimulationIoError, 'libsedml error'):
+            sedml.SedMlSimulationReader().run('non-existant-file')
 
     def test_read_with_multiple_models_and_sims_and_unsupported_task(self):
         filename = 'tests/fixtures/Simon2019-with-multiple-models-and-sims.sedml'
-        with self.assertWarnsRegex(SimIoWarning, 'is not supported'):
-            read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+        with self.assertWarnsRegex(SimulationIoWarning, 'is not supported'):
+            read_simulation(filename, ModelFormat.sbml, SimulationFormat.sedml)
 
     def test_read_with_unsupported_simulation(self):
         filename = 'tests/fixtures/Simon2019-with-one-step-sim.sedml'
-        with self.assertRaisesRegex(SimIoError, 'Unsupported simulation type'):
-            read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+        with self.assertRaisesRegex(SimulationIoError, 'Unsupported simulation type'):
+            read_simulation(filename, ModelFormat.sbml, SimulationFormat.sedml)
 
     def test_read_biomodels_sims(self):
-        sims, _ = read_sim('tests/fixtures/Simon2019.sedml', ModelFormat.sbml, SimFormat.sedml)
+        sims, _ = read_simulation('tests/fixtures/Simon2019.sedml', ModelFormat.sbml, SimulationFormat.sedml)
         self.assertEqual(len(sims), 1)
         sim = sims[0]
         self.assertEqual(sim.model_parameter_changes, [])
@@ -156,7 +156,7 @@ class WriteSedMlTestCase(unittest.TestCase):
 
     def test_read_visualizations(self):
         filename = 'tests/fixtures/BIOMD0000000297.sedml'
-        sims, viz = read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+        sims, viz = read_simulation(filename, ModelFormat.sbml, SimulationFormat.sedml)
         self.assertEqual(len(viz.layout), 4)
 
         viz.layout = viz.layout[slice(0, 1)]
@@ -210,19 +210,19 @@ class WriteSedMlTestCase(unittest.TestCase):
 
     def test_read_visualizations_with_log_axis(self):
         filename = 'tests/fixtures/BIOMD0000000297-with-log-axis.sedml'
-        _, viz = read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+        _, viz = read_simulation(filename, ModelFormat.sbml, SimulationFormat.sedml)
         self.assertEqual(viz.layout[0].chart_type.id, 'line-logX-logY')
 
     def test_read_visualizations_with_consistent_x_axes(self):
         filename = 'tests/fixtures/BIOMD0000000739.sedml'
-        read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+        read_simulation(filename, ModelFormat.sbml, SimulationFormat.sedml)
 
     def test_read_visualizations_with_inconsistent_x_axes(self):
         filename = 'tests/fixtures/BIOMD0000000297-with-invalid-x-axis.sedml'
-        with self.assertWarnsRegex(SimIoWarning, 'Curves must have the same X axis'):
-            read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+        with self.assertWarnsRegex(SimulationIoWarning, 'Curves must have the same X axis'):
+            read_simulation(filename, ModelFormat.sbml, SimulationFormat.sedml)
 
     def test_read_visualizations_with_inconsistent_y_axes(self):
         filename = 'tests/fixtures/BIOMD0000000297-with-invalid-y-axis.sedml'
-        with self.assertWarnsRegex(SimIoWarning, 'Curves must have the same Y axis'):
-            read_sim(filename, ModelFormat.sbml, SimFormat.sedml)
+        with self.assertWarnsRegex(SimulationIoWarning, 'Curves must have the same Y axis'):
+            read_simulation(filename, ModelFormat.sbml, SimulationFormat.sedml)

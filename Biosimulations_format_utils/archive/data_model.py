@@ -8,7 +8,7 @@
 
 from ..data_model import Person
 from ..model.data_model import ModelFormat  # noqa: F401
-from ..simulation.data_model import SimFormat  # noqa: F401
+from ..simulation.data_model import SimulationFormat  # noqa: F401
 import datetime
 import wc_utils.util.enumerate
 
@@ -72,7 +72,7 @@ class ArchiveFile(object):
 
     Attributes:
         filename (:obj:`str`): path to file within archive (e.g., `./models/model.xml`)
-        format (:obj:`ModelFormat` or :obj:`SimFormat`): model or simulation format
+        format (:obj:`ModelFormat` or :obj:`SimulationFormat`): model or simulation format
         description (:obj:`str`): description
         authors (:obj:`list` of :obj:`Person`): authors of the file
         created (:obj:`datetime.datetime`): date file was created
@@ -83,7 +83,7 @@ class ArchiveFile(object):
         """
         Args:
             filename (:obj:`str`, optional): path to file within archive (e.g., `./models/model.xml`)
-            format (:obj:`ModelFormat` or :obj:`SimFormat`, optional): model or simulation format
+            format (:obj:`ModelFormat` or :obj:`SimulationFormat`, optional): model or simulation format
             description (:obj:`str`, optional): description
             authors (:obj:`list` of :obj:`Person`, optional): authors of the archive
             created (:obj:`datetime.datetime`, optional): date archive was created

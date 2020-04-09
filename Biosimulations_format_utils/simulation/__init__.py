@@ -6,15 +6,15 @@
 :License: MIT
 """
 
-from .data_model import SimFormat
+from .data_model import SimulationFormat
 from ..model.data_model import ModelFormat
 from ..visualization.data_model import Visualization  # noqa: F401
-from .sbml import SbmlSedMlSimWriter, SbmlSedMlSimReader
+from .sbml import SbmlSedMlSimulationWriter, SbmlSedMlSimulationReader
 
-__all__ = ['write_sim', 'read_sim']
+__all__ = ['write_simulation', 'read_simulation']
 
 
-def write_sim(model_vars, sim, model_filename, sim_filename, sim_format, **sim_format_opts):
+def write_simulation(model_vars, sim, model_filename, sim_filename, sim_format, **sim_format_opts):
     """ Write a simulation experiment to a file
 
     Args:
@@ -22,13 +22,13 @@ def write_sim(model_vars, sim, model_filename, sim_filename, sim_format, **sim_f
         sim (:obj:`dict`): Simulation experiment
         model_filename (:obj:`str`): Path to the model definition
         sim_filename (:obj:`str`): Path to save simulation experiment in SED-ML format
-        sim_format (:obj:`SimFormat`): simulation experiment format
+        sim_format (:obj:`SimulationFormat`): simulation experiment format
         sim_format_opts (:obj:`dict`): options to the simulation experiment format (e.g., level, version)
     """
     model_format = ModelFormat[sim.model.format.name]
-    if sim_format == SimFormat.sedml:
+    if sim_format == SimulationFormat.sedml:
         if model_format == ModelFormat.sbml:
-            Writer = SbmlSedMlSimWriter
+            Writer = SbmlSedMlSimulationWriter
         else:
             raise NotImplementedError('Model format {} is not supported'.format(model_format.name))
     else:
@@ -36,21 +36,21 @@ def write_sim(model_vars, sim, model_filename, sim_filename, sim_format, **sim_f
     return Writer().run(model_vars, sim, model_filename, sim_filename, **sim_format_opts)
 
 
-def read_sim(filename, model_format, sim_format):
+def read_simulation(filename, model_format, sim_format):
     """ Read a simulation experiment from a file
 
     Args:
         filename (:obj:`str`): path to save simulation
         model_format (:obj:`ModelFormat`): model format
-        sim_format (:obj:`SimFormat`): simulation experiment format
+        sim_format (:obj:`SimulationFormat`): simulation experiment format
 
     Returns:
         :obj:`list` of :obj:`Simulation`: simulations
         :obj:`Visualization`: visualization
     """
-    if sim_format == SimFormat.sedml:
+    if sim_format == SimulationFormat.sedml:
         if model_format == ModelFormat.sbml:
-            Reader = SbmlSedMlSimReader
+            Reader = SbmlSedMlSimulationReader
         else:
             raise NotImplementedError('Model format {} is not supported'.format(model_format.name))
     else:

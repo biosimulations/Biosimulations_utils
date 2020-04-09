@@ -10,7 +10,7 @@ from .core import ArchiveWriter, ArchiveReader, ArchiveIoError
 from .data_model import Archive, ArchiveFile
 from ..data_model import Person
 from ..model.data_model import ModelFormat
-from ..simulation.data_model import SimFormat
+from ..simulation.data_model import SimulationFormat
 import dateutil.parser
 import libcombine
 import os
@@ -113,7 +113,7 @@ class OmexArchiveReader(ArchiveReader):
                 try:
                     format_comb = ModelFormat(format_comb)
                 except Exception:
-                    format_comb = SimFormat(format_comb)
+                    format_comb = SimulationFormat(format_comb)
             else:
                 format_comb = None
 

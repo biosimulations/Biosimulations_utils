@@ -21,7 +21,7 @@ import requests
 import requests.exceptions
 import requests_cache.core  # noqa: F401
 
-__all__ = ['SbmlModelReader', 'viz_model']
+__all__ = ['SbmlModelReader', 'visualize_model']
 
 
 class ModelingFramework(enum.Enum):
@@ -799,7 +799,7 @@ class SbmlModelReader(ModelReader):
 MINERVA_ENDPOINT = 'https://minerva-dev.lcsb.uni.lu/minerva/api/convert/image/{}:{}'
 
 
-def viz_model(model_filename, img_filename, requests_session=None):
+def visualize_model(model_filename, img_filename, requests_session=None):
     """ Use `MINERVA <https://minerva.pages.uni.lu/>`_ to visualize a model and save the visualization to a PNG file.
 
     Args:

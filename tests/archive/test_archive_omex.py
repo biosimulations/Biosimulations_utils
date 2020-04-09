@@ -11,7 +11,7 @@ from Biosimulations_format_utils.archive.core import ArchiveIoError
 from Biosimulations_format_utils.archive.data_model import Archive, ArchiveFile
 from Biosimulations_format_utils.data_model import Person
 from Biosimulations_format_utils.model.data_model import ModelFormat
-from Biosimulations_format_utils.simulation.data_model import SimFormat
+from Biosimulations_format_utils.simulation.data_model import SimulationFormat
 from unittest import mock
 import datetime
 import dateutil.tz
@@ -51,7 +51,7 @@ class OmexArchiveTestCase(unittest.TestCase):
             files=[
                 ArchiveFile(filename='./models/model.xml', format=ModelFormat.sbml, description='Description',
                             authors=[Person(first_name='John', last_name='Doe')], created=now, updated=now),
-                ArchiveFile(filename='./sims/sim.xml', format=SimFormat.sedml, description='Description',
+                ArchiveFile(filename='./sims/sim.xml', format=SimulationFormat.sedml, description='Description',
                             authors=[Person(first_name='John', last_name='Doe')], created=None, updated=now),
                 ArchiveFile(filename='./sims/sim2.xml', format=None, description='Description',
                             authors=[Person(first_name='John', last_name='Doe')], created=None, updated=now),

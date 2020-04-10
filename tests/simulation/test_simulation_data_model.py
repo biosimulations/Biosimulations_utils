@@ -10,7 +10,7 @@ from Biosimulations_format_utils.data_model import Format, JournalReference, Lic
 from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
 from Biosimulations_format_utils.biomodel.sbml import BiomodelingFramework
 from Biosimulations_format_utils.simulation.data_model import (
-    Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange,
+    Simulation, TimecourseSimulation, SteadyStateSimulation, Simulator, Algorithm, AlgorithmParameter, ParameterChange,
     SimulationResult)
 import unittest
 
@@ -95,6 +95,43 @@ class SimulationDataModelTestCase(unittest.TestCase):
         self.assertEqual(SteadyStateSimulation.from_json(sim.to_json()), sim)
         self.assertEqual(Simulation.from_json(sim.to_json()), sim)
 
+    def test_Simulator(self):
+        simulator = Simulator(
+            id='tellurium',
+            name='tellurium',
+            version='2.4.1',
+            description='description of tellurium',
+            url='http://tellurium.analogmachine.org/',
+            docker_hub_image_id='crbm/biosimulations_tellurium:2.4.1',
+            algorithms=[
+                Algorithm(
+                    id='00001',
+                    name='integrator',
+                    kisao_term=OntologyTerm(ontology='KISAO', id='00001'),
+                    ontology_terms=[
+                        OntologyTerm(ontology='KISAO', id='00002'),
+                        OntologyTerm(ontology='KISAO', id='00003'),
+                    ],
+                    modeling_frameworks=[
+                        BiomodelingFramework.logical.value,
+                        BiomodelingFramework.flux_balance.value,
+                    ],
+                    model_formats=[
+                        Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
+                    ],
+                    parameters=[
+                        AlgorithmParameter(id='param_1',
+                                           name='param 1',
+                                           type=Type.float,
+                                           value=1.2,
+                                           recommended_range=[0.12, 12.],
+                                           kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
+                    ],
+                )
+            ],
+        )
+        self.assertEqual(Simulator.from_json(simulator.to_json()), simulator)
+
     def test_Algorithm(self):
         alg = Algorithm(
             id='00001',
@@ -121,6 +158,37 @@ class SimulationDataModelTestCase(unittest.TestCase):
             ],
         )
         self.assertEqual(Algorithm.from_json(alg.to_json()), alg)
+        self.assertEqual(Algorithm.sort_key(alg), (
+            '00001',
+            'integrator',
+            ('KISAO', '00001', None, None, None),
+            (
+                ('KISAO', '00002', None, None, None),
+                ('KISAO', '00003', None, None, None),
+            ),
+            (
+                ('SBO', '0000234', 'logical framework',
+                 ('Modelling approach, pioneered by Rene Thomas and Stuart Kaufman, where the '
+                  'evolution of a system is described by the transitions between discrete activity '
+                  'states of "genes" that control each other.'),
+                 'http://biomodels.net/SBO/SBO_0000234',
+                 ),
+                ('SBO', '0000624', 'flux balance framework',
+                 ('Modelling approach, typically used for metabolic models, where the flow '
+                  'of metabolites (flux) through a network can be calculated. This approach '
+                  'will generally produce a set of solutions (solution space), which may be '
+                  'reduced using objective functions and constraints on individual fluxes.'),
+                 'http://biomodels.net/SBO/SBO_0000624',
+                 ),
+            ),
+            (
+                (None, 'SBML', 'L3V2', 'format_2585', 'http://sbml.org', None),
+            ),
+            (
+                ('param_1', 'param 1',
+                 'float', 1.2, (0.12, 12.), ('KISAO', '00001', None, None, None)),
+            )
+        ))
 
     def test_AlgorithmParameter(self):
         param = AlgorithmParameter(id='param_1',

@@ -9,12 +9,13 @@
 from Biosimulations_utils.archive import write_archive, read_archive
 from Biosimulations_utils.archive.core import ArchiveIoError
 from Biosimulations_utils.archive.data_model import Archive, ArchiveFile, ArchiveFormat
-from Biosimulations_utils.data_model import Person
+from Biosimulations_utils.data_model import Format, Person
 from Biosimulations_utils.biomodel.data_model import BiomodelFormat
 from Biosimulations_utils.simulation.data_model import SimulationFormat
 from unittest import mock
 import datetime
 import dateutil.tz
+import libcombine
 import os
 import shutil
 import tempfile
@@ -50,10 +51,12 @@ class OmexArchiveTestCase(unittest.TestCase):
             files=[
                 ArchiveFile(filename='./models/model.xml', format=BiomodelFormat.sbml.value, description='Description',
                             authors=[Person(first_name='John', last_name='Doe')], created=now, updated=now),
-                ArchiveFile(filename='./sims/sim.xml', format=SimulationFormat.sedml.value, description='Description',
+                ArchiveFile(filename='./sims/sim.xml', format=SimulationFormat.sedml.value, description='Description1',
                             authors=[Person(first_name='John', last_name='Doe')], created=None, updated=now),
-                ArchiveFile(filename='./sims/sim2.xml', format=None, description='Description',
-                            authors=[Person(first_name='John', last_name='Doe')], created=None, updated=now),
+                ArchiveFile(filename='./sims/sim2.xml', format=None, description='Description2',
+                            authors=[Person(first_name='Jane', last_name='Doe')], created=None, updated=now),
+                ArchiveFile(filename='./sims/sim3.xml', format=Format(spec_url='https://myspec.com'), description='Description3',
+                            authors=[Person(first_name='Jack', last_name='Doe')], created=now, updated=None),
             ],
             description='Description',
             authors=[Person(first_name='John', last_name='Doe')],
@@ -78,3 +81,34 @@ class OmexArchiveTestCase(unittest.TestCase):
 
         with self.assertRaisesRegex(ArchiveIoError, "Invalid OMEX archive"):
             read_archive('non-existant-file', archive_dir2)
+
+        # test multiple update dates
+        archive_comb = libcombine.CombineArchive()
+
+        desc_comb = libcombine.OmexDescription()
+        desc_comb.setAbout('.')
+        desc_comb.setDescription('description')
+
+        date_comb = libcombine.Date()
+        date_comb.setDateAsString(now.strftime('%Y-%m-%dT%H:%M:%SZ'))
+        desc_comb.getModified().append(date_comb)
+
+        date_comb = libcombine.Date()
+        date_comb.setDateAsString((now + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ'))
+        desc_comb.getModified().append(date_comb)
+
+        archive_comb.addMetadata('.', desc_comb)
+
+        archive_comb.addFile(
+            os.path.join(archive_dir1, './models/model.xml'),
+            './models/model.xml',
+            BiomodelFormat.sbml.value.spec_url,
+            True
+        )
+
+        archive_filename_2 = os.path.join(self.dirname, 'archive2.omex')
+        archive_comb.writeToFile(archive_filename_2)
+
+        archive_dir3 = os.path.join(self.dirname, 'dir3')
+        archive_3 = read_archive(archive_filename_2, archive_dir3)
+        archive_3.updated > archive_2.updated

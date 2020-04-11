@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.data_model import (Identifier, JournalReference,
-                                                    License, OntologyTerm, Person, RemoteFile, Taxon, Type)
+                                             License, OntologyTerm, Person, RemoteFile, Taxon, Type)
 from Biosimulations_utils.biomodel.data_model import (Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat)
 import datetime
 import dateutil.tz

@@ -33,6 +33,7 @@ class WriteSedMlTestCase(unittest.TestCase):
             sim = TimecourseSimulation.from_json(json.load(file))
         sim.model = Biomodel(
             id='sbml_model',
+            name='SBML model',
             file=RemoteFile(
                 name=os.path.join(self.dirname, 'model.sbml.xml'),
                 type='application/sbml+xml',
@@ -51,6 +52,10 @@ class WriteSedMlTestCase(unittest.TestCase):
             sim_filename, SimulationFormat.sedml)
         self.assertEqual(len(sims_2), 1)
         sim_2 = sims_2[0]
+        self.assertEqual(sim_2.id, sim.id)
+        self.assertEqual(sim_2.name, sim.name)
+        self.assertEqual(sim_2.model.id, sim.model.id)
+        self.assertEqual(sim_2.model.name, sim.model.name)
         self.assertEqual(
             set(v.id for v in sim_2.model.variables),
             set(v.id for v in sim.model.variables))

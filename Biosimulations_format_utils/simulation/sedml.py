@@ -45,7 +45,7 @@ class SedMlSimulationWriter(SimulationWriter):
             raise ValueError('Format must be SED-ML L{}V{}'.format(level, version))
 
         doc_sed = self._create_doc(level, version)
-        self._add_metadata_to_doc(sim, doc_sed)
+        self._add_metadata_to_obj(sim, doc_sed, doc_sed)
 
         model_sed = self._add_model_to_doc(sim.model, doc_sed)
         self._add_parameter_changes_to_model(sim.model_parameter_changes, doc_sed, model_sed)
@@ -53,9 +53,9 @@ class SedMlSimulationWriter(SimulationWriter):
         sim_sed = self._add_timecourse_sim_to_doc(sim, doc_sed)
         alg_sed = self._add_algorithm_to_sim(sim.algorithm, doc_sed, sim_sed)
         self._add_param_changes_to_alg(sim.algorithm_parameter_changes, doc_sed, alg_sed)
-        task_sed = self._add_sim_task_to_doc(doc_sed, model_sed, sim_sed)
+        task_sed = self._add_sim_task_to_doc(sim.id, sim.name, doc_sed, model_sed, sim_sed)
 
-        report_sed = self._add_report_to_doc(doc_sed)
+        report_sed = self._add_report_to_doc(sim.id, sim.name, doc_sed)
         time_gen_sed = self._add_data_gen_to_doc('time', 'time', doc_sed)
         self._add_var_to_data_gen('time', 'time', 'urn:sedml:symbol:time', doc_sed, time_gen_sed, task_sed)
         self._add_data_set_to_report('time', 'time', doc_sed, report_sed, time_gen_sed)
@@ -81,10 +81,9 @@ class SedMlSimulationWriter(SimulationWriter):
         self._call_libsedml_method(doc_sed, doc_sed, 'setVersion', version)
         return doc_sed
 
-    def _add_metadata_to_doc(self, sim, doc_sed):
-        """ Add the metadata about a simulation experiment to the annotation of a SED document
+    def _add_metadata_to_obj(self, obj, doc_sed, obj_sed):
+        """ Add the metadata about a resource to the annotation of a SED object
 
-        * Id
         * Name
         * Authors
         * Description
@@ -93,53 +92,37 @@ class SedMlSimulationWriter(SimulationWriter):
         * License
 
         Args:
-            sim (:obj:`Simulation`): simulation experiment
+            obj (:obj:`object`): object
             doc_sed (:obj:`libsedml.SedDocument`): SED document
+            obj_sed (:obj:`libsedml.SedBase`): SED object
         """
         metadata = []
         namespaces = set()
 
-        if sim.id:
-            metadata.append(XmlNode(
-                prefix='dc',
-                name='title',
-                children=sim.id,
-            ))
-            namespaces.add('dc')
-
-        if sim.name:
-            metadata.append(XmlNode(
-                prefix='dc',
-                name='description',
-                type='name',
-                children=sim.name,
-            ))
-            namespaces.add('dc')
-
-        if sim.description:
+        if obj.description:
             metadata.append(XmlNode(
                 prefix='dc',
                 name='description',
                 type='description',
-                children=sim.description,
+                children=obj.description,
             ))
             namespaces.add('dc')
 
-        if sim.tags:
+        if obj.tags:
             metadata.append(
                 XmlNode(prefix='dc', name='description', type='tags', children=[
                     XmlNode(prefix='rdf', name='Bag', children=[
                         XmlNode(prefix='rdf', name='li', children=[
                             XmlNode(prefix='rdf', name='value', children=tag)
-                        ]) for tag in sim.tags
+                        ]) for tag in obj.tags
                     ])
                 ]))
             namespaces.add('dc')
             namespaces.add('rdf')
 
-        if sim.authors:
+        if obj.authors:
             authors_xml = []
-            for author in sim.authors:
+            for author in obj.authors:
                 names_xml = []
                 if author.first_name:
                     names_xml.append(XmlNode(prefix='vcard', name='Given', children=author.first_name))
@@ -161,9 +144,9 @@ class SedMlSimulationWriter(SimulationWriter):
             namespaces.add('rdf')
             namespaces.add('vcard')
 
-        if sim.references:
+        if obj.references:
             refs_xml = []
-            for ref in sim.references:
+            for ref in obj.references:
                 props_xml = []
                 if ref.authors:
                     props_xml.append(XmlNode(prefix='bibo', name='authorList', children=ref.authors))
@@ -195,11 +178,11 @@ class SedMlSimulationWriter(SimulationWriter):
             namespaces.add('rdf')
             namespaces.add('bibo')
 
-        if sim.license:
+        if obj.license:
             metadata.append(XmlNode(
                 prefix='dcterms',
                 name='license',
-                children=sim.license.value,
+                children=obj.license.value,
             ))
             namespaces.add('dcterms')
 
@@ -208,7 +191,7 @@ class SedMlSimulationWriter(SimulationWriter):
                                 children=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')))
         namespaces.add('dcterms')
 
-        self._add_annotation_to_obj(metadata, doc_sed, doc_sed, namespaces)
+        self._add_annotation_to_obj(metadata, doc_sed, obj_sed, namespaces)
 
     def _add_model_to_doc(self, model, doc_sed):
         """ Add a model to a SED document
@@ -223,6 +206,8 @@ class SedMlSimulationWriter(SimulationWriter):
         model_sed = doc_sed.createModel()
         if model.id:
             self._call_libsedml_method(doc_sed, model_sed, 'setId', model.id)
+        if model.name:
+            self._call_libsedml_method(doc_sed, model_sed, 'setName', model.name)
         if model.file and model.file.name:
             self._call_libsedml_method(doc_sed, model_sed, 'setSource', model.file.name)
         if model.format and model.format.sed_urn:
@@ -290,7 +275,10 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedUniformTimeCourse`: timecourse simulation
         """
         sim_sed = doc_sed.createUniformTimeCourse()
-        self._call_libsedml_method(doc_sed, sim_sed, 'setId', 'simulation')
+        if sim.id:
+            self._call_libsedml_method(doc_sed, sim_sed, 'setId', sim.id + '_simulation')
+        if sim.name:
+            self._call_libsedml_method(doc_sed, sim_sed, 'setName', sim.name + ' simulation')
         self._call_libsedml_method(doc_sed, sim_sed, 'setInitialTime', sim.start_time)
         self._call_libsedml_method(doc_sed, sim_sed, 'setOutputStartTime', sim.output_start_time)
         self._call_libsedml_method(doc_sed, sim_sed, 'setOutputEndTime', sim.end_time)
@@ -373,10 +361,12 @@ class SedMlSimulationWriter(SimulationWriter):
         self._call_libsedml_method(doc_sed, change_sed, 'setValue', str(change.value))
         return change_sed
 
-    def _add_sim_task_to_doc(self, doc_sed, model_sed, sim_sed):
+    def _add_sim_task_to_doc(self, id, name, doc_sed, model_sed, sim_sed):
         """ Add a task to simulate a model to a SED document
 
         Args:
+            id (:obj:`str`): id
+            name (:obj:`str`): name
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             model_sed (:obj:`libsedml.SedModel`): SED model
             sim_sed (:obj:`libsedml.SedSimulation`): SED simulation
@@ -385,23 +375,29 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedTask`: SED task
         """
         task_sed = doc_sed.createTask()
-        self._call_libsedml_method(doc_sed, task_sed, 'setId', 'task')
+        if id:
+            self._call_libsedml_method(doc_sed, task_sed, 'setId', id)
+        if name:
+            self._call_libsedml_method(doc_sed, task_sed, 'setName', name)
         self._call_libsedml_method(doc_sed, task_sed, 'setModelReference', model_sed.getId())
         self._call_libsedml_method(doc_sed, task_sed, 'setSimulationReference', sim_sed.getId())
         return task_sed
 
-    def _add_report_to_doc(self, doc_sed):
+    def _add_report_to_doc(self, id, name, doc_sed):
         """ Add a report to a SED document
 
         Args:
+            id (:obj:`str`): id
+            name (:obj:`str`): name
             doc_sed (:obj:`libsedml.SedDocument`): SED document
 
         Returns:
             :obj:`libsedml.SedReport`: SED report
         """
         report_sed = doc_sed.createReport()
-        self._call_libsedml_method(doc_sed, report_sed, 'setId', 'report')
-        self._call_libsedml_method(doc_sed, report_sed, 'setName', 'report')
+        self._call_libsedml_method(doc_sed, report_sed, 'setId', id + '_results')
+        if name:
+            self._call_libsedml_method(doc_sed, report_sed, 'setName', name + ' results')
         return report_sed
 
     def _add_data_gen_to_doc(self, id, name, doc_sed):
@@ -613,6 +609,8 @@ class SedMlSimulationReader(SimulationReader):
                 continue
 
             sim = self._create_sim(sim_sed)
+            sim.id = task_sed.getId() or None
+            sim.name = task_sed.getName() or None
 
             # metadata
             self._read_metadata(doc_sed, sim)
@@ -753,11 +751,7 @@ class SedMlSimulationReader(SimulationReader):
         """
         metadata = self._get_obj_annotation(doc_sed)
         for node in metadata:
-            if node.prefix == 'dc' and node.name == 'title' and isinstance(node.children, str):
-                sim.id = node.children
-            elif node.prefix == 'dc' and node.name == 'description' and node.type == 'name' and isinstance(node.children, str):
-                sim.name = node.children
-            elif node.prefix == 'dc' and node.name == 'description' and node.type == 'description' and isinstance(node.children, str):
+            if node.prefix == 'dc' and node.name == 'description' and node.type == 'description' and isinstance(node.children, str):
                 sim.description = node.children
             elif node.prefix == 'dc' and node.name == 'description' and node.type == 'tags':
                 for child in node.children:
@@ -834,6 +828,7 @@ class SedMlSimulationReader(SimulationReader):
             format = Format(sed_urn=sed_urn)
         sim.model = Biomodel(
             id=model_sed.getId() or None,
+            name=model_sed.getName() or None,
             format=format,
             file=RemoteFile(name=model_sed.getSource(), type=format.mime_type),
         )

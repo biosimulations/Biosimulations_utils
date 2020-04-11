@@ -12,6 +12,8 @@ from Biosimulations_format_utils.biomodel.sbml import BiomodelingFramework
 from Biosimulations_format_utils.simulation.data_model import (
     Simulation, TimecourseSimulation, SteadyStateSimulation, Simulator, Algorithm, AlgorithmParameter, ParameterChange,
     SimulationResult)
+import datetime
+import dateutil.tz
 import unittest
 
 
@@ -51,7 +53,9 @@ class SimulationDataModelTestCase(unittest.TestCase):
                                                              value=1.2, recommended_range=[0.12, 12.],
                                                              kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
                                 value=2.1),
-            ]
+            ],
+            created=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
+            updated=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
         )
         self.assertEqual(TimecourseSimulation.from_json(sim.to_json()), sim)
         self.assertEqual(Simulation.from_json(sim.to_json()), sim)

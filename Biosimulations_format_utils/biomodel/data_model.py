@@ -7,6 +7,8 @@
 """
 
 from ..data_model import Format, Identifier, JournalReference, License, OntologyTerm, Person, RemoteFile, Taxon, Type
+import datetime  # noqa: F401
+import dateutil.parser
 import wc_utils.util.enumerate
 
 __all__ = [
@@ -112,12 +114,14 @@ class Biomodel(object):
         license (:obj:`License`): license
         parameters (:obj:`list` of :obj:`BiomodelParameter`): parameters (e.g., initial conditions and rate constants)
         variables (:obj:`list` of :obj:`BiomodelVariable`): variables (e.g., model predictions)
+        created (:obj:`datetime.datetime`): date that the model was created
+        updated (:obj:`datetime.datetime`): date that the model was last updated
     """
 
     def __init__(self, id=None, name=None, file=None, image=None, description=None,
                  format=None, framework=None, taxon=None, tags=None,
                  identifiers=None, references=None, authors=None, license=None,
-                 parameters=None, variables=None):
+                 parameters=None, variables=None, created=None, updated=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -135,6 +139,8 @@ class Biomodel(object):
             license (:obj:`License`, optional): license
             parameters (:obj:`list` of :obj:`BiomodelParameter`, optional): parameters (e.g., initial conditions and rate constants)
             variables (:obj:`list` of :obj:`BiomodelVariable`, optional): variables (e.g., model predictions)
+            created (:obj:`datetime.datetime`, optional): date that the model was created
+            updated (:obj:`datetime.datetime`, optional): date that the model was last updated
         """
         self.id = id
         self.name = name
@@ -151,6 +157,8 @@ class Biomodel(object):
         self.license = license
         self.parameters = parameters or []
         self.variables = variables or []
+        self.created = created
+        self.updated = updated
 
     def __eq__(self, other):
         """ Determine if two models are semantically equal
@@ -176,7 +184,9 @@ class Biomodel(object):
             and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
             and self.license == other.license \
             and sorted(self.parameters, key=BiomodelParameter.sort_key) == sorted(other.parameters, key=BiomodelParameter.sort_key) \
-            and sorted(self.variables, key=BiomodelVariable.sort_key) == sorted(other.variables, key=BiomodelVariable.sort_key)
+            and sorted(self.variables, key=BiomodelVariable.sort_key) == sorted(other.variables, key=BiomodelVariable.sort_key) \
+            and self.created == other.created \
+            and self.updated == other.updated
 
     def to_json(self):
         """ Export to JSON
@@ -200,6 +210,8 @@ class Biomodel(object):
             'license': self.license.value if self.license else None,
             'parameters': [parameter.to_json() for parameter in self.parameters],
             'variables': [variable.to_json() for variable in self.variables],
+            'created': self.created.strftime('%Y-%m-%dT%H:%M:%SZ') if self.created else None,
+            'updated': self.updated.strftime('%Y-%m-%dT%H:%M:%SZ') if self.updated else None,
         }
 
     @classmethod
@@ -228,6 +240,8 @@ class Biomodel(object):
             license=License(val.get('license')) if val.get('license', None) else None,
             parameters=[BiomodelParameter.from_json(parameter) for parameter in val.get('parameters', [])],
             variables=[BiomodelVariable.from_json(variable) for variable in val.get('variables', [])],
+            created=dateutil.parser.parse(val.get('created')) if val.get('created', None) else None,
+            updated=dateutil.parser.parse(val.get('updated')) if val.get('updated', None) else None,
         )
 
 

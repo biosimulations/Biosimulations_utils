@@ -9,6 +9,8 @@
 from Biosimulations_format_utils.data_model import (Identifier, JournalReference,
                                                     License, OntologyTerm, Person, RemoteFile, Taxon, Type)
 from Biosimulations_format_utils.biomodel.data_model import (Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat)
+import datetime
+import dateutil.tz
 import unittest
 
 
@@ -38,6 +40,8 @@ class BiomodelDataModelTestCase(unittest.TestCase):
             license=License.cc0,
             parameters=[BiomodelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
             variables=[BiomodelVariable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
+            created=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
+            updated=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
         )
         self.assertEqual(Biomodel.from_json(model.to_json()), model)
 

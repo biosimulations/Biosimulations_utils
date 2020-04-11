@@ -45,8 +45,7 @@ class OmexArchiveTestCase(unittest.TestCase):
         with open(os.path.join(archive_dir1, 'models', 'model.xml'), 'w') as file:
             file.write(model)
 
-        now = datetime.datetime.utcnow()
-        now = datetime.datetime(now.year, now.month, now.day, now.hour, now.minute, now.second, tzinfo=dateutil.tz.UTC)
+        now = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
         archive = Archive(
             files=[
                 ArchiveFile(filename='./models/model.xml', format=BiomodelFormat.sbml.value, description='Description',

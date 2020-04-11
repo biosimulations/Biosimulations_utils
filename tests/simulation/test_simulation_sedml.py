@@ -53,6 +53,9 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(len(sims_2), 1)
         sim_2 = sims_2[0]
         self.assertEqual(sim_2.id, sim.id)
+        print(sim_2.format.to_json())
+        print(sim.format.to_json())
+        self.assertEqual(sim_2.format, sim.format)
         self.assertEqual(sim_2.name, sim.name)
         self.assertEqual(sim_2.model.id, sim.model.id)
         self.assertEqual(sim_2.model.name, sim.model.name)

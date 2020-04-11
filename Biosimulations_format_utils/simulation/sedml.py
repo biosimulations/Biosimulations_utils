@@ -8,7 +8,8 @@
 
 from .core import SimulationWriter, SimulationReader, SimulationIoError, SimulationIoWarning
 from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation,  # noqa: F401
-                         Algorithm, AlgorithmParameter, ParameterChange, SimulationResult)
+                         Algorithm, AlgorithmParameter, ParameterChange, SimulationResult,
+                         SimulationFormat)
 from ..chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from ..data_model import Format, JournalReference, License, OntologyTerm, Person, RemoteFile
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
@@ -16,6 +17,7 @@ from ..visualization.data_model import Visualization, VisualizationLayoutElement
 from ..utils import assert_exception, get_enum_format_by_attr
 from datetime import datetime
 from xml.sax import saxutils
+import copy
 import enum
 import libsedml
 import os
@@ -41,7 +43,7 @@ class SedMlSimulationWriter(SimulationWriter):
         Returns:
             :obj:`libsedml.SedDocument`: SED document
         """
-        if sim.format.name != 'SED-ML' or sim.format.version != 'L{}V{}'.format(level, version):
+        if sim.format.id != 'SED-ML' or sim.format.version != 'L{}V{}'.format(level, version):
             raise ValueError('Format must be SED-ML L{}V{}'.format(level, version))
 
         doc_sed = self._create_doc(level, version)
@@ -809,10 +811,8 @@ class SedMlSimulationReader(SimulationReader):
             elif node.prefix == 'dcterms' and node.name == 'license' and isinstance(node.children, str):
                 sim.license = License(node.children)
 
-        sim.format = Format(
-            name="SED-ML",
-            version="L{}V{}".format(doc_sed.getLevel(), doc_sed.getVersion()),
-        )
+        sim.format = copy.copy(SimulationFormat.sedml.value)
+        sim.format.version = "L{}V{}".format(doc_sed.getLevel(), doc_sed.getVersion())
 
     def _read_model(self, model_sed, sim):
         """ Read a SED model

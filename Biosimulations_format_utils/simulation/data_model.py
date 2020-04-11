@@ -8,6 +8,8 @@
 
 from ..data_model import Format, Identifier, JournalReference, License, OntologyTerm, Person, RemoteFile, Type
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
+import datetime  # noqa: F401
+import dateutil.parser
 import wc_utils.util.enumerate
 
 __all__ = [
@@ -21,11 +23,13 @@ __all__ = [
 class SimulationFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
     """ Simulation format metadata """
     SEDML = Format(
-        id='SEDML',
+        id='SED-ML',
         name='Simulation Experiment Description Markup Language',
         edam_id='format_3685',
         url='https://sed-ml.org/',
         spec_url='http://identifiers.org/combine.specifications/sed-ml',
+        mime_type='application/xml',
+        extension='sedml',
     )
 
     SESSL = Format(
@@ -34,6 +38,8 @@ class SimulationFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='http://sessl.org',
         spec_url='http://sessl.org',
+        mime_type='text/plain',
+        extension='scala',
     )
 
 
@@ -55,12 +61,15 @@ class Simulation(object):
         model_parameter_changes (:obj:`list` of :obj:`ParameterChange`): model parameter changes
         algorithm (:obj:`Algorithm`): simulation algorithm
         algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`): simulation algorithm parameter changes
+        created (:obj:`datetime.datetime`): date that the model was created
+        updated (:obj:`datetime.datetime`): date that the model was last updated
     """
 
     def __init__(self, id=None, name=None, image=None, description=None,
                  tags=None, identifiers=None, references=None, authors=None, license=None, format=None,
                  model=None, model_parameter_changes=None,
-                 algorithm=None, algorithm_parameter_changes=None):
+                 algorithm=None, algorithm_parameter_changes=None,
+                 created=None, updated=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -77,6 +86,8 @@ class Simulation(object):
             model_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): model parameter changes
             algorithm (:obj:`Algorithm`, optional): simulation algorithm
             algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes
+            created (:obj:`datetime.datetime`, optional): date that the model was created
+            updated (:obj:`datetime.datetime`, optional): date that the model was last updated
         """
         self.id = id
         self.name = name
@@ -92,6 +103,8 @@ class Simulation(object):
         self.model_parameter_changes = model_parameter_changes or []
         self.algorithm = algorithm
         self.algorithm_parameter_changes = algorithm_parameter_changes or []
+        self.created = created
+        self.updated = updated
 
     def __eq__(self, other):
         """ Determine if two simulations are semantically equal
@@ -118,7 +131,9 @@ class Simulation(object):
             sorted(other.model_parameter_changes, key=ParameterChange.sort_key) \
             and self.algorithm == other.algorithm \
             and sorted(self.algorithm_parameter_changes, key=ParameterChange.sort_key) == \
-            sorted(other.algorithm_parameter_changes, key=ParameterChange.sort_key)
+            sorted(other.algorithm_parameter_changes, key=ParameterChange.sort_key) \
+            and self.created == other.created \
+            and self.updated == other.updated
 
     def to_json(self):
         """ Export to JSON
@@ -141,6 +156,8 @@ class Simulation(object):
             'modelParameterChanges': [change.to_json() for change in self.model_parameter_changes],
             'algorithm': self.algorithm.to_json() if self.algorithm else None,
             'algorithmParameterChanges': [change.to_json() for change in self.algorithm_parameter_changes],
+            'created': self.created.strftime('%Y-%m-%dT%H:%M:%SZ') if self.created else None,
+            'updated': self.updated.strftime('%Y-%m-%dT%H:%M:%SZ') if self.updated else None,
         }
 
     @classmethod
@@ -177,7 +194,9 @@ class Simulation(object):
                                          for change in val.get('modelParameterChanges', [])],
                 algorithm=Algorithm.from_json(val.get('algorithm')) if val.get('algorithm', None) else None,
                 algorithm_parameter_changes=[ParameterChange.from_json(change, AlgorithmParameter)
-                                             for change in val.get('algorithmParameterChanges', [])]
+                                             for change in val.get('algorithmParameterChanges', [])],
+                created=dateutil.parser.parse(val.get('created')) if val.get('created', None) else None,
+                updated=dateutil.parser.parse(val.get('updated')) if val.get('updated', None) else None,
             )
 
 
@@ -195,7 +214,8 @@ class TimecourseSimulation(Simulation):
                  tags=None, identifiers=None, references=None, authors=None, license=None, format=None,
                  model=None, model_parameter_changes=None,
                  start_time=None, output_start_time=None, end_time=None, num_time_points=None,
-                 algorithm=None, algorithm_parameter_changes=None):
+                 algorithm=None, algorithm_parameter_changes=None,
+                 created=None, updated=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -216,12 +236,15 @@ class TimecourseSimulation(Simulation):
             num_time_points (:obj:`int`, optional): number of time points to record
             algorithm (:obj:`Algorithm`, optional): simulation algorithm
             algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes
+            created (:obj:`datetime.datetime`, optional): date that the model was created
+            updated (:obj:`datetime.datetime`, optional): date that the model was last updated
         """
         super(TimecourseSimulation, self).__init__(id=id, name=name, image=image, description=description,
                                                    tags=tags, identifiers=identifiers,
                                                    references=references, authors=authors, license=license, format=format,
                                                    model=model, model_parameter_changes=model_parameter_changes,
-                                                   algorithm=algorithm, algorithm_parameter_changes=algorithm_parameter_changes)
+                                                   algorithm=algorithm, algorithm_parameter_changes=algorithm_parameter_changes,
+                                                   created=created, updated=updated)
         self.start_time = start_time
         self.output_start_time = output_start_time
         self.end_time = end_time

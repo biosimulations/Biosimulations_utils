@@ -39,8 +39,14 @@
   ],
   "license": "CC0",
   "format": {
-    "name": "SED-ML",
-    "version": "L1V3"
+    "id": "SED-ML",
+    "name": "Simulation Experiment Description Markup Language",
+    "version": "L1V3",
+    "edamId": "format_3685",
+    "url": "https://sed-ml.org/",
+    "specUrl": "http://identifiers.org/combine.specifications/sed-ml",
+    "mimeType": "application/xml",
+    "extension": "sedml"
   },
   "model": {
     "format": {

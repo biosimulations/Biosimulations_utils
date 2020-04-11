@@ -53,8 +53,7 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(len(sims_2), 1)
         sim_2 = sims_2[0]
         self.assertEqual(sim_2.id, sim.id)
-        print(sim_2.format.to_json())
-        print(sim.format.to_json())
+        self.assertEqual(sim_2.format.version, 'L1V3')
         self.assertEqual(sim_2.format, sim.format)
         self.assertEqual(sim_2.name, sim.name)
         self.assertEqual(sim_2.model.id, sim.model.id)
@@ -63,8 +62,9 @@ class WriteSedMlTestCase(unittest.TestCase):
             set(v.id for v in sim_2.model.variables),
             set(v.id for v in sim.model.variables))
         self.assertEqual(sim_2.model.file.name, sim.model.file.name)
+        self.assertEqual(sim_2.created, sim.created)
+        self.assertEqual(sim_2.updated, sim.updated)
         self.assertEqual(sim_2, sim)
-        self.assertEqual(sim_2.format.version, 'L1V3')
 
         with self.assertRaisesRegex(NotImplementedError, 'not supported'):
             read_simulation(None, SimulationFormat.sessl)

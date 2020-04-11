@@ -15,9 +15,9 @@ from ..data_model import Format, JournalReference, License, OntologyTerm, Person
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 from ..utils import assert_exception, get_enum_format_by_attr
-from datetime import datetime
 from xml.sax import saxutils
 import copy
+import dateutil.parser
 import enum
 import libsedml
 import os
@@ -189,8 +189,12 @@ class SedMlSimulationWriter(SimulationWriter):
             namespaces.add('dcterms')
 
         metadata.append(XmlNode(prefix='dcterms', name='mediator', children='BioSimulations'))
-        metadata.append(XmlNode(prefix='dcterms', name='created',
-                                children=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')))
+        if obj.created:
+            metadata.append(XmlNode(prefix='dcterms', name='created',
+                                    children=obj.created.strftime('%Y-%m-%dT%H:%M:%SZ')))
+        if obj.updated:
+            metadata.append(XmlNode(prefix='dcterms', name='date', type='update',
+                                    children=obj.updated.strftime('%Y-%m-%dT%H:%M:%SZ')))
         namespaces.add('dcterms')
 
         self._add_annotation_to_obj(metadata, doc_sed, obj_sed, namespaces)
@@ -810,6 +814,10 @@ class SedMlSimulationReader(SimulationReader):
                                         sim.references.append(ref)
             elif node.prefix == 'dcterms' and node.name == 'license' and isinstance(node.children, str):
                 sim.license = License(node.children)
+            elif node.prefix == 'dcterms' and node.name == 'created' and isinstance(node.children, str):
+                sim.created = dateutil.parser.parse(node.children)
+            elif node.prefix == 'dcterms' and node.name == 'date' and node.type == 'update' and isinstance(node.children, str):
+                sim.updated = dateutil.parser.parse(node.children)
 
         sim.format = copy.copy(SimulationFormat.sedml.value)
         sim.format.version = "L{}V{}".format(doc_sed.getLevel(), doc_sed.getVersion())

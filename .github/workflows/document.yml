@@ -21,7 +21,7 @@ jobs:
           python -m pip install -e .[docs]
       - name: Document
         run: |
-          sphinx-apidoc -P -o ./docs/source/ ./Biosimulations_format_utils
+          sphinx-apidoc -P -o ./docs/source/ ./Biosimulations_utils
           sphinx-build ./docs/ ./docs/html/
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v2

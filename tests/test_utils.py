@@ -6,8 +6,8 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.biomodel.data_model import BiomodelFormat
-from Biosimulations_format_utils.utils import get_enum_format_by_attr, pretty_print_units, assert_exception
+from Biosimulations_utils.biomodel.data_model import BiomodelFormat
+from Biosimulations_utils.utils import get_enum_format_by_attr, pretty_print_units, assert_exception
 import unittest
 
 

@@ -6,13 +6,13 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from Biosimulations_format_utils.data_model import OntologyTerm, RemoteFile
-from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelVariable, BiomodelFormat
-from Biosimulations_format_utils.simulation import write_simulation, read_simulation, sedml
-from Biosimulations_format_utils.simulation.core import SimulationIoError, SimulationIoWarning
-from Biosimulations_format_utils.simulation.data_model import SimulationFormat, TimecourseSimulation, SimulationResult
-from Biosimulations_format_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
+from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
+from Biosimulations_utils.data_model import OntologyTerm, RemoteFile
+from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelVariable, BiomodelFormat
+from Biosimulations_utils.simulation import write_simulation, read_simulation, sedml
+from Biosimulations_utils.simulation.core import SimulationIoError, SimulationIoWarning
+from Biosimulations_utils.simulation.data_model import SimulationFormat, TimecourseSimulation, SimulationResult
+from Biosimulations_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import json
 import libsedml
 import os

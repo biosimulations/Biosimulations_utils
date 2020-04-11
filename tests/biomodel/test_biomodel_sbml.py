@@ -6,11 +6,11 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.data_model import Taxon, Type
-from Biosimulations_format_utils.biomodel import read_biomodel
-from Biosimulations_format_utils.biomodel.core import BiomodelIoError
-from Biosimulations_format_utils.biomodel.data_model import BiomodelFormat, BiomodelParameter, BiomodelVariable
-from Biosimulations_format_utils.biomodel.sbml import visualize_biomodel
+from Biosimulations_utils.data_model import Taxon, Type
+from Biosimulations_utils.biomodel import read_biomodel
+from Biosimulations_utils.biomodel.core import BiomodelIoError
+from Biosimulations_utils.biomodel.data_model import BiomodelFormat, BiomodelParameter, BiomodelVariable
+from Biosimulations_utils.biomodel.sbml import visualize_biomodel
 import copy
 import importlib
 import libsbml

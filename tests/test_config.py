@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils import config
+from Biosimulations_utils import config
 import unittest
 
 

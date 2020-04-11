@@ -1,4 +1,4 @@
-# Biosimulations_format_utils
+# Biosimulations_utils
 Utilities for generating and parsing documents encoded in biomodeling standards such as the [Systems Biology Markup Language](http://www.sbml.org/) (SBML) and the [Simulation Experiment Description Markup Language](https://sed-ml.org/) (SED-ML).
 
 ## Contents
@@ -6,13 +6,13 @@ Utilities for generating and parsing documents encoded in biomodeling standards 
 * [License](#license)
 * [Development team](#development-team)
 * [Questions and comments](#questions-and-comments)
-* [Documentation](https://reproducible-biomedical-modeling.github.io/Biosimulations_format_utils/)
+* [Documentation](https://reproducible-biomedical-modeling.github.io/Biosimulations_utils/)
 
 ## Installation
 
 Install latest revision from GitHub
 ```
-pip install git+https://github.com/reproducible-biomedical-modeling/Biosimulations_format_utils.git#Biosimulations_format_utils
+pip install git+https://github.com/reproducible-biomedical-modeling/Biosimulations_utils.git#Biosimulations_utils
 ```
 
 ## License

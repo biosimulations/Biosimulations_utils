@@ -9,7 +9,7 @@ except ImportError:
     import pkg_utils
 import os
 
-name = 'Biosimulations_format_utils'
+name = 'Biosimulations_utils'
 dirname = os.path.dirname(__file__)
 
 # get package metadata

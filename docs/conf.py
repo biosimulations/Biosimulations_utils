@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Biosimulations_format_utils documentation build configuration file, created by
+# Biosimulations_utils documentation build configuration file, created by
 # sphinx-quickstart on Mon Jul 25 14:25:43 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -66,7 +66,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Biosimulations_format_utils'
+project = u'Biosimulations_utils'
 copyright = u'{}, Center for Reproducible Biomedical Modeling'.format(datetime.datetime.now().year)
 author = u'Center for Reproducible Biomedical Modeling'
 
@@ -75,7 +75,7 @@ author = u'Center for Reproducible Biomedical Modeling'
 # built documents.
 #
 # The short X.Y version.
-filename = os.path.join(os.path.dirname(__file__), "..", "Biosimulations_format_utils", "_version.py")
+filename = os.path.join(os.path.dirname(__file__), "..", "Biosimulations_utils", "_version.py")
 if os.path.isfile(filename):
     verstrline = open(filename, "rt").read()
     VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
@@ -166,10 +166,10 @@ def linkcode_resolve(domain, info):
     rel_filename = info['module'].replace('.', '/')
     if os.path.isfile(os.path.join(os.path.dirname(__file__), '..', rel_filename + '.py')):
         return ("https://github.com/reproducible-biomedical-modeling/"
-                "Biosimulations_format_utils/blob/master/{}.py").format(rel_filename)
+                "Biosimulations_utils/blob/master/{}.py").format(rel_filename)
     else:
         return ("https://github.com/reproducible-biomedical-modeling/"
-                "Biosimulations_format_utils/blob/master/{}/__init__.py").format(rel_filename)
+                "Biosimulations_utils/blob/master/{}/__init__.py").format(rel_filename)
 
 
 # -- napoleon options -----------------------------------------------------
@@ -204,7 +204,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'Biosimulations_format_utils v0.01'
+# html_title = u'Biosimulations_utils v0.01'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -304,7 +304,7 @@ html_show_copyright = True
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Biosimulations_format_utils_doc'
+htmlhelp_basename = 'Biosimulations_utils_doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -330,7 +330,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Biosimulations_format_utils.tex', u'Biosimulations_format_utils documentation',
+    (master_doc, 'Biosimulations_utils.tex', u'Biosimulations_utils documentation',
      u'Center for Reproducible Biomedical Modeling', 'manual'),
 ]
 
@@ -372,7 +372,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'Biosimulations_format_utils', u'Biosimulations_format_utils documentation',
+    (master_doc, 'Biosimulations_utils', u'Biosimulations_utils documentation',
      [author], 1)
 ]
 
@@ -387,8 +387,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Biosimulations_format_utils', u'Biosimulations_format_utils documentation',
-     author, 'Biosimulations_format_utils', 'Language for describing whole-cell models',
+    (master_doc, 'Biosimulations_utils', u'Biosimulations_utils documentation',
+     author, 'Biosimulations_utils', 'Language for describing whole-cell models',
      'Miscellaneous'),
 ]
 
@@ -416,5 +416,5 @@ googleanalytics_id = 'UA-86340737-1'
 
 # -- if RTD, redirect to https://docs.karrlab.org  ------------------------
 
-# addmetahtml_content = '<meta http-equiv="refresh" content="0; url=https://docs.karrlab.org/Biosimulations_format_utils" />'
+# addmetahtml_content = '<meta http-equiv="refresh" content="0; url=https://docs.karrlab.org/Biosimulations_utils" />'
 # addmetahtml_enabled = os.getenv('READTHEDOCS', '') == 'True'

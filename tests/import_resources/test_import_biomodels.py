@@ -6,11 +6,11 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.data_model import Identifier, JournalReference, License, Person, Taxon
-from Biosimulations_format_utils.import_resources import biomodels
-from Biosimulations_format_utils.biomodel.data_model import Biomodel
-from Biosimulations_format_utils.simulation.data_model import Simulation
-from Biosimulations_format_utils.visualization.data_model import Visualization
+from Biosimulations_utils.data_model import Identifier, JournalReference, License, Person, Taxon
+from Biosimulations_utils.import_resources import biomodels
+from Biosimulations_utils.biomodel.data_model import Biomodel
+from Biosimulations_utils.simulation.data_model import Simulation
+from Biosimulations_utils.visualization.data_model import Visualization
 from unittest import mock
 import shutil
 import tempfile

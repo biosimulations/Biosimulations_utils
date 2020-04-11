@@ -11,7 +11,7 @@ from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
 import wc_utils.util.enumerate
 
 __all__ = [
-    'SimulationFormat', 'SimulationFormatSpecificationUrl',
+    'SimulationFormat',
     'Simulation', 'TimecourseSimulation', 'SteadyStateSimulation',
     'Simulator', 'Algorithm', 'AlgorithmParameter', 'ParameterChange',
     'SimulationResult',
@@ -35,12 +35,6 @@ class SimulationFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         url='http://sessl.org',
         spec_url='http://sessl.org',
     )
-
-
-class SimulationFormatSpecificationUrl(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
-    """ Simulation experiment formats """
-    SEDML = 'http://identifiers.org/combine.specifications/sed-ml'
-    SESSL = 'http://sessl.org'
 
 
 class Simulation(object):

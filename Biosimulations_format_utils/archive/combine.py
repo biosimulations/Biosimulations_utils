@@ -9,8 +9,10 @@
 from .core import ArchiveWriter, ArchiveReader, ArchiveIoError
 from .data_model import Archive, ArchiveFile, ArchiveFormat
 from ..data_model import Format, Person
-from ..biomodel.data_model import BiomodelFormat, BiomodelFormatSpecificationUrl
-from ..simulation.data_model import SimulationFormat, SimulationFormatSpecificationUrl
+from ..biomodel.data_model import BiomodelFormat
+from ..simulation.data_model import SimulationFormat
+from ..utils import get_enum_format_by_attr
+import copy
 import dateutil.parser
 import libcombine
 import os
@@ -109,28 +111,14 @@ class CombineArchiveReader(ArchiveReader):
             file_comb = archive_comb.getEntryByLocation(filename)
 
             if file_comb.isSetFormat():
-                format = Format(spec_url=file_comb.getFormat())
-
-                try:
-                    model_format_spec_url = BiomodelFormatSpecificationUrl(format.spec_url)
-                    model_format = BiomodelFormat[model_format_spec_url.name].value
-                    format.id = model_format.id
-                    format.name = model_format.name
-                    format.edam_id = model_format.edam_id
-                    format.url = model_format.url
-                except ValueError:
-                    pass
-
-                try:
-                    sim_format_spec_url = SimulationFormatSpecificationUrl(format.spec_url)
-                    sim_format = SimulationFormat[sim_format_spec_url.name].value
-                    format.id = sim_format.id
-                    format.name = sim_format.name
-                    format.edam_id = sim_format.edam_id
-                    format.url = sim_format.url
-                except ValueError:
-                    pass
-
+                spec_url = file_comb.getFormat()
+                format = get_enum_format_by_attr(BiomodelFormat, 'spec_url', spec_url)
+                if not format:
+                    format = get_enum_format_by_attr(SimulationFormat, 'spec_url', spec_url)
+                if format:
+                    format = copy.copy(format)
+                else:
+                    format = Format(spec_url=spec_url)
             else:
                 format = None
 

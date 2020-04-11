@@ -44,7 +44,15 @@
   },
   "model": {
     "format": {
-      "name": "SBML"
+      "id": "SBML",
+      "name": "Systems Biology Markup Language",
+      "version": "L3V2",
+      "edamId": "format_2585",
+      "url": "http://sbml.org",
+      "specUrl": "http://identifiers.org/combine.specifications/sbml",
+      "mimeType": "application/sbml+xml",
+      "extension": "xml",
+      "sedUrn": "urn:sedml:language:sbml"
     }
   },
   "modelParameterChanges": [

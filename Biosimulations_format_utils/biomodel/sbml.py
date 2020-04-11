@@ -6,11 +6,12 @@
 :License: MIT
 """
 
-from ..data_model import Format, OntologyTerm, RemoteFile, Taxon, Type
+from ..data_model import Format, OntologyTerm, RemoteFile, Taxon, Type  # noqa: F401
 from ..utils import pretty_print_units
 from .core import BiomodelReader, BiomodelIoError
-from .data_model import Biomodel, BiomodelParameter, BiomodelVariable  # noqa: F401
+from .data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat  # noqa: F401
 from PIL import Image
+import copy
 import enum
 import ete3
 import libsbml
@@ -139,13 +140,8 @@ class SbmlBiomodelReader(BiomodelReader):
         Returns:
             :obj:`Format`: format of the model
         """
-        model.format = Format(
-            name='SBML',
-            version='L{}V{}'.format(model_sbml.getLevel(), model_sbml.getVersion()),
-            edam_id='format_2585',
-            url='http://sbml.org',
-        )
-
+        model.format = copy.copy(BiomodelFormat.sbml.value)
+        model.format.version = 'L{}V{}'.format(model_sbml.getLevel(), model_sbml.getVersion())
         return model.format
 
     def _read_metadata(self, model_sbml, model):

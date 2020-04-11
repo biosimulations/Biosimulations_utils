@@ -9,7 +9,7 @@
 from Biosimulations_format_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_format_utils.data_model import (Format, Identifier, JournalReference,
                                                     License, OntologyTerm, Person, RemoteFile, Taxon, Type)
-from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
+from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from Biosimulations_format_utils.simulation.data_model import TimecourseSimulation, SimulationResult
 from Biosimulations_format_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import inflect
@@ -20,10 +20,10 @@ import unittest
 
 class DataModelTestCase(unittest.TestCase):
     def test_Format(self):
-        format = Format(id='SBML', name='Systems Biology Markup Langugae', version='L3V2', edam_id='format_2585',
-                        url='http://sbml.org', spec_url='http://identifiers.org/combine.specifications/sbml')
+        format = BiomodelFormat.sbml.value
         self.assertEqual(Format.from_json(format.to_json()), format)
-        self.assertEqual(Format.sort_key(format), (format.id, format.name, format.version, format.edam_id, format.url, format.spec_url))
+        self.assertEqual(Format.sort_key(format), (format.id, format.name, format.version, format.edam_id, format.url,
+                                                   format.spec_url, format.mime_type, format.extension, format.sed_urn))
 
     def test_Identifier(self):
         id = Identifier(namespace='biomodels.db', id='BIOMD0000000924')
@@ -77,7 +77,7 @@ class ApiConsistencyTestCase(unittest.TestCase):
             file=RemoteFile(name='model.xml', type='application/sbml+xml'),
             image=RemoteFile(name='model.png', type='image/png'),
             description='description',
-            format=Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
+            format=BiomodelFormat.sbml.value,
             framework=OntologyTerm(ontology='KISAO', id='0000497', name='KLU',
                                    description='KLU is a software package and an algorithm ...',
                                    iri='http://www.biomodels.net/kisao/KISAO#KISAO_0000497'),

@@ -6,11 +6,15 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.utils import pretty_print_units, assert_exception
+from Biosimulations_format_utils.biomodel.data_model import BiomodelFormat
+from Biosimulations_format_utils.utils import get_enum_format_by_attr, pretty_print_units, assert_exception
 import unittest
 
 
 class UtilsTestCase(unittest.TestCase):
+    def test_get_enum_format_by_attr(self):
+        self.assertEqual(get_enum_format_by_attr(BiomodelFormat, 'sed_urn', 'urn:sedml:language:sbml'), BiomodelFormat.sbml.value)
+
     def test_pretty_print_units(self):
         self.assertEqual(pretty_print_units('undefined'), None)
         self.assertEqual(pretty_print_units('s'), 'second')

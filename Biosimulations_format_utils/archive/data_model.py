@@ -10,7 +10,7 @@ from ..data_model import Format, Person
 import datetime
 import wc_utils.util.enumerate
 
-__all__ = ['ArchiveFormat', 'ArchiveFormatSpecificationUrl', 'Archive', 'ArchiveFile']
+__all__ = ['ArchiveFormat', 'Archive', 'ArchiveFile']
 
 
 class ArchiveFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
@@ -22,11 +22,6 @@ class ArchiveFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         url='https://combinearchive.org/',
         spec_url='http://identifiers.org/combine.specifications/omex',
     )
-
-
-class ArchiveFormatSpecificationUrl(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
-    """ Simulation experiment formats """
-    COMBINE = 'http://identifiers.org/combine.specifications/omex'
 
 
 class Archive(object):

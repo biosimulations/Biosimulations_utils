@@ -11,7 +11,6 @@ import wc_utils.util.enumerate
 
 __all__ = [
     'BiomodelFormat',
-    'BiomodelFormatSpecificationUrl',
     'Biomodel',
     'BiomodelParameter',
     'BiomodelVariable',
@@ -26,6 +25,8 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='https://bionetgen.org/',
         spec_url='https://bionetgen.org/',
+        mime_type='text/plain',
+        extension='bngl',
     )
 
     CellML = Format(
@@ -34,6 +35,9 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id='format_3240',
         url='https://bionetgen.org/',
         spec_url='http://identifiers.org/combine.specifications/cellml',
+        mime_type='application/cellml+xml',
+        extension='cellml',
+        sed_urn='urn:sedml:language:cellml',
     )
 
     Kappa = Format(
@@ -42,14 +46,18 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='https://bionetgen.org/',
         spec_url='https://bionetgen.org/',
+        mime_type='text/plain',
+        extension='ka',
     )
 
     MML = Format(
         id='MML',
-        name='Multiscale Modeling Language ',
+        name='Multiscale Modeling Language',
         edam_id=None,
         url='https://doi.org/10.1016/j.procs.2010.04.089',
         spec_url='https://doi.org/10.1016/j.procs.2010.04.089',
+        mime_type='application/xml',
+        extension='xml',
     )
 
     NeuroML = Format(
@@ -58,6 +66,9 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='https://bionetgen.org/',
         spec_url='http://identifiers.org/combine.specifications/neuroml',
+        mime_type='application/xml',
+        extension='nml',
+        sed_urn='urn:sedml:language:neuroml',
     )
 
     pharmML = Format(
@@ -66,6 +77,8 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='http://www.pharmml.org/',
         spec_url='http://www.pharmml.org/',
+        mime_type='application/xml',
+        extension='xml',
     )
 
     SBML = Format(
@@ -74,18 +87,10 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id='format_2585',
         url='http://sbml.org/',
         spec_url='http://identifiers.org/combine.specifications/sbml',
+        mime_type='application/sbml+xml',
+        extension='xml',
+        sed_urn='urn:sedml:language:sbml',
     )
-
-
-class BiomodelFormatSpecificationUrl(str, wc_utils.util.enumerate.CaseInsensitiveEnum):
-    """ Biomodel format """
-    BNGL = 'https://bionetgen.org/'
-    CellML = 'http://identifiers.org/combine.specifications/cellml'
-    Kappa = 'https://kappalanguage.org/'
-    MML = 'https://doi.org/10.1016/j.procs.2010.04.089'
-    NeuroML = 'http://identifiers.org/combine.specifications/neuroml'
-    pharmML = 'http://www.pharmml.org/'
-    SBML = 'http://identifiers.org/combine.specifications/sbml'
 
 
 class Biomodel(object):

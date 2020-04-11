@@ -6,9 +6,9 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.data_model import (Format, Identifier, JournalReference,
+from Biosimulations_format_utils.data_model import (Identifier, JournalReference,
                                                     License, OntologyTerm, Person, RemoteFile, Taxon, Type)
-from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
+from Biosimulations_format_utils.biomodel.data_model import (Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat)
 import unittest
 
 
@@ -20,7 +20,7 @@ class BiomodelDataModelTestCase(unittest.TestCase):
             file=RemoteFile(name='model.xml', type='application/sbml+xml'),
             image=RemoteFile(name='model.png', type='image/png'),
             description='description',
-            format=Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
+            format=BiomodelFormat.sbml.value,
             framework=OntologyTerm(ontology='KISAO', id='0000497', name='KLU',
                                    description='KLU is a software package and an algorithm ...',
                                    iri='http://www.biomodels.net/kisao/KISAO#KISAO_0000497'),

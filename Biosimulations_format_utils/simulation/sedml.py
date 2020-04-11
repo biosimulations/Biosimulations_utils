@@ -11,9 +11,9 @@ from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation
                          Algorithm, AlgorithmParameter, ParameterChange, SimulationResult)
 from ..chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from ..data_model import Format, JournalReference, License, OntologyTerm, Person, RemoteFile
-from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
+from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
-from ..utils import assert_exception
+from ..utils import assert_exception, get_enum_format_by_attr
 from datetime import datetime
 from xml.sax import saxutils
 import enum
@@ -30,17 +30,11 @@ __all__ = [
 class SedMlSimulationWriter(SimulationWriter):
     """ Base class for SED-ML generator for each model format """
 
-    MODEL_LANGUAGE_URN = None
-    MODEL_LANGUAGE_NAME = None
-
-    def run(self, model_vars, sim, model_filename, sim_filename, level=1, version=3):
+    def run(self, sim, filename, level=1, version=3):
         """
         Args:
-            model_vars (:obj:`list` of :obj:`BiomodelVariable`): List of variables in the model.
-                Each variable should have the keys `id` and `target`
             sim (:obj:`Simulation`): Simulation experiment
-            model_filename (:obj:`str`): Path to the model definition
-            sim_filename (:obj:`str`): Path to save simulation experiment in SED-ML format
+            filename (:obj:`str`): Path to save simulation experiment in SED-ML format
             level (:obj:`int`): SED-ML level
             version (:obj:`int`): SED-ML version
 
@@ -53,7 +47,7 @@ class SedMlSimulationWriter(SimulationWriter):
         doc_sed = self._create_doc(level, version)
         self._add_metadata_to_doc(sim, doc_sed)
 
-        model_sed = self._add_model_to_doc(sim.model, model_filename, doc_sed)
+        model_sed = self._add_model_to_doc(sim.model, doc_sed)
         self._add_parameter_changes_to_model(sim.model_parameter_changes, doc_sed, model_sed)
 
         sim_sed = self._add_timecourse_sim_to_doc(sim, doc_sed)
@@ -66,9 +60,9 @@ class SedMlSimulationWriter(SimulationWriter):
         self._add_var_to_data_gen('time', 'time', 'urn:sedml:symbol:time', doc_sed, time_gen_sed, task_sed)
         self._add_data_set_to_report('time', 'time', doc_sed, report_sed, time_gen_sed)
 
-        self._add_task_results_to_report(model_vars, doc_sed, task_sed, report_sed)
+        self._add_task_results_to_report(sim.model.variables, doc_sed, task_sed, report_sed)
 
-        self._export_doc(doc_sed, sim_filename)
+        self._export_doc(doc_sed, filename)
 
         return doc_sed
 
@@ -216,28 +210,30 @@ class SedMlSimulationWriter(SimulationWriter):
 
         self._add_annotation_to_obj(metadata, doc_sed, doc_sed, namespaces)
 
-    def _add_model_to_doc(self, model, filename, doc_sed):
+    def _add_model_to_doc(self, model, doc_sed):
         """ Add a model to a SED document
 
         Args:
-            model (:obj:`dict`): model
-            filename (:obj:`str`): path to the model definition
+            model (:obj:`Biomodel`): model
             doc_sed (:obj:`libsedml.SedDocument`): SED document
 
         Returns:
             :obj:`libsedml.SedModel`: SED model
         """
         model_sed = doc_sed.createModel()
-        self._call_libsedml_method(doc_sed, model_sed, 'setId', 'model')
-        self._call_libsedml_method(doc_sed, model_sed, 'setSource', filename)
-        self._call_libsedml_method(doc_sed, model_sed, 'setLanguage', self.MODEL_LANGUAGE_URN)
+        if model.id:
+            self._call_libsedml_method(doc_sed, model_sed, 'setId', model.id)
+        if model.file and model.file.name:
+            self._call_libsedml_method(doc_sed, model_sed, 'setSource', model.file.name)
+        if model.format and model.format.sed_urn:
+            self._call_libsedml_method(doc_sed, model_sed, 'setLanguage', model.format.sed_urn)
         return model_sed
 
     def _add_parameter_changes_to_model(self, changes, doc_sed, model_sed):
         """ Add model parameter changes to a SED document
 
         Args:
-            changes (:obj:`list` of :obj:`dict`): model parameter changes
+            changes (:obj:`list` of :obj:`ParameterChange`): model parameter changes
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             model_sed (:obj:`libsedml.SedModel`): SED model
 
@@ -253,7 +249,7 @@ class SedMlSimulationWriter(SimulationWriter):
         """ Add a model parameter change to a SED document
 
         Args:
-            change (:obj:`dict`): model parameter change
+            change (:obj:`ParameterChange`): model parameter change
             doc_sed (:obj:`libsedml.SedDocument`): SED document
             model_sed (:obj:`libsedml.SedModel`): SED model
 
@@ -313,7 +309,6 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedAlgorithm`: SED simulation algorithm
         """
         alg_sed = sim_sed.createAlgorithm()
-        print(algorithm.kisao_term)
         if algorithm.kisao_term:
             self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.kisao_term.ontology + ':' + algorithm.kisao_term.id)
         if algorithm.id:
@@ -360,7 +355,6 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedAlgorithmParameter`: SED simulation algorithm paremeter change
         """
         change_sed = alg_sed.createAlgorithmParameter()
-        print(change.parameter.kisao_term)
         if change.parameter.kisao_term:
             self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID',
                                        change.parameter.kisao_term.ontology + ':' + change.parameter.kisao_term.id)
@@ -834,11 +828,14 @@ class SedMlSimulationReader(SimulationReader):
             sim (:obj:`Simulation`): simulation
         """
         # model
+        sed_urn = model_sed.getLanguage()
+        format = get_enum_format_by_attr(BiomodelFormat, 'sed_urn', sed_urn)
+        if not format:
+            format = Format(sed_urn=sed_urn)
         sim.model = Biomodel(
-            format=Format(
-                name=self.MODEL_LANGUAGE_NAME,
-            ),
-            file=RemoteFile(name=model_sed.getSource(), type='application/sbml+xml'),
+            id=model_sed.getId() or None,
+            format=format,
+            file=RemoteFile(name=model_sed.getSource(), type=format.mime_type),
         )
 
         # parameter changes

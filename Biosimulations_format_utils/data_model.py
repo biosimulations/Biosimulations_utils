@@ -31,9 +31,13 @@ class Format(object):
         edam_id (:obj:`str`): EDAM identifier
         url (:obj:`str`): URL
         spec_url (:obj:`str`): URL for specification
+        mime_type (:obj:`str`): Multipurpose Internet Mail Extensions (MIME) type. Also known as media type.
+        extension (:obj:`str`): file extension (e.g., `xml`)
+        sed_urn (:obj:`str): SED-ML URN
     """
 
-    def __init__(self, id=None, name=None, version=None, edam_id=None, url=None, spec_url=None):
+    def __init__(self, id=None, name=None, version=None, edam_id=None, url=None,
+                 spec_url=None, mime_type=None, extension=None, sed_urn=None):
         """
         Args:
             id (:obj:`str`, optional): name (e.g., SBML)
@@ -41,7 +45,10 @@ class Format(object):
             version (:obj:`str`, optional): version (e.g., L3V2)
             edam_id (:obj:`str`, optional): EDAM identifier
             url (:obj:`str`, optional): URL
-            spec_url (:obj:`str`): URL for specification
+            spec_url (:obj:`str`, optional): URL for specification
+            mime_type (:obj:`str`, optional): Multipurpose Internet Mail Extensions (MIME) type. Also known as media type.
+            extension (:obj:`str`, optional): file extension (e.g., `xml`)
+            sed_urn (:obj:`str`, optional): SED-ML URN
         """
         self.id = id
         self.name = name
@@ -49,6 +56,9 @@ class Format(object):
         self.edam_id = edam_id
         self.url = url
         self.spec_url = spec_url
+        self.mime_type = mime_type
+        self.extension = extension
+        self.sed_urn = sed_urn
 
     def __eq__(self, other):
         """ Determine if two formats are semantically equal
@@ -65,7 +75,10 @@ class Format(object):
             and self.version == other.version \
             and self.edam_id == other.edam_id \
             and self.url == other.url \
-            and self.spec_url == other.spec_url
+            and self.spec_url == other.spec_url \
+            and self.mime_type == other.mime_type \
+            and self.extension == other.extension \
+            and self.sed_urn == other.sed_urn
 
     def to_json(self):
         """ Export to JSON
@@ -80,6 +93,9 @@ class Format(object):
             'edamId': self.edam_id,
             'url': self.url,
             'specUrl': self.spec_url,
+            'mimeType': self.mime_type,
+            'extension': self.extension,
+            'sedUrn': self.sed_urn,
         }
 
     @classmethod
@@ -99,6 +115,9 @@ class Format(object):
             edam_id=val.get('edamId', None),
             url=val.get('url', None),
             spec_url=val.get('specUrl', None),
+            mime_type=val.get('mimeType', None),
+            extension=val.get('extension', None),
+            sed_urn=val.get('sedUrn', None),
         )
 
     @staticmethod
@@ -111,7 +130,8 @@ class Format(object):
         Returns:
             :obj:`tuple`
         """
-        return (format.id, format.name, format.version, format.edam_id, format.url, format.spec_url)
+        return (format.id, format.name, format.version, format.edam_id, format.url,
+                format.spec_url, format.mime_type, format.extension, format.sed_urn)
 
 
 class Identifier(object):

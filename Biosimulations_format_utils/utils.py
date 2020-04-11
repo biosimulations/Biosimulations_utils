@@ -9,7 +9,24 @@
 import math
 import pint
 
-__all__ = ['unit_registry', 'pretty_print_units']
+__all__ = ['get_enum_format_by_attr', 'unit_registry', 'pretty_print_units']
+
+
+def get_enum_format_by_attr(FormatEnum, attr_name, attr_val):
+    """ Get a biomodel format by its specification URL
+
+    Args:
+        FormatEnum (:obj:`type`): enumeration of formats (i.e. subclass of :obj:`enum.Enum`)
+        attr_name (:obj:`str`): attribute name
+        attr_val (:obj:`str`): attribute value
+
+    Returns:
+        :obj:`Format`: format
+    """
+    for format in FormatEnum.__members__.values():
+        if getattr(format.value, attr_name) == attr_val:
+            return format.value
+
 
 unit_registry = pint.UnitRegistry()
 

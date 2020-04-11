@@ -6,8 +6,8 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.data_model import Format, JournalReference, License, OntologyTerm, Person, RemoteFile, Type
-from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
+from Biosimulations_format_utils.data_model import JournalReference, License, OntologyTerm, Person, RemoteFile, Type
+from Biosimulations_format_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from Biosimulations_format_utils.biomodel.sbml import BiomodelingFramework
 from Biosimulations_format_utils.simulation.data_model import (
     Simulation, TimecourseSimulation, SteadyStateSimulation, Simulator, Algorithm, AlgorithmParameter, ParameterChange,
@@ -32,7 +32,7 @@ class SimulationDataModelTestCase(unittest.TestCase):
                 Person(first_name='Jane', middle_name='D', last_name='Doe'),
             ],
             license=License.cc0,
-            format=Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
+            format=BiomodelFormat.sbml.value,
             model=Biomodel(id='model_1', name='model 1'),
             model_parameter_changes=[
                 ParameterChange(parameter=BiomodelParameter(id='param_1', name='param 1', type=Type.float, value=3.5),
@@ -72,7 +72,7 @@ class SimulationDataModelTestCase(unittest.TestCase):
                 Person(first_name='Jane', middle_name='D', last_name='Doe'),
             ],
             license=License.cc0,
-            format=Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
+            format=BiomodelFormat.sbml.value,
             model=Biomodel(id='model_1', name='model 1'),
             model_parameter_changes=[
                 ParameterChange(parameter=BiomodelParameter(id='param_1', name='param 1', type=Type.float, value=3.5),
@@ -117,7 +117,7 @@ class SimulationDataModelTestCase(unittest.TestCase):
                         BiomodelingFramework.flux_balance.value,
                     ],
                     model_formats=[
-                        Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
+                        BiomodelFormat.sbml.value,
                     ],
                     parameters=[
                         AlgorithmParameter(id='param_1',
@@ -146,7 +146,7 @@ class SimulationDataModelTestCase(unittest.TestCase):
                 BiomodelingFramework.flux_balance.value,
             ],
             model_formats=[
-                Format(name='SBML', version='L3V2', edam_id='format_2585', url='http://sbml.org'),
+                BiomodelFormat.sbml.value,
             ],
             parameters=[
                 AlgorithmParameter(id='param_1',
@@ -182,7 +182,9 @@ class SimulationDataModelTestCase(unittest.TestCase):
                  ),
             ),
             (
-                (None, 'SBML', 'L3V2', 'format_2585', 'http://sbml.org', None),
+                ('SBML', 'Systems Biology Markup Language', None, 'format_2585', 'http://sbml.org/',
+                 'http://identifiers.org/combine.specifications/sbml', 'application/sbml+xml', 'xml',
+                 'urn:sedml:language:sbml'),
             ),
             (
                 ('param_1', 'param 1',

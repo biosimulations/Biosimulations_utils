@@ -6,11 +6,12 @@
 :License: MIT
 """
 
-from Biosimulations_format_utils.data_model import Format, Taxon, Type
+from Biosimulations_format_utils.data_model import Taxon, Type
 from Biosimulations_format_utils.biomodel import read_biomodel
 from Biosimulations_format_utils.biomodel.core import BiomodelIoError
 from Biosimulations_format_utils.biomodel.data_model import BiomodelFormat, BiomodelParameter, BiomodelVariable
 from Biosimulations_format_utils.biomodel.sbml import visualize_biomodel
+import copy
 import importlib
 import libsbml
 import os
@@ -33,12 +34,9 @@ class ReadSbmlBiomodelTestCase(unittest.TestCase):
         self.assertEqual(model.file.name, 'MODEL1204280027.sbml-L2V4.xml')
         self.assertEqual(model.file.type, 'application/sbml+xml')
 
-        self.assertEqual(model.format, Format(
-            name='SBML',
-            version='L2V4',
-            edam_id='format_2585',
-            url='http://sbml.org',
-        ))
+        format = copy.copy(BiomodelFormat.sbml.value)
+        format.version = 'L2V4'
+        self.assertEqual(model.format, format)
 
         self.assertEqual(model.framework.name, 'non-spatial continuous framework')
 

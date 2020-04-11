@@ -340,7 +340,7 @@ class BioModelsImporter(object):
                 with open(local_path, 'wb') as file:
                     file.write(self.get_model_file(id, file_metadata['name']))
 
-                model_sims, model_viz = read_simulation(local_path, BiomodelFormat.sbml, SimulationFormat.sedml)
+                model_sims, model_viz = read_simulation(local_path, SimulationFormat.sedml)
 
                 model_files = set([sim.model.file.name for sim in model_sims]).difference(set(['model']))
                 assert len(model_files) <= 1, 'Each simulation must use the same model'

@@ -401,7 +401,7 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedReport`: SED report
         """
         report_sed = doc_sed.createReport()
-        self._call_libsedml_method(doc_sed, report_sed, 'setId', id + '_results')
+        self._call_libsedml_method(doc_sed, report_sed, 'setId', id + '_report')
         if name:
             self._call_libsedml_method(doc_sed, report_sed, 'setName', name + ' results')
         return report_sed

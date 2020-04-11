@@ -1,1 +1,4 @@
+Biosimulations_tellurium
 inflect
+numpy
+pandas

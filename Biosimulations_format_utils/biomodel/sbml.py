@@ -154,6 +154,9 @@ class SbmlBiomodelReader(BiomodelReader):
         Returns:
             :obj:`Biomodel`: model with additional metadata
         """
+        model.id = model_sbml.getId() or None
+        model.name = model_sbml.getName() or None
+
         annot_xml = model_sbml.getAnnotation()
         desc_xml = self._get_xml_child_by_names(annot_xml, [
             XmlName('rdf', 'RDF'),

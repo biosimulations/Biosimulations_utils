@@ -41,7 +41,12 @@ class ApiClient(object):
         self._get_auth()
 
     def logout(self):
-        """ Logout of BioSimulations """
+        """ Logout of BioSimulations
+
+        Raises:
+            :obj:`requests.exceptions.HTTPError`: if the user was not logged out
+            :obj:`AssertionError`: if the user is not logged in or wasn't logged out
+        """
         assert self._auth, "Must be logged into BioSimulations"
 
         if self._dry_run:
@@ -66,7 +71,11 @@ class ApiClient(object):
             patch.stop()
 
     def _get_device_code(self):
-        """ Get a device code to authorize access to a BioSimulations account """
+        """ Get a device code to authorize access to a BioSimulations account
+
+        Raises:
+            :obj:`requests.exceptions.HTTPError`: if a device code was not generated
+        """
         if self._dry_run:
             patches = [
                 mock.patch('requests.post', return_value=mock.Mock(
@@ -102,7 +111,11 @@ class ApiClient(object):
                 patch.stop()
 
     def _get_auth(self):
-        """ Get the authorization header to access BioSimulations through a user's account """
+        """ Get the authorization header to access BioSimulations through a user's account
+
+        Raises:
+            :obj:`requests.exceptions.HTTPError`: if an authentication token was not generated
+        """
         if self._dry_run:
             patch = mock.patch('requests.post', return_value=mock.Mock(
                 raise_for_status=lambda: None,
@@ -131,6 +144,9 @@ class ApiClient(object):
                 information about model with id `model-id`)
             data (:obj:`object`): data for the route (e.g., `{name: 'model name', ...}` to
                 use 'put' `/models/model-id` to change the name of the model with id `model-id`)
+
+        Raises:
+            :obj:`requests.exceptions.HTTPError`: if the route was not successfully executed
         """
         if self._dry_run:
             route = 'post'

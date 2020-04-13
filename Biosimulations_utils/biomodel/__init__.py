@@ -21,6 +21,9 @@ def read_biomodel(filename, format):
 
     Returns:
         :obj:`dict`: model
+
+    Raises:
+        :obj:`NotImplementedError`: the format is not supported
     """
     if format == BiomodelFormat.sbml:
         Reader = SbmlBiomodelReader

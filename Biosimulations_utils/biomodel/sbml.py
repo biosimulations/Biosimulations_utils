@@ -121,6 +121,9 @@ class SbmlBiomodelReader(BiomodelReader):
 
         Returns:
             :obj:`libsbml.Model`: SBML-encoded model
+
+        Raises:
+            :obj:`ValueError`: file doesn't exist
         """
         if not os.path.isfile(filename):
             raise ValueError('{} does not exist'.format(filename))
@@ -153,6 +156,9 @@ class SbmlBiomodelReader(BiomodelReader):
 
         Returns:
             :obj:`Biomodel`: model with additional metadata
+
+        Raises:
+            :obj:`BiomodelIoError`: if the model uses an unsupported SBML package or any unsupported combination of packages
         """
         model.id = model_sbml.getId() or None
         model.name = model_sbml.getName() or None
@@ -244,6 +250,12 @@ class SbmlBiomodelReader(BiomodelReader):
 
         Returns:
             :obj:`list` of :obj:`BiomodelParameter`: information about parameters
+
+        Raises:
+            :obj:`AssertionError`: if any of the following conditions are met:
+
+                * A compartment, species, or reaction doesn't have an id
+                * The id of the active flux objective is the empty string
         """
         parameters = {}
 
@@ -495,6 +507,9 @@ class SbmlBiomodelReader(BiomodelReader):
 
         Returns:
             :obj:`BiomodelParameter`: information about the parameter
+
+        Raises:
+            :obj:`AssertionError`: the parameter doesn't have an id
         """
         assert param_sbml.getId()
 
@@ -564,6 +579,9 @@ class SbmlBiomodelReader(BiomodelReader):
 
         Returns:
             :obj:`list` of :obj:`BiomodelVariable`: information about the variables of the model
+
+        Raises:
+            :obj:`AssertionError`: there is no active objective or the active flux objective has no id
         """
         model.variables = vars = []
 
@@ -643,6 +661,9 @@ class SbmlBiomodelReader(BiomodelReader):
 
         Returns:
             :obj:`BiomodelVariable`: information about the species
+
+        Raises:
+            :obj:`AssertionError`: the species has no id
         """
         id = species_sbml.getId()
         assert id
@@ -667,8 +688,10 @@ class SbmlBiomodelReader(BiomodelReader):
             math_sbml (:obj:`libsbml.ASTNode`): mathematical expression
 
         Returns:
-            :obj:`Type`: type
-            :obj:`int` or :obj:`float`: value
+            :obj:`tuple`:
+
+                * :obj:`Type`: type
+                * :obj:`int` or :obj:`float`: value
         """
         math_type = math_sbml.getType()
         if math_type in [libsbml.AST_INTEGER]:
@@ -820,6 +843,9 @@ def visualize_biomodel(model_filename, img_filename, requests_session=None, remo
 
     Returns:
         :obj:`RemoteFile`: image
+
+    Raises:
+        :obj:`BiomodelIoError`: if an image could not be generated
     """
     if not os.path.isfile(img_filename):
         # read the model

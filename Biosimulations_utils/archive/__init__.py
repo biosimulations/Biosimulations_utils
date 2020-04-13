@@ -20,6 +20,9 @@ def write_archive(archive, in_dir, out_file, format=ArchiveFormat.combine):
         in_dir (:obj:`str`): directory which contains the files in the archive
         out_file (:obj:`str`): path to save archive
         format (:obj:`ArchiveFormat`, optional): archive format
+
+    Raises:
+        :obj:`NotImplementedError`: the format is not supported
     """
     if format == ArchiveFormat.combine:
         Writer = CombineArchiveWriter
@@ -37,7 +40,10 @@ def read_archive(in_file, out_dir, format=ArchiveFormat.combine):
         format (:obj:`ArchiveFormat`, optional): archive format
 
     Returns:
-        obj:`Archive`: description of archive
+        :obj:`Archive`: description of archive
+
+    Raises:
+        :obj:`NotImplementedError`: the format is not supported
     """
     if format == ArchiveFormat.combine:
         Reader = CombineArchiveReader

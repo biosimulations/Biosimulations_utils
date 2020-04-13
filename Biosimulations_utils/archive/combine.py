@@ -31,6 +31,10 @@ class CombineArchiveWriter(ArchiveWriter):
             archive (:obj:`Archive`): description of archive
             in_dir (:obj:`str`): directory which contains the files in the archive
             out_file (:obj:`str`): path to save archive
+
+        Raises:
+            :obj:`AssertionError`: if files could not be added to the archive or the archive could not be
+                saved
         """
         # instantiate archive
         archive_comb = libcombine.CombineArchive()
@@ -54,7 +58,7 @@ class CombineArchiveWriter(ArchiveWriter):
     def _write_metadata(self, obj, archive_comb, filename):
         """ Write metadata about an archive or a file in an archive
         Args:
-            obj (:obj:`Archive` or obj:`ArchiveFile`): archive or file in an archive
+            obj (:obj:`Archive` or :obj:`ArchiveFile`): archive or file in an archive
             archive_comb (:obj:`libcombine.CombineArchive`): archive
             filename (:obj:`str`): path of object with archive
         """
@@ -94,10 +98,13 @@ class CombineArchiveReader(ArchiveReader):
 
         Returns:
             :obj:`Archive`: description of archive
+
+        Raises:
+            :obj:`ArchiveIoError`: archive is invalid
         """
         archive_comb = libcombine.CombineArchive()
         if not archive_comb.initializeFromArchive(in_file):
-            raise ArchiveIoError("Invalid OMEX archive")
+            raise ArchiveIoError("Invalid COMBINE archive")
 
         # instantiate archive
         archive = Archive(format=ArchiveFormat.combine.value)

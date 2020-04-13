@@ -73,6 +73,9 @@ class SbmlSedmlCombineSimulatorValidator(SimulatorValidator):
         Args:
             model_filename (:obj:`str`): path to example model
             dockerhub_id (:obj:`str`): DockerHub id of simulator
+
+        Raises:
+            :obj:`AssertionError`: simulator isn't correctly processing model parameter changes
         """
         # simulate without parameter changes
         model_1 = self._gen_example_model(model_filename)
@@ -208,8 +211,10 @@ class SbmlSedmlCombineSimulatorValidator(SimulatorValidator):
             simulation (:obj:`Simulation`): simulation of model
 
         Returns:
-            :obj:`Archive`: properties of the archive
-            :obj:`str`: path to archive
+            :obj:`tuple`:
+
+                * :obj:`Archive`: properties of the archive
+                * :obj:`str`: path to archive
         """
         fid, archive_filename = tempfile.mkstemp(suffix='.omex')
         os.close(fid)
@@ -254,6 +259,9 @@ class SbmlSedmlCombineSimulatorValidator(SimulatorValidator):
             model (:obj:`Biomodel`): model
             simulation (:obj:`Simulation`): simulation
             out_dir (:obj:`str`): directory which contains the simulation results
+
+        Raises:
+            :obj:`AssertionError`: simulator did not generate the specified outputs
         """
         assert os.listdir(out_dir) == [simulation.id]
         assert os.listdir(os.path.join(out_dir, simulation.id)) == [simulation.id + '.csv']

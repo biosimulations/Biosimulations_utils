@@ -75,10 +75,12 @@ class BioModelsImporter(object):
         """ Retrieve models from BioModels and submit to BioSimulations
 
         Returns:
-            :obj:`list` of :obj:`Biomodel`: models
-            :obj:`list` of :obj:`Simulation`: simulations
-            :obj:`list` of :obj:`Visualization`: visualizations
-            :obj:`dict`: statistics about the models
+            :obj:`tuple`:
+
+                * :obj:`list` of :obj:`Biomodel`: models
+                * :obj:`list` of :obj:`Simulation`: simulations
+                * :obj:`list` of :obj:`Visualization`: visualizations
+                * :obj:`dict`: statistics about the models
         """
         with warnings.catch_warnings(record=True) as caught_warnings:
             warnings.simplefilter('ignore')
@@ -101,9 +103,11 @@ class BioModelsImporter(object):
         """ Get models from BioModels
 
         Returns:
-            :obj:`list` of :obj:`Biomodel`: list of metadata about each model
-            :obj:`list` of :obj:`Simulation`: list of metadata about each simulation
-            :obj:`list` of :obj:`Visualization`: list of metadata about each visualization
+            :obj:`tuple`:
+
+                * :obj:`list` of :obj:`Biomodel`: list of metadata about each model
+                * :obj:`list` of :obj:`Simulation`: list of metadata about each simulation
+                * :obj:`list` of :obj:`Visualization`: list of metadata about each visualization
         """
         models = []
         sims = []
@@ -172,6 +176,9 @@ class BioModelsImporter(object):
 
         Returns:
             :obj:`dict`: batch of models
+
+        Raises:
+            :obj:`requests.exceptions.HTTPError`: if the batch could not be retrieved
         """
         response = self._requests_session.get(
             self.BIOMODELS_ENDPOINT + '/search',
@@ -194,9 +201,15 @@ class BioModelsImporter(object):
             id (:obj:`str`): model id
 
         Returns:
-            :obj:`Biomodel`: information about model
-            :obj:`list` of :obj:`Simulation`: information about simulations
-            :obj:`list` of :obj:`Visualization`: information about visualizations
+            :obj:`tuple`:
+
+                :obj:`Biomodel`: information about model
+                :obj:`list` of :obj:`Simulation`: information about simulations
+                :obj:`list` of :obj:`Visualization`: information about visualizations
+
+        Raises:
+            :obj:`requests.exceptions.HTTPError`: if the model could not be retrieved
+            :obj:`AssertionError`: if the SED document references multiple models
         """
         metadata = self.get_model_metadata(id)
         files_metadata = self.get_model_files_metadata(id)
@@ -387,6 +400,9 @@ class BioModelsImporter(object):
 
         Returns:
             :obj:`dict`: metadata about the files of a model
+
+        Raises:
+            :obj:`requests.exceptions.HTTPError`: if the model could not be retrieved
         """
         response = self._requests_session.get(
             self.BIOMODELS_ENDPOINT + '/' + id,
@@ -404,6 +420,9 @@ class BioModelsImporter(object):
 
         Returns:
             :obj:`dict`: metadata about the files of a model
+
+        Raises:
+            :obj:`requests.exceptions.HTTPError`: if the file metadata for the model could not be retrieved
         """
         response = self._requests_session.get(
             self.BIOMODELS_ENDPOINT + '/model/files/' + id,
@@ -414,6 +433,15 @@ class BioModelsImporter(object):
         return response.json()
 
     def get_model_file(self, id, filename):
+        """ Get a model file
+
+        Args:
+            id (:obj:`str`): model id
+            filename (:obj:`str`): file name
+
+        Raises:
+            :obj:`requests.exceptions.HTTPError`: if the file could not be retrieved
+        """
         response = self._requests_session.get(
             self.BIOMODELS_ENDPOINT + '/model/download/' + id,
             params={
@@ -433,6 +461,9 @@ class BioModelsImporter(object):
 
         Returns:
             :obj:`RemoteFile`: image
+
+        Raises:
+            :obj:`AssertionError`: if the extension of the model file is not `xml`
         """
         model_basename = model.id + '.xml'
         img_basename = model.id + '.png'
@@ -494,10 +525,12 @@ class BioModelsImporter(object):
         """ Read models, simulations, and visualizations from JSON files
 
         Returns:
-            :obj:`list` of :obj:`Biomodel`: models
-            :obj:`list` of :obj:`Simulation`: simulations
-            :obj:`list` of :obj:`Visualization`: visualizations
-            :obj:`dict`: stats about the models
+            :obj:`tuple`:
+
+                * :obj:`list` of :obj:`Biomodel`: models
+                * :obj:`list` of :obj:`Simulation`: simulations
+                * :obj:`list` of :obj:`Visualization`: visualizations
+                * :obj:`dict`: stats about the models
         """
         filename = os.path.join(self._cache_dir, 'biomodels.models.json')
         with open(filename, 'r') as file:

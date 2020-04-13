@@ -33,7 +33,7 @@ class Format(object):
         spec_url (:obj:`str`): URL for specification
         mime_type (:obj:`str`): Multipurpose Internet Mail Extensions (MIME) type. Also known as media type.
         extension (:obj:`str`): file extension (e.g., `xml`)
-        sed_urn (:obj:`str): SED-ML URN
+        sed_urn (:obj:`str`): SED-ML URN
     """
 
     def __init__(self, id=None, name=None, version=None, edam_id=None, url=None,

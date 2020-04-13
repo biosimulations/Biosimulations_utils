@@ -29,7 +29,7 @@ class ExecTestCase(unittest.TestCase):
         shutil.rmtree(self.dir_name)
 
     @unittest.skipIf(os.getenv('CI', '0') in ['1', 'true'], 'Docker not setup in CI')
-    def test(self):        
+    def test(self):
         validator = SbmlSedmlCombineSimulatorValidator()
         validator.run('crbm/biosimulations_tellurium')
 

@@ -46,6 +46,9 @@ class SedMlSimulationWriter(SimulationWriter):
 
         Returns:
             :obj:`libsedml.SedDocument`: SED document
+
+        Raises:
+            :obj:`ValueError`: the SED-ML version of the simulation and the desired output version are different
         """
         if sim.format.id != 'SED-ML' or sim.format.version != 'L{}V{}'.format(level, version):
             raise ValueError('Format must be SED-ML L{}V{}'.format(level, version))
@@ -587,6 +590,9 @@ class SedMlSimulationWriter(SimulationWriter):
 
         Returns:
             :obj:`int`: libsedml return code
+
+        Raises:
+            :obj:`ValueError`: if there was a libSED-ML error
         """
         method = getattr(obj_sed, method_name)
         return_val = method(*args, **kwargs)
@@ -603,8 +609,17 @@ class SedMlSimulationReader(SimulationReader):
             filename (:obj:`str`): path to SED-ML document that describes a simulation experiment
 
         Returns:
-            :obj:`list` of :obj:`Simulation`: simulations
-            :obj:`Visualization`: visualization
+            :obj:`tuple`:
+
+                * :obj:`list` of :obj:`Simulation`: simulations
+                * :obj:`Visualization`: visualization
+
+        Raises:
+            :obj:`SimulationIoError`: if any of the following conditions are met
+
+                * The SED document contains changes other than instances of SedChangeAttribute
+                * The models or simulations don't have unique ids
+                * A model or simulation references cannot be resolved
         """
         doc_sed = libsedml.readSedMLFromFile(filename)
         if doc_sed.getErrorLog().getNumFailsWithSeverity(libsedml.LIBSEDML_SEV_ERROR):
@@ -913,6 +928,9 @@ class SedMlSimulationReader(SimulationReader):
 
         Returns
             :obj:`Simulation`: simulation
+
+        Raises:
+            :obj:`SimulationIoError`: if the simulation type is not supported
         """
         if isinstance(sim_sed, libsedml.SedUniformTimeCourse):
             return TimecourseSimulation()
@@ -928,13 +946,17 @@ class SedMlSimulationReader(SimulationReader):
             sim_sed (:obj:`libsedml.SedSimulation`): SED simulation
             sim_filename (:ob:`str`): path to SED-ML file in which SED simulation was defined
             sim (:obj:`Simulation`): simulation
+
+        Raises:
+            :obj:`SimulationIoError`: the output start time is less than the start time
+            :obj:`AssertionError`: a KiSAO term uses a different ontology or doesn't have an id
         """
         # time course
         if isinstance(sim_sed, libsedml.SedUniformTimeCourse):
             sim.start_time = float(sim_sed.getInitialTime())
             sim.output_start_time = float(sim_sed.getOutputStartTime())
             assert_exception(sim.output_start_time >= sim.start_time,
-                             SimulationIoError("Output time must in {} be at least the start time".format(sim_filename)))
+                             SimulationIoError("Output start time must in {} be at least the start time".format(sim_filename)))
             sim.end_time = float(sim_sed.getOutputEndTime())
             sim.num_time_points = int(sim_sed.getNumberOfPoints())
 
@@ -1006,7 +1028,7 @@ class SedMlSimulationReader(SimulationReader):
             change_sed (:obj:`libsedml.SedChangeAttribute`): SED change attribute
 
         Returns:
-            obj:`ParameterChange`: model parameter change
+            :obj:`ParameterChange`: model parameter change
         """
         props = self._get_obj_annotation(change_sed)
         param_id = None

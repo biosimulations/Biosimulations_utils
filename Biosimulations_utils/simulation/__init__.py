@@ -21,6 +21,9 @@ def write_simulation(sim, filename, format=SimulationFormat.sedml, **format_opts
         filename (:obj:`str`): Path to save simulation experiment in SED-ML format
         format (:obj:`SimulationFormat`, optional): simulation experiment format
         format_opts (:obj:`dict`, optional): options to the simulation experiment format (e.g., level, version)
+
+    Raises:
+        :obj:`NotImplementedError`: the format is not supported
     """
     if format == SimulationFormat.sedml:
         Writer = SedMlSimulationWriter
@@ -37,8 +40,13 @@ def read_simulation(filename, format=SimulationFormat.sedml):
         format (:obj:`SimulationFormat`, optional): simulation experiment format
 
     Returns:
-        :obj:`list` of :obj:`Simulation`: simulations
-        :obj:`Visualization`: visualization
+        :obj:`tuple`
+
+            * :obj:`list` of :obj:`Simulation`: simulations
+            * :obj:`Visualization`: visualization
+
+    Raises:
+        :obj:`NotImplementedError`: the format is not supported
     """
     if format == SimulationFormat.sedml:
         Reader = SedMlSimulationReader

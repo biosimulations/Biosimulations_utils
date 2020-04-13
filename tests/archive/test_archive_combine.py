@@ -79,7 +79,7 @@ class OmexArchiveTestCase(unittest.TestCase):
         with self.assertRaisesRegex(NotImplementedError, "is not supported"):
             read_archive(archive_filename, archive_dir2, format=mock.Mock(name='None'))
 
-        with self.assertRaisesRegex(ArchiveIoError, "Invalid OMEX archive"):
+        with self.assertRaisesRegex(ArchiveIoError, "Invalid COMBINE archive"):
             read_archive('non-existant-file', archive_dir2)
 
         # test multiple update dates

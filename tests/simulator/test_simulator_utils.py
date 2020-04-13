@@ -6,13 +6,14 @@
 :License: MIT
 """
 
-from Biosimulations_utils.archive.exec import gen_archive_for_sim, exec_simulations_in_archive
+from Biosimulations_utils.archive.exec import gen_archive_for_sim
 from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person
 from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import BiomodelFormat, BiomodelParameter
 from Biosimulations_utils.simulation import write_simulation
 from Biosimulations_utils.simulation.data_model import (
     TimecourseSimulation, Algorithm, AlgorithmParameter, ParameterChange, SimulationFormat)
+from Biosimulations_utils.simulator.utils import exec_simulations_in_archive
 import copy
 import datetime
 import dateutil.tz

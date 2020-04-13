@@ -62,6 +62,8 @@ class WriteSedMlTestCase(unittest.TestCase):
             set(v.id for v in sim_2.model.variables),
             set(v.id for v in sim.model.variables))
         self.assertEqual(sim_2.model.file.name, sim.model.file.name)
+        self.assertEqual(sim_2.algorithm.id, sim.algorithm.id)
+        self.assertEqual(sim_2.algorithm, sim.algorithm)
         self.assertEqual(sim_2.created, sim.created)
         self.assertEqual(sim_2.updated, sim.updated)
         self.assertEqual(sim_2, sim)
@@ -207,10 +209,25 @@ class WriteSedMlTestCase(unittest.TestCase):
 
     def test_read_visualizations_with_inconsistent_x_axes(self):
         filename = 'tests/fixtures/BIOMD0000000297-with-invalid-x-axis.sedml'
-        with self.assertWarnsRegex(SimulationIoWarning, 'Curves must have the same X axis'):
+        with self.assertWarnsRegex(SimulationIoWarning, 'must have the same X axis'):
             read_simulation(filename, SimulationFormat.sedml)
 
     def test_read_visualizations_with_inconsistent_y_axes(self):
         filename = 'tests/fixtures/BIOMD0000000297-with-invalid-y-axis.sedml'
-        with self.assertWarnsRegex(SimulationIoWarning, 'Curves must have the same Y axis'):
+        with self.assertWarnsRegex(SimulationIoWarning, 'must have the same Y axis'):
             read_simulation(filename, SimulationFormat.sedml)
+
+    def test_read_visualizations_with_duplicate_task_ids(self):
+        filename = 'tests/fixtures/BIOMD0000000297-with-duplicate-task-ids.sedml'
+        with self.assertWarnsRegex(SimulationIoWarning, 'must have unique ids'):
+            read_simulation(filename, SimulationFormat.sedml)
+
+    def test_read_visualizations_with_ref_to_non_existant_task(self):
+        filename = 'tests/fixtures/BIOMD0000000297-with-ref-to-non-existant-task.sedml'
+        with self.assertWarnsRegex(SimulationIoWarning, 'Unable to interpret curve'):
+            read_simulation(filename, SimulationFormat.sedml)
+
+    def test_read_visualizations_with_unknown_model_language(self):
+        filename = 'tests/fixtures/BIOMD0000000297-with-unknown-model-language.sedml'
+        sims, _ = read_simulation(filename, SimulationFormat.sedml)
+        self.assertEqual(sims[0].model.format.sed_urn, 'urn:sedml:language:unknown_language')

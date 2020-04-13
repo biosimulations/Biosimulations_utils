@@ -39,6 +39,7 @@ class ExecTestCase(unittest.TestCase):
         simulation = TimecourseSimulation(
             id='simulation_1',
             name='simulation 1',
+            description='Description of simulation 1',
             model=model,
             model_parameter_changes=[
                 ParameterChange(parameter=BiomodelParameter(target=param.target), value=0.)

@@ -305,18 +305,25 @@ class SedMlSimulationWriter(SimulationWriter):
         alg_sed = sim_sed.createAlgorithm()
         if algorithm.kisao_term:
             self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.kisao_term.ontology + ':' + algorithm.kisao_term.id)
+
+        annotations_xml = []
+
         if algorithm.id:
-            self._add_annotation_to_obj([XmlNode(
+            annotations_xml.append(XmlNode(
                 prefix='dc',
                 name='title',
                 children=algorithm.id,
-            )], doc_sed, alg_sed, set(['dc']))
+            ))
+
         if algorithm.name:
-            self._add_annotation_to_obj([XmlNode(
+            annotations_xml.append(XmlNode(
                 prefix='dc',
                 name='description',
                 children=algorithm.name,
-            )], doc_sed, alg_sed, set(['dc']))
+            ))
+
+        if annotations_xml:
+            self._add_annotation_to_obj(annotations_xml, doc_sed, alg_sed, set(['dc']))
 
         return alg_sed
 
@@ -352,18 +359,25 @@ class SedMlSimulationWriter(SimulationWriter):
         if change.parameter.kisao_term:
             self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID',
                                        change.parameter.kisao_term.ontology + ':' + change.parameter.kisao_term.id)
+        annotations_xml = []
+
         if change.parameter.id:
-            self._add_annotation_to_obj([XmlNode(
+            annotations_xml.append(XmlNode(
                 prefix='dc',
                 name='title',
                 children=change.parameter.id,
-            )], doc_sed, change_sed, set(['dc']))
+            ))
+
         if change.parameter.name:
-            self._add_annotation_to_obj([XmlNode(
+            annotations_xml.append(XmlNode(
                 prefix='dc',
                 name='description',
                 children=change.parameter.name,
-            )], doc_sed, change_sed, set(['dc']))
+            ))
+
+        if annotations_xml:
+            self._add_annotation_to_obj(annotations_xml, doc_sed, change_sed, set(['dc']))
+
         self._call_libsedml_method(doc_sed, change_sed, 'setValue', str(change.value))
         return change_sed
 
@@ -574,8 +588,8 @@ class SedMlSimulationReader(SimulationReader):
         for i_model, model_sed in enumerate(doc_sed.getListOfModels()):
             for change_sed in model_sed.getListOfChanges():
                 assert_exception(isinstance(change_sed, libsedml.SedChangeAttribute),
-                                 SimulationIoError("Changes must be attribute changes"))
-            assert_exception(model_sed.getId() not in models_sed, SimulationIoError("Models must have unique ids"))
+                                 SimulationIoError("Changes in {} must be attribute changes".format(filename)))
+            assert_exception(model_sed.getId() not in models_sed, SimulationIoError("Models in {} must have unique ids".format(filename)))
             models_sed[model_sed.getId()] = model_sed
 
             model = Simulation()
@@ -591,11 +605,11 @@ class SedMlSimulationReader(SimulationReader):
         default_sim_sed = None
         default_sim = None
         for sim_sed in doc_sed.getListOfSimulations():
-            assert_exception(sim_sed.getId() not in sims_sed, SimulationIoError("Simulations must have unique ids"))
+            assert_exception(sim_sed.getId() not in sims_sed, SimulationIoError("Simulations in {} must have unique ids".format(filename)))
             sims_sed[sim_sed.getId()] = sim_sed
 
             sim = self._create_sim(sim_sed)
-            self._read_sim(sim_sed, sim)
+            self._read_sim(sim_sed, filename, sim)
             if i_model == 0:
                 default_sim_sed = sim_sed
                 default_sim = sim
@@ -623,14 +637,16 @@ class SedMlSimulationReader(SimulationReader):
 
             # model
             model_sed = models_sed.get(task_sed.getModelReference(), default_model_sed)
-            assert_exception(model_sed is not None, SimulationIoError("Model cannot be determined"))
+            assert_exception(model_sed is not None, SimulationIoError("Model {} in {} cannot be determined".format(
+                task_sed.getModelReference(), filename)))
             self._read_model(model_sed, sim)
             self._read_model_variables(task_sed, sim)
 
             # simulation
             sim_sed = sims_sed.get(task_sed.getSimulationReference(), default_sim_sed)
-            assert_exception(sim_sed is not None, SimulationIoError("Simulation cannot be determined"))
-            self._read_sim(sim_sed, sim)
+            assert_exception(sim_sed is not None, SimulationIoError("Simulation {} in {} cannot be determined".format(
+                task_sed.getSimulationReference(), filename)))
+            self._read_sim(sim_sed, filename, sim)
 
             # append simulation to list of simulations
             sims.append(sim)
@@ -686,15 +702,10 @@ class SedMlSimulationReader(SimulationReader):
                     warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimulationIoWarning)
                     continue
 
-                if x_data_gen_id in time_data_gen_ids:
-                    x_var = BiomodelVariable(id='time', target='urn:sedml:symbol:time')
-                else:
-                    x_var = next(var for var in x_sim.model.variables if var.target == data_gen_id_to_var_target[x_data_gen_id])
-
-                if y_data_gen_id in time_data_gen_ids:
-                    y_var = BiomodelVariable(id='time', target='urn:sedml:symbol:time')
-                else:
-                    y_var = next(var for var in y_sim.model.variables if var.target == data_gen_id_to_var_target[y_data_gen_id])
+                x_var = self._get_model_var_by_data_gen_id(x_data_gen_id, data_gen_id_to_var_target,
+                                                           time_data_gen_ids, x_sim.model.variables)
+                y_var = self._get_model_var_by_data_gen_id(y_data_gen_id, data_gen_id_to_var_target,
+                                                           time_data_gen_ids, y_sim.model.variables)
 
                 x_sim_results.append(SimulationResult(simulation=x_sim, variable=x_var))
                 y_sim_results.append(SimulationResult(simulation=y_sim, variable=y_var))
@@ -703,11 +714,11 @@ class SedMlSimulationReader(SimulationReader):
                 x_sim_results = x_sim_results[slice(0, 1)]
             elif not all([sim_res.variable.target == 'urn:sedml:symbol:time' for sim_res in x_sim_results]) or \
                     len(set([curve_sed.getLogX() for curve_sed in output_sed.getListOfCurves()])) > 1:
-                warnings.warn('Curves must have the same X axis', SimulationIoWarning)
+                warnings.warn('Curves of {} in {} must have the same X axis'.format(output_sed.getId(), filename), SimulationIoWarning)
                 continue
 
             if len(set([curve_sed.getLogY() for curve_sed in output_sed.getListOfCurves()])) > 1:
-                warnings.warn('Curves must have the same Y axis', SimulationIoWarning)
+                warnings.warn('Curves if {} in {} must have the same Y axis'.format(output_sed.getId(), filename), SimulationIoWarning)
                 continue
 
             if not x_sim_results:
@@ -885,11 +896,12 @@ class SedMlSimulationReader(SimulationReader):
         else:
             raise SimulationIoError('Unsupported simulation type: {}'.format(sim_sed.__class__.__name__))
 
-    def _read_sim(self, sim_sed, sim):
+    def _read_sim(self, sim_sed, sim_filename, sim):
         """ Read a SED simulation
 
         Args:
             sim_sed (:obj:`libsedml.SedSimulation`): SED simulation
+            sim_filename (:ob:`str`): path to SED-ML file in which SED simulation was defined
             sim (:obj:`Simulation`): simulation
         """
         # time course
@@ -897,7 +909,7 @@ class SedMlSimulationReader(SimulationReader):
             sim.start_time = float(sim_sed.getInitialTime())
             sim.output_start_time = float(sim_sed.getOutputStartTime())
             assert_exception(sim.output_start_time >= sim.start_time,
-                             SimulationIoError("Output time must be at least the start time"))
+                             SimulationIoError("Output time must in {} be at least the start time".format(sim_filename)))
             sim.end_time = float(sim_sed.getOutputEndTime())
             sim.num_time_points = int(sim_sed.getNumberOfPoints())
 
@@ -922,7 +934,7 @@ class SedMlSimulationReader(SimulationReader):
                 id=kisao_term_id,
             )
         else:
-            kisao_term = None
+            kisao_term = None  # pragma: no cover # unreachable because SED requires kisaoID to be set
 
         sim.algorithm = Algorithm(
             id=alg_id,
@@ -952,7 +964,7 @@ class SedMlSimulationReader(SimulationReader):
                     id=kisao_term_id,
                 )
             else:
-                kisao_term = None
+                kisao_term = None  # pragma: no cover # unreachable because SED requires kisaoID to be set
             sim.algorithm_parameter_changes.append(ParameterChange(
                 parameter=AlgorithmParameter(
                     id=param_id,
@@ -989,6 +1001,23 @@ class SedMlSimulationReader(SimulationReader):
             ),
             value=float(change_sed.getNewValue())
         )
+
+    def _get_model_var_by_data_gen_id(self, data_gen_id, data_gen_id_to_var_target, time_data_gen_ids, variables):
+        """ Get a model variable by the data generator which records it
+
+        Args:
+            data_gen_id (:obj:`str`): id of data generator
+            data_gen_id_to_var_target (:obj:`dict`): dictionary that maps the ids of data generators to the targets of model variables
+            time_data_gen_ids (:obj:`list` of :obj:`str`): list of ids of data generators that represent time
+            variables (:obj:`list` of :obj:`BiomodelVariable`): model variables
+
+        Returns:
+            :obj:`BiomodelVariable`: variable
+        """
+        if data_gen_id in time_data_gen_ids:
+            return BiomodelVariable(id='time', target='urn:sedml:symbol:time')
+        else:
+            return next(var for var in variables if var.target == data_gen_id_to_var_target[data_gen_id])
 
     def _get_obj_annotation(self, obj_sed):
         """ Get the annotated properies of a SED object

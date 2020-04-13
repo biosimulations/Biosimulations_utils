@@ -14,7 +14,10 @@
     }
   ],
   "description": "Description of simulation 1",
-  "tags": ["tag-1", "tag-2"],
+  "tags": [
+    "tag-1",
+    "tag-2"
+  ],
   "references": [
     {
       "authors": "Doe JC & Doe JD",
@@ -79,16 +82,17 @@
       "value": 2.1
     }
   ],
-  "startTime": 0.0,
-  "outputStartTime": 1.0,
-  "endTime": 10.0,
+  "startTime": 0,
+  "outputStartTime": 1,
+  "endTime": 10,
   "numTimePoints": 100,
   "algorithm": {
     "kisaoTerm": {
-      "ontology": "KISAO", 
+      "ontology": "KISAO",
       "id": "0000019"
     },
-    "name": "CVODE"
+    "id": "CVODE",
+    "name": "C-language Variable-coefficient Ordinary Differential Equation solver"
   },
   "algorithmParameterChanges": [
     {
@@ -97,6 +101,7 @@
           "ontology": "KISAO",
           "id": "0000211"
         },
+        "id": "abs_tol",
         "name": "absolute tolerance"
       },
       "value": 3.3
@@ -104,9 +109,10 @@
     {
       "parameter": {
         "kisaoTerm": {
-          "ontology": "KISAO", 
+          "ontology": "KISAO",
           "id": "0000209"
         },
+        "id": "rel_tol",
         "name": "relative tolerance"
       },
       "value": 4.4

@@ -425,8 +425,17 @@ class VizBiomodelTestCase(unittest.TestCase):
         self.assertEqual(image.name, 'model.png')
         self.assertEqual(image.type, 'image/png')
         self.assertGreater(image.size, 0)
+        self.assertTrue(os.path.isfile(img_filename))
 
     def test_visualize_model_with_bad_units(self):
         model_filename = 'tests/fixtures/BIOMD0000000075.xml'
         img_filename = os.path.join(self.dirname, 'model.png')
         visualize_biomodel(model_filename, img_filename)
+        self.assertTrue(os.path.isfile(img_filename))
+
+    def test_visualize_model_with_layout(self):
+        model_filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'
+        img_filename = os.path.join(self.dirname, 'model.png')
+        with self.assertRaisesRegex(BiomodelIoError, 'Unable to generate image'):
+            visualize_biomodel(model_filename, img_filename, remove_layouts=False)
+        visualize_biomodel(model_filename, img_filename, remove_layouts=True)

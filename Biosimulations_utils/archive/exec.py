@@ -138,12 +138,11 @@ def exec_simulations_in_archive(archive_filename, task_executer, out_dir, archiv
 
         # extract simulations (e.g., SED tasks) from file
         simulations, _ = read_simulation(os.path.join(archive_tmp_dir, file.filename), format=format)
-        if not simulations:
-            continue
 
         # create directory for outputs of simulations
-        out_subdir = os.path.join(out_dir, os.path.splitext(file.filename)[0])
-        os.makedirs(out_subdir)
+        if simulations:
+            out_subdir = os.path.join(out_dir, os.path.splitext(file.filename)[0])
+            os.makedirs(out_subdir)
 
         # execute simulations
         working_dir = os.path.join(archive_tmp_dir, os.path.dirname(file.filename))

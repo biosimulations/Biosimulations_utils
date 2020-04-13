@@ -25,7 +25,12 @@ class BioModelsImporterTestCase(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dirname)
 
-    def test(self):
+    def test_import(self):
+        importer = biomodels.BioModelsImporter(_max_models=3, _cache_dir=self.dirname, _dry_run=True)
+        models, sims, vizs, stats = importer.run()
+        self.assertEqual(len(models), 3)
+
+    def test_import_diverse_set_of_models(self):
         importer = biomodels.BioModelsImporter(_max_models=6, _cache_dir=self.dirname, _dry_run=True)
         return_value = {
             'matches': 925,

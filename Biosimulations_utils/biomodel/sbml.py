@@ -346,19 +346,11 @@ class SbmlBiomodelReader(BiomodelReader):
         for init_assignment_sbml in model_sbml.getListOfInitialAssignments():
             symbol_id = init_assignment_sbml.getSymbol()
             symbol_sbml = model_sbml.getElementBySId(symbol_id)
-            math_sbml = init_assignment_sbml.getMath()
-            math_type = math_sbml.getType()
-            if math_type in [libsbml.AST_INTEGER]:
-                type = Type.integer
-                init_value = math_sbml.getInteger()
-            elif math_type in [libsbml.AST_REAL, libsbml.AST_REAL_E]:
-                type = Type.float
-                init_value = math_sbml.getReal()
-            elif math_type in [libsbml.AST_RATIONAL]:
-                # todo: support rational numbers
+
+            type, init_value = self._read_constant_from_math(init_assignment_sbml.getMath())
+            if not type:
                 continue
-            else:
-                continue
+
             parameters["init_assignment_{}".format(symbol_id)] = BiomodelParameter(
                 target='/' + '/'.join([
                     "sbml:sbml",
@@ -385,19 +377,11 @@ class SbmlBiomodelReader(BiomodelReader):
             if rule_sbml.isScalar():
                 var_id = rule_sbml.getVariable()
                 var_sbml = model_sbml.getElementBySId(var_id)
-                math_sbml = rule_sbml.getMath()
-                math_type = math_sbml.getType()
-                if math_type in [libsbml.AST_INTEGER]:
-                    type = Type.integer
-                    value = math_sbml.getInteger()
-                elif math_type in [libsbml.AST_REAL, libsbml.AST_REAL_E]:
-                    type = Type.float
-                    value = math_sbml.getReal()
-                elif math_type in [libsbml.AST_RATIONAL]:
-                    # todo: support rational numbers
+
+                type, value = self._read_constant_from_math(rule_sbml.getMath())
+                if not type:
                     continue
-                else:
-                    continue
+
                 parameters["assignment_{}".format(var_id)] = BiomodelParameter(
                     target='/' + '/'.join([
                         "sbml:sbml",
@@ -676,6 +660,31 @@ class SbmlBiomodelReader(BiomodelReader):
 
         return var
 
+    def _read_constant_from_math(self, math_sbml):
+        """Read the constant value of a mathematical expression
+
+        Args:
+            math_sbml (:obj:`libsbml.ASTNode`): mathematical expression
+
+        Returns:
+            :obj:`Type`: type
+            :obj:`int` or :obj:`float`: value
+        """
+        math_type = math_sbml.getType()
+        if math_type in [libsbml.AST_INTEGER]:
+            type = Type.integer
+            value = math_sbml.getInteger()
+            return (type, value)
+        elif math_type in [libsbml.AST_REAL, libsbml.AST_REAL_E]:
+            type = Type.float
+            value = math_sbml.getReal()
+            return (type, value)
+        elif math_type in [libsbml.AST_RATIONAL]:
+            # todo: support rational numbers
+            return (None, None)
+        else:
+            return (None, None)
+
     def _get_compartment(self, model_sbml, comp_id):
         """ Get a compartment
 
@@ -799,13 +808,15 @@ class SbmlBiomodelReader(BiomodelReader):
 MINERVA_ENDPOINT = 'https://minerva-dev.lcsb.uni.lu/minerva/api/convert/image/{}:{}'
 
 
-def visualize_biomodel(model_filename, img_filename, requests_session=None):
+def visualize_biomodel(model_filename, img_filename, requests_session=None, remove_layouts=True, remove_units=True):
     """ Use `MINERVA <https://minerva.pages.uni.lu/>`_ to visualize a model and save the visualization to a PNG file.
 
     Args:
         model_filename (:obj:`str`): path to the SBML-encoded model
         img_filename (:obj:`str`): path to save the visualization of the model
         requests_session (:obj:`requests_cache.core.CachedSession`, optional): cached requests session
+        remove_layouts (:obj:`bool`, optional): if :obj:`True`, remove layouts from model
+        remove_units (:obj:`bool`, optional): if :obj:`True`, remove units from model
 
     Returns:
         :obj:`RemoteFile`: image
@@ -816,20 +827,22 @@ def visualize_biomodel(model_filename, img_filename, requests_session=None):
         model = doc.getModel()
 
         # remove layouts from the model
-        plugin = model.getPlugin('layout')
-        if plugin:
-            for i_layout in range(plugin.getNumLayouts()):
-                plugin.removeLayout(i_layout)
+        if remove_layouts:
+            plugin = model.getPlugin('layout')
+            if plugin:
+                for i_layout in range(plugin.getNumLayouts()):
+                    plugin.removeLayout(i_layout)
 
         # remove units from model
-        for unit_def in model.getListOfUnitDefinitions():
-            for unit in range(unit_def.getNumUnits()):
-                unit_def.removeUnit(0)
-            unit = unit_def.createUnit()
-            unit.setExponent(0)
-            unit.setKind(libsbml.UNIT_KIND_DIMENSIONLESS)
-            unit.setMultiplier(1)
-            unit.setScale(0)
+        if remove_units:
+            for unit_def in model.getListOfUnitDefinitions():
+                for unit in range(unit_def.getNumUnits()):
+                    unit_def.removeUnit(0)
+                unit = unit_def.createUnit()
+                unit.setExponent(0)
+                unit.setKind(libsbml.UNIT_KIND_DIMENSIONLESS)
+                unit.setMultiplier(1)
+                unit.setScale(0)
 
         # encode corrected model to XML
         corrected_model = libsbml.writeSBMLToString(doc)

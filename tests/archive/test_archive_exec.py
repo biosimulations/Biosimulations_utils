@@ -93,8 +93,8 @@ class ExecTestCase(unittest.TestCase):
         subprocess.check_call(['tellurium', '-i', archive_filename, '-o', out_dir_2])
         self.assert_results_saved(simulation, out_dir_2)
 
-        data_frame_1 = pandas.read_csv(os.path.join(out_dir_1, simulation.id, simulation.id + '_report.csv'))
-        data_frame_2 = pandas.read_csv(os.path.join(out_dir_2, simulation.id, simulation.id + '_report.csv'))
+        data_frame_1 = pandas.read_csv(os.path.join(out_dir_1, simulation.id, simulation.id + '.csv'))
+        data_frame_2 = pandas.read_csv(os.path.join(out_dir_2, simulation.id, simulation.id + '.csv'))
         numpy.testing.assert_equal(data_frame_1.to_numpy(), data_frame_2.to_numpy())
 
         # remove parameter changes and re-simulate; check that results are different
@@ -104,7 +104,7 @@ class ExecTestCase(unittest.TestCase):
         out_dir_3 = os.path.join(self.dir_name, 'out-2')
         exec_simulations_in_archive(archive_filename_2, self.tellurium_task_executer, out_dir_3)
         self.assert_results_saved(simulation, out_dir_3)
-        data_frame_3 = pandas.read_csv(os.path.join(out_dir_3, simulation.id, simulation.id + '_report.csv'))
+        data_frame_3 = pandas.read_csv(os.path.join(out_dir_3, simulation.id, simulation.id + '.csv'))
         with self.assertRaises(AssertionError):
             numpy.testing.assert_equal(data_frame_1.to_numpy(), data_frame_3.to_numpy())
 
@@ -142,14 +142,14 @@ class ExecTestCase(unittest.TestCase):
                 factory.executePython()
                 """.replace('\n                ', '\n'),
             ])
-            os.rename(os.path.join(tmp_out_dir, simulation.id + '_report.csv'), out_filename)
+            os.rename(os.path.join(tmp_out_dir, simulation.id + '.csv'), out_filename)
         finally:
             os.remove(simulation_filename)
             shutil.rmtree(tmp_out_dir)
 
     def assert_results_saved(self, simulation, out_dir):
         self.assertEqual(os.listdir(out_dir), [simulation.id])
-        self.assertEqual(os.listdir(os.path.join(out_dir, simulation.id)), [simulation.id + '_report.csv'])
-        data_frame = pandas.read_csv(os.path.join(out_dir, simulation.id, simulation.id + '_report.csv'))
+        self.assertEqual(os.listdir(os.path.join(out_dir, simulation.id)), [simulation.id + '.csv'])
+        data_frame = pandas.read_csv(os.path.join(out_dir, simulation.id, simulation.id + '.csv'))
         self.assertEqual(set(data_frame.columns.to_list()), set([var.id for var in simulation.model.variables] + ['time']))
         numpy.testing.assert_array_almost_equal(data_frame['time'], numpy.linspace(0., 10., 101))

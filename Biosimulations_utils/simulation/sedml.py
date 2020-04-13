@@ -30,7 +30,11 @@ __all__ = [
 
 
 class SedMlSimulationWriter(SimulationWriter):
-    """ Base class for SED-ML generator for each model format """
+    """ Base class for SED-ML generator for each model format
+
+    Attributes:
+        _num_meta_id (:obj:`int`): number of assigned meta ids
+    """
 
     def run(self, sim, filename, level=1, version=3):
         """
@@ -45,6 +49,8 @@ class SedMlSimulationWriter(SimulationWriter):
         """
         if sim.format.id != 'SED-ML' or sim.format.version != 'L{}V{}'.format(level, version):
             raise ValueError('Format must be SED-ML L{}V{}'.format(level, version))
+
+        self._num_meta_id = 0
 
         doc_sed = self._create_doc(level, version)
         self._add_metadata_to_obj(sim, doc_sed, doc_sed)
@@ -197,6 +203,7 @@ class SedMlSimulationWriter(SimulationWriter):
                                     children=obj.updated.strftime('%Y-%m-%dT%H:%M:%SZ')))
         namespaces.add('dcterms')
 
+        self._set_meta_id(doc_sed, obj_sed)
         self._add_annotation_to_obj(metadata, doc_sed, obj_sed, namespaces)
 
     def _add_model_to_doc(self, model, doc_sed):
@@ -265,6 +272,7 @@ class SedMlSimulationWriter(SimulationWriter):
                 children=change.parameter.name,
             ))
         if metadata:
+            self._set_meta_id(doc_sed, change_sed)
             self._add_annotation_to_obj(metadata, doc_sed, change_sed, set(['dc']))
 
         self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change.value))
@@ -282,9 +290,9 @@ class SedMlSimulationWriter(SimulationWriter):
         """
         sim_sed = doc_sed.createUniformTimeCourse()
         if sim.id:
-            self._call_libsedml_method(doc_sed, sim_sed, 'setId', sim.id + '_simulation')
+            self._call_libsedml_method(doc_sed, sim_sed, 'setId', sim.id)
         if sim.name:
-            self._call_libsedml_method(doc_sed, sim_sed, 'setName', sim.name + ' simulation')
+            self._call_libsedml_method(doc_sed, sim_sed, 'setName', sim.name)
         self._call_libsedml_method(doc_sed, sim_sed, 'setInitialTime', sim.start_time)
         self._call_libsedml_method(doc_sed, sim_sed, 'setOutputStartTime', sim.output_start_time)
         self._call_libsedml_method(doc_sed, sim_sed, 'setOutputEndTime', sim.end_time)
@@ -323,6 +331,7 @@ class SedMlSimulationWriter(SimulationWriter):
             ))
 
         if annotations_xml:
+            self._set_meta_id(doc_sed, alg_sed)
             self._add_annotation_to_obj(annotations_xml, doc_sed, alg_sed, set(['dc']))
 
         return alg_sed
@@ -355,9 +364,9 @@ class SedMlSimulationWriter(SimulationWriter):
         Returns:
             :obj:`libsedml.SedAlgorithmParameter`: SED simulation algorithm paremeter change
         """
-        change_sed = alg_sed.createAlgorithmParameter()
+        param_sed = alg_sed.createAlgorithmParameter()
         if change.parameter.kisao_term:
-            self._call_libsedml_method(doc_sed, change_sed, 'setKisaoID',
+            self._call_libsedml_method(doc_sed, param_sed, 'setKisaoID',
                                        change.parameter.kisao_term.ontology + ':' + change.parameter.kisao_term.id)
         annotations_xml = []
 
@@ -376,10 +385,11 @@ class SedMlSimulationWriter(SimulationWriter):
             ))
 
         if annotations_xml:
-            self._add_annotation_to_obj(annotations_xml, doc_sed, change_sed, set(['dc']))
+            # self._set_meta_id(doc_sed, param_sed)
+            self._add_annotation_to_obj(annotations_xml, doc_sed, param_sed, set(['dc']))
 
-        self._call_libsedml_method(doc_sed, change_sed, 'setValue', str(change.value))
-        return change_sed
+        self._call_libsedml_method(doc_sed, param_sed, 'setValue', str(change.value))
+        return param_sed
 
     def _add_sim_task_to_doc(self, id, name, doc_sed, model_sed, sim_sed):
         """ Add a task to simulate a model to a SED document
@@ -415,9 +425,9 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedReport`: SED report
         """
         report_sed = doc_sed.createReport()
-        self._call_libsedml_method(doc_sed, report_sed, 'setId', id + '_report')
+        self._call_libsedml_method(doc_sed, report_sed, 'setId', id)
         if name:
-            self._call_libsedml_method(doc_sed, report_sed, 'setName', name + ' results')
+            self._call_libsedml_method(doc_sed, report_sed, 'setName', name)
         return report_sed
 
     def _add_data_gen_to_doc(self, id, name, doc_sed):
@@ -432,7 +442,7 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedDataGenerator`: SED data generator
         """
         data_gen_sed = doc_sed.createDataGenerator()
-        self._call_libsedml_method(doc_sed, data_gen_sed, 'setId', 'data_gen_' + id)
+        self._call_libsedml_method(doc_sed, data_gen_sed, 'setId', id)
         self._call_libsedml_method(doc_sed, data_gen_sed, 'setName', name)
         return data_gen_sed
 
@@ -451,7 +461,7 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedVariable`: SED variable
         """
         var_sed = data_gen_sed.createVariable()
-        self._call_libsedml_method(doc_sed, var_sed, 'setId', 'var_' + id)
+        self._call_libsedml_method(doc_sed, var_sed, 'setId', id)
         self._call_libsedml_method(doc_sed, var_sed, 'setName', name)
         self._call_libsedml_method(doc_sed, var_sed, 'setTaskReference', task_sed.getId())
         if symbol:
@@ -473,7 +483,7 @@ class SedMlSimulationWriter(SimulationWriter):
             :obj:`libsedml.SedDataSet`: SED data set
         """
         dataset_sed = report_sed.createDataSet()
-        self._call_libsedml_method(doc_sed, dataset_sed, 'setId', 'dataset_' + id)
+        self._call_libsedml_method(doc_sed, dataset_sed, 'setId', id)
         self._call_libsedml_method(doc_sed, dataset_sed, 'setLabel', name)
         self._call_libsedml_method(doc_sed, dataset_sed, 'setDataReference', data_gen_sed.getId())
         return dataset_sed
@@ -514,6 +524,15 @@ class SedMlSimulationWriter(SimulationWriter):
         # save the SED document to a file
         libsedml.writeSedML(doc_sed, filename)
 
+    def _set_meta_id(self, doc_sed, obj_sed):
+        """ Generate and set a unique meta id for a SED object
+
+        Args:
+            obj_sed (:obj:`libsedml.SedBase`): SED object
+        """
+        self._num_meta_id += 1
+        self._call_libsedml_method(doc_sed, obj_sed, 'setMetaId', '_{:08d}'.format(self._num_meta_id))
+
     def _add_annotation_to_obj(self, nodes, doc_sed, obj_sed, namespaces):
         """ Add annotation to a SED object
 
@@ -524,6 +543,12 @@ class SedMlSimulationWriter(SimulationWriter):
             namespaces (:obj:`set` of :obj:`str`): list of namespaces
         """
         if nodes:
+            meta_id = obj_sed.getMetaId()
+            if meta_id:
+                about_xml = ' rdf:about="#{}"'.format(meta_id)
+            else:
+                about_xml = ''
+
             namespaces.add('rdf')
             namespaces_xml = []
             if 'rdf' in namespaces:
@@ -540,11 +565,14 @@ class SedMlSimulationWriter(SimulationWriter):
             self._call_libsedml_method(doc_sed, obj_sed, 'setAnnotation',
                                        ('<annotation>'
                                         '  <rdf:RDF{}>'
-                                        '    <rdf:Description>'
+                                        '    <rdf:Description{}>'
                                         '    {}'
                                         '    </rdf:Description>'
                                         '  </rdf:RDF>'
-                                        '  </annotation>').format(''.join(namespaces_xml), ''.join(node.encode() for node in nodes)))
+                                        '  </annotation>').format(
+                                           ''.join(namespaces_xml),
+                                           about_xml,
+                                           ''.join(node.encode() for node in nodes)))
 
     @staticmethod
     def _call_libsedml_method(doc_sed, obj_sed, method_name, *args, **kwargs):
@@ -871,9 +899,6 @@ class SedMlSimulationReader(SimulationReader):
                 for var_sed in data_gen_sed.getListOfVariables():
                     if var_sed.getTarget() and var_sed.getTaskReference() == task_sed.getId():
                         var_id = var_sed.getId()
-                        if var_id.startswith('var_'):
-                            var_id = var_id[len('var_'):]
-
                         if var_id != 'time':
                             sim.model.variables.append(BiomodelVariable(
                                 id=var_id,
@@ -1040,6 +1065,15 @@ class SedMlSimulationReader(SimulationReader):
                     for i_child_2 in range(rdf_xml.getNumChildren()):
                         description_xml = rdf_xml.getChild(i_child_2)
                         if description_xml.getPrefix() == 'rdf' and description_xml.getName() == 'Description':
+                            description_about_obj = not obj_sed.getMetaId()
+                            for i_attr in range(description_xml.getAttributesLength()):
+                                if description_xml.getAttrPrefix(i_attr) == 'rdf' \
+                                        and description_xml.getAttrName(i_attr) == 'about' \
+                                        and description_xml.getAttrValue(i_attr) == '#' + obj_sed.getMetaId():
+                                    description_about_obj = True
+                                    break
+                            if not description_about_obj:
+                                continue
                             for i_child_3 in range(description_xml.getNumChildren()):
                                 child = description_xml.getChild(i_child_3)
                                 nodes.append(self._decode_obj_from_xml(child))

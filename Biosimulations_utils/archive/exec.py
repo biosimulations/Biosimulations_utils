@@ -148,7 +148,7 @@ def exec_simulations_in_archive(archive_filename, task_executer, out_dir, archiv
         working_dir = os.path.join(archive_tmp_dir, os.path.dirname(file.filename))
         for simulation in simulations:
             model = simulation.model
-            out_filename = os.path.join(out_subdir, simulation.id + '_report.csv')
+            out_filename = os.path.join(out_subdir, simulation.id + '.csv')
             task_executer(os.path.join(working_dir, model.file.name), model.format.sed_urn, simulation, working_dir, out_filename, 'csv')
 
     shutil.rmtree(archive_tmp_dir)

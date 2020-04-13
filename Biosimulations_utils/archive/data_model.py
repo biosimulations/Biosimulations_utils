@@ -21,6 +21,8 @@ class ArchiveFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id='format_3686',
         url='https://combinearchive.org/',
         spec_url='http://identifiers.org/combine.specifications/omex',
+        mime_type='application/zip',
+        extension='omex',
     )
 
 

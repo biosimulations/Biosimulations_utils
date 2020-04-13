@@ -6,12 +6,13 @@
 :License: MIT
 """
 
+from Biosimulations_utils.archive.data_model import ArchiveFormat
 from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person, RemoteFile, Type
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from Biosimulations_utils.biomodel.sbml import BiomodelingFramework
 from Biosimulations_utils.simulation.data_model import (
     Simulation, TimecourseSimulation, SteadyStateSimulation, Simulator, Algorithm, AlgorithmParameter, ParameterChange,
-    SimulationResult)
+    SimulationResult, SimulationFormat)
 import datetime
 import dateutil.tz
 import unittest
@@ -145,13 +146,6 @@ class SimulationDataModelTestCase(unittest.TestCase):
                 OntologyTerm(ontology='KISAO', id='00002'),
                 OntologyTerm(ontology='KISAO', id='00003'),
             ],
-            modeling_frameworks=[
-                BiomodelingFramework.logical.value,
-                BiomodelingFramework.flux_balance.value,
-            ],
-            model_formats=[
-                BiomodelFormat.sbml.value,
-            ],
             parameters=[
                 AlgorithmParameter(id='param_1',
                                    name='param 1',
@@ -159,6 +153,23 @@ class SimulationDataModelTestCase(unittest.TestCase):
                                    value=1.2,
                                    recommended_range=[0.12, 12.],
                                    kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
+            ],
+            modeling_frameworks=[
+                BiomodelingFramework.logical.value,
+                BiomodelingFramework.flux_balance.value,
+            ],
+            model_formats=[
+                BiomodelFormat.sbml.value,
+            ],
+            simulation_formats=[
+                SimulationFormat.sedml.value,
+            ],
+            archive_formats=[
+                ArchiveFormat.combine.value,
+            ],
+            references=[
+                JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                 volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
             ],
         )
         self.assertEqual(Algorithm.from_json(alg.to_json()), alg)
@@ -169,6 +180,10 @@ class SimulationDataModelTestCase(unittest.TestCase):
             (
                 ('KISAO', '00002', None, None, None),
                 ('KISAO', '00003', None, None, None),
+            ),
+            (
+                ('param_1', 'param 1',
+                 'float', 1.2, (0.12, 12.), ('KISAO', '00001', None, None, None)),
             ),
             (
                 ('SBO', '0000234', 'logical framework',
@@ -191,9 +206,18 @@ class SimulationDataModelTestCase(unittest.TestCase):
                  'urn:sedml:language:sbml'),
             ),
             (
-                ('param_1', 'param 1',
-                 'float', 1.2, (0.12, 12.), ('KISAO', '00001', None, None, None)),
-            )
+                ('SED-ML', 'Simulation Experiment Description Markup Language', None, 'format_3685', 'https://sed-ml.org/',
+                 'http://identifiers.org/combine.specifications/sed-ml', 'application/xml', 'sedml',
+                 None),
+            ),
+            (
+                ('COMBINE', 'COMBINE', None, 'format_3686', 'https://combinearchive.org/',
+                 'http://identifiers.org/combine.specifications/omex', 'application/zip', 'omex',
+                 None),
+            ),
+            (
+                ('John Doe and Jane Doe', 'title', 'journal', 10, 3, '1-10', 2020, '10.1016/XXXX'),
+            ),
         ))
 
     def test_AlgorithmParameter(self):

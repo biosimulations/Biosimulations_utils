@@ -441,13 +441,18 @@ class Algorithm(object):
         kisao_term (:obj:`OntologyTerm`): KiSAO id
         ontology_terms (:obj:`list` of :obj:`OntologyTerm`): list of sematically equivalent
             KiSAO ids for the parent simulator of an algorithm
-        modeling_frameworks (:obj:`list` of :obj:`OntologyTerm`): supported modeling frameworks
-        model_formats (:obj:`list` of :obj:`Format`): supoorted model formats
         parameters (:obj:`list` of :obj:`AlgorithmParameter`): parameters
+        modeling_frameworks (:obj:`list` of :obj:`OntologyTerm`): supported modeling frameworks
+        model_formats (:obj:`list` of :obj:`Format`): supported model formats (e.g., SBML)
+        simulation_formats (:obj:`list` of :obj:`Format`): supported simulation formats (e.g., SED-ML)
+        archive_formats (:obj:`list` of :obj:`Format`): supported archive formats (e.g., COMBINE)
+        references (:obj:`list` of :obj:`JournalReference`): references
     """
 
     def __init__(self, id=None, name=None, kisao_term=None, ontology_terms=None,
-                 modeling_frameworks=None, model_formats=None, parameters=None):
+                 parameters=None, modeling_frameworks=None,
+                 model_formats=None, simulation_formats=None, archive_formats=None,
+                 references=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -455,17 +460,23 @@ class Algorithm(object):
             kisao_term (:obj:`OntologyTerm`, optional): KiSAO id
             ontology_terms (:obj:`list` of :obj:`OntologyTerm`, optional): list of sematically equivalent
                 KiSAO ids for the parent simulator of an algorithm
-            modeling_frameworks (:obj:`list` of :obj:`OntologyTerm`, optional): supported modeling frameworks
-            model_formats (:obj:`list` of :obj:`Format`, optional): supoorted model formats
             parameters (:obj:`list` of :obj:`AlgorithmParameter`, optional): parameters
+            modeling_frameworks (:obj:`list` of :obj:`OntologyTerm`, optional): supported modeling frameworks
+            model_formats (:obj:`list` of :obj:`Format`, optional): supported model formats (e.g., SBML)
+            simulation_formats (:obj:`list` of :obj:`Format`, optional): supported simulation formats (e.g., SED-ML)
+            archive_formats (:obj:`list` of :obj:`Format`, optional): supported archive formats (e.g., COMBINE)
+            references (:obj:`list` of :obj:`JournalReference`, optional): references
         """
         self.id = id
         self.name = name
         self.kisao_term = kisao_term
         self.ontology_terms = ontology_terms or []
+        self.parameters = parameters or []
         self.modeling_frameworks = modeling_frameworks or []
         self.model_formats = model_formats or []
-        self.parameters = parameters or []
+        self.simulation_formats = simulation_formats or []
+        self.archive_formats = archive_formats or []
+        self.references = references or []
 
     def __eq__(self, other):
         """ Determine if two algorithms are semantically equal
@@ -481,10 +492,13 @@ class Algorithm(object):
             and self.name == other.name \
             and self.kisao_term == other.kisao_term \
             and sorted(self.ontology_terms, key=OntologyTerm.sort_key) == sorted(other.ontology_terms, key=OntologyTerm.sort_key) \
+            and sorted(self.parameters, key=AlgorithmParameter.sort_key) == sorted(other.parameters, key=AlgorithmParameter.sort_key) \
             and sorted(self.modeling_frameworks, key=OntologyTerm.sort_key) == \
             sorted(other.modeling_frameworks, key=OntologyTerm.sort_key) \
             and sorted(self.model_formats, key=Format.sort_key) == sorted(other.model_formats, key=Format.sort_key) \
-            and sorted(self.parameters, key=AlgorithmParameter.sort_key) == sorted(other.parameters, key=AlgorithmParameter.sort_key)
+            and sorted(self.simulation_formats, key=Format.sort_key) == sorted(other.simulation_formats, key=Format.sort_key) \
+            and sorted(self.archive_formats, key=Format.sort_key) == sorted(other.archive_formats, key=Format.sort_key) \
+            and sorted(self.references, key=JournalReference.sort_key) == sorted(other.references, key=JournalReference.sort_key)
 
     def to_json(self):
         """ Export to JSON
@@ -497,9 +511,12 @@ class Algorithm(object):
             'name': self.name,
             'kisaoTerm': self.kisao_term.to_json() if self.kisao_term else None,
             'ontologyTerms': [term.to_json() for term in self.ontology_terms],
+            'parameters': [param.to_json() for param in self.parameters],
             'modelingFrameworks': [framework.to_json() for framework in self.modeling_frameworks],
             'modelFormats': [format.to_json() for format in self.model_formats],
-            'parameters': [param.to_json() for param in self.parameters],
+            'simulationFormats': [format.to_json() for format in self.simulation_formats],
+            'archiveFormats': [format.to_json() for format in self.archive_formats],
+            'references': [format.to_json() for format in self.references],
         }
 
     @classmethod
@@ -517,9 +534,12 @@ class Algorithm(object):
             name=val.get('name', None),
             kisao_term=OntologyTerm.from_json(val.get('kisaoTerm')) if val.get('kisaoTerm', None) else None,
             ontology_terms=[OntologyTerm.from_json(term) for term in val.get('ontologyTerms', [])],
+            parameters=[AlgorithmParameter.from_json(param) for param in val.get('parameters', [])],
             modeling_frameworks=[OntologyTerm.from_json(framework) for framework in val.get('modelingFrameworks', [])],
             model_formats=[Format.from_json(format) for format in val.get('modelFormats', [])],
-            parameters=[AlgorithmParameter.from_json(param) for param in val.get('parameters', [])],
+            simulation_formats=[Format.from_json(format) for format in val.get('simulationFormats', [])],
+            archive_formats=[Format.from_json(format) for format in val.get('archiveFormats', [])],
+            references=[JournalReference.from_json(format) for format in val.get('references', [])],
         )
 
     @staticmethod
@@ -537,9 +557,12 @@ class Algorithm(object):
             algorithm.name,
             algorithm.kisao_term.sort_key(algorithm.kisao_term),
             tuple([term.sort_key(term) for term in algorithm.ontology_terms]),
+            tuple([param.sort_key(param) for param in algorithm.parameters]),
             tuple([framework.sort_key(framework) for framework in algorithm.modeling_frameworks]),
             tuple([format.sort_key(format) for format in algorithm.model_formats]),
-            tuple([param.sort_key(param) for param in algorithm.parameters]),
+            tuple([format.sort_key(format) for format in algorithm.simulation_formats]),
+            tuple([format.sort_key(format) for format in algorithm.archive_formats]),
+            tuple([ref.sort_key(ref) for ref in algorithm.references]),
         )
 
 

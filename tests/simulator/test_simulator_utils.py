@@ -8,6 +8,10 @@
 
 from Biosimulations_utils.simulation import write_simulation
 from Biosimulations_utils.simulation.data_model import SimulationFormat
+try:
+    from Biosimulations_utils.simulator.testing import SbmlSedmlCombineSimulatorValidator
+except ModuleNotFoundError:
+    pass
 from Biosimulations_utils.simulator.utils import exec_simulations_in_archive
 import os
 import shutil
@@ -25,8 +29,7 @@ class ExecTestCase(unittest.TestCase):
         shutil.rmtree(self.dir_name)
 
     @unittest.skipIf(os.getenv('CI', '0') in ['1', 'true'], 'Docker not setup in CI')
-    def test(self):
-        from Biosimulations_utils.simulator.testing import SbmlSedmlCombineSimulatorValidator
+    def test(self):        
         validator = SbmlSedmlCombineSimulatorValidator()
         validator.run('crbm/biosimulations_tellurium')
 

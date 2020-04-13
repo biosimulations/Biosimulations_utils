@@ -11,7 +11,7 @@ from Biosimulations_utils.data_model import JournalReference, License, OntologyT
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from Biosimulations_utils.biomodel.sbml import BiomodelingFramework
 from Biosimulations_utils.simulation.data_model import (
-    Simulation, TimecourseSimulation, SteadyStateSimulation, Simulator, Algorithm, AlgorithmParameter, ParameterChange,
+    Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange,
     SimulationResult, SimulationFormat)
 import datetime
 import dateutil.tz
@@ -99,43 +99,6 @@ class SimulationDataModelTestCase(unittest.TestCase):
         )
         self.assertEqual(SteadyStateSimulation.from_json(sim.to_json()), sim)
         self.assertEqual(Simulation.from_json(sim.to_json()), sim)
-
-    def test_Simulator(self):
-        simulator = Simulator(
-            id='tellurium',
-            name='tellurium',
-            version='2.4.1',
-            description='description of tellurium',
-            url='http://tellurium.analogmachine.org/',
-            docker_hub_image_id='crbm/biosimulations_tellurium:2.4.1',
-            algorithms=[
-                Algorithm(
-                    id='00001',
-                    name='integrator',
-                    kisao_term=OntologyTerm(ontology='KISAO', id='00001'),
-                    ontology_terms=[
-                        OntologyTerm(ontology='KISAO', id='00002'),
-                        OntologyTerm(ontology='KISAO', id='00003'),
-                    ],
-                    modeling_frameworks=[
-                        BiomodelingFramework.logical.value,
-                        BiomodelingFramework.flux_balance.value,
-                    ],
-                    model_formats=[
-                        BiomodelFormat.sbml.value,
-                    ],
-                    parameters=[
-                        AlgorithmParameter(id='param_1',
-                                           name='param 1',
-                                           type=Type.float,
-                                           value=1.2,
-                                           recommended_range=[0.12, 12.],
-                                           kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
-                    ],
-                )
-            ],
-        )
-        self.assertEqual(Simulator.from_json(simulator.to_json()), simulator)
 
     def test_Algorithm(self):
         alg = Algorithm(

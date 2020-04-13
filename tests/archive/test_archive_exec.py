@@ -7,13 +7,15 @@
 """
 
 from Biosimulations_utils.archive.exec import gen_archive_for_sim, exec_simulations_in_archive
-from Biosimulations_utils.data_model import OntologyTerm
+from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person
 from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import BiomodelFormat, BiomodelParameter
 from Biosimulations_utils.simulation import write_simulation
 from Biosimulations_utils.simulation.data_model import (
     TimecourseSimulation, Algorithm, AlgorithmParameter, ParameterChange, SimulationFormat)
 import copy
+import datetime
+import dateutil.tz
 import os
 import numpy.testing
 import pandas
@@ -35,11 +37,36 @@ class ExecTestCase(unittest.TestCase):
         model_filename = 'tests/fixtures/BIOMD0000000297.xml'
         model = read_biomodel(model_filename, format=BiomodelFormat.sbml)
         model.file.name = 'BIOMD0000000297_url.xml'
+        model.description = 'Description of model 1'
+        model.tags = ['tag-model-a', 'tag-model-b', 'tag-model-c']
+        model.references = [
+            JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
+                             volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+        ]
+        model.authors = [
+            Person(first_name='Jack', middle_name='A', last_name='Doe'),
+            Person(first_name='Jill', middle_name='B', last_name='Doe'),
+        ]
+        model.license = License.cc0
+        model.created = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
+        model.updated = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
 
         simulation = TimecourseSimulation(
             id='simulation_1',
             name='simulation 1',
             description='Description of simulation 1',
+            tags=['tag-simulation-a', 'tag-simulation-b', 'tag-simulation-c'],
+            references=[
+                JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                 volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+            ],
+            authors=[
+                Person(first_name='John', middle_name='C', last_name='Doe'),
+                Person(first_name='Jane', middle_name='D', last_name='Doe'),
+            ],
+            license=License.cc0,
+            created=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
+            updated=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
             model=model,
             model_parameter_changes=[
                 ParameterChange(parameter=BiomodelParameter(target=param.target), value=0.)
@@ -55,6 +82,8 @@ class ExecTestCase(unittest.TestCase):
                     id='0000019',
                     name='CVODE',
                 ),
+                id='CVODE',
+                name='C-language Variable-coefficient Ordinary Differential Equation solver',
             ),
             algorithm_parameter_changes=[
                 ParameterChange(
@@ -63,6 +92,7 @@ class ExecTestCase(unittest.TestCase):
                             ontology='KISAO',
                             id='0000209',
                         ),
+                        id='rel_tol',
                         name='Relative tolerance',
                     ),
                     value=1e-5,
@@ -73,7 +103,8 @@ class ExecTestCase(unittest.TestCase):
                             ontology='KISAO',
                             id='0000211',
                         ),
-                        name='absolute tolerance',
+                        id='abs_tol',
+                        name='Absolute tolerance',
                     ),
                     value=1e-11,
                 ),

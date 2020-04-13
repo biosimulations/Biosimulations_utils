@@ -6,3 +6,6 @@ include LICENSE
 
 # requirements
 include requirements.txt
+
+# test suite
+graft Biosimulations_utils/simulator/testing-examples

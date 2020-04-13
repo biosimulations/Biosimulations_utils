@@ -11,9 +11,14 @@ import os
 
 name = 'Biosimulations_utils'
 dirname = os.path.dirname(__file__)
+package_data = {
+    name: [
+        'simulator/testing-examples/*',
+    ],
+}
 
 # get package metadata
-md = pkg_utils.get_package_metadata(dirname, name)
+md = pkg_utils.get_package_metadata(dirname, name, package_data_filename_patterns=package_data)
 
 # install package
 setuptools.setup(

@@ -196,11 +196,11 @@ class SimulatorValidator(object):
                 else:
                     archive_filename = test_case.get_full_filename(test_case.filename)
 
-                # try:
-                self._validate_test_case(test_case, archive_filename, dockerhub_id)
-                valid_test_cases.append(test_case)
-                # except Exception as exception:
-                #    test_case_exceptions.append(TestCaseException(test_case, exception))
+                try:
+                    self._validate_test_case(test_case, archive_filename, dockerhub_id)
+                    valid_test_cases.append(test_case)
+                except Exception as exception:
+                    test_case_exceptions.append(TestCaseException(test_case, exception))
 
         print('{} passed {} test cases:\n  {}'.format(dockerhub_id, len(valid_test_cases), '\n  '.join(
             case.filename for case in valid_test_cases)))

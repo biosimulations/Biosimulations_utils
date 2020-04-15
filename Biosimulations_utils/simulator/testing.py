@@ -150,7 +150,7 @@ class SimulatorValidator(object):
             simulator = Simulator.from_json(json.load(file))
 
         valid_test_cases = []
-        invalid_test_cases = []
+        test_case_exceptions = []
         for test_case in self.TEST_CASES:
             for algorithm in simulator.algorithms:
                 case_supports_modeling_framework = False
@@ -196,17 +196,18 @@ class SimulatorValidator(object):
                 else:
                     archive_filename = test_case.get_full_filename(test_case.filename)
 
-                try:
-                    self._validate_test_case(test_case, archive_filename, dockerhub_id)
-                    valid_test_cases.append(test_case)
-                except Exception as exception:
-                    invalid_test_cases.append(TestCaseException(test_case, exception))
+                # try:
+                self._validate_test_case(test_case, archive_filename, dockerhub_id)
+                valid_test_cases.append(test_case)
+                # except Exception as exception:
+                #    test_case_exceptions.append(TestCaseException(test_case, exception))
 
         print('{} passed {} test cases:\n  {}'.format(dockerhub_id, len(valid_test_cases), '\n  '.join(
             case.filename for case in valid_test_cases)))
-        print('{} failed {} test cases:\n  {}'.format(dockerhub_id, len(invalid_test_cases), '\n  '.join(
-            case.filename for case, _ in invalid_test_cases)))
-        return valid_test_cases, invalid_test_cases
+        print('{} failed {} test cases:\n  {}'.format(dockerhub_id, len(test_case_exceptions), '\n  '.join(
+            '{}\n    {}'.format(test_case_exception.test_case.filename, str(test_case_exception.exception))
+            for test_case_exception in test_case_exceptions)))
+        return valid_test_cases, test_case_exceptions
 
     def _gen_example_model(self, model_filename):
         """ Generate an example model
@@ -396,8 +397,9 @@ class SimulatorValidator(object):
 
         # validate that outputs were created
         for file in archive.files:
-            if file.format.sed_urn == test_case.simulation_format.value.sed_urn:
-                simulations, _ = read_simulation(os.path.join(archive_dir, file.filename))
+            if file.format.spec_url == test_case.simulation_format.value.spec_url:
+                simulation_file_name = os.path.join(archive_dir, file.filename)
+                simulations, _ = read_simulation(simulation_file_name)
                 for simulation in simulations:
                     simulation_out_dir = os.path.join(out_dir, os.path.splitext(file.filename)[0])
                     simulation_report_filename = os.path.join(simulation_out_dir, simulation.id + '.csv')

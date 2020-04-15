@@ -104,6 +104,8 @@ class SimulatorValidator(object):
         _docker_client (:obj:`docker.client.DockerClient`): Docker client
     """
 
+    # TODO: add more test cases and more detailed assertions; potentially use SBML test suite
+
     TEST_CASES = (
         TestCase(
             filename='BIOMD0000000297.xml',

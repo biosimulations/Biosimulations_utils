@@ -63,7 +63,8 @@ def exec_simulations_in_archive(archive_filename, task_executer, out_dir, archiv
         # create directory for outputs of simulations
         if simulations:
             out_subdir = os.path.join(out_dir, os.path.splitext(file.filename)[0])
-            os.makedirs(out_subdir)
+            if not os.path.isdir(out_subdir):
+                os.makedirs(out_subdir)
 
         # execute simulations
         working_dir = os.path.join(archive_tmp_dir, os.path.dirname(file.filename))

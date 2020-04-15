@@ -10,5 +10,6 @@ python_libsbml
 python_libsedml >= 2
 requests
 requests_cache
+setuptools
 tzlocal
 wc_utils

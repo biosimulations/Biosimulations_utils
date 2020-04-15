@@ -8,4 +8,4 @@ include LICENSE
 include requirements.txt
 
 # test suite
-graft Biosimulations_utils/simulator/testing-examples
+graft Biosimulations_utils/simulator/test-cases

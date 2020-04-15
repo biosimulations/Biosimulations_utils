@@ -13,7 +13,7 @@ name = 'Biosimulations_utils'
 dirname = os.path.dirname(__file__)
 package_data = {
     name: [
-        'simulator/testing-examples/*',
+        'simulator/test-cases/*',
     ],
 }
 

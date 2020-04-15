@@ -30,7 +30,7 @@ class Simulator(object):
         authors (:obj:`list` of :obj:`Person`): authors
         license (:obj:`License`): license
         format (:obj:`Format`): format
-        docker_hub_image_id (:obj:`str`): id for image in DockerHub (e.g., "crbm/biosimulatons_tellurium:2.4.1")
+        docker_hub_image_id (:obj:`str`): id for image in DockerHub (e.g., "crbm/biosimulations_tellurium:2.4.1")
         algorithms (:obj:`list` of :obj:`Algorithm`): supported algorithms
         created (:obj:`datetime.datetime`): date that the simulator was created
         updated (:obj:`datetime.datetime`): date that the simulator was last updated
@@ -53,7 +53,7 @@ class Simulator(object):
             authors (:obj:`list` of :obj:`Person`, optional): authors
             license (:obj:`License`, optional): license
             format (:obj:`Format`, optional): format
-            docker_hub_image_id (:obj:`str`, optional): id for image in DockerHub (e.g., "crbm/biosimulatons_tellurium:2.4.1")
+            docker_hub_image_id (:obj:`str`, optional): id for image in DockerHub (e.g., "crbm/biosimulations_tellurium:2.4.1")
             algorithms (:obj:`list` of :obj:`Algorithm`, optional): supported algorithms
             created (:obj:`datetime.datetime`, optional): date that the simulator was created
             updated (:obj:`datetime.datetime`, optional): date that the simulator was last updated

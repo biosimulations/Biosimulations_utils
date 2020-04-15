@@ -8,8 +8,7 @@
 
 from Biosimulations_utils.archive.data_model import ArchiveFormat
 from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person, Type
-from Biosimulations_utils.biomodel.data_model import BiomodelFormat
-from Biosimulations_utils.biomodel.sbml import BiomodelingFramework
+from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import Algorithm, AlgorithmParameter, SimulationFormat
 from Biosimulations_utils.simulator.data_model import Simulator
 import datetime

@@ -6,17 +6,22 @@
 :License: MIT
 """
 
+from Biosimulations_utils.archive import read_archive
+from Biosimulations_utils.archive.data_model import ArchiveFormat
 from Biosimulations_utils.archive.exec import gen_archive_for_sim
 from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person
 from Biosimulations_utils.biomodel import read_biomodel
-from Biosimulations_utils.biomodel.data_model import BiomodelFormat, BiomodelParameter
+from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat, BiomodelParameter
+from Biosimulations_utils.simulation import read_simulation
 from Biosimulations_utils.simulation.data_model import (
     TimecourseSimulation, Algorithm, AlgorithmParameter, ParameterChange, SimulationFormat)
-import abc
+from Biosimulations_utils.simulator.data_model import Simulator
 import copy
 import datetime
 import dateutil.tz
 import docker
+import enum
+import json
 import os
 import numpy.testing
 import pandas
@@ -24,87 +29,184 @@ import pkg_resources
 import shutil
 import tempfile
 
-__all__ = ['SbmlSedmlCombineSimulatorValidator']
+__all__ = ['TestCaseType', 'TestCase', 'TestCaseException', 'SimulatorValidator']
 
 
-class SimulatorValidator(abc.ABC):
-    """ Validate that a Docker image for a simulator implements the BioSimulatons simulator interface by
-    checking that the image produces the correct outputs for example models
+class TestCaseType(int, enum.Enum):
+    """ Type of test case """
+    archive = 1
+    biomodel = 2
+
+
+class TestCase(object):
+    """ An example archive to validate simulators
+
+    Attributes:
+        filename (:obj:`str`): path to archive
+        type (:obj:`TestCaseType`): type of test case
+        modeling_framework (:obj:`BiomodelingFramework`): modeling framework
+        model_format (:obj:`BiomodelFormat`): model format
+        simulation_format (:obj:`SimulationFormat`): simulation format
+        archive_format (:obj:`ArchiveFormat`): archive format
+    """
+
+    def __init__(self, filename, type, modeling_framework, model_format, simulation_format, archive_format):
+        """
+        Args:
+            filename (:obj:`str`): path to archive
+            type (:obj:`TestCaseType`): type of test case
+            modeling_framework (:obj:`BiomodelingFramework`): modeling framework
+            model_format (:obj:`BiomodelFormat`): model format
+            simulation_format (:obj:`SimulationFormat`): simulation format
+            archive_format (:obj:`ArchiveFormat`): archive format
+        """
+        self.filename = filename
+        self.type = type
+        self.modeling_framework = modeling_framework
+        self.model_format = model_format
+        self.simulation_format = simulation_format
+        self.archive_format = archive_format
+
+    @staticmethod
+    def get_full_filename(filename):
+        """ Get the full path to the file
+
+        Returns:
+            :obj:`str`: full path to the file
+        """
+        return pkg_resources.resource_filename('Biosimulations_utils',
+                                               os.path.join('simulator', 'test-cases', filename))
+
+
+class TestCaseException(object):
+    """ An exception of a test case
+
+    Attributes:
+        test_case (:obj:`TestCase`): test case
+        exception (:obj:`Exception`): exception
+    """
+
+    def __init__(self, test_case, exception):
+        """
+        Args:
+            test_case (:obj:`TestCase`): test case
+            exception (:obj:`Exception`): exception
+        """
+        self.test_case = test_case
+        self.exception = exception
+
+
+class SimulatorValidator(object):
+    """ Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
+    checking that the image produces the correct outputs for one of more test cases (e.g., COMBINE archive)
 
     Attributes:
         _docker_client (:obj:`docker.client.DockerClient`): Docker client
     """
 
+    TEST_CASES = (
+        TestCase(
+            filename='BIOMD0000000297.xml',
+            type=TestCaseType.biomodel,
+            modeling_framework=BiomodelingFramework.non_spatial_continuous,
+            model_format=BiomodelFormat.sbml,
+            simulation_format=SimulationFormat.sedml,
+            archive_format=ArchiveFormat.combine,
+        ),
+        TestCase(
+            filename='BIOMD0000000297.omex',
+            type=TestCaseType.archive,
+            modeling_framework=BiomodelingFramework.non_spatial_continuous,
+            model_format=BiomodelFormat.sbml,
+            simulation_format=SimulationFormat.sedml,
+            archive_format=ArchiveFormat.combine,
+        ),
+        TestCase(
+            filename='test-bngl.omex',
+            type=TestCaseType.archive,
+            modeling_framework=BiomodelingFramework.non_spatial_discrete,
+            model_format=BiomodelFormat.bngl,
+            simulation_format=SimulationFormat.sedml,
+            archive_format=ArchiveFormat.combine,
+        ),
+    )
+
     def __init__(self):
         self._docker_client = docker.from_env()
 
-    @abc.abstractmethod
-    def run(self):
-        """ Validate that a Docker image for a simulator implements the BioSimulatons simulator interface by
-        checking that the image produces the correct outputs for example models
+    def run(self, dockerhub_id, properties_filename):
+        """ Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
+        checking that the image produces the correct outputs for test cases (e.g., COMBINE archive)
 
         Args:
             dockerhub_id (:obj:`str`): DockerHub id of simulator
+            properties_filename (:obj:`str`): path to the properties of the simulator
+
+        Returns:
+            :obj:`list` :obj:`TestCase`: valid test cases
+            :obj:`list` :obj:`TestCaseException`: invalid test cases
         """
-        pass  # pragma: no cover
+        with open(properties_filename, 'r') as file:
+            simulator = Simulator.from_json(json.load(file))
 
+        valid_test_cases = []
+        invalid_test_cases = []
+        for test_case in self.TEST_CASES:
+            for algorithm in simulator.algorithms:
+                case_supports_modeling_framework = False
+                for modeling_framework in algorithm.modeling_frameworks:
+                    if modeling_framework.ontology == test_case.modeling_framework.value.ontology and \
+                       modeling_framework.id == test_case.modeling_framework.value.id:
+                        case_supports_modeling_framework = True
+                        break
 
-class SbmlSedmlCombineSimulatorValidator(SimulatorValidator):
-    """ Validate that a Docker image for a SBML/SED-ML/COMBINE simulator implements the BioSimulatons simulator interface by
-    checking that the image produces the correct outputs for example models
-    """
-    EXAMPLE_MODEL_FILENAMES = (
-        pkg_resources.resource_filename('Biosimulations_utils', os.path.join('simulator', 'testing-examples', 'BIOMD0000000297.xml')),
-    )
+                case_supports_model_format = False
+                for model_format in algorithm.model_formats:
+                    if model_format.id == test_case.model_format.value.id:
+                        case_supports_model_format = True
+                        break
 
-    def run(self, dockerhub_id):
-        """ Validate that a Docker image for a simulator implements the BioSimulatons simulator interface by
-        checking that the image produces the correct outputs for example models
+                case_supports_simulation_format = False
+                for simulation_format in algorithm.simulation_formats:
+                    if simulation_format.id == test_case.simulation_format.value.id:
+                        case_supports_simulation_format = True
+                        break
 
-        Args:
-            dockerhub_id (:obj:`str`): DockerHub id of simulator
-        """
-        for model_filename in self.EXAMPLE_MODEL_FILENAMES:
-            self._validate_example(model_filename, dockerhub_id)
+                case_supports_archive_format = False
+                for archive_format in algorithm.archive_formats:
+                    if archive_format.id == test_case.archive_format.value.id:
+                        case_supports_archive_format = True
+                        break
 
-    def _validate_example(self, model_filename, dockerhub_id):
-        """ Validate that a simulator correctly produces the outputs for a simulation of a model
+            use_test_case = case_supports_modeling_framework \
+                and case_supports_model_format \
+                and case_supports_simulation_format \
+                and case_supports_archive_format
 
-        Args:
-            model_filename (:obj:`str`): path to example model
-            dockerhub_id (:obj:`str`): DockerHub id of simulator
+            if use_test_case:
+                if test_case.type == TestCaseType.biomodel:
+                    model_filename = test_case.get_full_filename(test_case.filename)
+                    model = self._gen_example_model(model_filename)
+                    simulation = self._gen_example_simulation(model)
+                    simulation.model_parameter_changes = [
+                        ParameterChange(parameter=BiomodelParameter(target=param.target), value=0.)
+                        for param in model.parameters if param.group == 'Initial species amounts/concentrations'
+                    ]
+                    _, archive_filename = self._gen_example_archive(model_filename, simulation)
+                else:
+                    archive_filename = test_case.get_full_filename(test_case.filename)
 
-        Raises:
-            :obj:`AssertionError`: simulator isn't correctly processing model parameter changes
-        """
-        # simulate without parameter changes
-        model_1 = self._gen_example_model(model_filename)
-        simulation_1 = self._gen_example_simulation(model_1)
-        _, archive_filename_1 = self._gen_example_archive(model_filename, simulation_1)
-        out_dir_1 = self._exec_archive(simulation_1, archive_filename_1, dockerhub_id)
-        self._assert_archive_output_valid(model_1, simulation_1, out_dir_1)
+                try:
+                    self._validate_test_case(test_case, archive_filename, dockerhub_id)
+                    valid_test_cases.append(test_case)
+                except Exception as exception:
+                    invalid_test_cases.append(TestCaseException(test_case, exception))
 
-        # simulate with parameter changes
-        model_2 = self._gen_example_model(model_filename)
-        simulation_2 = self._gen_example_simulation(model_2)
-        simulation_2.model_parameter_changes = [
-            ParameterChange(parameter=BiomodelParameter(target=param.target), value=0.)
-            for param in model_2.parameters if param.group == 'Initial species amounts/concentrations'
-        ]
-        _, archive_filename_2 = self._gen_example_archive(model_filename, simulation_2)
-        out_dir_2 = self._exec_archive(simulation_2, archive_filename_2, dockerhub_id)
-        self._assert_archive_output_valid(model_2, simulation_2, out_dir_2)
-
-        # check that results are different
-        data_frame_1 = pandas.read_csv(os.path.join(out_dir_1, simulation_1.id, simulation_1.id + '.csv'))
-        data_frame_2 = pandas.read_csv(os.path.join(out_dir_2, simulation_1.id, simulation_1.id + '.csv'))
-        assert (data_frame_1.to_numpy() != data_frame_2.to_numpy()).any()
-
-        # cleanup
-        os.remove(archive_filename_1)
-        os.remove(archive_filename_2)
-        shutil.rmtree(out_dir_1)
-        shutil.rmtree(out_dir_2)
+        print('{} passed {} test cases:\n  {}'.format(dockerhub_id, len(valid_test_cases), '\n  '.join(
+            case.filename for case in valid_test_cases)))
+        print('{} failed {} test cases:\n  {}'.format(dockerhub_id, len(invalid_test_cases), '\n  '.join(
+            case.filename for case, _ in invalid_test_cases)))
+        return valid_test_cases, invalid_test_cases
 
     def _gen_example_model(self, model_filename):
         """ Generate an example model
@@ -221,21 +323,40 @@ class SbmlSedmlCombineSimulatorValidator(SimulatorValidator):
         archive = gen_archive_for_sim(model_filename, simulation, archive_filename)
         return (archive, archive_filename)
 
-    def _exec_archive(self, simulation, archive_filename, dockerhub_id):
-        """ Execute the tasks described in a COMBINE archive
+    def _validate_test_case(self, test_case, archive_filename, dockerhub_id):
+        """ Validate that a simulator correctly produces the outputs for a test case
 
         Args:
-            simulation (:obj:`Simulation`): simulation of model
+            test_case (:obj:`TestCase`): test case
+            archive_filename (:obj:`str`): path to archive
+            dockerhub_id (:obj:`str`): DockerHub id of simulator
+        """
+
+        # execute archive
+        out_dir = self._exec_archive(archive_filename, dockerhub_id)
+
+        # check output
+        self._assert_archive_output_valid(test_case, archive_filename, out_dir)
+
+        # cleanup
+        shutil.rmtree(out_dir)
+
+    def _exec_archive(self, archive_filename, dockerhub_id):
+        """ Execute the tasks described in a archive
+
+        Args:
             archive_filename (:obj:`str`): path to archive
             dockerhub_id (:obj:`str`): DockerHub id of simulator
 
         Returns:
             :obj:`str`: directory where simulation results where saved
+
+        Raises:
+            :obj:`RuntimeError`: if the execution failed
         """
         out_dir = tempfile.mkdtemp()
-        os.makedirs(os.path.join(out_dir, simulation.id))
 
-        self._docker_client.containers.run(
+        container = self._docker_client.containers.run(
             dockerhub_id,
             volumes={
                 os.path.dirname(archive_filename): {
@@ -249,22 +370,48 @@ class SbmlSedmlCombineSimulatorValidator(SimulatorValidator):
             },
             command=['-i', '/root/in/' + os.path.basename(archive_filename), '-o', '/root/out'],
             tty=True,
-            remove=True)
+            detach=True)
+        status = container.wait()
+        if status['StatusCode'] != 0:
+            raise RuntimeError(container.logs().decode().replace('\\r\\n', '\n').strip())
+        container.stop()
+        container.remove()
+
         return out_dir
 
-    def _assert_archive_output_valid(self, model, simulation, out_dir):
+    def _assert_archive_output_valid(self, test_case, archive_filename, out_dir):
         """ Validate that the outputs of an archive were correctly generated
 
         Args:
-            model (:obj:`Biomodel`): model
-            simulation (:obj:`Simulation`): simulation
+            test_case (:obj:`TestCase`): test case
+            archive_filename (:obj:`str`): path to archive
             out_dir (:obj:`str`): directory which contains the simulation results
 
         Raises:
             :obj:`AssertionError`: simulator did not generate the specified outputs
         """
-        assert os.listdir(out_dir) == [simulation.id]
-        assert os.listdir(os.path.join(out_dir, simulation.id)) == [simulation.id + '.csv']
-        data_frame = pandas.read_csv(os.path.join(out_dir, simulation.id, simulation.id + '.csv'))
-        assert set(data_frame.columns.to_list()) == set([var.id for var in model.variables] + ['time'])
-        numpy.testing.assert_array_almost_equal(data_frame['time'], numpy.linspace(0., 10., 101))
+        # read archive and unpack to temporary directory
+        archive_dir = tempfile.mkdtemp()
+        archive = read_archive(archive_filename, archive_dir)
+
+        # validate that outputs were created
+        for file in archive.files:
+            if file.format.sed_urn == test_case.simulation_format.value.sed_urn:
+                simulations, _ = read_simulation(os.path.join(archive_dir, file.filename))
+                for simulation in simulations:
+                    simulation_out_dir = os.path.join(out_dir, os.path.splitext(file.filename)[0])
+                    simulation_report_filename = os.path.join(simulation_out_dir, simulation.id + '.csv')
+                    assert os.path.isdir(simulation_out_dir), "Output directory {} was not created".format(simulation_out_dir)
+                    assert os.path.isfile(simulation_report_filename), "Report {} was not created".format(simulation_report_filename)
+
+                    results_data_frame = pandas.read_csv(simulation_report_filename)
+
+                    numpy.testing.assert_array_almost_equal(
+                        results_data_frame['time'],
+                        numpy.linspace(simulation.output_start_time, simulation.end_time, simulation.num_time_points + 1),
+                    )
+
+                    assert set(results_data_frame.columns.to_list()) == set([var.id for var in simulation.model.variables] + ['time'])
+
+        # cleanup
+        shutil.rmtree(archive_dir)

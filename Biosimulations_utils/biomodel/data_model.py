@@ -7,16 +7,85 @@
 """
 
 from ..data_model import Format, Identifier, JournalReference, License, OntologyTerm, Person, RemoteFile, Taxon, Type
+import enum
 import datetime  # noqa: F401
 import dateutil.parser
 import wc_utils.util.enumerate
 
 __all__ = [
+    'BiomodelingFramework',
     'BiomodelFormat',
     'Biomodel',
     'BiomodelParameter',
     'BiomodelVariable',
 ]
+
+
+class BiomodelingFramework(enum.Enum):
+    flux_balance = OntologyTerm(
+        ontology='SBO',
+        id='0000624',
+        name='flux balance framework',
+        description=('Modelling approach, typically used for metabolic models, where the flow '
+                     'of metabolites (flux) through a network can be calculated. This approach '
+                     'will generally produce a set of solutions (solution space), which may be '
+                     'reduced using objective functions and constraints on individual fluxes.'),
+        iri='http://biomodels.net/SBO/SBO_0000624',
+    )
+
+    logical = OntologyTerm(
+        ontology='SBO',
+        id='0000234',
+        name='logical framework',
+        description=('Modelling approach, pioneered by Rene Thomas and Stuart Kaufman, where the '
+                     'evolution of a system is described by the transitions between discrete activity '
+                     'states of "genes" that control each other.'),
+        iri='http://biomodels.net/SBO/SBO_0000234',
+    )
+
+    non_spatial_continuous = OntologyTerm(
+        ontology='SBO',
+        id='0000293',
+        name='non-spatial continuous framework',
+        description=('Modelling approach where the quantities of participants are considered continuous, '
+                     'and represented by real values. The associated simulation methods make use of '
+                     'differential equations. The models do not take into account the distribution of the '
+                     'entities and describe only the temporal fluxes.'),
+        iri='http://biomodels.net/SBO/SBO_0000293',
+    )
+
+    non_spatial_discrete = OntologyTerm(
+        ontology='SBO',
+        id='0000295',
+        name='non-spatial discrete framework',
+        description=('Modelling approach where the quantities of participants are considered discrete, '
+                     'and represented by integer values. The associated simulation methods can be '
+                     'deterministic or stochastic.The models do not take into account the distribution '
+                     'of the entities and describe only the temporal fluxes.'),
+        iri='http://biomodels.net/SBO/SBO_0000295',
+    )
+
+    spatial_continuous = OntologyTerm(
+        ontology='SBO',
+        id='0000292 ',
+        name='spatial continuous framework',
+        description=('Modelling approach where the quantities of participants are considered continuous, '
+                     'and represented by real values. The associated simulation methods make use of '
+                     'differential equations. The models take into account the distribution of the '
+                     'entities and describe the spatial fluxes.'),
+        iri='http://biomodels.net/SBO/SBO_0000292 ',
+    )
+
+    spatial_discrete = OntologyTerm(
+        ontology='SBO',
+        id='0000294',
+        name='spatial discrete framework',
+        description=('Modelling approach where the quantities of participants are considered discrete, '
+                     'and represented by integer values. The associated simulation methods can be '
+                     'deterministic or stochastic. The models take into account the distribution of '
+                     'the entities and describe the spatial fluxes.'),
+        iri='http://biomodels.net/SBO/SBO_0000294',
+    )
 
 
 class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):

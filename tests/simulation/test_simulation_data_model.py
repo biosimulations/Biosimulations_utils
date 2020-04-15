@@ -8,8 +8,7 @@
 
 from Biosimulations_utils.archive.data_model import ArchiveFormat
 from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person, RemoteFile, Type
-from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
-from Biosimulations_utils.biomodel.sbml import BiomodelingFramework
+from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelingFramework, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import (
     Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange,
     SimulationResult, SimulationFormat)

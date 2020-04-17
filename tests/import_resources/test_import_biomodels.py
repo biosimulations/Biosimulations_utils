@@ -106,6 +106,42 @@ class BioModelsImporterTestCase(unittest.TestCase):
         ))
         self.assertEqual(models[0].license, License.cc0)
 
+        # verify invalid curves removed
+        model = models[3]
+        for viz in vizs:
+            if viz.id == '{}-viz'.format(model.id):
+                break
+
+        layout_vars = []
+        for layout_el in viz.layout:
+            field_vars = []
+            for field in layout_el.data:
+                sim_result_vars = []
+                for sim_result in field.simulation_results:
+                    sim_result_vars.append(sim_result.variable.target)
+                field_vars.append(sim_result_vars)
+            layout_vars.append(field_vars)
+
+        self.assertEqual(layout_vars, [
+            [
+                ['urn:sedml:symbol:time'],
+                [
+                    "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='BE']",
+                    "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Cln']"
+                    "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Sic']"
+                ],
+            ],
+            [
+                ['urn:sedml:symbol:time'],
+                [
+                    "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='PSwe1M']",
+                    "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Swe1M']",
+                    "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Swe1']",
+                ],
+            ],
+        ])
+
+        # verify stats
         self.assertEqual(stats, {
             'models': {
                 'total': 6,
@@ -133,6 +169,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
             },
         })
 
+        # verify models can be uploaded to the REST API
         for model in models:
             self.assertEqual(Biomodel.from_json(model.to_json()), model)
         for sim in sims:

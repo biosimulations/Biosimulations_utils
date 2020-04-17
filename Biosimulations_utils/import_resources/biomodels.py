@@ -346,6 +346,26 @@ class BioModelsImporter(object):
         sims = []
         vizs = []
         num_sim_files = 0
+
+        obj_target_to_var = {}
+        obj_id_to_var = {}
+        obj_name_to_var = {}
+        for var in model.variables:
+            if var.target not in obj_target_to_var:
+                obj_target_to_var[var.target] = var
+            else:
+                obj_target_to_var[var.target] = None
+
+            if var.id not in obj_id_to_var:
+                obj_id_to_var[var.id] = var
+            else:
+                obj_id_to_var[var.id] = None
+
+            if var.name not in obj_name_to_var:
+                obj_name_to_var[var.name] = var
+            else:
+                obj_name_to_var[var.name] = None
+
         for file_metadata in files_metadata['additional']:
             if file_metadata['name'].endswith('.sedml'):
                 num_sim_files += 1
@@ -372,6 +392,7 @@ class BioModelsImporter(object):
                     sims.append(sim)
 
                 if model_viz:
+                    # annotate visualization
                     model_viz.id = '{}-viz-{}'.format(model.id, len(vizs) + 1)
                     model_viz.name = file_metadata['name'][0:-6]
                     model_viz.description = file_metadata['description']
@@ -379,7 +400,50 @@ class BioModelsImporter(object):
                     model_viz.references = copy.deepcopy(model.references)
                     model_viz.authors = copy.deepcopy(model.authors)
                     model_viz.license = License.cc0
-                    vizs.append(model_viz)
+
+                    # remove curves that don't match model variables
+                    for layout_el in copy.copy(model_viz.layout):
+                        layout_el_has_vars = False
+                        for data_field in copy.copy(layout_el.data):
+                            parsed_sim_results = data_field.simulation_results
+                            valid_sim_results = []
+                            for sim_result in parsed_sim_results:
+                                if sim_result.variable.target == 'urn:sedml:symbol:time':
+                                    valid_sim_results.append(sim_result)
+                                else:
+                                    # if the variable isn't in the model, remove it from the data field
+                                    variable = obj_target_to_var.get(sim_result.variable.target, None)
+
+                                    if not variable:
+                                        match = re.match(r"^/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species\[@id='(.*?)'\]$",
+                                                         sim_result.variable.target)
+                                        if match:
+                                            species_id = match.group(1)
+                                            variable = obj_id_to_var.get(species_id, None)
+
+                                            if not variable:
+                                                variable = obj_name_to_var.get(species_id, None)
+                                                # TODO: log error
+
+                                    if variable:
+                                        sim_result.variable = variable
+                                        valid_sim_results.append(sim_result)
+                                        layout_el_has_vars = True
+                                    else:
+                                        pass  # TODO: log error
+                            data_field.simulation_results = valid_sim_results
+
+                            # if the data field doesn't have any simulation results, remove it from the subfigure
+                            if not data_field.simulation_results:
+                                layout_el.data.remove(data_field)
+
+                        # if the subfigure doesn't have a valid curve, remove it from the visualization
+                        if not layout_el.data or not layout_el_has_vars:
+                            model_viz.layout.remove(layout_el)
+
+                    # append to list of visualizations
+                    if model_viz.layout:
+                        vizs.append(model_viz)
 
         if len(sims) == 1:
             sims[0].id = '{}-sim'.format(model.id)

@@ -246,9 +246,10 @@ class SbmlBiomodelReader(BiomodelReader):
 
             species_name = species_sbml.getName() or species_id
 
-            species_substance_units = units.get(species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits(), None) \
-                or species_sbml.getSubstanceUnits() \
-                or model_sbml.getSubstanceUnits()
+            species_substance_units = units.get(species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits(), None)
+            if not species_substance_units:
+                species_substance_units = species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits()
+                # TODO: log error
             if species_sbml.isSetInitialAmount():
                 species_initial_type = 'Amount'
                 species_initial_val = species_sbml.getInitialAmount()
@@ -520,10 +521,17 @@ class SbmlBiomodelReader(BiomodelReader):
         fbc_plugin_sbml = model_sbml.getPlugin('fbc')
 
         if fbc_plugin_sbml:
-            flux_units = pretty_print_units('({}) / ({})'.format(
-                units.get(model_sbml.getExtentUnits(), None) or model_sbml.getExtentUnits(),
-                units.get(model_sbml.getTimeUnits(), None) or model_sbml.getTimeUnits(),
-            ))
+            extent_units = units.get(model_sbml.getExtentUnits(), None)
+            if not extent_units:
+                extent_units = model_sbml.getExtentUnits()
+                # TODO: log error
+
+            time_units = units.get(model_sbml.getTimeUnits(), None)
+            if not time_units:
+                time_units = model_sbml.getTimeUnits()
+                # TODO: log error
+
+            flux_units = pretty_print_units('({}) / ({})'.format(extent_units, time_units))
 
             # objective
             obj_sbml = fbc_plugin_sbml.getActiveObjective()
@@ -716,6 +724,7 @@ class SbmlBiomodelReader(BiomodelReader):
 
         unit_def_str = unit_def_sbml.printUnits(unit_def_sbml, True)
         if unit_def_str == 'indeterminable':
+            # TODO: log error
             return None
 
         return pretty_print_units(unit_def_str.replace(', ', ' * '))

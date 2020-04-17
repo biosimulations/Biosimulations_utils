@@ -7,13 +7,14 @@
 """
 
 from ..data_model import Format, OntologyTerm, RemoteFile, Taxon, Type  # noqa: F401
-from ..utils import pretty_print_units
+from ..utils import pretty_print_units, logger
 from .core import BiomodelReader, BiomodelIoError
 from .data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelingFramework, BiomodelFormat  # noqa: F401
 from PIL import Image
 import copy
 import ete3
 import libsbml
+import logging
 import numpy
 import os
 import re
@@ -249,7 +250,7 @@ class SbmlBiomodelReader(BiomodelReader):
             species_substance_units = units.get(species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits(), None)
             if not species_substance_units:
                 species_substance_units = species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits()
-                # TODO: log error
+                logger.log(logging.INFO, '{}: species {} does not have valid units'.format(self._filename, species_sbml.getId()))
             if species_sbml.isSetInitialAmount():
                 species_initial_type = 'Amount'
                 species_initial_val = species_sbml.getInitialAmount()
@@ -524,12 +525,12 @@ class SbmlBiomodelReader(BiomodelReader):
             extent_units = units.get(model_sbml.getExtentUnits(), None)
             if not extent_units:
                 extent_units = model_sbml.getExtentUnits()
-                # TODO: log error
+                logger.log(logging.INFO, '{}: model does not have valid extent units'.format(self._filename))
 
             time_units = units.get(model_sbml.getTimeUnits(), None)
             if not time_units:
                 time_units = model_sbml.getTimeUnits()
-                # TODO: log error
+                logger.log(logging.INFO, '{}: model does not have valid time units'.format(self._filename))
 
             flux_units = pretty_print_units('({}) / ({})'.format(extent_units, time_units))
 
@@ -724,7 +725,7 @@ class SbmlBiomodelReader(BiomodelReader):
 
         unit_def_str = unit_def_sbml.printUnits(unit_def_sbml, True)
         if unit_def_str == 'indeterminable':
-            # TODO: log error
+            logger.log(logging.INFO, '{}: unit definition {} is invalid'.format(self._filename, unit_def_sbml.getId()))
             return None
 
         return pretty_print_units(unit_def_str.replace(', ', ' * '))

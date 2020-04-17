@@ -15,10 +15,12 @@ from ..biomodel.sbml import visualize_biomodel
 from ..simulation import read_simulation
 from ..simulation.core import SimulationIoError, SimulationIoWarning
 from ..simulation.data_model import SimulationFormat, Simulation
+from ..utils import logger
 from ..visualization.data_model import Visualization
 import copy
 import json
 import libsbml
+import logging
 import math
 import os
 import re
@@ -415,6 +417,8 @@ class BioModelsImporter(object):
                                     variable = obj_target_to_var.get(sim_result.variable.target, None)
 
                                     if not variable:
+                                        logger.log(logging.INFO, '{}: target {} is invalid'.format(id, sim_result.variable.target))
+
                                         match = re.match(r"^/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species\[@id='(.*?)'\]$",
                                                          sim_result.variable.target)
                                         if match:
@@ -423,14 +427,11 @@ class BioModelsImporter(object):
 
                                             if not variable:
                                                 variable = obj_name_to_var.get(species_id, None)
-                                                # TODO: log error
 
                                     if variable:
                                         sim_result.variable = variable
                                         valid_sim_results.append(sim_result)
                                         layout_el_has_vars = True
-                                    else:
-                                        pass  # TODO: log error
                             data_field.simulation_results = valid_sim_results
 
                             # if the data field doesn't have any simulation results, remove it from the subfigure

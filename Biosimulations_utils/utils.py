@@ -6,10 +6,12 @@
 :License: MIT
 """
 
+import logging
 import math
+import os
 import pint
 
-__all__ = ['get_enum_format_by_attr', 'unit_registry', 'pretty_print_units']
+__all__ = ['get_enum_format_by_attr', 'unit_registry', 'pretty_print_units', 'assert_exception', 'logger']
 
 
 def get_enum_format_by_attr(FormatEnum, attr_name, attr_val):
@@ -116,3 +118,29 @@ def assert_exception(success, exception):
     """
     if not success:
         raise exception
+
+
+def create_logger():
+    """ Create a logger
+
+    Returns:
+        :obj:`logging.Logger`: logger
+    """
+    formatter = logging.Formatter('-'.join([
+        '%(levelname)s',
+        '%(pathname)s',
+        '%(funcName)s',
+        '%(lineno)d',
+        '%(message)s',
+    ]))
+
+    handler = logging.FileHandler(os.path.expanduser('~/.cache/Biosimulations_utils/log.log'))
+    handler.setFormatter(formatter)
+
+    logger = logging.getLogger('biosimulations_utils')
+    logger.addHandler(handler)
+
+    return logger
+
+
+logger = create_logger()

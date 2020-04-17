@@ -122,13 +122,15 @@ class BioModelsImporterTestCase(unittest.TestCase):
                 field_vars.append(sim_result_vars)
             layout_vars.append(field_vars)
 
+        print(layout_vars)
+
         self.assertEqual(layout_vars, [
             [
                 ['urn:sedml:symbol:time'],
                 [
                     "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='BE']",
-                    "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Cln']"
-                    "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Sic']"
+                    "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Cln']",
+                    "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='Sic']",
                 ],
             ],
             [

@@ -14,12 +14,13 @@ from ..chart.data_model import Chart, ChartDataField, ChartDataFieldShape, Chart
 from ..data_model import Format, JournalReference, License, OntologyTerm, Person, RemoteFile
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
-from ..utils import assert_exception, get_enum_format_by_attr
+from ..utils import assert_exception, get_enum_format_by_attr, logger
 from xml.sax import saxutils
 import copy
 import dateutil.parser
 import enum
 import libsedml
+import logging
 import os
 import warnings
 
@@ -30,7 +31,7 @@ __all__ = [
 
 
 class SedMlSimulationWriter(SimulationWriter):
-    """ Base class for SED-ML generator for each model format
+    """ SED-ML writer
 
     Attributes:
         _num_meta_id (:obj:`int`): number of assigned meta ids
@@ -602,6 +603,12 @@ class SedMlSimulationWriter(SimulationWriter):
 
 
 class SedMlSimulationReader(SimulationReader):
+    """ SED-ML reader
+
+    Attributes:
+        _filename (:obj:`str`): Path to save simulation experiment in SED-ML format
+    """
+
     def run(self, filename):
         """ Base class for reading a simulation experiment from a SED document
 
@@ -621,6 +628,8 @@ class SedMlSimulationReader(SimulationReader):
                 * The models or simulations don't have unique ids
                 * A model or simulation references cannot be resolved
         """
+        self._filename = filename
+
         doc_sed = libsedml.readSedMLFromFile(filename)
         if doc_sed.getErrorLog().getNumFailsWithSeverity(libsedml.LIBSEDML_SEV_ERROR):
             raise SimulationIoError('libsedml error: {}'.format(doc_sed.getErrorLog().toString()))
@@ -682,7 +691,7 @@ class SedMlSimulationReader(SimulationReader):
             model_sed = models_sed.get(task_sed.getModelReference(), None)
             if not model_sed:
                 model_sed = default_model_sed
-                # TODO: log error
+                logger.log(logging.INFO, '{}: model reference {} is invalid'.format(self._filename, task_sed.getModelReference()))
             assert_exception(model_sed is not None, SimulationIoError("Model {} in {} cannot be determined".format(
                 task_sed.getModelReference(), filename)))
             self._read_model(model_sed, sim)
@@ -692,7 +701,7 @@ class SedMlSimulationReader(SimulationReader):
             sim_sed = sims_sed.get(task_sed.getSimulationReference(), default_sim_sed)
             if not sim_sed:
                 sim_sed = default_sim_sed
-                # TODO: log error
+                logger.log(logging.INFO, '{}: simulation reference {} is invalid'.format(self._filename, task_sed.getSimulationReference()))
             assert_exception(sim_sed is not None, SimulationIoError("Simulation {} in {} cannot be determined".format(
                 task_sed.getSimulationReference(), filename)))
             self._read_sim(sim_sed, filename, sim)
@@ -702,7 +711,7 @@ class SedMlSimulationReader(SimulationReader):
             task_id = task_sed.getId()
             if task_id in task_id_to_sim:
                 warnings.warn('Tasks of {} must have unique ids'.format(os.path.basename(filename)), SimulationIoWarning)
-                # TODO: log error
+                logger.log(logging.INFO, '{}: task id {} is not unique'.format(self._filename, task_id))
                 task_id_to_sim[task_id] = None
             else:
                 task_id_to_sim[task_id] = sim
@@ -717,7 +726,7 @@ class SedMlSimulationReader(SimulationReader):
                 data_gen_id = data_gen_sed.getId()
                 if data_gen_id in data_gen_id_to_task_id:
                     warnings.warn('Data generators of {} must have unique ids'.format(os.path.basename(filename)), SimulationIoWarning)
-                    # TODO: log error
+                    logger.log(logging.INFO, '{}: data generator id {} is not unique'.format(self._filename, data_gen_id))
                     data_gen_id_to_task_id[data_gen_id] = None
                     data_gen_id_to_var_target[data_gen_id] = None
                 else:
@@ -745,22 +754,22 @@ class SedMlSimulationReader(SimulationReader):
                 y_task_id = data_gen_id_to_task_id.get(y_data_gen_id, None)
                 if not x_task_id:
                     warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimulationIoWarning)
-                    # TODO: log error
+                    logger.log(logging.INFO, '{}: data generator {} cannot be resolved'.format(self._filename, x_data_gen_id))
                     continue
                 if not y_task_id:
                     warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimulationIoWarning)
-                    # TODO: log error
+                    logger.log(logging.INFO, '{}: data generator {} cannot be resolved'.format(self._filename, y_data_gen_id))
                     continue
 
                 x_sim = task_id_to_sim.get(x_task_id, None)
                 y_sim = task_id_to_sim.get(y_task_id, None)
                 if not x_sim:
                     warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimulationIoWarning)
-                    # TODO: log error
+                    logger.log(logging.INFO, '{}: task {} cannot be resolved'.format(self._filename, x_task_id))
                     continue
                 if not y_sim:
                     warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimulationIoWarning)
-                    # TODO: log error
+                    logger.log(logging.INFO, '{}: task {} cannot be resolved'.format(self._filename, y_task_id))
                     continue
 
                 x_var = self._get_model_var_by_data_gen_id(x_data_gen_id, data_gen_id_to_var_target,
@@ -776,12 +785,12 @@ class SedMlSimulationReader(SimulationReader):
             elif not all([sim_res.variable.target == 'urn:sedml:symbol:time' for sim_res in x_sim_results]) or \
                     len(set([curve_sed.getLogX() for curve_sed in output_sed.getListOfCurves()])) > 1:
                 warnings.warn('Curves of {} in {} must have the same X axis'.format(output_sed.getId(), filename), SimulationIoWarning)
-                # TODO: log error
+                logger.log(logging.INFO, '{}: curves of {} have incompatible X axes'.format(self._filename, output_sed.getId()))
                 continue
 
             if len(set([curve_sed.getLogY() for curve_sed in output_sed.getListOfCurves()])) > 1:
                 warnings.warn('Curves if {} in {} must have the same Y axis'.format(output_sed.getId(), filename), SimulationIoWarning)
-                # TODO: log error
+                logger.log(logging.INFO, '{}: curves of {} have incompatible Y axes'.format(self._filename, output_sed.getId()))
                 continue
 
             if not x_sim_results or not y_sim_results:

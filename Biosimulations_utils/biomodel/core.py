@@ -14,7 +14,14 @@ __all__ = ['BiomodelReader', 'BiomodelIoError', 'BiomodelIoWarning']
 
 
 class BiomodelReader(abc.ABC):
-    """ Read information about models """
+    """ Read information about models
+
+    Attributes:
+        _filename (:obj:`str`): path to a file which defines a model
+    """
+
+    def __init__(self):
+        self._filename = None
 
     def run(self, filename):
         """ Read a model from a file
@@ -25,6 +32,8 @@ class BiomodelReader(abc.ABC):
         Returns:
             :obj:`Biomodel`: model
         """
+        self._filename = filename
+
         model = Biomodel()
         model_orig = self._read_from_file(filename, model)
         self._read_format(model_orig, model)

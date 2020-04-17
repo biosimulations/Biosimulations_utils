@@ -10,12 +10,16 @@ try:
     from Biosimulations_utils.simulator.testing import SimulatorValidator
 except ModuleNotFoundError:
     pass
+try:
+    import docker
+except ModuleNotFoundError:
+    docker = None
 import os
 import unittest
 
 
 class UtilsTestCase(unittest.TestCase):
-    @unittest.skipIf(os.getenv('CI', '0') in ['1', 'true'], 'Docker not setup in CI')
+    @unittest.skipIf(docker is None, 'Docker not available')
     def test(self):
         validator = SimulatorValidator()
         valid_examples, invalid_examples = validator.run('crbm/biosimulations_tellurium', 'tests/fixtures/tellurium-properties.json')

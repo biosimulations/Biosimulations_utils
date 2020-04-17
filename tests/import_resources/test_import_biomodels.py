@@ -30,13 +30,13 @@ class BioModelsImporterTestCase(unittest.TestCase):
         shutil.rmtree(self.dirname)
 
     def test_import(self):
-        importer = biomodels.BioModelsImporter(exec_simulation=docker is not None,
+        importer = biomodels.BioModelsImporter(exec_simulations=docker is not None,
                                                _max_models=3, _cache_dir=self.dirname, _dry_run=True)
         models, sims, vizs, stats = importer.run()
         self.assertEqual(len(models), 3)
 
     def test_import_diverse_set_of_models(self):
-        importer = biomodels.BioModelsImporter(exec_simulation=docker is not None,
+        importer = biomodels.BioModelsImporter(exec_simulations=docker is not None,
                                                _max_models=7, _cache_dir=self.dirname, _dry_run=True)
         return_value = {
             'matches': 925,

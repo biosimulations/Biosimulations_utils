@@ -7,7 +7,7 @@
 """
 
 from ..data_model import Format, OntologyTerm, RemoteFile, Taxon, Type  # noqa: F401
-from ..utils import pretty_print_units, crop_image, logger
+from ..utils import pretty_print_units, crop_image, get_logger
 from .core import BiomodelReader, BiomodelIoError
 from .data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelingFramework, BiomodelFormat  # noqa: F401
 import copy
@@ -42,7 +42,15 @@ class XmlName(object):
 
 
 class SbmlBiomodelReader(BiomodelReader):
-    """ Read information about SBML-encoded models """
+    """ Read information about SBML-encoded models
+
+    Attributes:
+        _logger (:obj:`logging.Logger`): logger
+    """
+
+    def __init__(self):
+        super(SbmlBiomodelReader, self).__init__()
+        self._logger = get_logger('sbml')
 
     def _read_from_file(self, filename, model):
         """ Read a SBML-encoded model from a file
@@ -248,7 +256,7 @@ class SbmlBiomodelReader(BiomodelReader):
             species_substance_units = units.get(species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits(), None)
             if not species_substance_units:
                 species_substance_units = species_sbml.getSubstanceUnits() or model_sbml.getSubstanceUnits()
-                logger.log(logging.INFO, '{}: species {} does not have valid units'.format(self._filename, species_sbml.getId()))
+                self._logger.log(logging.ERROR, '{}: species {} does not have valid units'.format(self._filename, species_sbml.getId()))
             if species_sbml.isSetInitialAmount():
                 species_initial_type = 'Amount'
                 species_initial_val = species_sbml.getInitialAmount()
@@ -523,12 +531,12 @@ class SbmlBiomodelReader(BiomodelReader):
             extent_units = units.get(model_sbml.getExtentUnits(), None)
             if not extent_units:
                 extent_units = model_sbml.getExtentUnits()
-                logger.log(logging.INFO, '{}: model does not have valid extent units'.format(self._filename))
+                self._logger.log(logging.ERROR, '{}: model does not have valid extent units'.format(self._filename))
 
             time_units = units.get(model_sbml.getTimeUnits(), None)
             if not time_units:
                 time_units = model_sbml.getTimeUnits()
-                logger.log(logging.INFO, '{}: model does not have valid time units'.format(self._filename))
+                self._logger.log(logging.ERROR, '{}: model does not have valid time units'.format(self._filename))
 
             flux_units = pretty_print_units('({}) / ({})'.format(extent_units, time_units))
 
@@ -723,7 +731,7 @@ class SbmlBiomodelReader(BiomodelReader):
 
         unit_def_str = unit_def_sbml.printUnits(unit_def_sbml, True)
         if unit_def_str == 'indeterminable':
-            logger.log(logging.INFO, '{}: unit definition {} is invalid'.format(self._filename, unit_def_sbml.getId()))
+            self._logger.log(logging.ERROR, '{}: unit definition {} is invalid'.format(self._filename, unit_def_sbml.getId()))
             return None
 
         return pretty_print_units(unit_def_str.replace(', ', ' * '))
@@ -857,6 +865,8 @@ def visualize_biomodel(model_filename, img_filename, requests_session=None, remo
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError:
+            logger = get_logger('minerva')
+            logger.log(logging.ERROR, '{}: unable to generate image: {}'.format(os.path.basename(model_filename), response.content))
             raise BiomodelIoError('Unable to generate image for {}: {}'.format(os.path.basename(model_filename), response.content))
         with open(img_filename, 'wb') as file:
             file.write(response.content)

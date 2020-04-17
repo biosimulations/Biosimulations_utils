@@ -16,7 +16,7 @@ from ..data_model import Identifier, JournalReference, License, Person, RemoteFi
 from ..simulation import read_simulation
 from ..simulation.core import SimulationIoError, SimulationIoWarning
 from ..simulation.data_model import SimulationFormat, Simulation, TimecourseSimulation
-from ..utils import crop_image, logger
+from ..utils import crop_image, get_logger
 from ..visualization.data_model import Visualization
 import copy
 import json
@@ -46,6 +46,8 @@ class BioModelsImporter(object):
         _cache_dir (:obj:`str`): directory to cache models from BioModels
         _dry_run (:obj:`bool`): if :obj:`True`, do not post models to BioModels
         _requests_session (:obj:`requests_cache.core.CachedSession`): requests cached session
+        _sedml_logger (:obj:`logging.Logger`): logger for SED-ML issues
+        _tellurium_logger (:obj:`logging.Logger`): logger for tellurium issues
     """
     BIOMODELS_ENDPOINT = 'https://www.ebi.ac.uk/biomodels'
     PUBMED_ENDPOINT = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
@@ -66,6 +68,8 @@ class BioModelsImporter(object):
         self._max_models = _max_models
         self._cache_dir = _cache_dir
         self._dry_run = _dry_run
+        self._sedml_logger = get_logger('sedml')
+        self._tellurium_logger = get_logger('tellurium')
         self.init_requests_cache()
 
     def init_requests_cache(self):
@@ -211,7 +215,7 @@ class BioModelsImporter(object):
                         except RuntimeError as error:
                             shutil.rmtree(out_dir)
                             unsimulatable_models.append(model_result['id'])
-                            logger.log(logging.INFO, '{}: cannot be simulated: {}'.format(sim.id, str(error)))
+                            self._tellurium_logger.log(logging.ERROR, '{}: cannot be simulated: {}'.format(sim.id, str(error)))
 
                         sim.model = old_model
                         sim.format = orig_format
@@ -489,7 +493,7 @@ class BioModelsImporter(object):
                                     variable = obj_target_to_var.get(sim_result.variable.target, None)
 
                                     if not variable:
-                                        logger.log(logging.INFO, '{}: target {} is invalid'.format(id, sim_result.variable.target))
+                                        self._sedml_logger.log(logging.ERROR, '{}: target {} is invalid'.format(id, sim_result.variable.target))
 
                                         match = re.match(r"^/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species\[@id='(.*?)'\]$",
                                                          sim_result.variable.target)

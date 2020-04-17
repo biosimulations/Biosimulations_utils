@@ -13,7 +13,7 @@ import os
 import PIL
 import pint
 
-__all__ = ['get_enum_format_by_attr', 'unit_registry', 'pretty_print_units', 'crop_image', 'assert_exception', 'logger']
+__all__ = ['get_enum_format_by_attr', 'unit_registry', 'pretty_print_units', 'crop_image', 'assert_exception', 'get_logger']
 
 
 def get_enum_format_by_attr(FormatEnum, attr_name, attr_val):
@@ -150,11 +150,27 @@ def assert_exception(success, exception):
         raise exception
 
 
-def create_logger():
-    """ Create a logger
+def get_logger(name='log'):
+    """ Get a logger
+
+    Args:
+        name (:obj:`str`, optional): name
 
     Returns:
         :obj:`logging.Logger`: logger
+    """
+    logger = logging.getLogger('biosimulations_utils-' + name)
+    if not logger.handlers:
+        config_logger(logger, name)
+    return logger
+
+
+def config_logger(logger, name='log'):
+    """ Create a logger
+
+    Args:
+        logger (:obj:`logging.Logger`): logger
+        name (:obj:`str`, optional): name
     """
     formatter = logging.Formatter('-'.join([
         '%(levelname)s',
@@ -167,13 +183,14 @@ def create_logger():
     log_dir = os.path.expanduser('~/.cache/Biosimulations_utils/')
     if not os.path.isdir(log_dir):
         os.makedirs(log_dir)
-    handler = logging.FileHandler(os.path.join(log_dir, 'Biosimulations_utils.log'))
+    handler = logging.FileHandler(os.path.join(log_dir, name + '.log'))
     handler.setFormatter(formatter)
 
-    logger = logging.getLogger('biosimulations_utils')
+    logger = logging.getLogger('biosimulations_utils-' + name)
     logger.addHandler(handler)
 
-    return logger
-
-
-logger = create_logger()
+    logger.log(logging.ERROR, '')
+    logger.log(logging.ERROR, '')
+    logger.log(logging.ERROR, '===============')
+    logger.log(logging.ERROR, 'Log initialized')
+    logger.log(logging.ERROR, '===============')

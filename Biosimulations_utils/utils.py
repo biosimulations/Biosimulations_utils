@@ -164,7 +164,10 @@ def create_logger():
         '%(message)s',
     ]))
 
-    handler = logging.FileHandler(os.path.expanduser('~/.cache/Biosimulations_utils/log.log'))
+    log_dir = os.path.expanduser('~/.cache/Biosimulations_utils/')
+    if not os.path.isdir(log_dir):
+        os.makedirs(log_dir)
+    handler = logging.FileHandler(os.path.join(log_dir, 'Biosimulations_utils.log'))
     handler.setFormatter(formatter)
 
     logger = logging.getLogger('biosimulations_utils')

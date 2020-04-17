@@ -563,6 +563,40 @@ class SbmlBiomodelReader(BiomodelReader):
             for species_sbml in model_sbml.getListOfSpecies():
                 vars.append(self._read_variable(model_sbml, species_sbml, model))
 
+            # compartments, parameters set via assignment rules
+            for rule_sbml in model_sbml.getListOfRules():
+                type, _ = self._read_constant_from_math(rule_sbml.getMath())
+                if type:
+                    continue
+
+                if rule_sbml.isScalar():
+                    var_id = rule_sbml.getVariable()
+                    var_sbml = model_sbml.getElementBySId(var_id)
+                    if isinstance(var_sbml, libsbml.Parameter):
+                        vars.append(BiomodelVariable(
+                            target=("/sbml:sbml/sbml:model/sbml:listOfParameters"
+                                    "/sbml:parameter[@id='{}']/@value").format(var_id),
+                            group='Other',
+                            id=var_id,
+                            name=var_sbml.getName() or None,
+                            description=None,
+                            identifiers=[],
+                            type=Type.float,
+                            units=self._format_unit_def(var_sbml.getDerivedUnitDefinition()),
+                        ))
+                    elif isinstance(var_sbml, libsbml.Compartment):
+                        vars.append(BiomodelVariable(
+                            target=("/sbml:sbml/sbml:model/sbml:listOfCompartments"
+                                    "/sbml:compartment[@id='{}']/@value").format(var_id),
+                            group='Compartment sizes',
+                            id=var_id,
+                            name=var_sbml.getName() or None,
+                            description=None,
+                            identifiers=[],
+                            type=Type.float,
+                            units=self._format_unit_def(var_sbml.getDerivedUnitDefinition()),
+                        ))
+
             # qualitative species of qual package
             qual_plugin = model_sbml.getPlugin('qual')
             if qual_plugin:

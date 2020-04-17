@@ -250,7 +250,8 @@ class ReadSbmlBiomodelTestCase(unittest.TestCase):
         ))
         self.assertEqual(next((param for param in model.parameters if param.id == 'assignment_CycB'), None), None)
 
-    def test_run_ignore_parameters_set_by_assignment(self):
+    def test_run_parameters_set_by_assignment(self):
+        """ exclude parameters set via assignment from independent parameters """
         filename = 'tests/fixtures/MODEL1904090001.sbml-L3V2.xml'
         model = read_biomodel(filename, format=BiomodelFormat.sbml)
 
@@ -259,6 +260,26 @@ class ReadSbmlBiomodelTestCase(unittest.TestCase):
 
         # assignment rule
         self.assertEqual(next((param for param in model.parameters if param.id == 'a_sum'), None), None)
+
+        self.assertEqual(set([v.target for v in model.variables]).intersection(set([p.target for p in model.parameters])), set())
+
+        """ include parameters set via assignment in dependent variables """
+        filename = 'tests/fixtures/BIOMD0000000075.xml'
+        model = read_biomodel(filename, format=BiomodelFormat.sbml)
+        self.assertEqual(
+            set([var.id for var in model.variables if var.group == 'Other']),
+            set([
+                'Rate_PIP2SynStim_PIP2Syn',
+                'signal_PLCact',
+                'Rate_PIP2Synbasal_PIP2Syn',
+                'kr_PIP2PH_PIP2_PH',
+                'kr_IP3PH_IP3_PHGFP',
+                'Ratestim_PIPsyn_PIPSyn',
+                'Ratebasal_PIPsyn_PIPSyn',
+            ])
+        )
+
+        self.assertEqual(set([v.target for v in model.variables]).intersection(set([p.target for p in model.parameters])), set())
 
     def test_run_file_does_not_exist(self):
         with self.assertRaisesRegex(ValueError, 'does not exist'):

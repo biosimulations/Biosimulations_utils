@@ -14,7 +14,6 @@ try:
     import docker
 except ModuleNotFoundError:
     docker = None
-import os
 import unittest
 
 

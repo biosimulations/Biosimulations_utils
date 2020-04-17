@@ -8,7 +8,7 @@
 
 from Biosimulations_utils.archive import read_archive
 from Biosimulations_utils.archive.data_model import ArchiveFormat
-from Biosimulations_utils.archive.exec import gen_archive_for_sim
+from Biosimulations_utils.archive.exec import gen_archive_for_sim, exec_archive
 from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person
 from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat, BiomodelParameter
@@ -19,7 +19,6 @@ from Biosimulations_utils.simulator.data_model import Simulator
 import copy
 import datetime
 import dateutil.tz
-import docker
 import enum
 import json
 import os
@@ -99,9 +98,6 @@ class TestCaseException(object):
 class SimulatorValidator(object):
     """ Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
     checking that the image produces the correct outputs for one of more test cases (e.g., COMBINE archive)
-
-    Attributes:
-        _docker_client (:obj:`docker.client.DockerClient`): Docker client
     """
 
     # TODO: add more test cases and more detailed assertions; potentially use SBML test suite
@@ -132,9 +128,6 @@ class SimulatorValidator(object):
             archive_format=ArchiveFormat.combine,
         ),
     )
-
-    def __init__(self):
-        self._docker_client = docker.from_env()
 
     def run(self, dockerhub_id, properties_filename):
         """ Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
@@ -334,53 +327,17 @@ class SimulatorValidator(object):
             archive_filename (:obj:`str`): path to archive
             dockerhub_id (:obj:`str`): DockerHub id of simulator
         """
+        # create output directory
+        out_dir = tempfile.mkdtemp()
 
         # execute archive
-        out_dir = self._exec_archive(archive_filename, dockerhub_id)
+        exec_archive(archive_filename, dockerhub_id, out_dir)
 
         # check output
         self._assert_archive_output_valid(test_case, archive_filename, out_dir)
 
         # cleanup
         shutil.rmtree(out_dir)
-
-    def _exec_archive(self, archive_filename, dockerhub_id):
-        """ Execute the tasks described in a archive
-
-        Args:
-            archive_filename (:obj:`str`): path to archive
-            dockerhub_id (:obj:`str`): DockerHub id of simulator
-
-        Returns:
-            :obj:`str`: directory where simulation results where saved
-
-        Raises:
-            :obj:`RuntimeError`: if the execution failed
-        """
-        out_dir = tempfile.mkdtemp()
-
-        container = self._docker_client.containers.run(
-            dockerhub_id,
-            volumes={
-                os.path.dirname(archive_filename): {
-                    'bind': '/root/in',
-                    'mode': 'ro',
-                },
-                out_dir: {
-                    'bind': '/root/out',
-                    'mode': 'rw',
-                }
-            },
-            command=['-i', '/root/in/' + os.path.basename(archive_filename), '-o', '/root/out'],
-            tty=True,
-            detach=True)
-        status = container.wait()
-        if status['StatusCode'] != 0:
-            raise RuntimeError(container.logs().decode().replace('\\r\\n', '\n').strip())
-        container.stop()
-        container.remove()
-
-        return out_dir
 
     def _assert_archive_output_valid(self, test_case, archive_filename, out_dir):
         """ Validate that the outputs of an archive were correctly generated

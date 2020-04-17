@@ -13,12 +13,13 @@ from .sedml import SedMlSimulationWriter, SedMlSimulationReader
 __all__ = ['write_simulation', 'read_simulation']
 
 
-def write_simulation(sim, filename, format=SimulationFormat.sedml, **format_opts):
+def write_simulation(sim, filename, format=SimulationFormat.sedml, visualization=None, **format_opts):
     """ Write a simulation experiment to a file
 
     Args:
         sim (:obj:`dict`): Simulation experiment
         filename (:obj:`str`): Path to save simulation experiment in SED-ML format
+        visualization (:obj:`Visualization`, optional): visualization
         format (:obj:`SimulationFormat`, optional): simulation experiment format
         format_opts (:obj:`dict`, optional): options to the simulation experiment format (e.g., level, version)
 
@@ -29,7 +30,7 @@ def write_simulation(sim, filename, format=SimulationFormat.sedml, **format_opts
         Writer = SedMlSimulationWriter
     else:
         raise NotImplementedError("Simulation experiment format {} is not supported".format(format.name))
-    return Writer().run(sim, filename, **format_opts)
+    return Writer().run(sim, filename, visualization=visualization, **format_opts)
 
 
 def read_simulation(filename, format=SimulationFormat.sedml):

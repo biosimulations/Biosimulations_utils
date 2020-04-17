@@ -7,15 +7,13 @@
 """
 
 from ..data_model import Format, OntologyTerm, RemoteFile, Taxon, Type  # noqa: F401
-from ..utils import pretty_print_units, logger
+from ..utils import pretty_print_units, crop_image, logger
 from .core import BiomodelReader, BiomodelIoError
 from .data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelingFramework, BiomodelFormat  # noqa: F401
-from PIL import Image
 import copy
 import ete3
 import libsbml
 import logging
-import numpy
 import os
 import re
 import requests
@@ -862,23 +860,6 @@ def visualize_biomodel(model_filename, img_filename, requests_session=None, remo
             raise BiomodelIoError('Unable to generate image for {}: {}'.format(os.path.basename(model_filename), response.content))
         with open(img_filename, 'wb') as file:
             file.write(response.content)
-        img = Image.open(img_filename)
-
-        # make the background of the visualization transparent
-        img = img.convert('RGBA')
-        img_data = numpy.array(img)
-        img_rgb = img_data[:, :, :3]
-        white = [255, 255, 255]
-        transparent = [0, 0, 0, 0]
-        mask = numpy.all(img_rgb == white, axis=-1)
-        img_data[mask] = transparent
-        img = Image.fromarray(img_data)
-
-        # crop the visualization
-        img_bbox = img.getbbox()
-        cropped_img = img.crop(img_bbox)
-
-        # save the visualization
-        cropped_img.save(img_filename)
+        crop_image(img_filename, background_to_transparent=[255, 255, 255])
 
     return RemoteFile(name=os.path.basename(img_filename), type='image/png', size=os.path.getsize(img_filename))

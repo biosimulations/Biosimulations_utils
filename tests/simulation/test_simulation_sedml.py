@@ -45,7 +45,7 @@ class WriteSedMlTestCase(unittest.TestCase):
             ],
         )
         sim.model.format.version = 'L1V3'
-        sim_filename = os.path.join(self.dirname, 'simulation.sed-ml.xml')
+        sim_filename = os.path.join(self.dirname, 'simulation.sedml')
         write_simulation(sim, sim_filename, SimulationFormat.sedml, level=1, version=3)
 
         sims_2, _ = read_simulation(
@@ -201,7 +201,7 @@ class WriteSedMlTestCase(unittest.TestCase):
     def test_read_visualizations_with_log_axis(self):
         filename = 'tests/fixtures/BIOMD0000000297-with-log-axis.sedml'
         _, viz = read_simulation(filename, SimulationFormat.sedml)
-        self.assertEqual(viz.layout[0].chart.id, 'line-logX-logY')
+        self.assertEqual(viz.layout[0].chart.id, 'line_logX_logY')
 
     def test_read_visualizations_with_consistent_x_axes(self):
         filename = 'tests/fixtures/BIOMD0000000739.sedml'

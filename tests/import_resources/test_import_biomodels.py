@@ -12,6 +12,10 @@ from Biosimulations_utils.biomodel.data_model import Biomodel
 from Biosimulations_utils.simulation.data_model import Simulation
 from Biosimulations_utils.visualization.data_model import Visualization
 from unittest import mock
+try:
+    import docker
+except ModuleNotFoundError:
+    docker = None
 import shutil
 import tempfile
 import unittest
@@ -26,12 +30,14 @@ class BioModelsImporterTestCase(unittest.TestCase):
         shutil.rmtree(self.dirname)
 
     def test_import(self):
-        importer = biomodels.BioModelsImporter(_max_models=3, _cache_dir=self.dirname, _dry_run=True)
+        importer = biomodels.BioModelsImporter(exec_simulation=docker is not None,
+                                               _max_models=3, _cache_dir=self.dirname, _dry_run=True)
         models, sims, vizs, stats = importer.run()
         self.assertEqual(len(models), 3)
 
     def test_import_diverse_set_of_models(self):
-        importer = biomodels.BioModelsImporter(_max_models=6, _cache_dir=self.dirname, _dry_run=True)
+        importer = biomodels.BioModelsImporter(exec_simulation=docker is not None,
+                                               _max_models=7, _cache_dir=self.dirname, _dry_run=True)
         return_value = {
             'matches': 925,
             'models': [
@@ -39,7 +45,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
                 {'id': 'BIOMD0000000002', 'name': 'Edelstein1996 - EPSP ACh species'},
                 {'id': 'BIOMD0000000003', 'name': 'Goldbeter1991 - Min Mit Oscil'},
                 {
-                    'id': 'BIOMD0000000297',  # has time course simulation
+                    'id': 'BIOMD0000000297',  # has time course simulation; tellurium fails on SED-ML interpretation
                     'name': 'Ciliberto2003_Morphogenesis_Checkpoint',
                 },
                 {
@@ -47,7 +53,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
                     'name': 'Musante2017 - Switching behaviour of PP2A inhibition by ARPP-16 - mutual inhibitions',
                 },
                 {'id': 'BIOMD0000000075', 'name': 'Xu2003 - Phosphoinositide turnover'},  # unable to generate image
-                {'id': 'BIOMD0000000007', 'name': 'Novak1997 - Cell Cycle'},
+                {'id': 'BIOMD0000000596', 'name': 'Philipson2015 - Innate immune response modulated by NLRX1'},
                 {'id': 'BIOMD0000000008', 'name': 'Gardner1998 - Cell Cycle Goldbeter'},
                 {'id': 'BIOMD0000000009', 'name': 'Huang1996 - Ultrasensitivity in MAPK cascade'},
                 {
@@ -58,7 +64,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
         }
         with mock.patch.object(biomodels.BioModelsImporter, 'get_model_batch', return_value=return_value):
             models, sims, vizs, stats = importer.run()
-        self.assertEqual(len(models), 6)
+        self.assertEqual(len(models), 7)
 
         self.assertEqual(models[0].id, 'BIOMD0000000001')
         self.assertEqual(models[0].name, 'Edelstein1996 - EPSP ACh event')
@@ -109,7 +115,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
         # verify invalid curves removed
         model = models[3]
         for viz in vizs:
-            if viz.id == '{}-viz'.format(model.id):
+            if viz.id == '{}_viz'.format(model.id):
                 break
 
         layout_vars = []
@@ -121,8 +127,6 @@ class BioModelsImporterTestCase(unittest.TestCase):
                     sim_result_vars.append(sim_result.variable.target)
                 field_vars.append(sim_result_vars)
             layout_vars.append(field_vars)
-
-        print(layout_vars)
 
         self.assertEqual(layout_vars, [
             [
@@ -146,9 +150,9 @@ class BioModelsImporterTestCase(unittest.TestCase):
         # verify stats
         self.assertEqual(stats, {
             'models': {
-                'total': 6,
+                'total': 7,
                 'frameworks': {
-                    'non-spatial continuous framework': 6,
+                    'non-spatial continuous framework': 7,
                 },
                 'layouts': 0,
                 'taxa': {
@@ -158,16 +162,16 @@ class BioModelsImporterTestCase(unittest.TestCase):
                     'Mus musculus': 1,
                     'Mus sp.': 1,
                 },
-                'simulated': 2,
+                'simulated': 3,
             },
             'sims': {
-                'total': 3,
-                'time course': 2,
+                'total': 4,
+                'time course': 3,
                 'one step': 0,
                 'steady-state': 1,
             },
             'vizs': {
-                'total': 1,
+                'total': 2,
             },
         })
 

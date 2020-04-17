@@ -37,13 +37,14 @@ class SedMlSimulationWriter(SimulationWriter):
         _num_meta_id (:obj:`int`): number of assigned meta ids
     """
 
-    def run(self, sim, filename, level=1, version=3):
+    def run(self, sim, filename, level=1, version=3, visualization=None):
         """
         Args:
             sim (:obj:`Simulation`): Simulation experiment
             filename (:obj:`str`): Path to save simulation experiment in SED-ML format
-            level (:obj:`int`): SED-ML level
-            version (:obj:`int`): SED-ML version
+            level (:obj:`int`, optional): SED-ML level
+            version (:obj:`int`, optional): SED-ML version
+            visualization (:obj:`Visualization`, optional): visualization
 
         Returns:
             :obj:`libsedml.SedDocument`: SED document
@@ -62,7 +63,7 @@ class SedMlSimulationWriter(SimulationWriter):
         model_sed = self._add_model_to_doc(sim.model, doc_sed)
         self._add_parameter_changes_to_model(sim.model_parameter_changes, doc_sed, model_sed)
 
-        sim_sed = self._add_timecourse_sim_to_doc(sim, doc_sed)
+        sim_sed = self._add_sim_to_doc(sim, doc_sed)
         alg_sed = self._add_algorithm_to_sim(sim.algorithm, doc_sed, sim_sed)
         self._add_param_changes_to_alg(sim.algorithm_parameter_changes, doc_sed, alg_sed)
         task_sed = self._add_sim_task_to_doc(sim.id, sim.name, doc_sed, model_sed, sim_sed)
@@ -73,6 +74,9 @@ class SedMlSimulationWriter(SimulationWriter):
         self._add_data_set_to_report('time', 'time', doc_sed, report_sed, time_gen_sed)
 
         self._add_task_results_to_report(sim.model.variables, doc_sed, task_sed, report_sed)
+
+        if visualization:
+            self._add_viz_to_doc(visualization, doc_sed)
 
         self._export_doc(doc_sed, filename)
 
@@ -282,8 +286,8 @@ class SedMlSimulationWriter(SimulationWriter):
         self._call_libsedml_method(doc_sed, change_sed, 'setNewValue', str(change.value))
         return change_sed
 
-    def _add_timecourse_sim_to_doc(self, sim, doc_sed):
-        """ Add a timecourse simulation to a SED document
+    def _add_sim_to_doc(self, sim, doc_sed):
+        """ Add a simulation to a SED document
 
         Args:
             sim (:obj:`Simulation`): simulation experiment
@@ -292,15 +296,20 @@ class SedMlSimulationWriter(SimulationWriter):
         Returns:
             :obj:`libsedml.SedUniformTimeCourse`: timecourse simulation
         """
-        sim_sed = doc_sed.createUniformTimeCourse()
+        if isinstance(sim, TimecourseSimulation):
+            sim_sed = doc_sed.createUniformTimeCourse()
+            self._call_libsedml_method(doc_sed, sim_sed, 'setInitialTime', sim.start_time)
+            self._call_libsedml_method(doc_sed, sim_sed, 'setOutputStartTime', sim.output_start_time)
+            self._call_libsedml_method(doc_sed, sim_sed, 'setOutputEndTime', sim.end_time)
+            self._call_libsedml_method(doc_sed, sim_sed, 'setNumberOfPoints', sim.num_time_points)
+        else:
+            sim_sed = doc_sed.createSteadyState()
+
         if sim.id:
             self._call_libsedml_method(doc_sed, sim_sed, 'setId', sim.id)
         if sim.name:
             self._call_libsedml_method(doc_sed, sim_sed, 'setName', sim.name)
-        self._call_libsedml_method(doc_sed, sim_sed, 'setInitialTime', sim.start_time)
-        self._call_libsedml_method(doc_sed, sim_sed, 'setOutputStartTime', sim.output_start_time)
-        self._call_libsedml_method(doc_sed, sim_sed, 'setOutputEndTime', sim.end_time)
-        self._call_libsedml_method(doc_sed, sim_sed, 'setNumberOfPoints', sim.num_time_points)
+
         return sim_sed
 
     def _add_algorithm_to_sim(self, algorithm, doc_sed, sim_sed):
@@ -518,6 +527,61 @@ class SedMlSimulationWriter(SimulationWriter):
             })
         return seds
 
+    def _add_viz_to_doc(self, visualization, doc_sed):
+        """ Encode visualization into 2D plots in SED document
+
+        Args:
+            visualization (:obj:`Visualization`): visualization
+            doc_sed (:obj:`libsedml.SedDocument`): SED document
+        """
+        for i_layout_el, layout_el in enumerate(visualization.layout):
+            x_sim_results = next((field.simulation_results for field in layout_el.data if field.data_field.name == 'x'), None)
+            y_sim_results = next((field.simulation_results for field in layout_el.data if field.data_field.name == 'y'), None)
+            if not x_sim_results or not y_sim_results:
+                continue
+
+            plot_sed = doc_sed.createPlot2D()
+            plot_sed.setId("plot_{}".format(i_layout_el + 1))
+            plot_sed.setName(" ")
+
+            log_x = '_logX' in layout_el.chart.id
+            log_y = '_logY' in layout_el.chart.id
+
+            if len(x_sim_results) == 1:
+                x_sim_res = x_sim_results[0]
+                for y_sim_res in y_sim_results:
+                    self._add_curve_to_plot(x_sim_res, y_sim_res, log_x, log_y, plot_sed)
+
+            elif len(x_sim_results) == len(y_sim_results):
+                for x_sim_res, y_sim_res in zip(x_sim_results, y_sim_results):
+                    self._add_curve_to_plot(x_sim_res, y_sim_res, log_x, log_y, plot_sed)
+
+    def _add_curve_to_plot(self, x_sim_res, y_sim_res, log_x, log_y, plot_sed):
+        """
+        Args:
+            x_sim_res (:obj:`SimulationResult`): X simulation result
+            y_sim_res (:obj:`SimulationResult`): Y simulation result
+            log_x (:obj:`bool`): if :obj:`True`, plot X axis in log scale
+            log_y (:obj:`bool`): if :obj:`True`, plot Y axis in log scale
+            plot_sed (:obj:`libsedml.Plot2D`): plot
+        """
+        curve_sed = plot_sed.createCurve()
+        curve_sed.setId('{}_{}_{}'.format(plot_sed.getId(), y_sim_res.variable.id, x_sim_res.variable.id))
+
+        curve_sed.setLogX(log_x)
+        curve_sed.setLogY(log_y)
+
+        if x_sim_res.variable.target == 'urn:sedml:symbol:time':
+            curve_sed.setXDataReference("time")
+            curve_sed.setName(y_sim_res.variable.name or y_sim_res.variable.id)
+        else:
+            curve_sed.setXDataReference(x_sim_res.variable.id)
+            curve_sed.setName('{} vs. {}'.format(
+                y_sim_res.variable.name or y_sim_res.variable.id,
+                x_sim_res.variable.name or x_sim_res.variable.id))
+
+        curve_sed.setYDataReference(y_sim_res.variable.id)
+
     def _export_doc(self, doc_sed, filename):
         """ Export a SED document to an XML file
 
@@ -680,12 +744,18 @@ class SedMlSimulationReader(SimulationReader):
                     SimulationIoWarning)
                 continue
 
+            # simulation
+            sim_sed = sims_sed.get(task_sed.getSimulationReference(), default_sim_sed)
+            if not sim_sed:
+                sim_sed = default_sim_sed
+                logger.log(logging.INFO, '{}: simulation reference {} is invalid'.format(self._filename, task_sed.getSimulationReference()))
+            assert_exception(sim_sed is not None, SimulationIoError("Simulation {} in {} cannot be determined".format(
+                task_sed.getSimulationReference(), filename)))
+
             sim = self._create_sim(sim_sed)
             sim.id = task_sed.getId() or None
             sim.name = task_sed.getName() or None
-
-            # metadata
-            self._read_metadata(doc_sed, sim)
+            self._read_sim(sim_sed, filename, sim)
 
             # model
             model_sed = models_sed.get(task_sed.getModelReference(), None)
@@ -697,14 +767,8 @@ class SedMlSimulationReader(SimulationReader):
             self._read_model(model_sed, sim)
             self._read_model_variables(task_sed, sim)
 
-            # simulation
-            sim_sed = sims_sed.get(task_sed.getSimulationReference(), default_sim_sed)
-            if not sim_sed:
-                sim_sed = default_sim_sed
-                logger.log(logging.INFO, '{}: simulation reference {} is invalid'.format(self._filename, task_sed.getSimulationReference()))
-            assert_exception(sim_sed is not None, SimulationIoError("Simulation {} in {} cannot be determined".format(
-                task_sed.getSimulationReference(), filename)))
-            self._read_sim(sim_sed, filename, sim)
+            # metadata
+            self._read_metadata(doc_sed, sim)
 
             # append simulation to list of simulations
             sims.append(sim)
@@ -798,9 +862,9 @@ class SedMlSimulationReader(SimulationReader):
 
             chart_id = 'line'
             if output_sed.getCurve(0).getLogX():
-                chart_id += '-logX'
+                chart_id += '_logX'
             if output_sed.getCurve(0).getLogY():
-                chart_id += '-logY'
+                chart_id += '_logY'
 
             layout_el = VisualizationLayoutElement(
                 chart=Chart(id=chart_id),

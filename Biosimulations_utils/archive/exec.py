@@ -11,16 +11,21 @@ from . import write_archive
 from .data_model import Archive, ArchiveFile, ArchiveFormat
 from ..simulation import write_simulation
 from ..simulation.data_model import Simulation  # noqa: F401
+from ..visualization.data_model import Visualization  # noqa: F401
 import datetime
 import dateutil.tz
+try:
+    import docker
+except ModuleNotFoundError:
+    pass
 import os
 import tempfile
 import shutil
 
-__all__ = ['gen_archive_for_sim']
+__all__ = ['gen_archive_for_sim', 'exec_archive']
 
 
-def gen_archive_for_sim(model_filename, simulation, archive_filename, simulation_format_opts=None):
+def gen_archive_for_sim(model_filename, simulation, archive_filename, simulation_format_opts=None, visualization=None):
     """ Create a COMBINE archive of a simulation
 
     Args:
@@ -28,6 +33,7 @@ def gen_archive_for_sim(model_filename, simulation, archive_filename, simulation
         simulation (:obj:`Simulation`): simulation
         archive_filename (:obj:`str`): path to save the archive
         simulation_format_opts (:obj:`dict`, optional): keyword arguments for :obj:`write_simulation`
+        visualization (:obj:`Visualization`): visualization
 
     Returns:
         :obj:`Archive`: archive
@@ -44,7 +50,8 @@ def gen_archive_for_sim(model_filename, simulation, archive_filename, simulation
 
     # save simulation to the temporary directory
     sim_archive_filename = '{}.{}'.format(simulation.id, simulation.format.extension)
-    write_simulation(simulation, os.path.join(tmp_dir, sim_archive_filename), **(simulation_format_opts or {}))
+    write_simulation(simulation, os.path.join(tmp_dir, sim_archive_filename),
+                     visualization=visualization, **(simulation_format_opts or {}))
 
     # create archive
     archive = Archive(
@@ -95,3 +102,38 @@ def _get_omex_description(obj):
     if obj.description:
         desc += '\n\n' + obj.description
     return desc
+
+
+def exec_archive(archive_filename, dockerhub_id, out_dir):
+    """ Execute the tasks described in a archive
+
+    Args:
+        archive_filename (:obj:`str`): path to archive
+        dockerhub_id (:obj:`str`): DockerHub id of simulator
+        out_dir (:obj:`str`): directory where simulation results where saved
+
+    Raises:
+        :obj:`RuntimeError`: if the execution failed
+    """
+    docker_client = docker.from_env()
+
+    container = docker_client.containers.run(
+        dockerhub_id,
+        volumes={
+            os.path.dirname(archive_filename): {
+                'bind': '/root/in',
+                'mode': 'ro',
+            },
+            out_dir: {
+                'bind': '/root/out',
+                'mode': 'rw',
+            }
+        },
+        command=['-i', '/root/in/' + os.path.basename(archive_filename), '-o', '/root/out'],
+        tty=True,
+        detach=True)
+    status = container.wait()
+    if status['StatusCode'] != 0:
+        raise RuntimeError(container.logs().decode().replace('\\r\\n', '\n').strip())
+    container.stop()
+    container.remove()

@@ -2,6 +2,7 @@ attrdict
 click
 ete3
 numpy
+pdf2image
 pillow
 pint
 python_dateutil

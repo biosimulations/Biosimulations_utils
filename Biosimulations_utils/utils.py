@@ -8,10 +8,12 @@
 
 import logging
 import math
+import numpy
 import os
+import PIL
 import pint
 
-__all__ = ['get_enum_format_by_attr', 'unit_registry', 'pretty_print_units', 'assert_exception', 'logger']
+__all__ = ['get_enum_format_by_attr', 'unit_registry', 'pretty_print_units', 'crop_image', 'assert_exception', 'logger']
 
 
 def get_enum_format_by_attr(FormatEnum, attr_name, attr_val):
@@ -104,6 +106,34 @@ def pretty_print_units(units_str):
             return '{}{}'.format(pow_str, units)
         else:
             return '{} {}{}'.format(mag, pow_str, units)
+
+
+def crop_image(filename, background_to_transparent=None):
+    """ Crop an image and, optionally, make the background transparent
+
+    Args:
+        filename (:obj:`str`): path to image
+        background_to_transparent (:obj:`list` of :obj:`int`, optional): background
+            to make transparent
+    """
+    img = PIL.Image.open(filename)
+
+    # make the background of the visualization transparent
+    if background_to_transparent:
+        img = img.convert('RGBA')
+        img_data = numpy.array(img)
+        img_rgb = img_data[:, :, :3]
+        transparent = [0, 0, 0, 0]
+        mask = numpy.all(img_rgb == background_to_transparent, axis=-1)
+        img_data[mask] = transparent
+        img = PIL.Image.fromarray(img_data)
+
+    # crop the visualization
+    img_bbox = img.getbbox()
+    cropped_img = img.crop(img_bbox)
+
+    # save the visualization
+    cropped_img.save(filename)
 
 
 def assert_exception(success, exception):

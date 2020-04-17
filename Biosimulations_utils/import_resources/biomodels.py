@@ -7,15 +7,16 @@
 """
 
 from ..api_client import ApiClient
-from ..data_model import Identifier, JournalReference, License, Person, RemoteFile
+from ..archive.exec import gen_archive_for_sim, exec_archive
 from ..biomodel import read_biomodel
 from ..biomodel.core import BiomodelIoError
 from ..biomodel.data_model import BiomodelFormat, Biomodel  # noqa: F401
 from ..biomodel.sbml import visualize_biomodel
+from ..data_model import Identifier, JournalReference, License, Person, RemoteFile
 from ..simulation import read_simulation
 from ..simulation.core import SimulationIoError, SimulationIoWarning
-from ..simulation.data_model import SimulationFormat, Simulation
-from ..utils import logger
+from ..simulation.data_model import SimulationFormat, Simulation, TimecourseSimulation
+from ..utils import crop_image, logger
 from ..visualization.data_model import Visualization
 import copy
 import json
@@ -23,6 +24,7 @@ import libsbml
 import logging
 import math
 import os
+import pdf2image
 import re
 import requests
 import requests.adapters
@@ -39,6 +41,7 @@ class BioModelsImporter(object):
     """ Import models from BioModels
 
     Attributes:
+        exec_simulations (:obj:`bool`): if :obj:`True`, execute simulation experiments
         _max_models (:obj:`int`): maximum number of models to download from BioModels
         _cache_dir (:obj:`str`): directory to cache models from BioModels
         _dry_run (:obj:`bool`): if :obj:`True`, do not post models to BioModels
@@ -49,14 +52,17 @@ class BioModelsImporter(object):
     BIOSIMULATIONS_ENDPOINT = 'https://api.biosimulations.dev'
     NUM_MODELS_PER_BATCH = 100
     MAX_RETRIES = 5
+    SIMULATOR_DOCKERHUB_ID = 'crbm/biosimulations_tellurium'
 
-    def __init__(self, _max_models=float('inf'), _cache_dir=None, _dry_run=False):
+    def __init__(self, exec_simulations=True, _max_models=float('inf'), _cache_dir=None, _dry_run=False):
         """
         Args:
+            exec_simulations (:obj:`bool`, optional): if :obj:`True`, execute simulation experiments
             _max_models (:obj:`int`, optional): maximum number of models to download from BioModels
             _cache_dir (:obj:`str`, optional): directory to cache models from BioModels
             _dry_run (:obj:`bool`, optional): if :obj:`True`, do not post models to BioModels
         """
+        self.exec_simulations = exec_simulations
         self._max_models = _max_models
         self._cache_dir = _cache_dir
         self._dry_run = _dry_run
@@ -117,6 +123,7 @@ class BioModelsImporter(object):
         unimportable_models = []
         unimportable_sims = []
         unvisualizable_models = []
+        unsimulatable_models = []
         num_models = min(self._max_models, self.get_num_models())
         print('Importing {} models'.format(num_models))
         for i_batch in range(int(math.ceil(num_models / self.NUM_MODELS_PER_BATCH))):
@@ -145,7 +152,69 @@ class BioModelsImporter(object):
                 except BiomodelIoError:
                     unvisualizable_models.append(model_result['id'])
 
-                # todo: simulate models
+                # simulate models to generate images of simulations and visualizations
+                for sim in model_sims:
+
+                    viz_of_sim = None
+                    for viz in model_vizs:
+                        is_viz_of_sim = True
+                        for layout_el in viz.layout:
+                            for field in layout_el.data:
+                                for sim_result in field.simulation_results:
+                                    if sim != sim_result.simulation:
+                                        is_viz_of_sim = False
+                                        break
+                                if not is_viz_of_sim:
+                                    break
+                            if not is_viz_of_sim:
+                                break
+                        if is_viz_of_sim:
+                            viz_of_sim = viz
+                            break
+
+                    model_filename = os.path.join(self._cache_dir, model_result['id'] + '.xml')
+                    archive_filename = os.path.join(self._cache_dir, sim.id + '.omex')
+
+                    if self.exec_simulations:
+                        old_model = sim.model
+                        orig_format = sim.format
+                        sim.model = model
+                        sim.format = copy.copy(sim.format)
+                        sim.format.version = 'L1V3'
+                        gen_archive_for_sim(model_filename, sim, archive_filename,
+                                            simulation_format_opts={"format": SimulationFormat.sedml},
+                                            visualization=viz_of_sim)
+
+                        out_dir = os.path.join(self._cache_dir, sim.id)
+                        if not os.path.isdir(os.path.join(out_dir, sim.id)):
+                            os.makedirs(os.path.join(out_dir, sim.id))
+                        try:
+                            exec_archive(archive_filename, self.SIMULATOR_DOCKERHUB_ID, out_dir)
+                            if viz_of_sim:
+                                pdf_filename = os.path.join(out_dir, sim.id, 'plot_1.pdf')
+                                sim_png_filename = os.path.join(self._cache_dir, sim.id + '.png')
+                                viz_png_filename = os.path.join(self._cache_dir, viz.id + '.png')
+                                images = pdf2image.convert_from_path(pdf_filename, fmt='png')
+                                images[0].save(sim_png_filename)
+                                crop_image(sim_png_filename, background_to_transparent=[255, 255, 255])
+                                shutil.copyfile(sim_png_filename, viz_png_filename)
+                                sim.image = RemoteFile(
+                                    name=sim.id + '.png',
+                                    type='image/png',
+                                    size=os.path.getsize(sim_png_filename),
+                                )
+                                viz.image = RemoteFile(
+                                    name=viz.id + '.png',
+                                    type='image/png',
+                                    size=os.path.getsize(viz_png_filename),
+                                )
+                        except RuntimeError as error:
+                            shutil.rmtree(out_dir)
+                            unsimulatable_models.append(model_result['id'])
+                            logger.log(logging.INFO, '{}: cannot be simulated: {}'.format(sim.id, str(error)))
+
+                        sim.model = old_model
+                        sim.format = orig_format
 
                 if len(models) == self._max_models:
                     break
@@ -158,6 +227,9 @@ class BioModelsImporter(object):
         if unvisualizable_models:
             warnings.warn('Unable visualize the following models:\n  {}'.format(
                 '\n  '.join(sorted(unvisualizable_models))), BiomodelsIoWarning)
+        if unsimulatable_models:
+            warnings.warn('Unable simulate simulations of the following models:\n  {}'.format(
+                '\n  '.join(sorted(unsimulatable_models))), BiomodelsIoWarning)
 
         return (models, sims, vizs)
 
@@ -371,7 +443,7 @@ class BioModelsImporter(object):
         for file_metadata in files_metadata['additional']:
             if file_metadata['name'].endswith('.sedml'):
                 num_sim_files += 1
-                local_path = os.path.join(self._cache_dir, '{}-{}.sedml'.format(model.id, num_sim_files))
+                local_path = os.path.join(self._cache_dir, '{}_{}.sedml'.format(model.id, num_sim_files))
                 with open(local_path, 'wb') as file:
                     file.write(self.get_model_file(id, file_metadata['name']))
 
@@ -381,7 +453,7 @@ class BioModelsImporter(object):
                 assert len(model_files) <= 1, 'Each simulation must use the same model'
 
                 for sim in model_sims:
-                    sim.id = '{}-sim-{}'.format(model.id, len(sims))
+                    sim.id = '{}_sim_{}'.format(model.id, len(sims))
                     sim.name = file_metadata['name'][0:-6]
                     sim.description = file_metadata['description']
                     sim.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
@@ -395,7 +467,7 @@ class BioModelsImporter(object):
 
                 if model_viz:
                     # annotate visualization
-                    model_viz.id = '{}-viz-{}'.format(model.id, len(vizs) + 1)
+                    model_viz.id = '{}_viz_{}'.format(model.id, len(vizs) + 1)
                     model_viz.name = file_metadata['name'][0:-6]
                     model_viz.description = file_metadata['description']
                     model_viz.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
@@ -447,13 +519,13 @@ class BioModelsImporter(object):
                         vizs.append(model_viz)
 
         if len(sims) == 1:
-            sims[0].id = '{}-sim'.format(model.id)
+            sims[0].id = '{}_sim'.format(model.id)
             os.rename(
-                os.path.join(self._cache_dir, '{}-{}.sedml'.format(model.id, 1)),
+                os.path.join(self._cache_dir, '{}_{}.sedml'.format(model.id, 1)),
                 os.path.join(self._cache_dir, '{}.sedml'.format(model.id)))
 
         if len(vizs) == 1:
-            vizs[0].id = '{}-viz'.format(model.id)
+            vizs[0].id = '{}_viz'.format(model.id)
 
         return (model, sims, vizs)
 
@@ -662,12 +734,10 @@ class BioModelsImporter(object):
                 stats['models']['taxa'][model.taxon.name] += 1
 
         for sim in sims:
-            if sim.num_time_points is None:
-                stats['sims']['steady-state'] += 1
-            elif sim.num_time_points == 2:
-                stats['sims']['one step'] += 1
-            else:
+            if isinstance(sim, TimecourseSimulation):
                 stats['sims']['time course'] += 1
+            else:
+                stats['sims']['steady-state'] += 1
 
         return stats
 

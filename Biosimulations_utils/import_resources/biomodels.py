@@ -515,8 +515,11 @@ class BioModelsImporter(object):
                             if not data_field.simulation_results:
                                 layout_el.data.remove(data_field)
 
+                        x_data_field = next((data for data in layout_el.data if data.data_field.name == 'x'), None)
+                        y_data_field = next((data for data in layout_el.data if data.data_field.name == 'y'), None)
+
                         # if the subfigure doesn't have a valid curve, remove it from the visualization
-                        if not layout_el.data or not layout_el_has_vars:
+                        if not layout_el.data or not x_data_field or not y_data_field or not layout_el_has_vars:
                             model_viz.layout.remove(layout_el)
 
                     # append to list of visualizations

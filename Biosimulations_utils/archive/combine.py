@@ -56,7 +56,7 @@ class CombineArchiveWriter(ArchiveWriter):
         if os.path.isfile(out_file):
             os.remove(out_file)
 
-        # save archive to a file        
+        # save archive to a file
         assert archive_comb.writeToFile(out_file)
 
     def _write_metadata(self, obj, archive_comb, filename):

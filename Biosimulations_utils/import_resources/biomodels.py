@@ -493,7 +493,8 @@ class BioModelsImporter(object):
                                     variable = obj_target_to_var.get(sim_result.variable.target, None)
 
                                     if not variable:
-                                        self._sedml_logger.log(logging.ERROR, '{}: target {} is invalid'.format(id, sim_result.variable.target))
+                                        self._sedml_logger.log(logging.ERROR, '{}: target {} is invalid'.format(
+                                            id, sim_result.variable.target))
 
                                         match = re.match(r"^/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species\[@id='(.*?)'\]$",
                                                          sim_result.variable.target)

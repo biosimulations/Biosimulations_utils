@@ -28,6 +28,7 @@ import warnings
 __all__ = [
     'SedMlSimulationWriter',
     'SedMlSimulationReader',
+    'modify_xml_model_for_simulation',
 ]
 
 
@@ -1316,8 +1317,8 @@ class XmlNode(object):
                                    self.prefix, self.name)
 
 
-def modify_model_for_simulation(simulation, in_model_filename, out_model_filename, default_namespace=None, pretty_print=True):
-    """ Modify a model according to the model changes in a simulation
+def modify_xml_model_for_simulation(simulation, in_model_filename, out_model_filename, default_namespace=None, pretty_print=True):
+    """ Modify an XML-encoded model according to the model changes in a simulation
 
     Args:
         simulation (:obj:`Simulation`): simulation

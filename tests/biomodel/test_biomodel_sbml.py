@@ -279,6 +279,10 @@ class ReadSbmlBiomodelTestCase(unittest.TestCase):
             ])
         )
 
+        self.assertEqual(
+            next(var.target for var in model.variables if var.group == 'Other' and var.id == 'Rate_PIP2Synbasal_PIP2Syn'),
+            "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='Rate_PIP2Synbasal_PIP2Syn']")
+
         self.assertEqual(set([v.target for v in model.variables]).intersection(set([p.target for p in model.parameters])), set())
 
     def test_run_file_does_not_exist(self):

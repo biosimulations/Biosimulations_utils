@@ -590,7 +590,7 @@ class SbmlBiomodelReader(BiomodelReader):
                     if isinstance(var_sbml, libsbml.Parameter):
                         vars.append(BiomodelVariable(
                             target=("/sbml:sbml/sbml:model/sbml:listOfParameters"
-                                    "/sbml:parameter[@id='{}']/@value").format(var_id),
+                                    "/sbml:parameter[@id='{}']").format(var_id),
                             group='Other',
                             id=var_id,
                             name=var_sbml.getName() or None,
@@ -602,7 +602,7 @@ class SbmlBiomodelReader(BiomodelReader):
                     elif isinstance(var_sbml, libsbml.Compartment):
                         vars.append(BiomodelVariable(
                             target=("/sbml:sbml/sbml:model/sbml:listOfCompartments"
-                                    "/sbml:compartment[@id='{}']/@value").format(var_id),
+                                    "/sbml:compartment[@id='{}']").format(var_id),
                             group='Compartment sizes',
                             id=var_id,
                             name=var_sbml.getName() or None,

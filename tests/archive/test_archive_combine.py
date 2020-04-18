@@ -108,6 +108,7 @@ class OmexArchiveTestCase(unittest.TestCase):
 
         archive_filename_2 = os.path.join(self.dirname, 'archive2.omex')
         archive_comb.writeToFile(archive_filename_2)
+        archive_comb.writeToFile(archive_filename_2)
 
         archive_dir3 = os.path.join(self.dirname, 'dir3')
         archive_3 = read_archive(archive_filename_2, archive_dir3)

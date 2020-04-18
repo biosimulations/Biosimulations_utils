@@ -15,6 +15,7 @@ from ..data_model import Format, JournalReference, License, OntologyTerm, Person
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 from ..utils import assert_exception, get_enum_format_by_attr, get_logger
+from lxml import etree
 from xml.sax import saxutils
 import copy
 import dateutil.parser
@@ -359,7 +360,7 @@ class SedMlSimulationWriter(SimulationWriter):
 
         Returns:
             :obj:`list` of :obj:`libsedml.SedAlgorithmParameter`: list of SED simulation algorithm
-                paremeter changes
+                parameter changes
         """
         changes_sed = []
         for change in changes:
@@ -375,7 +376,7 @@ class SedMlSimulationWriter(SimulationWriter):
             alg_sed (:obj:`libsedml.SedAlgorithm`): SED simulation algorithm
 
         Returns:
-            :obj:`libsedml.SedAlgorithmParameter`: SED simulation algorithm paremeter change
+            :obj:`libsedml.SedAlgorithmParameter`: SED simulation algorithm parameter change
         """
         param_sed = alg_sed.createAlgorithmParameter()
         if change.parameter.kisao_term:
@@ -1118,13 +1119,14 @@ class SedMlSimulationReader(SimulationReader):
                 )
             else:
                 kisao_term = None  # pragma: no cover # unreachable because SED requires kisaoID to be set
+
             sim.algorithm_parameter_changes.append(ParameterChange(
                 parameter=AlgorithmParameter(
                     id=param_id,
                     name=param_name,
                     kisao_term=kisao_term,
                 ),
-                value=float(change_sed.getValue()),
+                value=self._parse_string(change_sed.getValue()),
             ))
 
     def _get_parameter_change_from_model(self, change_sed):
@@ -1152,7 +1154,7 @@ class SedMlSimulationReader(SimulationReader):
                 name=param_name,
                 target=change_sed.getTarget(),
             ),
-            value=float(change_sed.getNewValue())
+            value=self._parse_string(change_sed.getNewValue())
         )
 
     def _get_model_var_by_data_gen_id(self, data_gen_id, data_gen_id_to_var_target, time_data_gen_ids, variables):
@@ -1171,6 +1173,30 @@ class SedMlSimulationReader(SimulationReader):
             return BiomodelVariable(id='time', target='urn:sedml:symbol:time')
         else:
             return next(var for var in variables if var.target == data_gen_id_to_var_target[data_gen_id])
+
+    def _parse_string(self, str_value):
+        """ Parse a string to a Boolean, integer, float, or string
+
+        Args:
+            str_value (:obj:`str`): string
+
+        Returns:
+            :obj:`bool`, :obj:`int`, :obj:`float`, or :obj:`str`: value
+        """
+        if str_value == 'true':
+            return True
+        elif str_value == 'false':
+            return False
+
+        try:
+            value = float(str_value)
+            if value == int(value):
+                value = int(value)
+            return value
+        except ValueError:
+            pass
+
+        return str_value
 
     def _get_obj_annotation(self, obj_sed):
         """ Get the annotated properies of a SED object
@@ -1288,3 +1314,49 @@ class XmlNode(object):
                 '</{}:{}>').format(self.prefix, self.name,
                                    type, value_xml,
                                    self.prefix, self.name)
+
+
+def modify_model_for_simulation(simulation, in_model_filename, out_model_filename, default_namespace=None, pretty_print=True):
+    """ Modify a model according to the model changes in a simulation
+
+    Args:
+        simulation (:obj:`Simulation`): simulation
+        in_model_filename (:obj:`str`): path to model
+        out_model_filename (:obj:`str`): path to save modified model
+        default_namespace (:obj:`str`, optional): default XML namespace URI (e.g., `sbml`)
+        pretty_print (:obj:`bool`, optional): if :obj:`True`, pretty print output
+    """
+    # read model
+    et = etree.parse(in_model_filename)
+
+    # get namespaces
+    root = et.getroot()
+    namespaces = root.nsmap
+    if default_namespace:
+        namespaces[default_namespace] = namespaces[None]
+        namespaces.pop(None)
+
+    # apply changes
+    for change in simulation.model_parameter_changes:
+        # get object to change
+        obj_xpath, sep, attr = change.parameter.target.rpartition('/@')
+        if sep != '/@':
+            raise ValueError('target {} is not a valid XPATH to an attribute of a model element'.format(change.parameter.target))
+        objs = et.xpath(obj_xpath, namespaces=namespaces)
+        if len(objs) != 1:
+            raise ValueError('xpath {} must match a single object in {}'.format(obj_xpath, in_model_filename))
+        obj = objs[0]
+
+        # get new value
+        if isinstance(change.value, bool):
+            value = str(change.value).lower()
+        elif isinstance(change.value, (int, float)):
+            value = str(change.value)
+        else:
+            value = change.value
+
+        # change value
+        obj.set(attr, value)
+
+    # write model
+    et.write(out_model_filename, xml_declaration=True, encoding="utf-8", standalone=False, pretty_print=pretty_print)

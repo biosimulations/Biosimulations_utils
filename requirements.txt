@@ -1,6 +1,7 @@
 attrdict
 click
 ete3
+lxml
 numpy
 pdf2image
 pillow

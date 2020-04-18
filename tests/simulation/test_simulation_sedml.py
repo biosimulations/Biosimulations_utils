@@ -8,10 +8,12 @@
 
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_utils.data_model import OntologyTerm, RemoteFile
+from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelVariable, BiomodelFormat
 from Biosimulations_utils.simulation import write_simulation, read_simulation, sedml
 from Biosimulations_utils.simulation.core import SimulationIoError, SimulationIoWarning
 from Biosimulations_utils.simulation.data_model import SimulationFormat, TimecourseSimulation, SimulationResult
+from Biosimulations_utils.simulation.sedml import modify_model_for_simulation
 from Biosimulations_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import json
 import libsedml
@@ -234,8 +236,33 @@ class WriteSedMlTestCase(unittest.TestCase):
 
     def test_variable_target_is_parameter(self):
         filename = 'tests/fixtures/BIOMD0000000803.sedml'
-        _, viz = read_simulation(filename, SimulationFormat.sedml)        
+        _, viz = read_simulation(filename, SimulationFormat.sedml)
         self.assertEqual(viz.layout[0].data[0].simulation_results[0].variable.target,
-            "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL7']")
+                         "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL7']")
         self.assertEqual(viz.layout[0].data[1].simulation_results[0].variable.target,
-            "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='f_7']")
+                         "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='f_7']")
+
+    def test_modify_model_for_simulation(self):
+        in_model_filename = 'tests/fixtures/BIOMD0000000806.xml'
+        out_model_filename = os.path.join(self.dirname, 'model.xml')
+        simulation_filename = 'tests/fixtures/BIOMD0000000806-with-change-attribute.sedml'
+        simulations, _ = read_simulation(simulation_filename)
+        simulation = simulations[0]
+        self.assertNotEqual(simulation.model_parameter_changes, [])
+        modify_model_for_simulation(simulation, in_model_filename, out_model_filename, default_namespace='sbml')
+
+        model2 = read_biomodel(out_model_filename, format=BiomodelFormat.sbml)
+        param_target_to_value = {p.target: p.value for p in model2.parameters}
+        for change in simulation.model_parameter_changes:
+            self.assertEqual(param_target_to_value[change.parameter.target], change.value)
+
+        # invalid simulation configurations
+        simulation_filename = 'tests/fixtures/BIOMD0000000806-invalid-change-attribute-target.sedml'
+        simulations, _ = read_simulation(simulation_filename)
+        with self.assertRaisesRegex(ValueError, 'is not a valid XPATH'):
+            modify_model_for_simulation(simulations[0], in_model_filename, out_model_filename, default_namespace='sbml')
+
+        simulation_filename = 'tests/fixtures/BIOMD0000000806-invalid-change-attribute-target-2.sedml'
+        simulations, _ = read_simulation(simulation_filename)
+        with self.assertRaisesRegex(ValueError, 'must match a single object'):
+            modify_model_for_simulation(simulations[0], in_model_filename, out_model_filename, default_namespace='sbml')

@@ -172,13 +172,14 @@ def config_logger(logger, name='log'):
         logger (:obj:`logging.Logger`): logger
         name (:obj:`str`, optional): name
     """
-    formatter = logging.Formatter('-'.join([
-        '%(levelname)s',
-        '%(pathname)s',
-        '%(funcName)s',
-        '%(lineno)d',
-        '%(message)s',
-    ]))
+    formatter = logging.Formatter(
+        '%(levelname)s'
+        '-%(asctime)s'
+        '-%(pathname)s'
+        '-%(funcName)s'
+        '-%(lineno)d'
+        ': %(message)s'
+    )
 
     log_dir = os.path.expanduser('~/.cache/Biosimulations_utils/')
     if not os.path.isdir(log_dir):

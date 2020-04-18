@@ -457,7 +457,7 @@ class BioModelsImporter(object):
                 assert len(model_files) <= 1, 'Each simulation must use the same model'
 
                 for sim in model_sims:
-                    sim.id = '{}_sim_{}'.format(model.id, len(sims))
+                    sim.id = '{}_sim_{}'.format(model.id, len(sims) + 1)
                     sim.name = file_metadata['name'][0:-6]
                     sim.description = file_metadata['description']
                     sim.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]

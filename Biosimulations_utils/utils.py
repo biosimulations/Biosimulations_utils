@@ -190,8 +190,8 @@ def config_logger(logger, name='log'):
     logger = logging.getLogger('biosimulations_utils-' + name)
     logger.addHandler(handler)
 
-    logger.log(logging.ERROR, '')
-    logger.log(logging.ERROR, '')
-    logger.log(logging.ERROR, '===============')
-    logger.log(logging.ERROR, 'Log initialized')
-    logger.log(logging.ERROR, '===============')
+    logger.log(logging.INFO, '')
+    logger.log(logging.INFO, '')
+    logger.log(logging.INFO, '===============')
+    logger.log(logging.INFO, 'Log initialized')
+    logger.log(logging.INFO, '===============')

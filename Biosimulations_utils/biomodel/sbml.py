@@ -70,6 +70,8 @@ class SbmlBiomodelReader(BiomodelReader):
         reader = libsbml.SBMLReader()
         doc = reader.readSBMLFromFile(filename)
         model_sbml = doc.getModel()
+        if not model_sbml:
+            raise ValueError('{} does not contain a valid model'.format(filename))
         return model_sbml
 
     def _read_format(self, model_sbml, model):

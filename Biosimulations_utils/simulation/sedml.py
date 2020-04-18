@@ -845,6 +845,14 @@ class SedMlSimulationReader(SimulationReader):
                                                            time_data_gen_ids, x_sim.model.variables)
                 y_var = self._get_model_var_by_data_gen_id(y_data_gen_id, data_gen_id_to_var_target,
                                                            time_data_gen_ids, y_sim.model.variables)
+                if not x_var:
+                    warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimulationIoWarning)
+                    self._logger.log(logging.ERROR, '{}: data generator {} cannot be resolved'.format(self._filename, x_data_gen_id))
+                    continue
+                if not y_var:
+                    warnings.warn('Unable to interpret curve of {}'.format(os.path.basename(filename)), SimulationIoWarning)
+                    self._logger.log(logging.ERROR, '{}: data generator {} cannot be resolved'.format(self._filename, y_data_gen_id))
+                    continue
 
                 x_sim_results.append(SimulationResult(simulation=x_sim, variable=x_var))
                 y_sim_results.append(SimulationResult(simulation=y_sim, variable=y_var))

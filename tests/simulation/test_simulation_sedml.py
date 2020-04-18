@@ -231,3 +231,11 @@ class WriteSedMlTestCase(unittest.TestCase):
         filename = 'tests/fixtures/BIOMD0000000297-with-unknown-model-language.sedml'
         sims, _ = read_simulation(filename, SimulationFormat.sedml)
         self.assertEqual(sims[0].model.format.sed_urn, 'urn:sedml:language:unknown_language')
+
+    def test_variable_target_is_parameter(self):
+        filename = 'tests/fixtures/BIOMD0000000803.sedml'
+        _, viz = read_simulation(filename, SimulationFormat.sedml)        
+        self.assertEqual(viz.layout[0].data[0].simulation_results[0].variable.target,
+            "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='IL7']")
+        self.assertEqual(viz.layout[0].data[1].simulation_results[0].variable.target,
+            "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='f_7']")

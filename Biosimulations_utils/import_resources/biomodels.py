@@ -125,7 +125,6 @@ class BioModelsImporter(object):
         sims = []
         vizs = []
         unimportable_models = []
-        unimportable_sims = []
         unvisualizable_models = []
         unsimulatable_models = []
         num_models = min(self._max_models, self.get_num_models())
@@ -141,8 +140,7 @@ class BioModelsImporter(object):
                     vizs.extend(model_vizs)
                 except BiomodelIoError:
                     unimportable_models.append(model_result['id'])
-                except SimulationIoError:
-                    unimportable_sims.append(model_result['id'])
+                    continue
 
                 try:
                     model.image = self.visualize_biomodel(model)
@@ -225,9 +223,6 @@ class BioModelsImporter(object):
 
         if unimportable_models:
             warnings.warn('Unable import the following models:\n  {}'.format('\n  '.join(sorted(unimportable_models))), BiomodelsIoWarning)
-        if unimportable_sims:
-            warnings.warn('Unable import simulations for the following models:\n  {}'.format(
-                '\n  '.join(sorted(unimportable_sims))), BiomodelsIoWarning)
         if unvisualizable_models:
             warnings.warn('Unable visualize the following models:\n  {}'.format(
                 '\n  '.join(sorted(unvisualizable_models))), BiomodelsIoWarning)
@@ -444,6 +439,7 @@ class BioModelsImporter(object):
             else:
                 obj_name_to_var[var.name] = None
 
+        unimportable_sims = []
         for file_metadata in files_metadata['additional']:
             if file_metadata['name'].endswith('.sedml'):
                 num_sim_files += 1
@@ -451,7 +447,11 @@ class BioModelsImporter(object):
                 with open(local_path, 'wb') as file:
                     file.write(self.get_model_file(id, file_metadata['name']))
 
-                model_sims, model_viz = read_simulation(local_path, SimulationFormat.sedml)
+                try:
+                    model_sims, model_viz = read_simulation(local_path, SimulationFormat.sedml)
+                except SimulationIoError:
+                    unimportable_sims.append('{}-{}'.format(model.id, num_sim_files))
+                    continue
 
                 model_files = set([sim.model.file.name for sim in model_sims]).difference(set(['model']))
                 assert len(model_files) <= 1, 'Each simulation must use the same model'
@@ -525,6 +525,10 @@ class BioModelsImporter(object):
                     # append to list of visualizations
                     if model_viz.layout:
                         vizs.append(model_viz)
+
+        if unimportable_sims:
+            warnings.warn('Unable import the following simulations:\n  {}'.format(
+                '\n  '.join(sorted(unimportable_sims))), BiomodelsIoWarning)
 
         if len(sims) == 1:
             sims[0].id = '{}_sim'.format(model.id)

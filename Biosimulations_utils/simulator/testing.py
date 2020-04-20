@@ -120,6 +120,14 @@ class SimulatorValidator(object):
             archive_format=ArchiveFormat.combine,
         ),
         TestCase(
+            filename='BIOMD0000000734.omex',
+            type=TestCaseType.archive,
+            modeling_framework=BiomodelingFramework.non_spatial_continuous,
+            model_format=BiomodelFormat.sbml,
+            simulation_format=SimulationFormat.sedml,
+            archive_format=ArchiveFormat.combine,
+        ),
+        TestCase(
             filename='test-bngl.omex',
             type=TestCaseType.archive,
             modeling_framework=BiomodelingFramework.non_spatial_discrete,

@@ -27,6 +27,7 @@ class UtilsTestCase(unittest.TestCase):
             set([ex.filename for ex in valid_examples]),
             set([
                 'BIOMD0000000297.omex',
+                'BIOMD0000000734.omex',
             ]),
         )
         self.assertEqual(

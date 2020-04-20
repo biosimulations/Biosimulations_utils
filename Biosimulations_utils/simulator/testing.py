@@ -41,6 +41,7 @@ class TestCase(object):
     """ An example archive to validate simulators
 
     Attributes:
+        id (:obj:`str`): id
         filename (:obj:`str`): path to archive
         type (:obj:`TestCaseType`): type of test case
         modeling_framework (:obj:`BiomodelingFramework`): modeling framework
@@ -49,9 +50,10 @@ class TestCase(object):
         archive_format (:obj:`ArchiveFormat`): archive format
     """
 
-    def __init__(self, filename, type, modeling_framework, model_format, simulation_format, archive_format):
+    def __init__(self, id, filename, type, modeling_framework, model_format, simulation_format, archive_format):
         """
         Args:
+            id (:obj:`str`): id
             filename (:obj:`str`): path to archive
             type (:obj:`TestCaseType`): type of test case
             modeling_framework (:obj:`BiomodelingFramework`): modeling framework
@@ -59,6 +61,7 @@ class TestCase(object):
             simulation_format (:obj:`SimulationFormat`): simulation format
             archive_format (:obj:`ArchiveFormat`): archive format
         """
+        self.id = id
         self.filename = filename
         self.type = type
         self.modeling_framework = modeling_framework
@@ -104,6 +107,7 @@ class SimulatorValidator(object):
 
     TEST_CASES = (
         TestCase(
+            id='BIOMD0000000297.xml',
             filename='BIOMD0000000297.xml',
             type=TestCaseType.biomodel,
             modeling_framework=BiomodelingFramework.non_spatial_continuous,
@@ -112,6 +116,7 @@ class SimulatorValidator(object):
             archive_format=ArchiveFormat.combine,
         ),
         TestCase(
+            id='BIOMD0000000297.omex',
             filename='BIOMD0000000297.omex',
             type=TestCaseType.archive,
             modeling_framework=BiomodelingFramework.non_spatial_continuous,
@@ -120,6 +125,7 @@ class SimulatorValidator(object):
             archive_format=ArchiveFormat.combine,
         ),
         TestCase(
+            id='BIOMD0000000734.omex',
             filename='BIOMD0000000734.omex',
             type=TestCaseType.archive,
             modeling_framework=BiomodelingFramework.non_spatial_continuous,
@@ -128,6 +134,7 @@ class SimulatorValidator(object):
             archive_format=ArchiveFormat.combine,
         ),
         TestCase(
+            id='test-bngl.omex',
             filename='test-bngl.omex',
             type=TestCaseType.archive,
             modeling_framework=BiomodelingFramework.non_spatial_discrete,
@@ -137,13 +144,15 @@ class SimulatorValidator(object):
         ),
     )
 
-    def run(self, dockerhub_id, properties_filename):
+    def run(self, dockerhub_id, properties_filename, test_case_ids=None):
         """ Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
         checking that the image produces the correct outputs for test cases (e.g., COMBINE archive)
 
         Args:
             dockerhub_id (:obj:`str`): DockerHub id of simulator
             properties_filename (:obj:`str`): path to the properties of the simulator
+            test_case_ids (:obj:`list` of :obj:`str`, optional): List of ids of test cases to verify. If :obj:`test_case_ids`
+                is none, all test cases are verified.
 
         Returns:
             :obj:`list` :obj:`TestCase`: valid test cases
@@ -154,7 +163,12 @@ class SimulatorValidator(object):
 
         valid_test_cases = []
         test_case_exceptions = []
+        skipped_test_cases = []
         for test_case in self.TEST_CASES:
+            if test_case_ids is not None and test_case.id not in test_case_ids:
+                skipped_test_cases.append(test_case)
+                continue
+
             for algorithm in simulator.algorithms:
                 case_supports_modeling_framework = False
                 for modeling_framework in algorithm.modeling_frameworks:
@@ -204,13 +218,17 @@ class SimulatorValidator(object):
                     valid_test_cases.append(test_case)
                 except Exception as exception:
                     test_case_exceptions.append(TestCaseException(test_case, exception))
+            else:
+                skipped_test_cases.append(test_case)
 
         print('{} passed {} test cases:\n  {}'.format(dockerhub_id, len(valid_test_cases), '\n  '.join(
             case.filename for case in valid_test_cases)))
         print('{} failed {} test cases:\n  {}'.format(dockerhub_id, len(test_case_exceptions), '\n  '.join(
             '{}\n    {}'.format(test_case_exception.test_case.filename, str(test_case_exception.exception))
             for test_case_exception in test_case_exceptions)))
-        return valid_test_cases, test_case_exceptions
+        print('{} skipped {} test cases:\n  {}'.format(dockerhub_id, len(skipped_test_cases), '\n  '.join(
+            case.filename for case in skipped_test_cases)))
+        return valid_test_cases, test_case_exceptions, skipped_test_cases
 
     def _gen_example_model(self, model_filename):
         """ Generate an example model

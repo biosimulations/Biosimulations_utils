@@ -7,6 +7,7 @@
 """
 
 import enum
+import wc_utils.util.enumerate
 
 __all__ = [
     'Format',
@@ -203,15 +204,20 @@ class Identifier(object):
         return (identifier.namespace, identifier.id)
 
 
-class License(str, enum.Enum):
-    """ A license """
-    cc0 = 'CC0'
-    cc_by = 'CC BY'
-    cc_by_sa = 'CC BY-SA'
-    cc_by_nc = 'CC BY-NC'
-    cc_by_nc_sa = 'CC BY-NC-SA'
-    mit = 'MIT'
-    other = 'Other'
+License = wc_utils.util.enumerate.CaseInsensitiveEnum('License', {
+    'cc0': 'CC0',
+    'cc_by': 'CC BY',
+    'cc_by_sa': 'CC BY-SA',
+    'cc_by_nc': 'CC BY-NC',
+    'cc_by_nc_sa': 'CC BY-NC-SA',
+    'mit': 'MIT',
+    'Apache-1.1': 'Apache 1.1',
+    'Apache-2.0': 'Apache 2.0',
+    'Artistic-1.0': 'Artistic 1.0',
+    'Artistic-2.0': 'Artistic 2.0',
+    'other': 'Other',
+})
+""" A license """
 
 
 class JournalReference(object):

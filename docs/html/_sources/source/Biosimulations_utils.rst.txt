@@ -1,13 +1,147 @@
-Biosimulations_format_utils package
+Biosimulations_utils package
 
 Subpackages
 
 
 Submodules
 
-Biosimulations_format_utils._version module
+Biosimulations_utils._version module
 
-Biosimulations_format_utils.data_model module
+Biosimulations_utils.api_client module
+
+Client for interacting with the
+
+BioSimulations REST API
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-06
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_utils.api_client.ApiClient(config=<module 'Biosimulations_utils.config' from '/home/runner/work/Biosimulations_utils/Biosimulations_utils/Biosimulations_utils/config.py'>, _dry_run=False)
+
+   Bases: "object"
+
+   Client for interacting with the
+
+   BioSimulations REST API
+
+   config
+
+      package configuration
+
+      Type:
+         "object"
+
+   _dry_run
+
+      if "True", do not execute HTTP requests
+
+      Type:
+         "bool"
+
+   _device_code
+
+      auth0 code for a device
+
+      Type:
+         "str"
+
+   _auth
+
+      auth0 authorization type and token for a device for a user's
+      account
+
+      Type:
+         "dict"
+
+   _get_auth()
+
+      Get the authorization header to access BioSimulations through a
+      user's account
+
+      Raises:
+         requests.exceptions.HTTPError
+
+          -- if an authentication token was not generated
+
+   _get_device_code()
+
+      Get a device code to authorize access to a BioSimulations
+      account
+
+      Raises:
+         requests.exceptions.HTTPError
+
+          -- if a device code was not generated
+
+   exec(method, route, data=None)
+
+      Execute a route of the BioSimulations API
+
+      Parameters:
+         method (str) -- HTTP request method (e.g., 'get', 'post',
+         'put', 'patch', 'delete')
+
+         route (str) -- route within the API (e.g., /models/model-id
+         which gets information about model with id model-id)
+
+         data (object) -- data for the route (e.g., {name: 'model
+         name', ...} to use 'put' /models/model-id to change the name
+         of the model with id model-id)
+
+      Raises:
+         requests.exceptions.HTTPError
+
+          -- if the route was not successfully executed
+
+   login()
+
+      Login into BioSimulations using a browser
+
+   logout()
+
+      Logout of BioSimulations
+
+      Raises:
+         requests.exceptions.HTTPError -- if the user was not logged
+         out
+
+         AssertionError -- if the user is not logged in or wasn't
+         logged out
+
+Biosimulations_utils.config module
+
+Package configuration
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-06
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+Biosimulations_utils.data_model module
 
 Utility clases for data models for models and simulations
 
@@ -27,15 +161,22 @@ Copyright:
 License:
    MIT
 
-class Biosimulations_format_utils.data_model.Format(name=None, version=None, edam_id=None, url=None)
+class Biosimulations_utils.data_model.Format(id=None, name=None, version=None, edam_id=None, url=None, spec_url=None, mime_type=None, extension=None, sed_urn=None)
 
    Bases: "object"
 
    A format
 
-   name
+   id
 
       name (e.g., SBML)
+
+      Type:
+         "str"
+
+   name
+
+      name (e.g., Systems Biology Markup Language)
 
       Type:
          "str"
@@ -57,6 +198,35 @@ class Biosimulations_format_utils.data_model.Format(name=None, version=None, eda
    url
 
       URL
+
+      Type:
+         "str"
+
+   spec_url
+
+      URL for specification
+
+      Type:
+         "str"
+
+   mime_type
+
+      Multipurpose Internet Mail Extensions (MIME) type. Also known as
+      media type.
+
+      Type:
+         "str"
+
+   extension
+
+      file extension (e.g., *xml*)
+
+      Type:
+         "str"
+
+   sed_urn
+
+      SED-ML URN
 
       Type:
          "str"
@@ -89,6 +259,22 @@ class Biosimulations_format_utils.data_model.Format(name=None, version=None, eda
       Returns:
          Format
 
+   static sort_key(format)
+
+      Get a key to sort a format
+
+      Parameters:
+         format
+
+          (
+
+         Format
+
+         ) -- format
+
+      Returns:
+         "tuple"
+
    to_json()
 
       Export to JSON
@@ -96,7 +282,7 @@ class Biosimulations_format_utils.data_model.Format(name=None, version=None, eda
       Returns:
          "dict"
 
-class Biosimulations_format_utils.data_model.Identifier(namespace=None, id=None)
+class Biosimulations_utils.data_model.Identifier(namespace=None, id=None)
 
    Bases: "object"
 
@@ -168,7 +354,7 @@ class Biosimulations_format_utils.data_model.Identifier(namespace=None, id=None)
       Returns:
          "dict"
 
-class Biosimulations_format_utils.data_model.JournalReference(authors=None, title=None, journal=None, volume=None, num=None, pages=None, year=None, doi=None)
+class Biosimulations_utils.data_model.JournalReference(authors=None, title=None, journal=None, volume=None, issue=None, pages=None, year=None, doi=None)
 
    Bases: "object"
 
@@ -202,7 +388,7 @@ class Biosimulations_format_utils.data_model.JournalReference(authors=None, titl
       Type:
          "int" or "str"
 
-   num
+   issue
 
       issue number
 
@@ -281,23 +467,11 @@ class Biosimulations_format_utils.data_model.JournalReference(authors=None, titl
       Returns:
          "dict"
 
-class Biosimulations_format_utils.data_model.License
+class Biosimulations_utils.data_model.License
 
-   Bases: "str", "enum.Enum"
+   Bases: "wc_utils.util.enumerate.CaseInsensitiveEnum"
 
    A license
-
-   _generate_next_value_(start, count, last_values)
-
-   _member_map_ = {'cc0': <License.cc0: 'CC0'>, 'cc_by': <License.cc_by: 'CC BY'>, 'cc_by_nc': <License.cc_by_nc: 'CC BY-NC'>, 'cc_by_nc_sa': <License.cc_by_nc_sa: 'CC BY-NC-SA'>, 'cc_by_sa': <License.cc_by_sa: 'CC BY-SA'>, 'mit': <License.mit: 'MIT'>, 'other': <License.other: 'Other'>}
-
-   _member_names_ = ['cc0', 'cc_by', 'cc_by_sa', 'cc_by_nc', 'cc_by_nc_sa', 'mit', 'other']
-
-   _member_type_
-
-      alias of "builtins.str"
-
-   _value2member_map_ = {'CC BY': <License.cc_by: 'CC BY'>, 'CC BY-NC': <License.cc_by_nc: 'CC BY-NC'>, 'CC BY-NC-SA': <License.cc_by_nc_sa: 'CC BY-NC-SA'>, 'CC BY-SA': <License.cc_by_sa: 'CC BY-SA'>, 'CC0': <License.cc0: 'CC0'>, 'MIT': <License.mit: 'MIT'>, 'Other': <License.other: 'Other'>}
 
    cc0 = 'CC0'
 
@@ -313,7 +487,7 @@ class Biosimulations_format_utils.data_model.License
 
    other = 'Other'
 
-class Biosimulations_format_utils.data_model.OntologyTerm(ontology=None, id=None, name=None, description=None, iri=None)
+class Biosimulations_utils.data_model.OntologyTerm(ontology=None, id=None, name=None, description=None, iri=None)
 
    Bases: "object"
 
@@ -382,6 +556,22 @@ class Biosimulations_format_utils.data_model.OntologyTerm(ontology=None, id=None
       Returns:
          OntologyTerm
 
+   static sort_key(term)
+
+      Get a key to sort an ontology term
+
+      Parameters:
+         term
+
+          (
+
+         OntologyTerm
+
+         ) -- term
+
+      Returns:
+         "tuple"
+
    to_json()
 
       Export to JSON
@@ -389,7 +579,7 @@ class Biosimulations_format_utils.data_model.OntologyTerm(ontology=None, id=None
       Returns:
          "dict"
 
-class Biosimulations_format_utils.data_model.Person(first_name=None, middle_name=None, last_name=None)
+class Biosimulations_utils.data_model.Person(first_name=None, middle_name=None, last_name=None)
 
    Bases: "object"
 
@@ -467,7 +657,7 @@ class Biosimulations_format_utils.data_model.Person(first_name=None, middle_name
       Returns:
          "dict"
 
-class Biosimulations_format_utils.data_model.RemoteFile(name=None, type=None, size=None)
+class Biosimulations_utils.data_model.RemoteFile(name=None, type=None, size=None)
 
    Bases: "object"
 
@@ -529,7 +719,7 @@ class Biosimulations_format_utils.data_model.RemoteFile(name=None, type=None, si
       Returns:
          "dict"
 
-class Biosimulations_format_utils.data_model.Taxon(id=None, name=None)
+class Biosimulations_utils.data_model.Taxon(id=None, name=None)
 
    Bases: "object"
 
@@ -584,7 +774,7 @@ class Biosimulations_format_utils.data_model.Taxon(id=None, name=None)
       Returns:
          "dict"
 
-class Biosimulations_format_utils.data_model.Type
+class Biosimulations_utils.data_model.Type
 
    Bases: "str", "enum.Enum"
 
@@ -610,7 +800,7 @@ class Biosimulations_format_utils.data_model.Type
 
    string = 'string'
 
-Biosimulations_format_utils.utils module
+Biosimulations_utils.utils module
 
 Utilities
 
@@ -630,7 +820,25 @@ Copyright:
 License:
    MIT
 
-Biosimulations_format_utils.utils.pretty_print_units(units_str)
+Biosimulations_utils.utils.get_enum_format_by_attr(FormatEnum, attr_name, attr_val)
+
+   Get a biomodel format by its specification URL
+
+   Parameters:
+      FormatEnum (type) -- enumeration of formats (i.e. subclass of
+      enum.Enum)
+
+      attr_name (str) -- attribute name
+
+      attr_val (str) -- attribute value
+
+   Returns:
+      format
+
+   Return type:
+      "Format"
+
+Biosimulations_utils.utils.pretty_print_units(units_str)
 
    Pretty print units
 
@@ -644,5 +852,44 @@ Biosimulations_format_utils.utils.pretty_print_units(units_str)
 
    Return type:
       "str"
+
+Biosimulations_utils.utils.crop_image(filename, background_to_transparent=None)
+
+   Crop an image and, optionally, make the background transparent
+
+   Parameters:
+      filename (str) -- path to image
+
+      background_to_transparent (list of int, optional) -- background
+      to make transparent
+
+Biosimulations_utils.utils.assert_exception(success, exception)
+
+   Raise an error if "success" is "False"
+
+   Parameters:
+      success (bool) --
+
+      exception (Exception) --
+
+   Raises:
+      Exception
+
+       --
+
+Biosimulations_utils.utils.get_logger(name='log')
+
+   Get a logger
+
+   Parameters:
+      name
+
+       ("str", optional) -- name
+
+   Returns:
+      logger
+
+   Return type:
+      "logging.Logger"
 
 Module contents

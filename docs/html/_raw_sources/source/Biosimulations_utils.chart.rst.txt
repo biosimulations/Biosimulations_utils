@@ -1,0 +1,24 @@
+Biosimulations\_utils.chart package
+===================================
+
+Submodules
+----------
+
+Biosimulations\_utils.chart.data\_model module
+----------------------------------------------
+
+.. automodule:: Biosimulations_utils.chart.data_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+
+Module contents
+---------------
+
+.. automodule:: Biosimulations_utils.chart
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

@@ -1,52 +1,648 @@
-Biosimulations\_format\_utils package
-=====================================
+Biosimulations_format_utils package
 
 Subpackages
------------
 
-.. toctree::
-   :maxdepth: 4
-
-   Biosimulations_format_utils.import_resources
-   Biosimulations_format_utils.model
-   Biosimulations_format_utils.sim
 
 Submodules
-----------
 
-Biosimulations\_format\_utils.\_version module
-----------------------------------------------
+Biosimulations_format_utils._version module
 
-.. automodule:: Biosimulations_format_utils._version
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
+Biosimulations_format_utils.data_model module
 
-Biosimulations\_format\_utils.data\_model module
-------------------------------------------------
+Utility clases for data models for models and simulations
 
-.. automodule:: Biosimulations_format_utils.data_model
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
+Author:
+   Jonathan Karr <
 
-Biosimulations\_format\_utils.utils module
-------------------------------------------
+   karr@mssm.edu
 
-.. automodule:: Biosimulations_format_utils.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
+   >
 
+Date:
+   2020-03-31
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_format_utils.data_model.Format(name=None, version=None, edam_id=None, url=None)
+
+   Bases: "object"
+
+   A format
+
+   name
+
+      name (e.g., SBML)
+
+      Type:
+         "str"
+
+   version
+
+      version (e.g., L3V2)
+
+      Type:
+         "str"
+
+   edam_id
+
+      EDAM identifier
+
+      Type:
+         "str"
+
+   url
+
+      URL
+
+      Type:
+         "str"
+
+   __eq__(other)
+
+      Determine if two formats are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         Format
+
+         ) -- other format
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create format from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         Format
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_format_utils.data_model.Identifier(namespace=None, id=None)
+
+   Bases: "object"
+
+   An identifier of a concept
+
+   namespace
+
+      namespace (e.g., Identifiers.org namespace such as
+      'biomodels.db')
+
+      Type:
+         "str"
+
+   id
+
+      id within namespace
+
+      Type:
+         "str"
+
+   __eq__(other)
+
+      Determine if two identifiers are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         Identifier
+
+         ) -- other identifier
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create an identifier from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         Identifier
+
+   static sort_key(identifier)
+
+      Get a key to sort an identifier
+
+      Parameters:
+         identifier
+
+          (
+
+         Identifier
+
+         ) -- identifier
+
+      Returns:
+         "tuple"
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_format_utils.data_model.JournalReference(authors=None, title=None, journal=None, volume=None, num=None, pages=None, year=None, doi=None)
+
+   Bases: "object"
+
+   A format
+
+   authors
+
+      authors
+
+      Type:
+         "str"
+
+   title
+
+      title
+
+      Type:
+         "str"
+
+   journal
+
+      journal
+
+      Type:
+         "str"
+
+   volume
+
+      volume
+
+      Type:
+         "int" or "str"
+
+   num
+
+      issue number
+
+      Type:
+         "int"
+
+   pages
+
+      pages
+
+      Type:
+         "str"
+
+   year
+
+      year
+
+      Type:
+         "int"
+
+   doi
+
+      DOI
+
+      Type:
+         "str"
+
+   __eq__(other)
+
+      Determine if two formats are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         Format
+
+         ) -- other format
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create journal reference from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         JournalReference
+
+   static sort_key(ref)
+
+      Get a key to sort a reference
+
+      Parameters:
+         ref
+
+          (
+
+         JournalReference
+
+         ) -- reference
+
+      Returns:
+         "tuple"
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_format_utils.data_model.License
+
+   Bases: "str", "enum.Enum"
+
+   A license
+
+   _generate_next_value_(start, count, last_values)
+
+   _member_map_ = {'cc0': <License.cc0: 'CC0'>, 'cc_by': <License.cc_by: 'CC BY'>, 'cc_by_nc': <License.cc_by_nc: 'CC BY-NC'>, 'cc_by_nc_sa': <License.cc_by_nc_sa: 'CC BY-NC-SA'>, 'cc_by_sa': <License.cc_by_sa: 'CC BY-SA'>, 'mit': <License.mit: 'MIT'>, 'other': <License.other: 'Other'>}
+
+   _member_names_ = ['cc0', 'cc_by', 'cc_by_sa', 'cc_by_nc', 'cc_by_nc_sa', 'mit', 'other']
+
+   _member_type_
+
+      alias of "builtins.str"
+
+   _value2member_map_ = {'CC BY': <License.cc_by: 'CC BY'>, 'CC BY-NC': <License.cc_by_nc: 'CC BY-NC'>, 'CC BY-NC-SA': <License.cc_by_nc_sa: 'CC BY-NC-SA'>, 'CC BY-SA': <License.cc_by_sa: 'CC BY-SA'>, 'CC0': <License.cc0: 'CC0'>, 'MIT': <License.mit: 'MIT'>, 'Other': <License.other: 'Other'>}
+
+   cc0 = 'CC0'
+
+   cc_by = 'CC BY'
+
+   cc_by_nc = 'CC BY-NC'
+
+   cc_by_nc_sa = 'CC BY-NC-SA'
+
+   cc_by_sa = 'CC BY-SA'
+
+   mit = 'MIT'
+
+   other = 'Other'
+
+class Biosimulations_format_utils.data_model.OntologyTerm(ontology=None, id=None, name=None, description=None, iri=None)
+
+   Bases: "object"
+
+   A term in an ontology
+
+   ontology
+
+      id of the parent ontology
+
+      Type:
+         "str"
+
+   id
+
+      id
+
+      Type:
+         "str"
+
+   name
+
+      name
+
+      Type:
+         "str"
+
+   description
+
+      description
+
+      Type:
+         "str"
+
+   iri
+
+      IRI
+
+      Type:
+         "str"
+
+   __eq__(other)
+
+      Determine if two ontology terms are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         OntologyTerm
+
+         ) -- other term
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create an ontology term from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         OntologyTerm
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_format_utils.data_model.Person(first_name=None, middle_name=None, last_name=None)
+
+   Bases: "object"
+
+   A person, such as an author of a journal article
+
+   first_name
+
+      first name
+
+      Type:
+         "str"
+
+   middle_name
+
+      middle name
+
+      Type:
+         "str"
+
+   last_name
+
+      last name
+
+      Type:
+         "str"
+
+   __eq__(other)
+
+      Determine if two formats are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         Format
+
+         ) -- other format
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create person from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         Person
+
+   static sort_key(person)
+
+      Get a key to sort a person
+
+      Parameters:
+         person
+
+          (
+
+         Person
+
+         ) -- person
+
+      Returns:
+         "tuple"
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_format_utils.data_model.RemoteFile(name=None, type=None, size=None)
+
+   Bases: "object"
+
+   A remote file
+
+   name
+
+      name (e.g., model.xml)
+
+      Type:
+         "str"
+
+   type
+
+      MIME type (e.g., application/sbml+xml)
+
+      Type:
+         "str"
+
+   size
+
+      size in bytes
+
+      Type:
+         "int"
+
+   __eq__(other)
+
+      Determine if two formats are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         Format
+
+         ) -- other format
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create a remote file from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         RemoteFile
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_format_utils.data_model.Taxon(id=None, name=None)
+
+   Bases: "object"
+
+   A taxon in the NCBI Taxonomy database
+
+   id
+
+      id
+
+      Type:
+         "int"
+
+   name
+
+      name
+
+      Type:
+         "str"
+
+   __eq__(other)
+
+      Determine if two taxa are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         Taxon
+
+         ) -- other taxon
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create a taxon from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         Taxon
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_format_utils.data_model.Type
+
+   Bases: "str", "enum.Enum"
+
+   A type
+
+   _generate_next_value_(start, count, last_values)
+
+   _member_map_ = {'boolean': <Type.boolean: 'boolean'>, 'float': <Type.float: 'float'>, 'integer': <Type.integer: 'integer'>, 'string': <Type.string: 'string'>}
+
+   _member_names_ = ['boolean', 'integer', 'float', 'string']
+
+   _member_type_
+
+      alias of "builtins.str"
+
+   _value2member_map_ = {'boolean': <Type.boolean: 'boolean'>, 'float': <Type.float: 'float'>, 'integer': <Type.integer: 'integer'>, 'string': <Type.string: 'string'>}
+
+   boolean = 'boolean'
+
+   float = 'float'
+
+   integer = 'integer'
+
+   string = 'string'
+
+Biosimulations_format_utils.utils module
+
+Utilities
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-01
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+Biosimulations_format_utils.utils.pretty_print_units(units_str)
+
+   Pretty print units
+
+   Parameters:
+      units_str
+
+       ("str") -- units
+
+   Returns:
+      pretty printed units
+
+   Return type:
+      "str"
 
 Module contents
----------------
-
-.. automodule:: Biosimulations_format_utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:

@@ -1,0 +1,51 @@
+Biosimulations\_utils.archive package
+=====================================
+
+Submodules
+----------
+
+Biosimulations\_utils.archive.combine module
+--------------------------------------------
+
+.. automodule:: Biosimulations_utils.archive.combine
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Biosimulations\_utils.archive.core module
+-----------------------------------------
+
+.. automodule:: Biosimulations_utils.archive.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Biosimulations\_utils.archive.data\_model module
+------------------------------------------------
+
+.. automodule:: Biosimulations_utils.archive.data_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Biosimulations\_utils.archive.exec module
+-----------------------------------------
+
+.. automodule:: Biosimulations_utils.archive.exec
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+
+Module contents
+---------------
+
+.. automodule:: Biosimulations_utils.archive
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

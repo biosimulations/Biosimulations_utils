@@ -1,0 +1,801 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-86340737-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>1.1.1.1. Biosimulations_utils.archive package &mdash; Biosimulations_utils 0.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="1.1.1.2. Biosimulations_utils.biomodel package" href="Biosimulations_utils.biomodel.html" />
+    <link rel="prev" title="1.1. Biosimulations_utils package" href="Biosimulations_utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Biosimulations_utils
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">1. API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="Biosimulations_utils.html">1.1. Biosimulations_utils package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="Biosimulations_utils.html#subpackages">1.1.1. Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">1.1.1.1. Biosimulations_utils.archive package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Biosimulations_utils.biomodel.html">1.1.1.2. Biosimulations_utils.biomodel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Biosimulations_utils.chart.html">1.1.1.3. Biosimulations_utils.chart package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Biosimulations_utils.import_resources.html">1.1.1.4. Biosimulations_utils.import_resources package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Biosimulations_utils.simulation.html">1.1.1.5. Biosimulations_utils.simulation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Biosimulations_utils.simulator.html">1.1.1.6. Biosimulations_utils.simulator package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Biosimulations_utils.visualization.html">1.1.1.7. Biosimulations_utils.visualization package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Biosimulations_utils.html#submodules">1.1.2. Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Biosimulations_utils.html#module-Biosimulations_utils._version">1.1.3. Biosimulations_utils._version module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Biosimulations_utils.html#module-Biosimulations_utils.api_client">1.1.4. Biosimulations_utils.api_client module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Biosimulations_utils.html#module-Biosimulations_utils.config">1.1.5. Biosimulations_utils.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Biosimulations_utils.html#module-Biosimulations_utils.data_model">1.1.6. Biosimulations_utils.data_model module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Biosimulations_utils.html#module-Biosimulations_utils.utils">1.1.7. Biosimulations_utils.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Biosimulations_utils.html#module-Biosimulations_utils">1.1.8. Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Biosimulations_utils</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html"><span class="section-number">1. </span>Biosimulations_utils</a> &raquo;</li>
+        
+          <li><a href="Biosimulations_utils.html"><span class="section-number">1.1. </span>Biosimulations_utils package</a> &raquo;</li>
+        
+      <li><span class="section-number">1.1.1.1. </span>Biosimulations_utils.archive package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="biosimulations-utils-archive-package">
+<h1><span class="section-number">1.1.1.1. </span>Biosimulations_utils.archive package<a class="headerlink" href="#biosimulations-utils-archive-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2><span class="section-number">1.1.1.1.1. </span>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-Biosimulations_utils.archive.combine">
+<span id="biosimulations-utils-archive-combine-module"></span><h2><span class="section-number">1.1.1.1.2. </span>Biosimulations_utils.archive.combine module<a class="headerlink" href="#module-Biosimulations_utils.archive.combine" title="Permalink to this headline">¶</a></h2>
+<p>Classes for reading and writing OMEX archives</p>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Jonathan Karr &lt;<a class="reference external" href="mailto:karr&#37;&#52;&#48;mssm&#46;edu">karr<span>&#64;</span>mssm<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Date</dt>
+<dd class="field-even"><p>2020-04-09</p>
+</dd>
+<dt class="field-odd">Copyright</dt>
+<dd class="field-odd"><p>2020, Center for Reproducible Biomedical Modeling</p>
+</dd>
+<dt class="field-even">License</dt>
+<dd class="field-even"><p>MIT</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="Biosimulations_utils.archive.combine.CombineArchiveWriter">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.archive.combine.</code><code class="sig-name descname">CombineArchiveWriter</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/combine.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.combine.CombineArchiveWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Biosimulations_utils.archive.core.ArchiveWriter" title="Biosimulations_utils.archive.core.ArchiveWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Biosimulations_utils.archive.core.ArchiveWriter</span></code></a></p>
+<p>Writer for COMBINE/OMEX archives</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.combine.CombineArchiveWriter._abc_impl">
+<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/combine.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.combine.CombineArchiveWriter._abc_impl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.archive.combine.CombineArchiveWriter._write_metadata">
+<code class="sig-name descname">_write_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">archive_comb</span></em>, <em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/combine.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.combine.CombineArchiveWriter._write_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write metadata about an archive or a file in an archive
+:param obj: archive or file in an archive
+:type obj: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">ArchiveFile</span></code>
+:param archive_comb: archive
+:type archive_comb: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcombine.CombineArchive</span></code>
+:param filename: path of object with archive
+:type filename: <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.archive.combine.CombineArchiveWriter.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">archive</span></em>, <em class="sig-param"><span class="n">in_dir</span></em>, <em class="sig-param"><span class="n">out_file</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/combine.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.combine.CombineArchiveWriter.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an archive to a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>archive</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code>) – description of archive</p></li>
+<li><p><strong>in_dir</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – directory which contains the files in the archive</p></li>
+<li><p><strong>out_file</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to save archive</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – if files could not be added to the archive or the archive could not be
+    saved</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Biosimulations_utils.archive.combine.CombineArchiveReader">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.archive.combine.</code><code class="sig-name descname">CombineArchiveReader</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/combine.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.combine.CombineArchiveReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Biosimulations_utils.archive.core.ArchiveReader" title="Biosimulations_utils.archive.core.ArchiveReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">Biosimulations_utils.archive.core.ArchiveReader</span></code></a></p>
+<p>Reader for COMBINE/OMEX archives</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.combine.CombineArchiveReader.NONE_DATETIME">
+<code class="sig-name descname">NONE_DATETIME</code><em class="property"> = '2000-01-01T00:00:00Z'</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/combine.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.combine.CombineArchiveReader.NONE_DATETIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.combine.CombineArchiveReader._abc_impl">
+<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/combine.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.combine.CombineArchiveReader._abc_impl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.archive.combine.CombineArchiveReader._read_metadata">
+<code class="sig-name descname">_read_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">archive_comb</span></em>, <em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/combine.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.combine.CombineArchiveReader._read_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read metadata about an archive or a file in an archive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>archive_comb</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libcombine.CombineArchive</span></code>) – archive</p></li>
+<li><p><strong>filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to object within archive</p></li>
+<li><p><strong>obj</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ArchiveFile</span></code>) – object to add metadata to</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.archive.combine.CombineArchiveReader.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_file</span></em>, <em class="sig-param"><span class="n">out_dir</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/combine.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.combine.CombineArchiveReader.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an archive from a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_file</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to save archive</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – directory which contains the files in the archive</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>description of archive</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#Biosimulations_utils.archive.core.ArchiveIoError" title="Biosimulations_utils.archive.core.ArchiveIoError"><strong>ArchiveIoError</strong></a> – archive is invalid</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Biosimulations_utils.archive.core">
+<span id="biosimulations-utils-archive-core-module"></span><h2><span class="section-number">1.1.1.1.3. </span>Biosimulations_utils.archive.core module<a class="headerlink" href="#module-Biosimulations_utils.archive.core" title="Permalink to this headline">¶</a></h2>
+<p>Base clases for reading and writing archives</p>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Jonathan Karr &lt;<a class="reference external" href="mailto:karr&#37;&#52;&#48;mssm&#46;edu">karr<span>&#64;</span>mssm<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Date</dt>
+<dd class="field-even"><p>2020-04-09</p>
+</dd>
+<dt class="field-odd">Copyright</dt>
+<dd class="field-odd"><p>2020, Center for Reproducible Biomedical Modeling</p>
+</dd>
+<dt class="field-even">License</dt>
+<dd class="field-even"><p>MIT</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="Biosimulations_utils.archive.core.ArchiveWriter">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.archive.core.</code><code class="sig-name descname">ArchiveWriter</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.core.ArchiveWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Writer for archives</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.core.ArchiveWriter._abc_impl">
+<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.core.ArchiveWriter._abc_impl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.archive.core.ArchiveWriter.run">
+<em class="property">abstract </em><code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_dir</span></em>, <em class="sig-param"><span class="n">out_file</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.core.ArchiveWriter.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an archive to a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>archive</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code>) – description of archive</p></li>
+<li><p><strong>in_dir</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – directory which contains the files in the archive</p></li>
+<li><p><strong>out_file</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to save archive</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Biosimulations_utils.archive.core.ArchiveReader">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.archive.core.</code><code class="sig-name descname">ArchiveReader</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.core.ArchiveReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Reader for COMBINE/OMEX archives</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.core.ArchiveReader._abc_impl">
+<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.core.ArchiveReader._abc_impl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.archive.core.ArchiveReader.run">
+<em class="property">abstract </em><code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">out_dir</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.core.ArchiveReader.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an archive from a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_file</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to save archive</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – directory which contains the files in the archive</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>description of archive</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="Biosimulations_utils.archive.core.ArchiveIoError">
+<em class="property">exception </em><code class="sig-prename descclassname">Biosimulations_utils.archive.core.</code><code class="sig-name descname">ArchiveIoError</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.core.ArchiveIoError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Archive IO error</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="Biosimulations_utils.archive.core.ArchiveIoWarning">
+<em class="property">exception </em><code class="sig-prename descclassname">Biosimulations_utils.archive.core.</code><code class="sig-name descname">ArchiveIoWarning</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.core.ArchiveIoWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserWarning</span></code></p>
+<p>Archive IO warning</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-Biosimulations_utils.archive.data_model">
+<span id="biosimulations-utils-archive-data-model-module"></span><h2><span class="section-number">1.1.1.1.4. </span>Biosimulations_utils.archive.data_model module<a class="headerlink" href="#module-Biosimulations_utils.archive.data_model" title="Permalink to this headline">¶</a></h2>
+<p>Data model for archives</p>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Jonathan Karr &lt;<a class="reference external" href="mailto:karr&#37;&#52;&#48;mssm&#46;edu">karr<span>&#64;</span>mssm<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Date</dt>
+<dd class="field-even"><p>2020-04-09</p>
+</dd>
+<dt class="field-odd">Copyright</dt>
+<dd class="field-odd"><p>2020, Center for Reproducible Biomedical Modeling</p>
+</dd>
+<dt class="field-even">License</dt>
+<dd class="field-even"><p>MIT</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFormat">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.archive.data_model.</code><code class="sig-name descname">ArchiveFormat</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFormat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wc_utils.util.enumerate.CaseInsensitiveEnum</span></code></p>
+<p>Simulation format metadata</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFormat.combine">
+<code class="sig-name descname">combine</code><em class="property"> = &lt;Biosimulations_utils.data_model.Format object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFormat.combine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Biosimulations_utils.archive.data_model.Archive">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.archive.data_model.</code><code class="sig-name descname">Archive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">master_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">files</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">authors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">created</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">updated</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.Archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An archive archive</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.Archive.master_file">
+<code class="sig-name descname">master_file</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.Archive.master_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>master file of archive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#Biosimulations_utils.archive.data_model.ArchiveFile" title="Biosimulations_utils.archive.data_model.ArchiveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ArchiveFile</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.Archive.files">
+<code class="sig-name descname">files</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.Archive.files" title="Permalink to this definition">¶</a></dt>
+<dd><p>files in archive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <cite>:obj:`ArchiveFile</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.Archive.description">
+<code class="sig-name descname">description</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.Archive.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>description</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.Archive.authors">
+<code class="sig-name descname">authors</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.Archive.authors" title="Permalink to this definition">¶</a></dt>
+<dd><p>authors of the archive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Person</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.Archive.format">
+<code class="sig-name descname">format</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.Archive.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Format</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.Archive.created">
+<code class="sig-name descname">created</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.Archive.created" title="Permalink to this definition">¶</a></dt>
+<dd><p>date archive was created</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.Archive.updated">
+<code class="sig-name descname">updated</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.Archive.updated" title="Permalink to this definition">¶</a></dt>
+<dd><p>date archive was last updated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.archive.data_model.Archive.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.Archive.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if two archives are semantically equal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#Biosimulations_utils.archive.data_model.Archive" title="Biosimulations_utils.archive.data_model.Archive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code></a>) – other archive</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFile">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.archive.data_model.</code><code class="sig-name descname">ArchiveFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">authors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">created</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">updated</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A file in an archive</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFile.filename">
+<code class="sig-name descname">filename</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFile.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>path to file within archive (e.g., <cite>./models/model.xml</cite>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFile.format">
+<code class="sig-name descname">format</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFile.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>model or simulation format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Format</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFile.description">
+<code class="sig-name descname">description</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFile.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>description</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFile.authors">
+<code class="sig-name descname">authors</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFile.authors" title="Permalink to this definition">¶</a></dt>
+<dd><p>authors of the file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Person</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFile.created">
+<code class="sig-name descname">created</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFile.created" title="Permalink to this definition">¶</a></dt>
+<dd><p>date file was created</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFile.updated">
+<code class="sig-name descname">updated</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFile.updated" title="Permalink to this definition">¶</a></dt>
+<dd><p>date file was last updated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFile.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFile.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if two archive files are semantically equal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#Biosimulations_utils.archive.data_model.ArchiveFile" title="Biosimulations_utils.archive.data_model.ArchiveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ArchiveFile</span></code></a>) – other archive file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.archive.data_model.ArchiveFile.sort_key">
+<em class="property">static </em><code class="sig-name descname">sort_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.data_model.ArchiveFile.sort_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a key to sort a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference internal" href="#Biosimulations_utils.archive.data_model.ArchiveFile" title="Biosimulations_utils.archive.data_model.ArchiveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ArchiveFile</span></code></a>) – file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Biosimulations_utils.archive.exec">
+<span id="biosimulations-utils-archive-exec-module"></span><h2><span class="section-number">1.1.1.1.5. </span>Biosimulations_utils.archive.exec module<a class="headerlink" href="#module-Biosimulations_utils.archive.exec" title="Permalink to this headline">¶</a></h2>
+<p>Utilities for generating COMBINE archives for simulations and
+executing simulations in archives</p>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Jonathan Karr &lt;<a class="reference external" href="mailto:karr&#37;&#52;&#48;mssm&#46;edu">karr<span>&#64;</span>mssm<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Date</dt>
+<dd class="field-even"><p>2020-04-10</p>
+</dd>
+<dt class="field-odd">Copyright</dt>
+<dd class="field-odd"><p>2020, Center for Reproducible Biomedical Modeling</p>
+</dd>
+<dt class="field-even">License</dt>
+<dd class="field-even"><p>MIT</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt id="Biosimulations_utils.archive.exec.gen_archive_for_sim">
+<code class="sig-prename descclassname">Biosimulations_utils.archive.exec.</code><code class="sig-name descname">gen_archive_for_sim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_filename</span></em>, <em class="sig-param"><span class="n">simulation</span></em>, <em class="sig-param"><span class="n">archive_filename</span></em>, <em class="sig-param"><span class="n">simulation_format_opts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">visualization</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/exec.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.exec.gen_archive_for_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a COMBINE archive of a simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – local path to model</p></li>
+<li><p><strong>simulation</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>) – simulation</p></li>
+<li><p><strong>archive_filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to save the archive</p></li>
+<li><p><strong>simulation_format_opts</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>, optional) – keyword arguments for <code class="xref py py-obj docutils literal notranslate"><span class="pre">write_simulation</span></code></p></li>
+<li><p><strong>visualization</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Visualization</span></code>) – visualization</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>archive</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Biosimulations_utils.archive.exec.exec_archive">
+<code class="sig-prename descclassname">Biosimulations_utils.archive.exec.</code><code class="sig-name descname">exec_archive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">archive_filename</span></em>, <em class="sig-param"><span class="n">dockerhub_id</span></em>, <em class="sig-param"><span class="n">out_dir</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/exec.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.exec.exec_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the tasks described in a archive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>archive_filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to archive</p></li>
+<li><p><strong>dockerhub_id</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – DockerHub id of simulator</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – directory where simulation results where saved</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – if the execution failed</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-Biosimulations_utils.archive">
+<span id="module-contents"></span><h2><span class="section-number">1.1.1.1.6. </span>Module contents<a class="headerlink" href="#module-Biosimulations_utils.archive" title="Permalink to this headline">¶</a></h2>
+<p>Module for representing, reading, and writing archives</p>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Jonathan Karr &lt;<a class="reference external" href="mailto:karr&#37;&#52;&#48;mssm&#46;edu">karr<span>&#64;</span>mssm<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Date</dt>
+<dd class="field-even"><p>2020-03-31</p>
+</dd>
+<dt class="field-odd">Copyright</dt>
+<dd class="field-odd"><p>2020, Center for Reproducible Biomedical Modeling</p>
+</dd>
+<dt class="field-even">License</dt>
+<dd class="field-even"><p>MIT</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt id="Biosimulations_utils.archive.write_archive">
+<code class="sig-prename descclassname">Biosimulations_utils.archive.</code><code class="sig-name descname">write_archive</code><span class="sig-paren">(</span><em class="sig-param">archive</em>, <em class="sig-param">in_dir</em>, <em class="sig-param">out_file</em>, <em class="sig-param">format=&lt;ArchiveFormat.combine: &lt;Biosimulations_utils.data_model.Format object&gt;&gt;</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/__init__.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.write_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an archive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>archive</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code>) – description of archive</p></li>
+<li><p><strong>in_dir</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – directory which contains the files in the archive</p></li>
+<li><p><strong>out_file</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to save archive</p></li>
+<li><p><strong>format</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ArchiveFormat</span></code>, optional) – archive format</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – the format is not supported</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Biosimulations_utils.archive.read_archive">
+<code class="sig-prename descclassname">Biosimulations_utils.archive.</code><code class="sig-name descname">read_archive</code><span class="sig-paren">(</span><em class="sig-param">in_file</em>, <em class="sig-param">out_dir</em>, <em class="sig-param">format=&lt;ArchiveFormat.combine: &lt;Biosimulations_utils.data_model.Format object&gt;&gt;</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/archive/__init__.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.archive.read_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an archive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_dir</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – directory which contains the files in the archive</p></li>
+<li><p><strong>out_file</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to save archive</p></li>
+<li><p><strong>format</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ArchiveFormat</span></code>, optional) – archive format</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>description of archive</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – the format is not supported</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Biosimulations_utils.biomodel.html" class="btn btn-neutral float-right" title="1.1.1.2. Biosimulations_utils.biomodel package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="Biosimulations_utils.html" class="btn btn-neutral float-left" title="1.1. Biosimulations_utils package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Center for Reproducible Biomedical Modeling
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

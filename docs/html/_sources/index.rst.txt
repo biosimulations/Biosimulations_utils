@@ -1,4 +1,4 @@
-Biosimulations_format_utils documentation
+Biosimulations_utils documentation
 
 Utilities for generating and parsing documents encoded in biomodeling
 standards such as the

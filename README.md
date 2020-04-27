@@ -16,6 +16,10 @@ Utilities for generating and parsing documents encoded in biomodeling standards 
 
 ## Installation
 
+Requirements
+* Python >= 3.7
+* pip
+
 Install latest revision from GitHub
 ```
 pip install git+https://github.com/reproducible-biomedical-modeling/Biosimulations_utils.git#Biosimulations_utils

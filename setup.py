@@ -34,6 +34,7 @@ setuptools.setup(
     license="MIT",
     keywords='systems biology modeling simulation',
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
+    package_data=md.package_data,
     install_requires=md.install_requires,
     extras_require=md.extras_require,
     tests_require=md.tests_require,

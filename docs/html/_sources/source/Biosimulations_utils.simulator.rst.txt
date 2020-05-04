@@ -1,0 +1,469 @@
+Biosimulations_utils.simulator package
+
+Submodules
+
+Biosimulations_utils.simulator.data_model module
+
+Data model for simulators
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-13
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_utils.simulator.data_model.Simulator(id=None, name=None, version=None, image=None, description=None, url=None, tags=None, identifiers=None, references=None, authors=None, license=None, format=None, docker_hub_image_id=None, algorithms=None, created=None, updated=None)
+
+   Bases: "object"
+
+   A simulator
+
+   id
+
+      id
+
+      Type:
+         "str"
+
+   name
+
+      name
+
+      Type:
+         "str"
+
+   version
+
+      version
+
+      Type:
+         "str"
+
+   image
+
+      image file
+
+      Type:
+         "RemoteFile"
+
+   description
+
+      description
+
+      Type:
+         "str"
+
+   url
+
+      URL
+
+      Type:
+         "str"
+
+   tags
+
+      tags
+
+      Type:
+         "list" of "str"
+
+   identifiers
+
+      identifiers
+
+      Type:
+         "list" of "Identifier"
+
+   references
+
+      references
+
+      Type:
+         "list" of "JournalReference"
+
+   authors
+
+      authors
+
+      Type:
+         "list" of "Person"
+
+   license
+
+      license
+
+      Type:
+         "License"
+
+   format
+
+      format
+
+      Type:
+         "Format"
+
+   docker_hub_image_id
+
+      id for image in DockerHub (e.g.,
+      "crbm/biosimulations_tellurium:2.4.1")
+
+      Type:
+         "str"
+
+   algorithms
+
+      supported algorithms
+
+      Type:
+         "list" of "Algorithm"
+
+   created
+
+      date that the simulator was created
+
+      Type:
+         "datetime.datetime"
+
+   updated
+
+      date that the simulator was last updated
+
+      Type:
+         "datetime.datetime"
+
+   __eq__(other)
+
+      Determine if two simulators are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         Simulator
+
+         ) -- other simulator
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create simulator from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         "Simulation"
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+Biosimulations_utils.simulator.testing module
+
+Utilities for validate containerized simulators
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-13
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_utils.simulator.testing.TestCaseType
+
+   Bases: "int", "enum.Enum"
+
+   Type of test case
+
+   _generate_next_value_(start, count, last_values)
+
+   _member_map_ = {'archive': <TestCaseType.archive: 1>, 'biomodel': <TestCaseType.biomodel: 2>}
+
+   _member_names_ = ['archive', 'biomodel']
+
+   _member_type_
+
+      alias of "builtins.int"
+
+   _value2member_map_ = {1: <TestCaseType.archive: 1>, 2: <TestCaseType.biomodel: 2>}
+
+   archive = 1
+
+   biomodel = 2
+
+class Biosimulations_utils.simulator.testing.TestCase(id, filename, type, modeling_framework, model_format, simulation_format, archive_format)
+
+   Bases: "object"
+
+   An example archive to validate simulators
+
+   id
+
+      id
+
+      Type:
+         "str"
+
+   filename
+
+      path to archive
+
+      Type:
+         "str"
+
+   type
+
+      type of test case
+
+      Type:
+         TestCaseType
+
+   modeling_framework
+
+      modeling framework
+
+      Type:
+         "BiomodelingFramework"
+
+   model_format
+
+      model format
+
+      Type:
+         "BiomodelFormat"
+
+   simulation_format
+
+      simulation format
+
+      Type:
+         "SimulationFormat"
+
+   archive_format
+
+      archive format
+
+      Type:
+         "ArchiveFormat"
+
+   static get_full_filename(filename)
+
+      Get the full path to the file
+
+      Returns:
+         full path to the file
+
+      Return type:
+         "str"
+
+class Biosimulations_utils.simulator.testing.TestCaseException(test_case, exception)
+
+   Bases: "object"
+
+   An exception of a test case
+
+   test_case
+
+      test case
+
+      Type:
+         TestCase
+
+   exception
+
+      exception
+
+      Type:
+         "Exception"
+
+class Biosimulations_utils.simulator.testing.SimulatorValidator
+
+   Bases: "object"
+
+   Validate that a Docker image for a simulator implements the
+   BioSimulations simulator interface by checking that the image
+   produces the correct outputs for one of more test cases (e.g.,
+   COMBINE archive)
+
+   TEST_CASES = (<Biosimulations_utils.simulator.testing.TestCase object>, <Biosimulations_utils.simulator.testing.TestCase object>, <Biosimulations_utils.simulator.testing.TestCase object>, <Biosimulations_utils.simulator.testing.TestCase object>)
+
+   _assert_archive_output_valid(test_case, archive_filename, out_dir)
+
+      Validate that the outputs of an archive were correctly generated
+
+      Parameters:
+         test_case (TestCase) -- test case
+
+         archive_filename (str) -- path to archive
+
+         out_dir (str) -- directory which contains the simulation
+         results
+
+      Raises:
+         AssertionError
+
+          -- simulator did not generate the specified outputs
+
+   _gen_example_archive(model_filename, simulation)
+
+      Encode a simulation into SED-ML and generate an example COMBINE
+      archive for it
+
+      Parameters:
+         model_filename (str) -- path to example model
+
+         simulation (Simulation) -- simulation of model
+
+      Returns:
+         Archive: properties of the archive
+
+         str: path to archive
+
+      Return type:
+         "tuple"
+
+   _gen_example_model(model_filename)
+
+      Generate an example model
+
+      Parameters:
+         model_filename
+
+          ("str") -- path to example model
+
+      Returns:
+         example model
+
+      Return type:
+         "Biomodel"
+
+   _gen_example_simulation(model)
+
+      Generate an example simulation
+
+      Parameters:
+         model
+
+          ("Biomodel") -- model
+
+      Returns:
+         example simulation
+
+      Return type:
+         "Simulation"
+
+   _validate_test_case(test_case, archive_filename, dockerhub_id)
+
+      Validate that a simulator correctly produces the outputs for a
+      test case
+
+      Parameters:
+         test_case (TestCase) -- test case
+
+         archive_filename (str) -- path to archive
+
+         dockerhub_id (str) -- DockerHub id of simulator
+
+   run(dockerhub_id, properties_filename, test_case_ids=None)
+
+      Validate that a Docker image for a simulator implements the
+      BioSimulations simulator interface by checking that the image
+      produces the correct outputs for test cases (e.g., COMBINE
+      archive)
+
+      Parameters:
+         dockerhub_id (str) -- DockerHub id of simulator
+
+         properties_filename (str) -- path to the properties of the
+         simulator
+
+         test_case_ids (list of str, optional) -- List of ids of test
+         cases to verify. If test_case_ids is none, all test cases are
+         verified.
+
+      Returns:
+         valid test cases "list"
+
+         TestCaseException
+
+         : invalid test cases
+
+      Return type:
+         "list"
+
+         TestCase
+
+Biosimulations_utils.simulator.utils module
+
+Utilities for generating COMBINE archives for simulations and
+executing simulations in archives
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-10
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+Biosimulations_utils.simulator.utils.exec_simulations_in_archive(archive_filename, task_executer, out_dir, archive_format=<ArchiveFormat.combine: <Biosimulations_utils.data_model.Format object>>)
+
+   Execute the SED tasks represented by an archive
+
+   Parameters:
+      archive_filename (str) -- path to COMBINE archive
+
+      task_executer (types.FunctionType) -- Function to execute each
+      SED task in the archive. The function must implement the
+      following interface:def task_executer(model_filename,
+      model_sed_urn, simulation, working_dir, out_filename,
+      out_format):     ''' Execute a simulation and save its results
+      Args:        model_filename (:obj:`str`): path to the model
+      model_sed_urn (:obj:`str`): SED URN for the format of the model
+      (e.g., `urn:sedml:language:sbml`)        simulation
+      (:obj:`Simulation`): simulation        working_dir (:obj:`str`):
+      directory of the SED-ML file        out_filename (:obj:`str`):
+      path to save the results of the simulation        out_format
+      (:obj:`str`): format to save the results of the simulation
+      (e.g., `csv`)     '''     pass
+
+      out_dir (str) -- Directory to store the results of the tasks
+
+      archive_format (ArchiveFormat, optional) -- archive format
+
+Module contents

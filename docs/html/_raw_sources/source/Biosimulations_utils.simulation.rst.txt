@@ -1,0 +1,42 @@
+Biosimulations\_utils.simulation package
+========================================
+
+Submodules
+----------
+
+Biosimulations\_utils.simulation.core module
+--------------------------------------------
+
+.. automodule:: Biosimulations_utils.simulation.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Biosimulations\_utils.simulation.data\_model module
+---------------------------------------------------
+
+.. automodule:: Biosimulations_utils.simulation.data_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Biosimulations\_utils.simulation.sedml module
+---------------------------------------------
+
+.. automodule:: Biosimulations_utils.simulation.sedml
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+
+Module contents
+---------------
+
+.. automodule:: Biosimulations_utils.simulation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

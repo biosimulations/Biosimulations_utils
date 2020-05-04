@@ -1,0 +1,479 @@
+Biosimulations_utils.archive package
+
+Submodules
+
+Biosimulations_utils.archive.combine module
+
+Classes for reading and writing OMEX archives
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-09
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_utils.archive.combine.CombineArchiveWriter
+
+   Bases:
+
+   Biosimulations_utils.archive.core.ArchiveWriter
+
+   Writer for COMBINE/OMEX archives
+
+   _abc_impl = <_abc_data object>
+
+   _write_metadata(obj, archive_comb, filename)
+
+      Write metadata about an archive or a file in an archive :param
+      obj: archive or file in an archive :type obj: "Archive" or
+      "ArchiveFile" :param archive_comb: archive :type archive_comb:
+      "libcombine.CombineArchive" :param filename: path of object with
+      archive :type filename: "str"
+
+   run(archive, in_dir, out_file)
+
+      Write an archive to a file
+
+      Parameters:
+         archive (Archive) -- description of archive
+
+         in_dir (str) -- directory which contains the files in the
+         archive
+
+         out_file (str) -- path to save archive
+
+      Raises:
+         AssertionError
+
+          -- if files could not be added to the archive or the archive
+         could not be     saved
+
+class Biosimulations_utils.archive.combine.CombineArchiveReader
+
+   Bases:
+
+   Biosimulations_utils.archive.core.ArchiveReader
+
+   Reader for COMBINE/OMEX archives
+
+   NONE_DATETIME = '2000-01-01T00:00:00Z'
+
+   _abc_impl = <_abc_data object>
+
+   _read_metadata(archive_comb, filename, obj)
+
+      Read metadata about an archive or a file in an archive
+
+      Parameters:
+         archive_comb (libcombine.CombineArchive) -- archive
+
+         filename (str) -- path to object within archive
+
+         obj (Archive of ArchiveFile) -- object to add metadata to
+
+   run(in_file, out_dir)
+
+      Read an archive from a file
+
+      Parameters:
+         in_file (str) -- path to save archive
+
+         out_dir (str) -- directory which contains the files in the
+         archive
+
+      Returns:
+         description of archive
+
+      Return type:
+         "Archive"
+
+      Raises:
+         ArchiveIoError
+
+          -- archive is invalid
+
+Biosimulations_utils.archive.core module
+
+Base clases for reading and writing archives
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-09
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_utils.archive.core.ArchiveWriter
+
+   Bases: "abc.ABC"
+
+   Writer for archives
+
+   _abc_impl = <_abc_data object>
+
+   abstract run(in_dir, out_file)
+
+      Write an archive to a file
+
+      Parameters:
+         archive (Archive) -- description of archive
+
+         in_dir (str) -- directory which contains the files in the
+         archive
+
+         out_file (str) -- path to save archive
+
+class Biosimulations_utils.archive.core.ArchiveReader
+
+   Bases: "abc.ABC"
+
+   Reader for COMBINE/OMEX archives
+
+   _abc_impl = <_abc_data object>
+
+   abstract run(out_dir)
+
+      Read an archive from a file
+
+      Parameters:
+         in_file (str) -- path to save archive
+
+         out_dir (str) -- directory which contains the files in the
+         archive
+
+      Returns:
+         description of archive
+
+      Return type:
+         "Archive"
+
+exception Biosimulations_utils.archive.core.ArchiveIoError
+
+   Bases: "Exception"
+
+   Archive IO error
+
+exception Biosimulations_utils.archive.core.ArchiveIoWarning
+
+   Bases: "UserWarning"
+
+   Archive IO warning
+
+Biosimulations_utils.archive.data_model module
+
+Data model for archives
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-09
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_utils.archive.data_model.ArchiveFormat
+
+   Bases: "wc_utils.util.enumerate.CaseInsensitiveEnum"
+
+   Simulation format metadata
+
+   combine = <Biosimulations_utils.data_model.Format object>
+
+class Biosimulations_utils.archive.data_model.Archive(master_file=None, files=None, description=None, authors=None, format=None, created=None, updated=None)
+
+   Bases: "object"
+
+   An archive archive
+
+   master_file
+
+      master file of archive
+
+      Type:
+         ArchiveFile
+
+   files
+
+      files in archive
+
+      Type:
+         "list" of *:obj:`ArchiveFile*
+
+   description
+
+      description
+
+      Type:
+         "str"
+
+   authors
+
+      authors of the archive
+
+      Type:
+         "list" of "Person"
+
+   format
+
+      format
+
+      Type:
+         "Format"
+
+   created
+
+      date archive was created
+
+      Type:
+         "datetime.datetime"
+
+   updated
+
+      date archive was last updated
+
+      Type:
+         "datetime.datetime"
+
+   __eq__(other)
+
+      Determine if two archives are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         Archive
+
+         ) -- other archive
+
+      Returns:
+         "bool"
+
+class Biosimulations_utils.archive.data_model.ArchiveFile(filename=None, format=None, description=None, authors=None, created=None, updated=None)
+
+   Bases: "object"
+
+   A file in an archive
+
+   filename
+
+      path to file within archive (e.g., *./models/model.xml*)
+
+      Type:
+         "str"
+
+   format
+
+      model or simulation format
+
+      Type:
+         "Format"
+
+   description
+
+      description
+
+      Type:
+         "str"
+
+   authors
+
+      authors of the file
+
+      Type:
+         "list" of "Person"
+
+   created
+
+      date file was created
+
+      Type:
+         "datetime.datetime"
+
+   updated
+
+      date file was last updated
+
+      Type:
+         "datetime.datetime"
+
+   __eq__(other)
+
+      Determine if two archive files are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         ArchiveFile
+
+         ) -- other archive file
+
+      Returns:
+         "bool"
+
+   static sort_key(file)
+
+      Get a key to sort a file
+
+      Parameters:
+         file
+
+          (
+
+         ArchiveFile
+
+         ) -- file
+
+      Returns:
+         "tuple"
+
+Biosimulations_utils.archive.exec module
+
+Utilities for generating COMBINE archives for simulations and
+executing simulations in archives
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-10
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+Biosimulations_utils.archive.exec.gen_archive_for_sim(model_filename, simulation, archive_filename, simulation_format_opts=None, visualization=None)
+
+   Create a COMBINE archive of a simulation
+
+   Parameters:
+      model_filename (str) -- local path to model
+
+      simulation (Simulation) -- simulation
+
+      archive_filename (str) -- path to save the archive
+
+      simulation_format_opts (dict, optional) -- keyword arguments for
+      write_simulation
+
+      visualization (Visualization) -- visualization
+
+   Returns:
+      archive
+
+   Return type:
+      "Archive"
+
+Biosimulations_utils.archive.exec.exec_archive(archive_filename, dockerhub_id, out_dir)
+
+   Execute the tasks described in a archive
+
+   Parameters:
+      archive_filename (str) -- path to archive
+
+      dockerhub_id (str) -- DockerHub id of simulator
+
+      out_dir (str) -- directory where simulation results where saved
+
+   Raises:
+      RuntimeError
+
+       -- if the execution failed
+
+Module contents
+
+Module for representing, reading, and writing archives
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-03-31
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+Biosimulations_utils.archive.write_archive(archive, in_dir, out_file, format=<ArchiveFormat.combine: <Biosimulations_utils.data_model.Format object>>)
+
+   Write an archive
+
+   Parameters:
+      archive (Archive) -- description of archive
+
+      in_dir (str) -- directory which contains the files in the
+      archive
+
+      out_file (str) -- path to save archive
+
+      format (ArchiveFormat, optional) -- archive format
+
+   Raises:
+      NotImplementedError
+
+       -- the format is not supported
+
+Biosimulations_utils.archive.read_archive(in_file, out_dir, format=<ArchiveFormat.combine: <Biosimulations_utils.data_model.Format object>>)
+
+   Read an archive
+
+   Parameters:
+      in_dir (str) -- directory which contains the files in the
+      archive
+
+      out_file (str) -- path to save archive
+
+      format (ArchiveFormat, optional) -- archive format
+
+   Returns:
+      description of archive
+
+   Return type:
+      "Archive"
+
+   Raises:
+      NotImplementedError
+
+       -- the format is not supported

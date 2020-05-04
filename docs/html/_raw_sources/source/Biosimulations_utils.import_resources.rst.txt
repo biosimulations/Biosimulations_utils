@@ -1,0 +1,24 @@
+Biosimulations\_utils.import\_resources package
+===============================================
+
+Submodules
+----------
+
+Biosimulations\_utils.import\_resources.biomodels module
+--------------------------------------------------------
+
+.. automodule:: Biosimulations_utils.import_resources.biomodels
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+
+Module contents
+---------------
+
+.. automodule:: Biosimulations_utils.import_resources
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

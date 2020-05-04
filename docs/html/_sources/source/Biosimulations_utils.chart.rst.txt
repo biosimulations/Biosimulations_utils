@@ -1,0 +1,195 @@
+Biosimulations_utils.chart package
+
+Submodules
+
+Biosimulations_utils.chart.data_model module
+
+Data model for chart types
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-06
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_utils.chart.data_model.Chart(id=None)
+
+   Bases: "object"
+
+   Chart type
+
+   id
+
+      id
+
+      Type:
+         "str"
+
+   __eq__(other)
+
+      Determine if two chart types are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         Chart
+
+         ) -- other chart type
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create chart type from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         Chart
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_utils.chart.data_model.ChartDataField(name=None, shape=None, type=None)
+
+   Bases: "object"
+
+   Chart type data field
+
+   name
+
+      name
+
+      Type:
+         "str"
+
+   shape
+
+      shape
+
+      Type:
+         ChartDataFieldShape
+
+   type
+
+      type
+
+      Type:
+         ChartDataFieldType
+
+   __eq__(other)
+
+      Determine if two chart types are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         Chart
+
+         ) -- other chart type
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create chart type data field from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         ChartDataField
+
+   static sort_key(field)
+
+      Get a key to sort a field
+
+      Parameters:
+         field
+
+          (
+
+         ChartDataField
+
+         ) -- field
+
+      Returns:
+         "tuple"
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_utils.chart.data_model.ChartDataFieldShape
+
+   Bases: "str", "enum.Enum"
+
+   Chart type data field shape
+
+   _generate_next_value_(start, count, last_values)
+
+   _member_map_ = {'array': <ChartDataFieldShape.array: 'array'>, 'scalar': <ChartDataFieldShape.scalar: 'scalar'>}
+
+   _member_names_ = ['scalar', 'array']
+
+   _member_type_
+
+      alias of "builtins.str"
+
+   _value2member_map_ = {'array': <ChartDataFieldShape.array: 'array'>, 'scalar': <ChartDataFieldShape.scalar: 'scalar'>}
+
+   array = 'array'
+
+   scalar = 'scalar'
+
+class Biosimulations_utils.chart.data_model.ChartDataFieldType
+
+   Bases: "str", "enum.Enum"
+
+   Chart type data field type
+
+   _generate_next_value_(start, count, last_values)
+
+   _member_map_ = {'dynamic_simulation_result': <ChartDataFieldType.dynamic_simulation_result: 'dynamicSimulationResult'>, 'static': <ChartDataFieldType.static: 'static'>}
+
+   _member_names_ = ['dynamic_simulation_result', 'static']
+
+   _member_type_
+
+      alias of "builtins.str"
+
+   _value2member_map_ = {'dynamicSimulationResult': <ChartDataFieldType.dynamic_simulation_result: 'dynamicSimulationResult'>, 'static': <ChartDataFieldType.static: 'static'>}
+
+   dynamic_simulation_result = 'dynamicSimulationResult'
+
+   static = 'static'
+
+Module contents

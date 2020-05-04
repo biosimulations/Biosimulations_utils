@@ -1,8 +1,8 @@
-Biosimulations_format_utils.model package
+Biosimulations_utils.biomodel package
 
 Submodules
 
-Biosimulations_format_utils.model.core module
+Biosimulations_utils.biomodel.core module
 
 Utilities for working with models
 
@@ -22,11 +22,18 @@ Copyright:
 License:
    MIT
 
-class Biosimulations_format_utils.model.core.ModelReader
+class Biosimulations_utils.biomodel.core.BiomodelReader
 
    Bases: "abc.ABC"
 
    Read information about models
+
+   _filename
+
+      path to a file which defines a model
+
+      Type:
+         "str"
 
    _abc_impl = <_abc_data object>
 
@@ -38,7 +45,7 @@ class Biosimulations_format_utils.model.core.ModelReader
          model_orig (object) -- original model encoded in a format
          such as SBML
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
       Returns:
          format of the model
@@ -53,7 +60,7 @@ class Biosimulations_format_utils.model.core.ModelReader
       Parameters:
          filename (str) -- path to a file which defines a model
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
       Returns:
          model encoded in a format such as SBML
@@ -69,13 +76,13 @@ class Biosimulations_format_utils.model.core.ModelReader
          model_orig (object) -- original model encoded in a format
          such as SBML
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
       Returns:
          model with additional metadata
 
       Return type:
-         "Model"
+         "Biomodel"
 
    abstract _read_parameters(model_orig, model)
 
@@ -85,13 +92,13 @@ class Biosimulations_format_utils.model.core.ModelReader
          model_orig (object) -- original model encoded in a format
          such as SBML
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
       Returns:
          information about parameters
 
       Return type:
-         "list" of "ModelParameter"
+         "list" of "BiomodelParameter"
 
    abstract _read_units(model_orig, model)
 
@@ -101,7 +108,7 @@ class Biosimulations_format_utils.model.core.ModelReader
          model_orig (object) -- original model encoded in a format
          such as SBML
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
       Returns:
          dictionary that maps the ids of units to their definitions
@@ -117,13 +124,13 @@ class Biosimulations_format_utils.model.core.ModelReader
          model_orig (object) -- original model encoded in a format
          such as SBML
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
       Returns:
          information about the variables of the model
 
       Return type:
-         "list" of "Variable"
+         "list" of "BiomodelVariable"
 
    run(filename)
 
@@ -138,21 +145,21 @@ class Biosimulations_format_utils.model.core.ModelReader
          model
 
       Return type:
-         "Model"
+         "Biomodel"
 
-exception Biosimulations_format_utils.model.core.ModelIoError
+exception Biosimulations_utils.biomodel.core.BiomodelIoError
 
    Bases: "Exception"
 
    Model IO error
 
-exception Biosimulations_format_utils.model.core.ModelIoWarning
+exception Biosimulations_utils.biomodel.core.BiomodelIoWarning
 
    Bases: "UserWarning"
 
    Model IO warning
 
-Biosimulations_format_utils.model.data_model module
+Biosimulations_utils.biomodel.data_model module
 
 Data model for biomodels
 
@@ -172,7 +179,45 @@ Copyright:
 License:
    MIT
 
-class Biosimulations_format_utils.model.data_model.Model(id=None, name=None, file=None, image=None, description=None, format=None, framework=None, taxon=None, tags=None, identifiers=None, references=None, authors=None, license=None, parameters=None, variables=None)
+class Biosimulations_utils.biomodel.data_model.BiomodelingFramework
+
+   Bases: "enum.Enum"
+
+   An enumeration.
+
+   flux_balance = <Biosimulations_utils.data_model.OntologyTerm object>
+
+   logical = <Biosimulations_utils.data_model.OntologyTerm object>
+
+   non_spatial_continuous = <Biosimulations_utils.data_model.OntologyTerm object>
+
+   non_spatial_discrete = <Biosimulations_utils.data_model.OntologyTerm object>
+
+   spatial_continuous = <Biosimulations_utils.data_model.OntologyTerm object>
+
+   spatial_discrete = <Biosimulations_utils.data_model.OntologyTerm object>
+
+class Biosimulations_utils.biomodel.data_model.BiomodelFormat
+
+   Bases: "wc_utils.util.enumerate.CaseInsensitiveEnum"
+
+   Model format metadata
+
+   bngl = <Biosimulations_utils.data_model.Format object>
+
+   cellml = <Biosimulations_utils.data_model.Format object>
+
+   kappa = <Biosimulations_utils.data_model.Format object>
+
+   mml = <Biosimulations_utils.data_model.Format object>
+
+   neuroml = <Biosimulations_utils.data_model.Format object>
+
+   pharmml = <Biosimulations_utils.data_model.Format object>
+
+   sbml = <Biosimulations_utils.data_model.Format object>
+
+class Biosimulations_utils.biomodel.data_model.Biomodel(id=None, name=None, file=None, image=None, description=None, format=None, framework=None, taxon=None, tags=None, identifiers=None, references=None, authors=None, license=None, parameters=None, variables=None, created=None, updated=None)
 
    Bases: "object"
 
@@ -276,7 +321,7 @@ class Biosimulations_format_utils.model.data_model.Model(id=None, name=None, fil
       Type:
          "list" of
 
-         ModelParameter
+         BiomodelParameter
 
    variables
 
@@ -285,7 +330,21 @@ class Biosimulations_format_utils.model.data_model.Model(id=None, name=None, fil
       Type:
          "list" of
 
-         Variable
+         BiomodelVariable
+
+   created
+
+      date that the model was created
+
+      Type:
+         "datetime.datetime"
+
+   updated
+
+      date that the model was last updated
+
+      Type:
+         "datetime.datetime"
 
    __eq__(other)
 
@@ -296,7 +355,7 @@ class Biosimulations_format_utils.model.data_model.Model(id=None, name=None, fil
 
           (
 
-         Model
+         Biomodel
 
          ) -- other model
 
@@ -313,7 +372,7 @@ class Biosimulations_format_utils.model.data_model.Model(id=None, name=None, fil
           ("dict") --
 
       Returns:
-         Model
+         Biomodel
 
    to_json()
 
@@ -322,7 +381,7 @@ class Biosimulations_format_utils.model.data_model.Model(id=None, name=None, fil
       Returns:
          "dict"
 
-class Biosimulations_format_utils.model.data_model.ModelParameter(target=None, group=None, id=None, name=None, description=None, identifiers=None, type=None, value=None, recommended_range=None, units=None)
+class Biosimulations_utils.biomodel.data_model.BiomodelParameter(target=None, group=None, id=None, name=None, description=None, identifiers=None, type=None, value=None, recommended_range=None, units=None)
 
    Bases: "object"
 
@@ -415,7 +474,7 @@ class Biosimulations_format_utils.model.data_model.ModelParameter(target=None, g
 
           (
 
-         ModelParameter
+         BiomodelParameter
 
          ) -- other parameter
 
@@ -432,7 +491,7 @@ class Biosimulations_format_utils.model.data_model.ModelParameter(target=None, g
           ("dict") --
 
       Returns:
-         ModelParameter
+         BiomodelParameter
 
    static sort_key(parameter)
 
@@ -443,7 +502,7 @@ class Biosimulations_format_utils.model.data_model.ModelParameter(target=None, g
 
           (
 
-         ModelParameter
+         BiomodelParameter
 
          ) -- parameter
 
@@ -457,7 +516,7 @@ class Biosimulations_format_utils.model.data_model.ModelParameter(target=None, g
       Returns:
          "dict"
 
-class Biosimulations_format_utils.model.data_model.Variable(target=None, group=None, id=None, name=None, description=None, identifiers=None, type=None, units=None)
+class Biosimulations_utils.biomodel.data_model.BiomodelVariable(target=None, group=None, id=None, name=None, description=None, identifiers=None, type=None, units=None)
 
    Bases: "object"
 
@@ -530,7 +589,7 @@ class Biosimulations_format_utils.model.data_model.Variable(target=None, group=N
 
           (
 
-         Variable
+         BiomodelVariable
 
          ) -- other variable
 
@@ -547,7 +606,7 @@ class Biosimulations_format_utils.model.data_model.Variable(target=None, group=N
           ("dict") --
 
       Returns:
-         Variable
+         BiomodelVariable
 
    static sort_key(variable)
 
@@ -558,7 +617,7 @@ class Biosimulations_format_utils.model.data_model.Variable(target=None, group=N
 
           (
 
-         Variable
+         BiomodelVariable
 
          ) -- variable
 
@@ -572,7 +631,7 @@ class Biosimulations_format_utils.model.data_model.Variable(target=None, group=N
       Returns:
          "dict"
 
-Biosimulations_format_utils.model.sbml module
+Biosimulations_utils.biomodel.sbml module
 
 Utilities for working with SBML-encoded models
 
@@ -592,13 +651,20 @@ Copyright:
 License:
    MIT
 
-class Biosimulations_format_utils.model.sbml.SbmlModelReader
+class Biosimulations_utils.biomodel.sbml.SbmlBiomodelReader
 
    Bases:
 
-   Biosimulations_format_utils.model.core.ModelReader
+   Biosimulations_utils.biomodel.core.BiomodelReader
 
    Read information about SBML-encoded models
+
+   _logger
+
+      logger
+
+      Type:
+         "logging.Logger"
 
    _abc_impl = <_abc_data object>
 
@@ -710,6 +776,23 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
       Return type:
          "libsbml.XMLNode"
 
+   _read_constant_from_math(math_sbml)
+
+      Read the constant value of a mathematical expression
+
+      Parameters:
+         math_sbml
+
+          ("libsbml.ASTNode") -- mathematical expression
+
+      Returns:
+         Type: type
+
+         int or float: value
+
+      Return type:
+         "tuple"
+
    _read_format(model_sbml, model)
 
       Read the metadata of a model
@@ -717,7 +800,7 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
       Parameters:
          model_sbml (libsbml.Model) -- SBML-encoded model
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
       Returns:
          format of the model
@@ -741,6 +824,11 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
       Return type:
          "libsbml.Model"
 
+      Raises:
+         ValueError
+
+          -- file doesn't exist
+
    _read_metadata(model_sbml, model)
 
       Read the metadata of a model
@@ -748,22 +836,28 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
       Parameters:
          model_sbml (libsbml.Model) -- SBML-encoded model
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
       Returns:
          model with additional metadata
 
       Return type:
-         "Model"
+         "Biomodel"
+
+      Raises:
+         BiomodelIoError
+
+          -- if the model uses an unsupported SBML package or any
+         unsupported combination of packages
 
    _read_parameter(param_sbml, model, rxn_sbml=None, rxn_id=None, rxn_name=None)
 
       Read information about a SBML parameter
 
       Parameters:
-         param_sbml (libsbml.ModelParameter) -- SBML parameter
+         param_sbml (libsbml.BiomodelParameter) -- SBML parameter
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
          rxn_sbml (libsbml.Reaction, optional) -- SBML reaction
 
@@ -777,7 +871,12 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
          information about the parameter
 
       Return type:
-         "ModelParameter"
+         "BiomodelParameter"
+
+      Raises:
+         AssertionError
+
+          -- the parameter doesn't have an id
 
    _read_parameters(model_sbml, model, units)
 
@@ -786,7 +885,7 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
       Parameters:
          model_sbml (libsbml.Model) -- SBML-encoded model
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
          units (dict) -- dictionary that maps the ids of units to
          their definitions
@@ -795,7 +894,14 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
          information about parameters
 
       Return type:
-         "list" of "ModelParameter"
+         "list" of "BiomodelParameter"
+
+      Raises:
+         AssertionError
+
+          -- if any of the following conditions are met:          * A
+         compartment, species, or reaction doesn't have an id     *
+         The id of the active flux objective is the empty string
 
    _read_units(model_sbml, model)
 
@@ -804,7 +910,7 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
       Parameters:
          model_sbml (libsbml.Model) -- SBML-encoded model
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
       Returns:
          dictionary that maps the ids of units to their definitions
@@ -817,17 +923,22 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
       Read information about a SBML species
 
       Parameters:
-         model_sbml (libsbml.Model) -- SBML-encoded model
+         model_sbml (libsbml.Biomodel) -- SBML-encoded model
 
          species_sbml (libsbml.Species) -- SBML species
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
       Returns:
          information about the species
 
       Return type:
-         "Variable"
+         "BiomodelVariable"
+
+      Raises:
+         AssertionError
+
+          -- the species has no id
 
    _read_variables(model_sbml, model, units)
 
@@ -836,7 +947,7 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
       Parameters:
          model_sbml (libsbml.Model) -- SBML-encoded model
 
-         model (Model) -- model
+         model (Biomodel) -- model
 
          units (dict) -- dictionary that maps the ids of units to
          their definitions
@@ -845,9 +956,15 @@ class Biosimulations_format_utils.model.sbml.SbmlModelReader
          information about the variables of the model
 
       Return type:
-         "list" of "Variable"
+         "list" of "BiomodelVariable"
 
-Biosimulations_format_utils.model.sbml.viz_model(model_filename, img_filename, requests_session=None)
+      Raises:
+         AssertionError
+
+          -- there is no active objective or the active flux objective
+         has no id
+
+Biosimulations_utils.biomodel.sbml.visualize_biomodel(model_filename, img_filename, requests_session=None, remove_layouts=True, remove_units=True)
 
    Use
 
@@ -864,11 +981,22 @@ Biosimulations_format_utils.model.sbml.viz_model(model_filename, img_filename, r
       requests_session (requests_cache.core.CachedSession, optional)
       -- cached requests session
 
+      remove_layouts (bool, optional) -- if True, remove layouts from
+      model
+
+      remove_units (bool, optional) -- if True, remove units from
+      model
+
    Returns:
       image
 
    Return type:
       "RemoteFile"
+
+   Raises:
+      BiomodelIoError
+
+       -- if an image could not be generated
 
 Module contents
 
@@ -890,47 +1018,22 @@ Copyright:
 License:
    MIT
 
-class Biosimulations_format_utils.model.ModelFormat
-
-   Bases: "int", "wc_utils.util.enumerate.CaseInsensitiveEnum"
-
-   Model format
-
-   _member_map_ = {'bngl': <ModelFormat.bngl: 1>, 'cellml': <ModelFormat.cellml: 2>, 'kappa': <ModelFormat.kappa: 3>, 'mml': <ModelFormat.mml: 4>, 'neuroml': <ModelFormat.neuroml: 5>, 'pharmml': <ModelFormat.pharmml: 6>, 'sbml': <ModelFormat.sbml: 7>}
-
-   _member_names_ = ['bngl', 'cellml', 'kappa', 'mml', 'neuroml', 'pharmml', 'sbml']
-
-   _member_type_
-
-      alias of "builtins.int"
-
-   _value2member_map_ = {1: <ModelFormat.bngl: 1>, 2: <ModelFormat.cellml: 2>, 3: <ModelFormat.kappa: 3>, 4: <ModelFormat.mml: 4>, 5: <ModelFormat.neuroml: 5>, 6: <ModelFormat.pharmml: 6>, 7: <ModelFormat.sbml: 7>}
-
-   bngl = 1
-
-   cellml = 2
-
-   kappa = 3
-
-   mml = 4
-
-   neuroml = 5
-
-   pharmml = 6
-
-   sbml = 7
-
-Biosimulations_format_utils.model.read_model(filename, format)
+Biosimulations_utils.biomodel.read_biomodel(filename, format)
 
    Read a model from a file
 
    Parameters:
       filename (str) -- path to a file which defines a model
 
-      format (ModelFormat) -- model format
+      format (BiomodelFormat) -- model format
 
    Returns:
       model
 
    Return type:
       "dict"
+
+   Raises:
+      NotImplementedError
+
+       -- the format is not supported

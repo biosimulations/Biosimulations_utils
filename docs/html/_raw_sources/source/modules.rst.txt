@@ -1,7 +1,7 @@
-Biosimulations_format_utils
-===========================
+Biosimulations_utils
+====================
 
 .. toctree::
    :maxdepth: 4
 
-   Biosimulations_format_utils
+   Biosimulations_utils

@@ -1,0 +1,292 @@
+Biosimulations_utils.visualization package
+
+Submodules
+
+Biosimulations_utils.visualization.data_model module
+
+Data model for visualizations
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-04-06
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_utils.visualization.data_model.Visualization(id=None, name=None, image=None, description=None, tags=None, identifiers=None, references=None, authors=None, license=None, format=None, columns=None, layout=None)
+
+   Bases: "object"
+
+   Visualization of the results of one or more simulations
+
+   id
+
+      id
+
+      Type:
+         "str"
+
+   name
+
+      name
+
+      Type:
+         "str"
+
+   image
+
+      image file
+
+      Type:
+         "RemoteFile"
+
+   description
+
+      description
+
+      Type:
+         "str"
+
+   tags
+
+      tags
+
+      Type:
+         "list" of "str"
+
+   identifiers
+
+      identifiers
+
+      Type:
+         "list" of "Identifier"
+
+   references
+
+      references
+
+      Type:
+         "list" of "JournalReference"
+
+   authors
+
+      authors
+
+      Type:
+         "list" of "Person"
+
+   license
+
+      license
+
+      Type:
+         "License"
+
+   format
+
+      format
+
+      Type:
+         "Format"
+
+   columns
+
+      number of columns
+
+      Type:
+         "int"
+
+   layout
+
+      element of the visualization (i.e. the cells in the grid of
+      visualizations)
+
+      Type:
+         "list" of
+
+         VisualizationLayoutElement
+
+   __eq__(other)
+
+      Determine if two simulations are semantically equal
+
+      Parameters:
+         other
+
+          ("Simulation") -- other simulation
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create simulation from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         "Simulation"
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_utils.visualization.data_model.VisualizationLayoutElement(chart=None, data=None)
+
+   Bases: "object"
+
+   Element of a visualization (i.e. a cell in a grid of
+   visualizations)
+
+   chart
+
+      chart type
+
+      Type:
+         "Chart"
+
+   data
+
+      data to paint chart type
+
+      Type:
+         "list" of
+
+         VisualizationDataField
+
+   __eq__(other)
+
+      Determine if two elements are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         VisualizationLayoutElement
+
+         ) -- other element
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create an element from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         VisualizationLayoutElement
+
+   static sort_key(el)
+
+      Get a key to sort an element
+
+      Parameters:
+         el
+
+          (
+
+         VisualizationLayoutElement
+
+         ) -- element
+
+      Returns:
+         "tuple"
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+class Biosimulations_utils.visualization.data_model.VisualizationDataField(data_field=None, simulation_results=None)
+
+   Bases: "object"
+
+   data_field
+
+      data field
+
+      Type:
+         "ChartDataField"
+
+   simulation_results
+
+      simulation results
+
+      Type:
+         "list" of "SimulationResult"
+
+   __eq__(other)
+
+      Determine if two fields are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         VisualizationDataField
+
+         ) -- other field
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create field from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         VisualizationDataField
+
+   static sort_key(field)
+
+      Get a key to sort a field
+
+      Parameters:
+         field
+
+          (
+
+         VisualizationDataField
+
+         ) -- field
+
+      Returns:
+         "tuple"
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
+Module contents

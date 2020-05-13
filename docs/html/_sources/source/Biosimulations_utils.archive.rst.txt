@@ -359,63 +359,6 @@ class Biosimulations_utils.archive.data_model.ArchiveFile(filename=None, format=
 
 Biosimulations_utils.archive.exec module
 
-Utilities for generating COMBINE archives for simulations and
-executing simulations in archives
-
-Author:
-   Jonathan Karr <
-
-   karr@mssm.edu
-
-   >
-
-Date:
-   2020-04-10
-
-Copyright:
-   2020, Center for Reproducible Biomedical Modeling
-
-License:
-   MIT
-
-Biosimulations_utils.archive.exec.gen_archive_for_sim(model_filename, simulation, archive_filename, simulation_format_opts=None, visualization=None)
-
-   Create a COMBINE archive of a simulation
-
-   Parameters:
-      model_filename (str) -- local path to model
-
-      simulation (Simulation) -- simulation
-
-      archive_filename (str) -- path to save the archive
-
-      simulation_format_opts (dict, optional) -- keyword arguments for
-      write_simulation
-
-      visualization (Visualization) -- visualization
-
-   Returns:
-      archive
-
-   Return type:
-      "Archive"
-
-Biosimulations_utils.archive.exec.exec_archive(archive_filename, dockerhub_id, out_dir)
-
-   Execute the tasks described in a archive
-
-   Parameters:
-      archive_filename (str) -- path to archive
-
-      dockerhub_id (str) -- DockerHub id of simulator
-
-      out_dir (str) -- directory where simulation results where saved
-
-   Raises:
-      RuntimeError
-
-       -- if the execution failed
-
 Module contents
 
 Module for representing, reading, and writing archives

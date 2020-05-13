@@ -52,10 +52,6 @@ class CombineArchiveWriter(ArchiveWriter):
             )
             self._write_metadata(file, archive_comb, file.filename)
 
-        # delete file if it already exists because libcombine appends to files rather then overwriting them
-        if os.path.isfile(out_file):
-            os.remove(out_file)
-
         # save archive to a file
         assert archive_comb.writeToFile(out_file)
 

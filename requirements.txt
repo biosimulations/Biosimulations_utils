@@ -7,7 +7,7 @@ pdf2image
 pillow
 pint
 python_dateutil
-python_libcombine
+python_libcombine >= 0.2.7
 python_libsbml
 python_libsedml >= 2
 requests

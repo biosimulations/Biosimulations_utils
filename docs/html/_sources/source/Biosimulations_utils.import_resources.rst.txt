@@ -4,4 +4,307 @@ Submodules
 
 Biosimulations_utils.import_resources.biomodels module
 
+Import models from BioModels into BioSimulations
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-03-23
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_utils.import_resources.biomodels.BioModelsImporter(exec_simulations=True, _max_models=inf, _cache_dir=None, _dry_run=False)
+
+   Bases: "object"
+
+   Import models from BioModels
+
+   exec_simulations
+
+      if "True", execute simulation experiments
+
+      Type:
+         "bool"
+
+   _max_models
+
+      maximum number of models to download from BioModels
+
+      Type:
+         "int"
+
+   _cache_dir
+
+      directory to cache models from BioModels
+
+      Type:
+         "str"
+
+   _dry_run
+
+      if "True", do not post models to BioModels
+
+      Type:
+         "bool"
+
+   _requests_session
+
+      requests cached session
+
+      Type:
+         "requests_cache.core.CachedSession"
+
+   _sedml_logger
+
+      logger for SED-ML issues
+
+      Type:
+         "logging.Logger"
+
+   _tellurium_logger
+
+      logger for tellurium issues
+
+      Type:
+         "logging.Logger"
+
+   BIOMODELS_ENDPOINT = 'https://www.ebi.ac.uk/biomodels'
+
+   BIOSIMULATIONS_ENDPOINT = 'https://api.biosimulations.dev'
+
+   MAX_RETRIES = 5
+
+   NUM_MODELS_PER_BATCH = 100
+
+   PUBMED_ENDPOINT = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
+
+   SIMULATOR_DOCKERHUB_ID = 'crbm/biosimulations_tellurium'
+
+   get_model(id)
+
+      Get a model
+
+      Parameters:
+         id
+
+          ("str") -- model id
+
+      Returns:
+         "Biomodel": information about model "list" of "Simulation":
+         information about simulations "list" of "Visualization":
+         information about visualizations
+
+      Return type:
+         "tuple"
+
+      Raises:
+         requests.exceptions.HTTPError -- if the model could not be
+         retrieved
+
+         AssertionError -- if the SED document references multiple
+         models
+
+   get_model_batch(num_results=10, i_batch=0)
+
+      Retrieve a batch of models
+
+      Parameters:
+         num_results (int, optional) -- number of results to retrieve
+
+         i_batch (int, optional) -- index of batch to retrieve
+
+      Returns:
+         batch of models
+
+      Return type:
+         "dict"
+
+      Raises:
+         requests.exceptions.HTTPError
+
+          -- if the batch could not be retrieved
+
+   get_model_file(id, filename)
+
+      Get a model file
+
+      Parameters:
+         id (str) -- model id
+
+         filename (str) -- file name
+
+      Raises:
+         requests.exceptions.HTTPError
+
+          -- if the file could not be retrieved
+
+   get_model_files_metadata(id)
+
+      Get metadata about the files of a model
+
+      Parameters:
+         id
+
+          ("str") -- model id
+
+      Returns:
+         metadata about the files of a model
+
+      Return type:
+         "dict"
+
+      Raises:
+         requests.exceptions.HTTPError
+
+          -- if the file metadata for the model could not be retrieved
+
+   get_model_metadata(id)
+
+      Get metadata about a model
+
+      Parameters:
+         id
+
+          ("str") -- model id
+
+      Returns:
+         metadata about the files of a model
+
+      Return type:
+         "dict"
+
+      Raises:
+         requests.exceptions.HTTPError
+
+          -- if the model could not be retrieved
+
+   get_models()
+
+      Get models from BioModels
+
+      Returns:
+         list of Biomodel: list of metadata about each model
+
+         list of Simulation: list of metadata about each simulation
+
+         list of Visualization: list of metadata about each
+         visualization
+
+      Return type:
+         "tuple"
+
+   get_num_models()
+
+      Get the number of models to import
+
+      Returns:
+         number of models to import
+
+      Return type:
+         "int"
+
+   get_stats(models, sims, vizs)
+
+      Calculate statistics about the imported models
+
+      Parameters:
+         models (list of Biomodel) -- models
+
+         sims (list of Simulation) -- simulations
+
+         vizs (list of Visualization) -- visualizations
+
+      Returns:
+         statistics about the imported models
+
+      Return type:
+         "dict"
+
+   init_requests_cache()
+
+   read_data()
+
+      Read models, simulations, and visualizations from JSON files
+
+      Returns:
+         list of Biomodel: models
+
+         list of Simulation: simulations
+
+         list of Visualization: visualizations
+
+         dict: stats about the models
+
+      Return type:
+         "tuple"
+
+   run()
+
+      Retrieve models from BioModels and submit to BioSimulations
+
+      Returns:
+         list of Biomodel: models
+
+         list of Simulation: simulations
+
+         list of Visualization: visualizations
+
+         dict: statistics about the models
+
+      Return type:
+         "tuple"
+
+   submit_models(models, sims, vizs)
+
+      Post models and simulations to BioSimulations
+
+      Parameters:
+         models (list of Biomodel) --
+
+         sims (list of Simulation) -- simulations
+
+         vizs (list of Visualization) -- visualization
+
+   visualize_biomodel(model)
+
+      Generate a visualization of a model
+
+      Parameters:
+         model
+
+          ("Biomodel") -- model
+
+      Returns:
+         image
+
+      Return type:
+         "RemoteFile"
+
+      Raises:
+         AssertionError
+
+          -- if the extension of the model file is not *xml*
+
+   write_data(models, sims, vizs, stats)
+
+      Save models and simulations to JSON files
+
+      Parameters:
+         models (list of Biomodel) -- models
+
+         sims (list of Simulation) -- simulations
+
+         vizs (list of Visualization) -- visualization
+
+         stats (dict) -- statistics of the models
+
 Module contents

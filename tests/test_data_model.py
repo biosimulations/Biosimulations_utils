@@ -59,6 +59,7 @@ class DataModelTestCase(unittest.TestCase):
         self.assertEqual(Taxon.from_json(taxon.to_json()), taxon)
 
 
+@unittest.skip('API is in development')
 class ApiConsistencyTestCase(unittest.TestCase):
     SPEC = 'https://api.biosimulations.dev/openapi.json'
 

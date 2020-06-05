@@ -170,7 +170,10 @@ class ApiClient(object):
 
         response = request_func(self.config.api.endpoint + route, **opts)
         response.raise_for_status()
-        content = response.json()
+        if response.content:
+            content = response.json()
+        else:
+            content = None
 
         if self._dry_run:
             patch.stop()

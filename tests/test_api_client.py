@@ -13,6 +13,7 @@ import unittest.mock
 
 
 class ConfigTestCase(unittest.TestCase):
+    @unittest.skip('API under development')
     def test_get_models(self):
         client = api_client.ApiClient()
         response = client.exec('get', '/models')
@@ -31,6 +32,7 @@ class ConfigTestCase(unittest.TestCase):
         self.assertEqual(client._device_code, None)
         self.assertEqual(client._auth, None)
 
+    @unittest.skip('API under development')
     def test_put(self):
         client = api_client.ApiClient(_dry_run=True)
         client._auth = {'type': 'bearer', 'token': 'ZZZ'}

@@ -9,7 +9,7 @@ pint
 python_dateutil
 python_libcombine >= 0.2.7
 python_libsbml
-python_libsedml >= 2
+python_libsedml >= 2, <= 2.0.9
 requests
 requests_cache
 setuptools

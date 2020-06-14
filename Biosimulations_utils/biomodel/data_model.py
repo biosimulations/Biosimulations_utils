@@ -223,14 +223,21 @@ class Biomodel(object):
             :obj:`dict`
         """
         return {
-            'id': self.id,
-            'file': self.file.to_json() if self.file else None,
-            'format': self.format.to_json() if self.format else None,
-            'framework': self.framework.to_json() if self.framework else None,
-            'taxon': self.taxon.to_json() if self.taxon else None,
-            'parameters': [parameter.to_json() for parameter in self.parameters],
-            'variables': [variable.to_json() for variable in self.variables],
-            'metadata': self.metadata.to_json() if self.metadata else None,
+            'data': {
+                'type': 'biomodel',
+                'id': self.id,
+                'attributes': {
+                    'format': self.format.to_json() if self.format else None,
+                    'framework': self.framework.to_json() if self.framework else None,
+                    'taxon': self.taxon.to_json() if self.taxon else None,
+                    'parameters': [parameter.to_json() for parameter in self.parameters],
+                    'variables': [variable.to_json() for variable in self.variables],
+                },
+                'relationships': {
+                    'file': self.file.to_json() if self.file else None,
+                },
+                'metadata': self.metadata.to_json() if self.metadata else None,
+            },
         }
 
     @classmethod
@@ -243,15 +250,21 @@ class Biomodel(object):
         Returns:
             :obj:`Biomodel`
         """
+        data = val.get('data', {})
+        if data.get('type', None) != cls.__name__.lower():
+            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.__name__.lower()))
+
+        attrs = data.get('attributes', {})
+        rel = data.get('relationships', {})
         return cls(
-            id=val.get('id', None),
-            file=RemoteFile.from_json(val.get('file')) if val.get('file', None) else None,
-            format=Format.from_json(val.get('format')) if val.get('format', None) else None,
-            framework=OntologyTerm.from_json(val.get('framework')) if val.get('framework', None) else None,
-            taxon=Taxon.from_json(val.get('taxon')) if val.get('taxon', None) else None,
-            parameters=[BiomodelParameter.from_json(parameter) for parameter in val.get('parameters', [])],
-            variables=[BiomodelVariable.from_json(variable) for variable in val.get('variables', [])],
-            metadata=ResourceMetadata.from_json(val.get('metadata')) if val.get('metadata', None) else None,
+            id=data.get('id', None),
+            file=RemoteFile.from_json(rel.get('file')) if rel.get('file', None) else None,
+            format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
+            framework=OntologyTerm.from_json(attrs.get('framework')) if attrs.get('framework', None) else None,
+            taxon=Taxon.from_json(attrs.get('taxon')) if attrs.get('taxon', None) else None,
+            parameters=[BiomodelParameter.from_json(parameter) for parameter in attrs.get('parameters', [])],
+            variables=[BiomodelVariable.from_json(variable) for variable in attrs.get('variables', [])],
+            metadata=ResourceMetadata.from_json(data.get('metadata')) if data.get('metadata', None) else None,
         )
 
 

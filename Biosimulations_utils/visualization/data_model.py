@@ -68,11 +68,16 @@ class Visualization(object):
             :obj:`dict`
         """
         return {
-            'id': self.id,
-            'format': self.format.to_json() if self.format else None,
-            'columns': self.columns,
-            'layout': [el.to_json() for el in self.layout],
-            'metadata': self.metadata.to_json() if self.metadata else None,
+            'data': {
+                'type': 'visualization',
+                'id': self.id,
+                'attributes': {
+                    'format': self.format.to_json() if self.format else None,
+                    'columns': self.columns,
+                    'layout': [el.to_json() for el in self.layout],
+                },
+                'metadata': self.metadata.to_json() if self.metadata else None,
+            },
         }
 
     @classmethod
@@ -85,12 +90,17 @@ class Visualization(object):
         Returns:
             :obj:`Simulation`
         """
+        data = val.get('data', {})
+        if data.get('type', None) != cls.__name__.lower():
+            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.__name__.lower()))
+
+        attrs = data.get('attributes', {})
         return cls(
-            id=val.get('id', None),
-            format=Format.from_json(val.get('format')) if val.get('format', None) else None,
-            columns=val.get('columns', None),
-            layout=[VisualizationLayoutElement.from_json(el) for el in val.get('layout', [])],
-            metadata=ResourceMetadata.from_json(val.get('metadata')) if val.get('metadata', None) else None,
+            id=data.get('id', None),
+            format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
+            columns=attrs.get('columns', None),
+            layout=[VisualizationLayoutElement.from_json(el) for el in attrs.get('layout', [])],
+            metadata=ResourceMetadata.from_json(data.get('metadata')) if data.get('metadata', None) else None,
         )
 
 

@@ -1,125 +1,130 @@
 {
-  "id": "simulation_1",  
-  "format": {
-    "id": "SED-ML",
-    "name": "Simulation Experiment Description Markup Language",
-    "version": "L1V3",
-    "edamId": "format_3685",
-    "url": "https://sed-ml.org/",
-    "specUrl": "http://identifiers.org/combine.specifications/sed-ml",
-    "mimeType": "application/xml",
-    "extension": "sedml"
-  },
-  "model": {
-    "format": {
-      "id": "SBML",
-      "name": "Systems Biology Markup Language",
-      "version": "L3V2",
-      "edamId": "format_2585",
-      "url": "http://sbml.org",
-      "specUrl": "http://identifiers.org/combine.specifications/sbml",
-      "mimeType": "application/sbml+xml",
-      "extension": "xml",
-      "sedUrn": "urn:sedml:language:sbml"
-    }
-  },
-  "modelParameterChanges": [
-    {
-      "parameter": {
-        "id": "k_1",
-        "name": "Kinetic constant 1",
-        "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='k_1']/@value"
+  "data": {
+    "type": "simulation",
+    "id": "simulation_1",
+    "attributes": {
+      "format": {
+        "id": "SED-ML",
+        "name": "Simulation Experiment Description Markup Language",
+        "version": "L1V3",
+        "edamId": "format_3685",
+        "url": "https://sed-ml.org/",
+        "specUrl": "http://identifiers.org/combine.specifications/sed-ml",
+        "mimeType": "application/xml",
+        "extension": "sedml"
       },
-      "value": 1.1
-    },
-    {
-      "parameter": {
-        "id": "k_2",
-        "name": "Reaction 2: Kinetic constant 2",
-        "target": "/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='r_2']/sbml:kineticLaw/sbml:listOfLocalParameters/sbml:localParameter[@id='k_2']/@value"
+      "model": {
+        "format": {
+          "id": "SBML",
+          "name": "Systems Biology Markup Language",
+          "version": "L3V2",
+          "edamId": "format_2585",
+          "url": "http://sbml.org",
+          "specUrl": "http://identifiers.org/combine.specifications/sbml",
+          "mimeType": "application/sbml+xml",
+          "extension": "xml",
+          "sedUrn": "urn:sedml:language:sbml"
+        }
       },
-      "value": 2.1
-    }
-  ],
-  "startTime": 0,
-  "outputStartTime": 1,
-  "endTime": 10,
-  "numTimePoints": 100,
-  "algorithm": {
-    "kisaoTerm": {
-      "ontology": "KISAO",
-      "id": "0000019"
-    },
-    "id": "CVODE",
-    "name": "C-language Variable-coefficient Ordinary Differential Equation solver"
-  },
-  "algorithmParameterChanges": [
-    {
-      "parameter": {
+      "modelParameterChanges": [
+        {
+          "parameter": {
+            "id": "k_1",
+            "name": "Kinetic constant 1",
+            "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='k_1']/@value"
+          },
+          "value": 1.1
+        },
+        {
+          "parameter": {
+            "id": "k_2",
+            "name": "Reaction 2: Kinetic constant 2",
+            "target": "/sbml:sbml/sbml:model/sbml:listOfReactions/sbml:reaction[@id='r_2']/sbml:kineticLaw/sbml:listOfLocalParameters/sbml:localParameter[@id='k_2']/@value"
+          },
+          "value": 2.1
+        }
+      ],
+      "startTime": 0,
+      "outputStartTime": 1,
+      "endTime": 10,
+      "numTimePoints": 100,
+      "algorithm": {
         "kisaoTerm": {
           "ontology": "KISAO",
-          "id": "0000211"
+          "id": "0000019"
         },
-        "id": "abs_tol",
-        "name": "absolute tolerance"
+        "id": "CVODE",
+        "name": "C-language Variable-coefficient Ordinary Differential Equation solver"
       },
-      "value": 3.3
+      "algorithmParameterChanges": [
+        {
+          "parameter": {
+            "kisaoTerm": {
+              "ontology": "KISAO",
+              "id": "0000211"
+            },
+            "id": "abs_tol",
+            "name": "absolute tolerance"
+          },
+          "value": 3.3
+        },
+        {
+          "parameter": {
+            "kisaoTerm": {
+              "ontology": "KISAO",
+              "id": "0000209"
+            },
+            "id": "rel_tol",
+            "name": "relative tolerance"
+          },
+          "value": 4.4
+        }
+      ]
     },
-    {
-      "parameter": {
-        "kisaoTerm": {
-          "ontology": "KISAO",
-          "id": "0000209"
+    "metadata": {
+      "name": "simulation 1",
+      "description": "Description of simulation 1",
+      "tags": [
+        "tag-1",
+        "tag-2"
+      ],
+      "references": [
+        {
+          "authors": "Doe JC & Doe JD",
+          "title": "Title-1",
+          "journal": "Journal-1",
+          "volume": 1,
+          "issue": 1,
+          "pages": "1-10",
+          "year": 2019,
+          "doi": "10.1016/XXXX"
         },
-        "id": "rel_tol",
-        "name": "relative tolerance"
-      },
-      "value": 4.4
+        {
+          "authors": "Doe JC & Doe JD",
+          "title": "Title-2",
+          "journal": "Journal-2",
+          "volume": "Database issue",
+          "issue": 2,
+          "pages": "11-20",
+          "year": 2020,
+          "doi": "10.1016/XXXX"
+        }
+      ],
+      "authors": [
+        {
+          "firstName": "John",
+          "middleName": "C",
+          "lastName": "Doe"
+        },
+        {
+          "firstName": "Jane",
+          "middleName": "D",
+          "lastName": "Doe"
+        }
+      ],
+      "license": "CC0",
+      "created": "2020-04-01T12:00:00Z",
+      "updated": "2020-04-02T12:00:00Z"
     }
-  ],
-  "metadata": {
-    "name": "simulation 1",
-    "description": "Description of simulation 1",
-    "tags": [
-      "tag-1",
-      "tag-2"
-    ],
-    "references": [
-      {
-        "authors": "Doe JC & Doe JD",
-        "title": "Title-1",
-        "journal": "Journal-1",
-        "volume": 1,
-        "issue": 1,
-        "pages": "1-10",
-        "year": 2019,
-        "doi": "10.1016/XXXX"
-      },
-      {
-        "authors": "Doe JC & Doe JD",
-        "title": "Title-2",
-        "journal": "Journal-2",
-        "volume": "Database issue",
-        "issue": 2,
-        "pages": "11-20",
-        "year": 2020,
-        "doi": "10.1016/XXXX"
-      }
-    ],
-    "authors": [
-      {
-        "firstName": "John",
-        "middleName": "C",
-        "lastName": "Doe"
-      },
-      {
-        "firstName": "Jane",
-        "middleName": "D",
-        "lastName": "Doe"
-      }
-    ],
-    "license": "CC0",
-    "created": "2020-04-01T12:00:00Z",
-    "updated": "2020-04-02T12:00:00Z"
   }
 }

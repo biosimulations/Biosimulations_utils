@@ -103,13 +103,20 @@ class Simulation(object):
             :obj:`dict`
         """
         return {
-            'id': self.id,
-            'format': self.format.to_json() if self.format else None,
-            'model': self.model.to_json() if self.model else None,
-            'modelParameterChanges': [change.to_json() for change in self.model_parameter_changes],
-            'algorithm': self.algorithm.to_json() if self.algorithm else None,
-            'algorithmParameterChanges': [change.to_json() for change in self.algorithm_parameter_changes],
-            'metadata': self.metadata.to_json() if self.metadata else None,
+            'data': {
+                'type': 'simulation',
+                'id': self.id,
+                'attributes': {
+                    'format': self.format.to_json() if self.format else None,
+                    'modelParameterChanges': [change.to_json() for change in self.model_parameter_changes],
+                    'algorithm': self.algorithm.to_json() if self.algorithm else None,
+                    'algorithmParameterChanges': [change.to_json() for change in self.algorithm_parameter_changes],
+                },
+                'relationships': {
+                    'model': self.model.to_json() if self.model else None,
+                },
+                'metadata': self.metadata.to_json() if self.metadata else None,
+            },
         }
 
     @classmethod
@@ -122,8 +129,15 @@ class Simulation(object):
         Returns:
             :obj:`Simulation`
         """
+        data = val.get('data', {})
+        if data.get('type', None) != 'Simulation'.lower():
+            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), 'Simulation'.lower()))
+
+        attrs = data.get('attributes', {})
+        rel = data.get('relationships', {})
+
         if cls == Simulation:
-            if 'startTime' in val or 'endTime' in val or 'numTimePoints' in val:
+            if 'startTime' in attrs or 'endTime' in attrs or 'numTimePoints' in attrs:
                 subcls = TimecourseSimulation
             else:
                 subcls = SteadyStateSimulation
@@ -131,15 +145,15 @@ class Simulation(object):
 
         else:
             return cls(
-                id=val.get('id', None),
-                format=Format.from_json(val.get('format')) if val.get('format', None) else None,
-                model=Biomodel.from_json(val.get('model')) if val.get('model', None) else None,
+                id=data.get('id', None),
+                format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
+                model=Biomodel.from_json(rel.get('model')) if rel.get('model', None) else None,
                 model_parameter_changes=[ParameterChange.from_json(change, BiomodelParameter)
-                                         for change in val.get('modelParameterChanges', [])],
-                algorithm=Algorithm.from_json(val.get('algorithm')) if val.get('algorithm', None) else None,
+                                         for change in attrs.get('modelParameterChanges', [])],
+                algorithm=Algorithm.from_json(attrs.get('algorithm')) if attrs.get('algorithm', None) else None,
                 algorithm_parameter_changes=[ParameterChange.from_json(change, AlgorithmParameter)
-                                             for change in val.get('algorithmParameterChanges', [])],
-                metadata=ResourceMetadata.from_json(val.get('metadata')) if val.get('metadata', None) else None,
+                                             for change in attrs.get('algorithmParameterChanges', [])],
+                metadata=ResourceMetadata.from_json(data.get('metadata')) if data.get('metadata', None) else None,
             )
 
 
@@ -203,10 +217,12 @@ class TimecourseSimulation(Simulation):
             :obj:`dict`
         """
         val = super(TimecourseSimulation, self).to_json()
-        val['startTime'] = self.start_time
-        val['outputStartTime'] = self.output_start_time
-        val['endTime'] = self.end_time
-        val['numTimePoints'] = self.num_time_points
+
+        val['data']['attributes']['startTime'] = self.start_time
+        val['data']['attributes']['outputStartTime'] = self.output_start_time
+        val['data']['attributes']['endTime'] = self.end_time
+        val['data']['attributes']['numTimePoints'] = self.num_time_points
+
         return val
 
     @classmethod
@@ -220,10 +236,14 @@ class TimecourseSimulation(Simulation):
             :obj:`TimecourseSimulation`
         """
         obj = super(TimecourseSimulation, cls).from_json(val)
-        obj.start_time = val.get('startTime', None)
-        obj.output_start_time = val.get('outputStartTime', None)
-        obj.end_time = val.get('endTime', None)
-        obj.num_time_points = val.get('numTimePoints', None)
+
+        data = val.get('data', {})
+        attrs = data.get('attributes', {})
+        obj.start_time = attrs.get('startTime', None)
+        obj.output_start_time = attrs.get('outputStartTime', None)
+        obj.end_time = attrs.get('endTime', None)
+        obj.num_time_points = attrs.get('numTimePoints', None)
+
         return obj
 
 

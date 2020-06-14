@@ -29,7 +29,7 @@ class DataModelTestCase(unittest.TestCase):
         id = Identifier(namespace='biomodels.db', id='BIOMD0000000924')
         self.assertEqual(Identifier.from_json(id.to_json()), id)
 
-        self.assertEqual(Identifier.sort_key(id), (id.namespace, id.id))
+        self.assertEqual(Identifier.sort_key(id), (id.namespace, id.id, None))
 
     def test_JournalReference(self):
         ref = JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',

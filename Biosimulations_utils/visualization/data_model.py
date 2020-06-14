@@ -7,7 +7,7 @@
 """
 
 from ..chart.data_model import Chart, ChartDataField
-from ..data_model import Format, Identifier, JournalReference, License, Person, RemoteFile
+from ..data_model import Format, ResourceMetadata
 from ..simulation.data_model import SimulationResult
 
 __all__ = [
@@ -20,51 +20,29 @@ class Visualization(object):
 
     Attributes:
         id (:obj:`str`): id
-        name (:obj:`str`): name
-        image (:obj:`RemoteFile`): image file
-        description (:obj:`str`): description
-        tags (:obj:`list` of :obj:`str`): tags
-        identifiers (:obj:`list` of :obj:`Identifier`): identifiers
-        references (:obj:`list` of :obj:`JournalReference`): references
-        authors (:obj:`list` of :obj:`Person`): authors
-        license (:obj:`License`): license
         format (:obj:`Format`): format
         columns (:obj:`int`): number of columns
         layout (:obj:`list` of :obj:`VisualizationLayoutElement`): element of the visualization
             (i.e. the cells in the grid of visualizations)
+        metadata (:obj:`ResourceMetadata`): metadata
     """
 
-    def __init__(self, id=None, name=None, image=None, description=None,
-                 tags=None, identifiers=None, references=None, authors=None, license=None, format=None,
-                 columns=None, layout=None):
+    def __init__(self, id=None, format=None,
+                 columns=None, layout=None, metadata=None):
         """
         Args:
             id (:obj:`str`, optional): id
-            name (:obj:`str`, optional): name
-            image (:obj:`RemoteFile`, optional): image file
-            description (:obj:`str`, optional): description
-            tags (:obj:`list` of :obj:`str`, optional): tags
-            identifiers (:obj:`list` of :obj:`Identifier`, optional): identifiers
-            references (:obj:`list` of :obj:`JournalReference`, optional): references
-            authors (:obj:`list` of :obj:`Person`, optional): authors
-            license (:obj:`License`, optional): license
             format (:obj:`Format`, optional): format
             columns (:obj:`int`, optional): number of columns
             layout (:obj:`list` of :obj:`VisualizationLayoutElement`, optional): element of the visualization
                 (i.e. the cells in the grid of visualizations)
+            metadata (:obj:`ResourceMetadata`, optional): metadata
         """
         self.id = id
-        self.name = name
-        self.image = image
-        self.description = description
-        self.tags = tags or []
-        self.identifiers = identifiers or []
-        self.references = references or []
-        self.authors = authors or []
-        self.license = license
         self.format = format
         self.columns = columns
         self.layout = layout or []
+        self.metadata = metadata or ResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two simulations are semantically equal
@@ -77,18 +55,11 @@ class Visualization(object):
         """
         return other.__class__ == self.__class__ \
             and self.id == other.id \
-            and self.name == other.name \
-            and self.image == other.image \
-            and self.description == other.description \
-            and sorted(self.tags) == sorted(other.tags) \
-            and sorted(self.identifiers, key=Identifier.sort_key) == sorted(other.identifiers, key=Identifier.sort_key) \
-            and sorted(self.references, key=JournalReference.sort_key) == sorted(other.references, key=JournalReference.sort_key) \
-            and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
-            and self.license == other.license \
             and self.format == other.format \
             and self.columns == other.columns \
             and sorted(self.layout, key=VisualizationLayoutElement.sort_key) == \
-            sorted(other.layout, key=VisualizationLayoutElement.sort_key)
+            sorted(other.layout, key=VisualizationLayoutElement.sort_key) \
+            and self.metadata == other.metadata
 
     def to_json(self):
         """ Export to JSON
@@ -98,17 +69,10 @@ class Visualization(object):
         """
         return {
             'id': self.id,
-            'name': self.name,
-            'image': self.image.to_json() if self.image else None,
-            'description': self.description,
-            'tags': self.tags or [],
-            'identifiers': [identifier.to_json() for identifier in self.identifiers],
-            'references': [ref.to_json() for ref in self.references],
-            'authors': [author.to_json() for author in self.authors],
-            'license': self.license.value if self.license else None,
             'format': self.format.to_json() if self.format else None,
             'columns': self.columns,
             'layout': [el.to_json() for el in self.layout],
+            'metadata': self.metadata.to_json() if self.metadata else None,
         }
 
     @classmethod
@@ -123,17 +87,10 @@ class Visualization(object):
         """
         return cls(
             id=val.get('id', None),
-            name=val.get('name', None),
-            image=RemoteFile.from_json(val.get('image')) if val.get('image', None) else None,
-            description=val.get('description', None),
-            tags=val.get('tags', []),
-            identifiers=[Identifier.from_json(identifier) for identifier in val.get('identifiers', [])],
-            references=[JournalReference.from_json(ref) for ref in val.get('references', [])],
-            authors=[Person.from_json(author) for author in val.get('authors', [])],
-            license=License(val.get('license')) if val.get('license', None) else None,
             format=Format.from_json(val.get('format')) if val.get('format', None) else None,
             columns=val.get('columns', None),
             layout=[VisualizationLayoutElement.from_json(el) for el in val.get('layout', [])],
+            metadata=ResourceMetadata.from_json(val.get('metadata')) if val.get('metadata', None) else None,
         )
 
 

@@ -59,20 +59,20 @@ def gen_archive_for_sim(model_filename, simulation, archive_filename, simulation
             ArchiveFile(filename='./' + model_archive_filename,
                         format=model.format,
                         description=_get_omex_description(model),
-                        authors=model.authors,
-                        created=model.created,
-                        updated=model.updated,
+                        authors=model.metadata.authors,
+                        created=model.metadata.created,
+                        updated=model.metadata.updated,
                         ),
             ArchiveFile(filename='./' + sim_archive_filename,
                         format=simulation.format,
                         description=_get_omex_description(simulation),
-                        authors=simulation.authors,
-                        created=simulation.created,
-                        updated=simulation.updated,
+                        authors=simulation.metadata.authors,
+                        created=simulation.metadata.created,
+                        updated=simulation.metadata.updated,
                         ),
         ],
         description=_get_omex_description(simulation),
-        authors=simulation.authors,
+        authors=simulation.metadata.authors,
     )
     archive.master_file = archive.files[1]
     archive.created = archive.updated = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
@@ -97,10 +97,10 @@ def _get_omex_description(obj):
         :obj:`str`: description
     """
     desc = obj.id
-    if obj.name:
-        desc += ': ' + obj.name
-    if obj.description:
-        desc += '\n\n' + obj.description
+    if obj.metadata.name:
+        desc += ': ' + obj.metadata.name
+    if obj.metadata.description:
+        desc += '\n\n' + obj.metadata.description
     return desc
 
 

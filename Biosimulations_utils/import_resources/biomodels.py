@@ -143,13 +143,14 @@ class BioModelsImporter(object):
                     continue
 
                 try:
-                    model.image = self.visualize_biomodel(model)
+                    model.metadata.image = self.visualize_biomodel(model)
                     for sim in model_sims:
-                        sim.image = RemoteFile(
+                        sim.metadata.image = RemoteFile(
                             name=sim.id + '.png',
                             type='image/png',
-                            size=model.image.size)
-                        shutil.copyfile(os.path.join(self._cache_dir, model.id + '.png'), os.path.join(self._cache_dir, sim.image.name))
+                            size=model.metadata.image.size)
+                        shutil.copyfile(os.path.join(self._cache_dir, model.id + '.png'),
+                                        os.path.join(self._cache_dir, sim.metadata.image.name))
 
                 except BiomodelIoError:
                     unvisualizable_models.append(model_result['id'])
@@ -200,12 +201,12 @@ class BioModelsImporter(object):
                                 images[0].save(sim_png_filename)
                                 crop_image(sim_png_filename, background_to_transparent=[255, 255, 255])
                                 shutil.copyfile(sim_png_filename, viz_png_filename)
-                                sim.image = RemoteFile(
+                                sim.metadata.image = RemoteFile(
                                     name=sim.id + '.png',
                                     type='image/png',
                                     size=os.path.getsize(sim_png_filename),
                                 )
-                                viz.image = RemoteFile(
+                                viz.metadata.image = RemoteFile(
                                     name=viz.id + '.png',
                                     type='image/png',
                                     size=os.path.getsize(viz_png_filename),
@@ -394,26 +395,26 @@ class BioModelsImporter(object):
 
         model = read_biomodel(local_path, format=BiomodelFormat.sbml)
         model.id = id
-        model.name = metadata['name']
+        model.metadata.name = metadata['name']
         model.file = RemoteFile(
             name=model_filename,
             type='application/sbml+xml',
             size=os.path.getsize(local_path),
         )
-        model.description = metadata.get('description', None)
-        if model.description:
+        model.metadata.description = metadata.get('description', None)
+        if model.metadata.description:
             try:
-                description_xml = xml.dom.minidom.parseString(model.description)
+                description_xml = xml.dom.minidom.parseString(model.metadata.description)
                 for div_xml in description_xml.getElementsByTagNameNS('http://www.w3.org/1999/xhtml', 'div'):
                     if div_xml.getAttribute('class') == 'dc:description':
                         div_xml.removeAttribute('class')
-                        model.description = div_xml.toxml()
+                        model.metadata.description = div_xml.toxml()
             except Exception:
                 pass
-        model.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
-        model.references = references
-        model.authors = authors
-        model.license = License.cc0
+        model.metadata.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
+        model.metadata.references = references
+        model.metadata.authors = authors
+        model.metadata.license = License.cc0
 
         # get information about simulation(s)
         sims = []
@@ -458,26 +459,26 @@ class BioModelsImporter(object):
 
                 for sim in model_sims:
                     sim.id = '{}_sim_{}'.format(model.id, len(sims) + 1)
-                    sim.name = file_metadata['name'][0:-6]
-                    sim.description = file_metadata['description']
-                    sim.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
-                    sim.references = copy.deepcopy(model.references)
-                    sim.authors = copy.deepcopy(model.authors)
-                    sim.license = License.cc0
+                    sim.metadata.name = file_metadata['name'][0:-6]
+                    sim.metadata.description = file_metadata['description']
+                    sim.metadata.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
+                    sim.metadata.references = copy.deepcopy(model.metadata.references)
+                    sim.metadata.authors = copy.deepcopy(model.metadata.authors)
+                    sim.metadata.license = License.cc0
                     sim.model.id = model.id
-                    sim.model.name = model.name
+                    sim.model.metadata.name = model.metadata.name
                     sim.model.file = None
                     sims.append(sim)
 
                 if model_viz:
                     # annotate visualization
                     model_viz.id = '{}_viz_{}'.format(model.id, len(vizs) + 1)
-                    model_viz.name = file_metadata['name'][0:-6]
-                    model_viz.description = file_metadata['description']
-                    model_viz.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
-                    model_viz.references = copy.deepcopy(model.references)
-                    model_viz.authors = copy.deepcopy(model.authors)
-                    model_viz.license = License.cc0
+                    model_viz.metadata.name = file_metadata['name'][0:-6]
+                    model_viz.metadata.description = file_metadata['description']
+                    model_viz.metadata.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
+                    model_viz.metadata.references = copy.deepcopy(model.metadata.references)
+                    model_viz.metadata.authors = copy.deepcopy(model.metadata.authors)
+                    model_viz.metadata.license = License.cc0
 
                     # remove curves that don't match model variables
                     for layout_el in copy.copy(model_viz.layout):

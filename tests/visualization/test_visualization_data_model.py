@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from Biosimulations_utils.data_model import Format, Identifier, JournalReference, License, Person, RemoteFile
+from Biosimulations_utils.data_model import Format, Identifier, JournalReference, License, Person, RemoteFile, ResourceMetadata
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_utils.biomodel.data_model import BiomodelVariable
 from Biosimulations_utils.simulation.data_model import TimecourseSimulation, SimulationResult
@@ -18,20 +18,6 @@ class ChartDataModelTestCase(unittest.TestCase):
     def test_Visualization(self):
         viz = Visualization(
             id='viz_1',
-            name='viz 1',
-            image=RemoteFile(name='viz.png', type='image/png'),
-            description='description',
-            tags=['a', 'b', 'c'],
-            identifiers=[Identifier(namespace='biomodels.db', id='XXX')],
-            references=[
-                JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                 volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
-            ],
-            authors=[
-                Person(first_name='John', middle_name='C', last_name='Doe'),
-                Person(first_name='Jane', middle_name='D', last_name='Doe'),
-            ],
-            license=License.cc0,
             format=Format(name='Vega', version='5.10.1', url='https://vega.github.io/vega/'),
             columns=3,
             layout=[
@@ -106,6 +92,22 @@ class ChartDataModelTestCase(unittest.TestCase):
                     ],
                 )
             ],
+            metadata=ResourceMetadata(
+                name='viz 1',
+                image=RemoteFile(name='viz.png', type='image/png'),
+                description='description',
+                tags=['a', 'b', 'c'],
+                identifiers=[Identifier(namespace='biomodels.db', id='XXX')],
+                references=[
+                    JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                     volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                ],
+                authors=[
+                    Person(first_name='John', middle_name='C', last_name='Doe'),
+                    Person(first_name='Jane', middle_name='D', last_name='Doe'),
+                ],
+                license=License.cc0,
+            ),
         )
         self.assertEqual(Visualization.from_json(viz.to_json()), viz)
 

@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from Biosimulations_utils.data_model import OntologyTerm, RemoteFile
+from Biosimulations_utils.data_model import OntologyTerm, RemoteFile, ResourceMetadata
 from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelVariable, BiomodelFormat
 from Biosimulations_utils.simulation import write_simulation, read_simulation, sedml
@@ -33,9 +33,9 @@ class WriteSedMlTestCase(unittest.TestCase):
     def test_gen_sedml(self):
         with open('tests/fixtures/simulation.json', 'rb') as file:
             sim = TimecourseSimulation.from_json(json.load(file))
+        self.assertEqual(sim.metadata.name, "simulation 1")
         sim.model = Biomodel(
             id='sbml_model',
-            name='SBML model',
             file=RemoteFile(
                 name=os.path.join(self.dirname, 'model.sbml.xml'),
                 type='application/sbml+xml',
@@ -45,6 +45,7 @@ class WriteSedMlTestCase(unittest.TestCase):
                 BiomodelVariable(id='species_1', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_1']"),
                 BiomodelVariable(id='species_2', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_2']"),
             ],
+            metadata=ResourceMetadata(name='SBML model'),
         )
         sim.model.format.version = 'L1V3'
         sim_filename = os.path.join(self.dirname, 'simulation.sedml')
@@ -57,17 +58,17 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(sim_2.id, sim.id)
         self.assertEqual(sim_2.format.version, 'L1V3')
         self.assertEqual(sim_2.format, sim.format)
-        self.assertEqual(sim_2.name, sim.name)
+        self.assertEqual(sim_2.metadata.name, sim.metadata.name)
         self.assertEqual(sim_2.model.id, sim.model.id)
-        self.assertEqual(sim_2.model.name, sim.model.name)
+        self.assertEqual(sim_2.model.metadata.name, sim.model.metadata.name)
         self.assertEqual(
             set(v.id for v in sim_2.model.variables),
             set(v.id for v in sim.model.variables))
         self.assertEqual(sim_2.model.file.name, sim.model.file.name)
         self.assertEqual(sim_2.algorithm.id, sim.algorithm.id)
         self.assertEqual(sim_2.algorithm, sim.algorithm)
-        self.assertEqual(sim_2.created, sim.created)
-        self.assertEqual(sim_2.updated, sim.updated)
+        self.assertEqual(sim_2.metadata.created, sim.metadata.created)
+        self.assertEqual(sim_2.metadata.updated, sim.metadata.updated)
         self.assertEqual(sim_2, sim)
 
         with self.assertRaisesRegex(NotImplementedError, 'not supported'):

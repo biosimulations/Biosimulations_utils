@@ -6,10 +6,8 @@
 :License: MIT
 """
 
-from ..data_model import Format, Identifier, JournalReference, License, OntologyTerm, Person, RemoteFile, Taxon, Type
+from ..data_model import Format, Identifier, OntologyTerm, RemoteFile, ResourceMetadata, Taxon, Type
 import enum
-import datetime  # noqa: F401
-import dateutil.parser
 import wc_utils.util.enumerate
 
 __all__ = [
@@ -169,65 +167,35 @@ class Biomodel(object):
 
     Attributes:
         id (:obj:`str`): id
-        name (:obj:`str`): name
         file (:obj:`RemoteFile`): file
-        image (:obj:`RemoteFile`): image file
-        description (:obj:`str`): description
         format (:obj:`Format`): format
         framework (:obj:`OntologyTerm`): modeling framework
         taxon (:obj:`Taxon`): taxon
-        tags (:obj:`list` of :obj:`str`): tags
-        identifiers (:obj:`list` of :obj:`Identifier`): identifiers
-        references (:obj:`list` of :obj:`JournalReference`): references
-        authors (:obj:`list` of :obj:`Person`): authors
-        license (:obj:`License`): license
         parameters (:obj:`list` of :obj:`BiomodelParameter`): parameters (e.g., initial conditions and rate constants)
         variables (:obj:`list` of :obj:`BiomodelVariable`): variables (e.g., model predictions)
-        created (:obj:`datetime.datetime`): date that the model was created
-        updated (:obj:`datetime.datetime`): date that the model was last updated
+        metadata (:obj:`ResourceMetadata`): metadata
     """
 
-    def __init__(self, id=None, name=None, file=None, image=None, description=None,
-                 format=None, framework=None, taxon=None, tags=None,
-                 identifiers=None, references=None, authors=None, license=None,
-                 parameters=None, variables=None, created=None, updated=None):
+    def __init__(self, id=None, file=None, format=None, framework=None, taxon=None, parameters=None, variables=None, metadata=None):
         """
         Args:
             id (:obj:`str`, optional): id
-            name (:obj:`str`, optional): name
             file (:obj:`RemoteFile`, optional): file
-            image (:obj:`RemoteFile`, optional): image file
-            description (:obj:`str`, optional): description
             format (:obj:`Format`, optional): format
             framework (:obj:`OntologyTerm`, optional): modeling framework
             taxon (:obj:`Taxon`, optional): taxon
-            tags (:obj:`list` of :obj:`str`, optional): tags
-            identifiers (:obj:`list` of :obj:`Identifier`, optional): identifiers
-            references (:obj:`list` of :obj:`JournalReference`, optional): references
-            authors (:obj:`list` of :obj:`Person`, optional): authors
-            license (:obj:`License`, optional): license
             parameters (:obj:`list` of :obj:`BiomodelParameter`, optional): parameters (e.g., initial conditions and rate constants)
             variables (:obj:`list` of :obj:`BiomodelVariable`, optional): variables (e.g., model predictions)
-            created (:obj:`datetime.datetime`, optional): date that the model was created
-            updated (:obj:`datetime.datetime`, optional): date that the model was last updated
+            metadata (:obj:`ResourceMetadata`, optional): metadata
         """
         self.id = id
-        self.name = name
         self.file = file
-        self.image = image
-        self.description = description
         self.format = format
         self.framework = framework
         self.taxon = taxon
-        self.tags = tags or []
-        self.identifiers = identifiers or []
-        self.references = references or []
-        self.authors = authors or []
-        self.license = license
         self.parameters = parameters or []
         self.variables = variables or []
-        self.created = created
-        self.updated = updated
+        self.metadata = metadata or ResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two models are semantically equal
@@ -240,22 +208,13 @@ class Biomodel(object):
         """
         return other.__class__ == self.__class__ \
             and self.id == other.id \
-            and self.name == other.name \
             and self.file == other.file \
-            and self.image == other.image \
-            and self.description == other.description \
             and self.format == other.format \
             and self.framework == other.framework \
             and self.taxon == other.taxon \
-            and sorted(self.tags) == sorted(other.tags) \
-            and sorted(self.identifiers, key=Identifier.sort_key) == sorted(other.identifiers, key=Identifier.sort_key) \
-            and sorted(self.references, key=JournalReference.sort_key) == sorted(other.references, key=JournalReference.sort_key) \
-            and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
-            and self.license == other.license \
             and sorted(self.parameters, key=BiomodelParameter.sort_key) == sorted(other.parameters, key=BiomodelParameter.sort_key) \
             and sorted(self.variables, key=BiomodelVariable.sort_key) == sorted(other.variables, key=BiomodelVariable.sort_key) \
-            and self.created == other.created \
-            and self.updated == other.updated
+            and self.metadata == other.metadata
 
     def to_json(self):
         """ Export to JSON
@@ -265,22 +224,13 @@ class Biomodel(object):
         """
         return {
             'id': self.id,
-            'name': self.name,
             'file': self.file.to_json() if self.file else None,
-            'image': self.image.to_json() if self.image else None,
-            'description': self.description,
             'format': self.format.to_json() if self.format else None,
             'framework': self.framework.to_json() if self.framework else None,
             'taxon': self.taxon.to_json() if self.taxon else None,
-            'tags': self.tags or [],
-            'identifiers': [identifier.to_json() for identifier in self.identifiers],
-            'references': [ref.to_json() for ref in self.references],
-            'authors': [author.to_json() for author in self.authors],
-            'license': self.license.value if self.license else None,
             'parameters': [parameter.to_json() for parameter in self.parameters],
             'variables': [variable.to_json() for variable in self.variables],
-            'created': self.created.strftime('%Y-%m-%dT%H:%M:%SZ') if self.created else None,
-            'updated': self.updated.strftime('%Y-%m-%dT%H:%M:%SZ') if self.updated else None,
+            'metadata': self.metadata.to_json() if self.metadata else None,
         }
 
     @classmethod
@@ -295,22 +245,13 @@ class Biomodel(object):
         """
         return cls(
             id=val.get('id', None),
-            name=val.get('name', None),
             file=RemoteFile.from_json(val.get('file')) if val.get('file', None) else None,
-            image=RemoteFile.from_json(val.get('image')) if val.get('image', None) else None,
-            description=val.get('description', None),
             format=Format.from_json(val.get('format')) if val.get('format', None) else None,
             framework=OntologyTerm.from_json(val.get('framework')) if val.get('framework', None) else None,
             taxon=Taxon.from_json(val.get('taxon')) if val.get('taxon', None) else None,
-            tags=val.get('tags', []),
-            identifiers=[Identifier.from_json(identifier) for identifier in val.get('identifiers', [])],
-            references=[JournalReference.from_json(ref) for ref in val.get('references', [])],
-            authors=[Person.from_json(author) for author in val.get('authors', [])],
-            license=License(val.get('license')) if val.get('license', None) else None,
             parameters=[BiomodelParameter.from_json(parameter) for parameter in val.get('parameters', [])],
             variables=[BiomodelVariable.from_json(variable) for variable in val.get('variables', [])],
-            created=dateutil.parser.parse(val.get('created')) if val.get('created', None) else None,
-            updated=dateutil.parser.parse(val.get('updated')) if val.get('updated', None) else None,
+            metadata=ResourceMetadata.from_json(val.get('metadata')) if val.get('metadata', None) else None,
         )
 
 

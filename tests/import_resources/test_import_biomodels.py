@@ -67,17 +67,17 @@ class BioModelsImporterTestCase(unittest.TestCase):
         self.assertEqual(len(models), 7)
 
         self.assertEqual(models[0].id, 'BIOMD0000000001')
-        self.assertEqual(models[0].name, 'Edelstein1996 - EPSP ACh event')
+        self.assertEqual(models[0].metadata.name, 'Edelstein1996 - EPSP ACh event')
 
         self.assertEqual(models[0].file.name, 'BIOMD0000000001_url.xml')
         self.assertEqual(models[0].file.type, 'application/sbml+xml')
         self.assertGreater(models[0].file.size, 0)
 
-        self.assertEqual(models[0].image.name, 'BIOMD0000000001_url.png')
-        self.assertEqual(models[0].image.type, 'image/png')
-        self.assertGreater(models[0].image.size, 0)
+        self.assertEqual(models[0].metadata.image.name, 'BIOMD0000000001_url.png')
+        self.assertEqual(models[0].metadata.image.type, 'image/png')
+        self.assertGreater(models[0].metadata.image.size, 0)
 
-        self.assertEqual(models[0].description,
+        self.assertEqual(models[0].metadata.description,
                          ('<div>\n'
                              '  <p>Model of a nicotinic Excitatory Post-Synaptic Potential in a\n'
                              '  Torpedo electric organ. Acetylcholine is not represented\n'
@@ -89,12 +89,12 @@ class BioModelsImporterTestCase(unittest.TestCase):
             id=7787,
             name="Tetronarce californica",
         ))
-        self.assertEqual(models[0].tags, [])
-        self.assertEqual(models[0].identifiers, [Identifier(
+        self.assertEqual(models[0].metadata.tags, [])
+        self.assertEqual(models[0].metadata.identifiers, [Identifier(
             namespace="biomodels.db",
             id="BIOMD0000000001",
         )])
-        self.assertEqual(models[0].references, [JournalReference(
+        self.assertEqual(models[0].metadata.references, [JournalReference(
             authors="S J Edelstein, O Schaad, E Henry, D Bertrand & J P Changeux",
             title="A kinetic mechanism for nicotinic acetylcholine receptors based on multiple allosteric transitions.",
             journal="Biological cybernetics",
@@ -104,13 +104,13 @@ class BioModelsImporterTestCase(unittest.TestCase):
             year=1996,
             doi="10.1007/s004220050302",
         )])
-        self.assertEqual(len(models[0].authors), 5)
-        self.assertEqual(models[0].authors[0], Person(
+        self.assertEqual(len(models[0].metadata.authors), 5)
+        self.assertEqual(models[0].metadata.authors[0], Person(
             last_name="Edelstein",
             first_name="S",
             middle_name="J"
         ))
-        self.assertEqual(models[0].license, License.cc0)
+        self.assertEqual(models[0].metadata.license, License.cc0)
 
         # verify invalid curves removed
         model = models[3]

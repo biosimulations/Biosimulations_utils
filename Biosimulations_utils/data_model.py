@@ -6,6 +6,8 @@
 :License: MIT
 """
 
+import datetime  # noqa: F401
+import dateutil.tz
 import enum
 import wc_utils.util.enumerate
 
@@ -17,6 +19,7 @@ __all__ = [
     'OntologyTerm',
     'Person',
     'RemoteFile',
+    'ResourceMetadata',
     'Taxon',
     'Type',
 ]
@@ -141,16 +144,19 @@ class Identifier(object):
     Attributes:
         namespace (:obj:`str`): namespace (e.g., Identifiers.org namespace such as 'biomodels.db')
         id (:obj:`str`): id within namespace
+        url (:obj:`str`): URL
     """
 
-    def __init__(self, namespace=None, id=None):
+    def __init__(self, namespace=None, id=None, url=None):
         """
         Args:
             namespace (:obj:`str`, optional): namespace (e.g., Identifiers.org namespace such as 'biomodels.db')
             id (:obj:`str`, optional): id within namespace
+            url (:obj:`str`, optional): URL
         """
         self.namespace = namespace
         self.id = id
+        self.url = url
 
     def __eq__(self, other):
         """ Determine if two identifiers are semantically equal
@@ -163,7 +169,9 @@ class Identifier(object):
         """
         return other.__class__ == self.__class__ \
             and self.namespace == other.namespace \
-            and self.id == other.id
+            and self.id == other.id \
+            and self.url == other.url \
+
 
     def to_json(self):
         """ Export to JSON
@@ -174,6 +182,7 @@ class Identifier(object):
         return {
             'namespace': self.namespace,
             'id': self.id,
+            'url': self.url,
         }
 
     @classmethod
@@ -189,6 +198,7 @@ class Identifier(object):
         return cls(
             namespace=val.get('namespace', None),
             id=val.get('id', None),
+            url=val.get('url', None),
         )
 
     @staticmethod
@@ -201,7 +211,7 @@ class Identifier(object):
         Returns:
             :obj:`tuple`
         """
-        return (identifier.namespace, identifier.id)
+        return (identifier.namespace, identifier.id, identifier.url)
 
 
 License = wc_utils.util.enumerate.CaseInsensitiveEnum('License', {
@@ -622,3 +632,96 @@ class Type(str, enum.Enum):
     integer = 'integer'
     float = 'float'
     string = 'string'
+
+
+class ResourceMetadata(object):
+    """ Metadata about a top-level resource such as a model
+
+    Attributes:
+        name (:obj:`str`): name
+        image (:obj:`RemoteFile`): image file
+        description (:obj:`str`): description
+        tags (:obj:`list` of :obj:`str`): tags
+        identifiers (:obj:`list` of :obj:`Identifier`): identifiers
+        references (:obj:`list` of :obj:`JournalReference`): references
+        authors (:obj:`list` of :obj:`Person`): authors
+        license (:obj:`License`): license
+        created (:obj:`datetime.datetime`): date that the model was created
+        updated (:obj:`datetime.datetime`): date that the model was last updated
+    """
+
+    def __init__(self, name=None, image=None, description=None, tags=None, identifiers=None,
+                 references=None, authors=None, license=None, created=None, updated=None):
+        self.name = name
+        self.image = image
+        self.description = description
+        self.tags = tags or []
+        self.identifiers = identifiers or []
+        self.references = references or []
+        self.authors = authors or []
+        self.license = license
+        self.created = created
+        self.updated = updated
+
+    def __eq__(self, other):
+        """ Determine if two metadata containers are semantically equal
+
+        Args:
+            other (:obj:`ResourceMetadata`): other model
+
+        Returns:
+            :obj:`bool`
+        """
+        return other.__class__ == self.__class__ \
+            and self.name == other.name \
+            and self.image == other.image \
+            and self.description == other.description \
+            and sorted(self.tags) == sorted(other.tags) \
+            and sorted(self.identifiers, key=Identifier.sort_key) == sorted(other.identifiers, key=Identifier.sort_key) \
+            and sorted(self.references, key=JournalReference.sort_key) == sorted(other.references, key=JournalReference.sort_key) \
+            and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
+            and self.license == other.license \
+            and self.created == other.created \
+            and self.updated == other.updated
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'name': self.name,
+            'image': self.image.to_json() if self.image else None,
+            'description': self.description,
+            'tags': self.tags or [],
+            'identifiers': [identifier.to_json() for identifier in self.identifiers],
+            'references': [ref.to_json() for ref in self.references],
+            'authors': [author.to_json() for author in self.authors],
+            'license': self.license.value if self.license else None,
+            'created': self.created.strftime('%Y-%m-%dT%H:%M:%SZ') if self.created else None,
+            'updated': self.updated.strftime('%Y-%m-%dT%H:%M:%SZ') if self.updated else None,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create metadata from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`ResourceMetadata`
+        """
+        return cls(
+            name=val.get('name', None),
+            image=RemoteFile.from_json(val.get('image')) if val.get('image', None) else None,
+            description=val.get('description', None),
+            tags=val.get('tags', []),
+            identifiers=[Identifier.from_json(identifier) for identifier in val.get('identifiers', [])],
+            references=[JournalReference.from_json(ref) for ref in val.get('references', [])],
+            authors=[Person.from_json(author) for author in val.get('authors', [])],
+            license=License(val.get('license')) if val.get('license', None) else None,
+            created=dateutil.parser.parse(val.get('created')) if val.get('created', None) else None,
+            updated=dateutil.parser.parse(val.get('updated')) if val.get('updated', None) else None,
+        )

@@ -11,7 +11,7 @@ from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation
                          Algorithm, AlgorithmParameter, ParameterChange, SimulationResult,
                          SimulationFormat)
 from ..chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from ..data_model import Format, JournalReference, License, OntologyTerm, Person, RemoteFile
+from ..data_model import Format, JournalReference, License, OntologyTerm, Person, RemoteFile, ResourceMetadata
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 from ..utils import assert_exception, get_enum_format_by_attr, get_logger
@@ -68,9 +68,9 @@ class SedMlSimulationWriter(SimulationWriter):
         sim_sed = self._add_sim_to_doc(sim, doc_sed)
         alg_sed = self._add_algorithm_to_sim(sim.algorithm, doc_sed, sim_sed)
         self._add_param_changes_to_alg(sim.algorithm_parameter_changes, doc_sed, alg_sed)
-        task_sed = self._add_sim_task_to_doc(sim.id, sim.name, doc_sed, model_sed, sim_sed)
+        task_sed = self._add_sim_task_to_doc(sim.id, sim.metadata.name, doc_sed, model_sed, sim_sed)
 
-        report_sed = self._add_report_to_doc(sim.id, sim.name, doc_sed)
+        report_sed = self._add_report_to_doc(sim.id, sim.metadata.name, doc_sed)
         time_gen_sed = self._add_data_gen_to_doc('time', 'time', doc_sed)
         self._add_var_to_data_gen('time', 'time', 'urn:sedml:symbol:time', doc_sed, time_gen_sed, task_sed)
         self._add_data_set_to_report('time', 'time', doc_sed, report_sed, time_gen_sed)
@@ -117,30 +117,30 @@ class SedMlSimulationWriter(SimulationWriter):
         metadata = []
         namespaces = set()
 
-        if obj.description:
+        if obj.metadata.description:
             metadata.append(XmlNode(
                 prefix='dc',
                 name='description',
                 type='description',
-                children=obj.description,
+                children=obj.metadata.description,
             ))
             namespaces.add('dc')
 
-        if obj.tags:
+        if obj.metadata.tags:
             metadata.append(
                 XmlNode(prefix='dc', name='description', type='tags', children=[
                     XmlNode(prefix='rdf', name='Bag', children=[
                         XmlNode(prefix='rdf', name='li', children=[
                             XmlNode(prefix='rdf', name='value', children=tag)
-                        ]) for tag in obj.tags
+                        ]) for tag in obj.metadata.tags
                     ])
                 ]))
             namespaces.add('dc')
             namespaces.add('rdf')
 
-        if obj.authors:
+        if obj.metadata.authors:
             authors_xml = []
-            for author in obj.authors:
+            for author in obj.metadata.authors:
                 names_xml = []
                 if author.first_name:
                     names_xml.append(XmlNode(prefix='vcard', name='Given', children=author.first_name))
@@ -162,9 +162,9 @@ class SedMlSimulationWriter(SimulationWriter):
             namespaces.add('rdf')
             namespaces.add('vcard')
 
-        if obj.references:
+        if obj.metadata.references:
             refs_xml = []
-            for ref in obj.references:
+            for ref in obj.metadata.references:
                 props_xml = []
                 if ref.authors:
                     props_xml.append(XmlNode(prefix='bibo', name='authorList', children=ref.authors))
@@ -196,21 +196,21 @@ class SedMlSimulationWriter(SimulationWriter):
             namespaces.add('rdf')
             namespaces.add('bibo')
 
-        if obj.license:
+        if obj.metadata.license:
             metadata.append(XmlNode(
                 prefix='dcterms',
                 name='license',
-                children=obj.license.value,
+                children=obj.metadata.license.value,
             ))
             namespaces.add('dcterms')
 
         metadata.append(XmlNode(prefix='dcterms', name='mediator', children='BioSimulations'))
-        if obj.created:
+        if obj.metadata.created:
             metadata.append(XmlNode(prefix='dcterms', name='created',
-                                    children=obj.created.strftime('%Y-%m-%dT%H:%M:%SZ')))
-        if obj.updated:
+                                    children=obj.metadata.created.strftime('%Y-%m-%dT%H:%M:%SZ')))
+        if obj.metadata.updated:
             metadata.append(XmlNode(prefix='dcterms', name='date', type='update',
-                                    children=obj.updated.strftime('%Y-%m-%dT%H:%M:%SZ')))
+                                    children=obj.metadata.updated.strftime('%Y-%m-%dT%H:%M:%SZ')))
         namespaces.add('dcterms')
 
         self._set_meta_id(doc_sed, obj_sed)
@@ -229,8 +229,8 @@ class SedMlSimulationWriter(SimulationWriter):
         model_sed = doc_sed.createModel()
         if model.id:
             self._call_libsedml_method(doc_sed, model_sed, 'setId', model.id)
-        if model.name:
-            self._call_libsedml_method(doc_sed, model_sed, 'setName', model.name)
+        if model.metadata.name:
+            self._call_libsedml_method(doc_sed, model_sed, 'setName', model.metadata.name)
         if model.file and model.file.name:
             self._call_libsedml_method(doc_sed, model_sed, 'setSource', model.file.name)
         if model.format and model.format.sed_urn:
@@ -309,8 +309,8 @@ class SedMlSimulationWriter(SimulationWriter):
 
         if sim.id:
             self._call_libsedml_method(doc_sed, sim_sed, 'setId', sim.id)
-        if sim.name:
-            self._call_libsedml_method(doc_sed, sim_sed, 'setName', sim.name)
+        if sim.metadata.name:
+            self._call_libsedml_method(doc_sed, sim_sed, 'setName', sim.metadata.name)
 
         return sim_sed
 
@@ -761,7 +761,7 @@ class SedMlSimulationReader(SimulationReader):
 
             sim = self._create_sim(sim_sed)
             sim.id = task_sed.getId() or None
-            sim.name = task_sed.getName() or None
+            sim.metadata.name = task_sed.getName() or None
             self._read_sim(sim_sed, filename, sim)
 
             # model
@@ -920,7 +920,7 @@ class SedMlSimulationReader(SimulationReader):
         metadata = self._get_obj_annotation(doc_sed)
         for node in metadata:
             if node.prefix == 'dc' and node.name == 'description' and node.type == 'description' and isinstance(node.children, str):
-                sim.description = node.children
+                sim.metadata.description = node.children
             elif node.prefix == 'dc' and node.name == 'description' and node.type == 'tags':
                 for child in node.children:
                     if child.prefix == 'rdf' and child.name == 'Bag':
@@ -928,7 +928,7 @@ class SedMlSimulationReader(SimulationReader):
                             if child_2.prefix == 'rdf' and child_2.name == 'li':
                                 for child_3 in child_2.children:
                                     if child_3.prefix == 'rdf' and child_3.name == 'value' and isinstance(child_3.children, str):
-                                        sim.tags.append(child_3.children)
+                                        sim.metadata.tags.append(child_3.children)
             elif node.prefix == 'dc' and node.name == 'creator':
                 for child in node.children:
                     if child.prefix == 'rdf' and child.name == 'Bag':
@@ -944,7 +944,7 @@ class SedMlSimulationReader(SimulationReader):
                                                 author.middle_name = prop.children
                                             elif prop.prefix == 'vcard' and prop.name == 'Family' and isinstance(prop.children, str):
                                                 author.last_name = prop.children
-                                        sim.authors.append(author)
+                                        sim.metadata.authors.append(author)
             elif node.prefix == 'dcterms' and node.name == 'references':
                 for child in node.children:
                     if child.prefix == 'rdf' and child.name == 'Bag':
@@ -973,13 +973,13 @@ class SedMlSimulationReader(SimulationReader):
                                                 ref.year = int(prop.children)
                                             elif prop.prefix == 'bibo' and prop.name == 'doi' and isinstance(prop.children, str):
                                                 ref.doi = prop.children
-                                        sim.references.append(ref)
+                                        sim.metadata.references.append(ref)
             elif node.prefix == 'dcterms' and node.name == 'license' and isinstance(node.children, str):
-                sim.license = License(node.children)
+                sim.metadata.license = License(node.children)
             elif node.prefix == 'dcterms' and node.name == 'created' and isinstance(node.children, str):
-                sim.created = dateutil.parser.parse(node.children)
+                sim.metadata.created = dateutil.parser.parse(node.children)
             elif node.prefix == 'dcterms' and node.name == 'date' and node.type == 'update' and isinstance(node.children, str):
-                sim.updated = dateutil.parser.parse(node.children)
+                sim.metadata.updated = dateutil.parser.parse(node.children)
 
         sim.format = copy.copy(SimulationFormat.sedml.value)
         sim.format.version = "L{}V{}".format(doc_sed.getLevel(), doc_sed.getVersion())
@@ -998,9 +998,9 @@ class SedMlSimulationReader(SimulationReader):
             format = Format(sed_urn=sed_urn)
         sim.model = Biomodel(
             id=model_sed.getId() or None,
-            name=model_sed.getName() or None,
             format=format,
             file=RemoteFile(name=model_sed.getSource(), type=format.mime_type),
+            metadata=ResourceMetadata(name=model_sed.getName() or None),
         )
 
         # parameter changes

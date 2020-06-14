@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.archive.data_model import ArchiveFormat
-from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person, Type
+from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person, ResourceMetadata, Type
 from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import Algorithm, AlgorithmParameter, SimulationFormat
 from Biosimulations_utils.simulator.data_model import Simulator
@@ -21,9 +21,7 @@ class SimulatorDataModelTestCase(unittest.TestCase):
         now = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
         simulator = Simulator(
             id='tellurium',
-            name='tellurium',
             version='2.4.1',
-            description='description of tellurium',
             url='http://tellurium.analogmachine.org/',
             docker_hub_image_id='crbm/biosimulations_tellurium:2.4.1',
             algorithms=[
@@ -62,12 +60,16 @@ class SimulatorDataModelTestCase(unittest.TestCase):
                     ],
                 )
             ],
-            authors=[
-                Person(first_name='John', middle_name='C', last_name='Doe'),
-                Person(first_name='Jane', middle_name='D', last_name='Doe'),
-            ],
-            license=License.cc0,
-            created=now,
-            updated=now,
+            metadata=ResourceMetadata(
+                name='tellurium',
+                description='description of tellurium',
+                authors=[
+                    Person(first_name='John', middle_name='C', last_name='Doe'),
+                    Person(first_name='Jane', middle_name='D', last_name='Doe'),
+                ],
+                license=License.cc0,
+                created=now,
+                updated=now,
+            ),
         )
         self.assertEqual(Simulator.from_json(simulator.to_json()), simulator)

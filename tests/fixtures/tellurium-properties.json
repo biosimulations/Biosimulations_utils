@@ -1,90 +1,13 @@
 {
-  "id": "tellurium",
-  "name": "tellurium",
+  "id": "tellurium",  
   "version": "2.4.1",
-  "description": "Tellurium is a Python-based environment for model building, simulation, and analysis that facilitates reproducibility of models in systems and synthetic biology.",
   "url": "http://tellurium.analogmachine.org/",
   "dockerHubImageId": "crbm/Biosimulations_tellurium:2.4.1",
   "format": {
     "name": "Docker Image",
     "version": "1.2",
     "spec_url": "https://github.com/moby/moby/blob/master/image/spec/v1.2.md"
-  },
-  "authors": [
-    {
-      "firstName": "Jayit",
-      "lastName": "Biswas"
-    },
-    {
-      "firstName": "Kiri",
-      "lastName": "Choi"
-    },
-    {
-      "firstName": "Wilbert",
-      "lastName": "Copeland"
-    },
-    {
-      "firstName": "Caroline",
-      "lastName": "Cannistra"
-    },
-    {
-      "firstName": "Alex",
-      "lastName": "Darling"
-    },
-    {
-      "firstName": "Nasir",
-      "lastName": "Elmi"
-    },
-    {
-      "firstName": "Michal",
-      "lastName": "Galdzicki"
-    },
-    {
-      "firstName": "Stanley",
-      "lastName": "Gu"
-    },
-    {
-      "firstName": "Totte",
-      "lastName": "Karlsson"
-    },
-    {
-      "firstName": "Matthias",
-      "lastName": "König"
-    },
-    {
-      "firstName": "J",
-      "middleName": "Kyle",
-      "lastName": "Medley"
-    },
-    {
-      "firstName": "Herbert",
-      "lastName": "Sauro"
-    },
-    {
-      "firstName": "Andy",
-      "lastName": "Somogyi"
-    },
-    {
-      "firstName": "Lucian",
-      "lastName": "Smith"
-    },
-    {
-      "firstName": "Kaylene",
-      "lastName": "Stocking"
-    }
-  ],
-  "references": [
-    {
-      "title": "Tellurium: an extensible python-based modeling environment for systems and synthetic biology",
-      "authors": "Kiri Choi, J. Kyle Medley, Matthias König, Kaylene Stocking, Lucian Smith, Stanley Gua & Herbert M. Sauro",
-      "journal": "Biosystems",
-      "volume": 171,
-      "pages": "74-79",
-      "year": 2018,
-      "doi": "10.1016/j.biosystems.2018.07.006"
-    }
-  ],
-  "license": "MIT",
+  },  
   "algorithms": [
     {
       "id": "cvode",
@@ -725,6 +648,85 @@
       ]
     }
   ],
-  "created": "2020-04-13T12:00:00Z",
-  "updated": "2020-04-13T12:00:00Z"
+  "metadata": {
+    "name": "tellurium",
+    "description": "Tellurium is a Python-based environment for model building, simulation, and analysis that facilitates reproducibility of models in systems and synthetic biology.",  
+    "references": [
+      {
+        "title": "Tellurium: an extensible python-based modeling environment for systems and synthetic biology",
+        "authors": "Kiri Choi, J. Kyle Medley, Matthias König, Kaylene Stocking, Lucian Smith, Stanley Gua & Herbert M. Sauro",
+        "journal": "Biosystems",
+        "volume": 171,
+        "pages": "74-79",
+        "year": 2018,
+        "doi": "10.1016/j.biosystems.2018.07.006"
+      }
+    ],
+    "authors": [
+      {
+        "firstName": "Jayit",
+        "lastName": "Biswas"
+      },
+      {
+        "firstName": "Kiri",
+        "lastName": "Choi"
+      },
+      {
+        "firstName": "Wilbert",
+        "lastName": "Copeland"
+      },
+      {
+        "firstName": "Caroline",
+        "lastName": "Cannistra"
+      },
+      {
+        "firstName": "Alex",
+        "lastName": "Darling"
+      },
+      {
+        "firstName": "Nasir",
+        "lastName": "Elmi"
+      },
+      {
+        "firstName": "Michal",
+        "lastName": "Galdzicki"
+      },
+      {
+        "firstName": "Stanley",
+        "lastName": "Gu"
+      },
+      {
+        "firstName": "Totte",
+        "lastName": "Karlsson"
+      },
+      {
+        "firstName": "Matthias",
+        "lastName": "König"
+      },
+      {
+        "firstName": "J",
+        "middleName": "Kyle",
+        "lastName": "Medley"
+      },
+      {
+        "firstName": "Herbert",
+        "lastName": "Sauro"
+      },
+      {
+        "firstName": "Andy",
+        "lastName": "Somogyi"
+      },
+      {
+        "firstName": "Lucian",
+        "lastName": "Smith"
+      },
+      {
+        "firstName": "Kaylene",
+        "lastName": "Stocking"
+      }
+    ],
+    "license": "MIT",
+    "created": "2020-04-13T12:00:00Z",
+    "updated": "2020-04-13T12:00:00Z"
+  }
 }

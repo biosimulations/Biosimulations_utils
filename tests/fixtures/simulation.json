@@ -1,46 +1,5 @@
 {
-  "id": "simulation_1",
-  "name": "simulation 1",
-  "authors": [
-    {
-      "firstName": "John",
-      "middleName": "C",
-      "lastName": "Doe"
-    },
-    {
-      "firstName": "Jane",
-      "middleName": "D",
-      "lastName": "Doe"
-    }
-  ],
-  "description": "Description of simulation 1",
-  "tags": [
-    "tag-1",
-    "tag-2"
-  ],
-  "references": [
-    {
-      "authors": "Doe JC & Doe JD",
-      "title": "Title-1",
-      "journal": "Journal-1",
-      "volume": 1,
-      "issue": 1,
-      "pages": "1-10",
-      "year": 2019,
-      "doi": "10.1016/XXXX"
-    },
-    {
-      "authors": "Doe JC & Doe JD",
-      "title": "Title-2",
-      "journal": "Journal-2",
-      "volume": "Database issue",
-      "issue": 2,
-      "pages": "11-20",
-      "year": 2020,
-      "doi": "10.1016/XXXX"
-    }
-  ],
-  "license": "CC0",
+  "id": "simulation_1",  
   "format": {
     "id": "SED-ML",
     "name": "Simulation Experiment Description Markup Language",
@@ -118,6 +77,49 @@
       "value": 4.4
     }
   ],
-  "created": "2020-04-01T12:00:00Z",
-  "updated": "2020-04-02T12:00:00Z"
+  "metadata": {
+    "name": "simulation 1",
+    "description": "Description of simulation 1",
+    "tags": [
+      "tag-1",
+      "tag-2"
+    ],
+    "references": [
+      {
+        "authors": "Doe JC & Doe JD",
+        "title": "Title-1",
+        "journal": "Journal-1",
+        "volume": 1,
+        "issue": 1,
+        "pages": "1-10",
+        "year": 2019,
+        "doi": "10.1016/XXXX"
+      },
+      {
+        "authors": "Doe JC & Doe JD",
+        "title": "Title-2",
+        "journal": "Journal-2",
+        "volume": "Database issue",
+        "issue": 2,
+        "pages": "11-20",
+        "year": 2020,
+        "doi": "10.1016/XXXX"
+      }
+    ],
+    "authors": [
+      {
+        "firstName": "John",
+        "middleName": "C",
+        "lastName": "Doe"
+      },
+      {
+        "firstName": "Jane",
+        "middleName": "D",
+        "lastName": "Doe"
+      }
+    ],
+    "license": "CC0",
+    "created": "2020-04-01T12:00:00Z",
+    "updated": "2020-04-02T12:00:00Z"
+  }
 }

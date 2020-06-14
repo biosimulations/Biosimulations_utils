@@ -102,7 +102,7 @@ class SbmlBiomodelReader(BiomodelReader):
             :obj:`BiomodelIoError`: if the model uses an unsupported SBML package or any unsupported combination of packages
         """
         model.id = model_sbml.getId() or None
-        model.name = model_sbml.getName() or None
+        model.metadata.name = model_sbml.getName() or None
 
         annot_xml = model_sbml.getAnnotation()
         desc_xml = self._get_xml_child_by_names(annot_xml, [

@@ -6,10 +6,8 @@
 :License: MIT
 """
 
-from ..data_model import Format, Identifier, JournalReference, License, OntologyTerm, Person, RemoteFile, Type
+from ..data_model import Format, JournalReference, OntologyTerm, ResourceMetadata, Type
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
-import datetime  # noqa: F401
-import dateutil.parser
 import wc_utils.util.enumerate
 
 __all__ = [
@@ -48,63 +46,35 @@ class Simulation(object):
 
     Attributes:
         id (:obj:`str`): id
-        name (:obj:`str`): name
-        image (:obj:`RemoteFile`): image file
-        description (:obj:`str`): description
-        tags (:obj:`list` of :obj:`str`): tags
-        identifiers (:obj:`list` of :obj:`Identifier`): identifiers
-        references (:obj:`list` of :obj:`JournalReference`): references
-        authors (:obj:`list` of :obj:`Person`): authors
-        license (:obj:`License`): license
         format (:obj:`Format`): format
         model (:obj:`Biomodel`): model
         model_parameter_changes (:obj:`list` of :obj:`ParameterChange`): model parameter changes
         algorithm (:obj:`Algorithm`): simulation algorithm
         algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`): simulation algorithm parameter changes
-        created (:obj:`datetime.datetime`): date that the simulation was created
-        updated (:obj:`datetime.datetime`): date that the simulation was last updated
+        metadata (:obj:`ResourceMetadata`): metadata
     """
 
-    def __init__(self, id=None, name=None, image=None, description=None,
-                 tags=None, identifiers=None, references=None, authors=None, license=None, format=None,
+    def __init__(self, id=None, format=None,
                  model=None, model_parameter_changes=None,
                  algorithm=None, algorithm_parameter_changes=None,
-                 created=None, updated=None):
+                 metadata=None):
         """
         Args:
             id (:obj:`str`, optional): id
-            name (:obj:`str`, optional): name
-            image (:obj:`RemoteFile`, optional): image file
-            description (:obj:`str`, optional): description
-            tags (:obj:`list` of :obj:`str`, optional): tags
-            identifiers (:obj:`list` of :obj:`Identifier`, optional): identifiers
-            references (:obj:`list` of :obj:`JournalReference`, optional): references
-            authors (:obj:`list` of :obj:`Person`, optional): authors
-            license (:obj:`License`, optional): license
             format (:obj:`Format`, optional): format
             model (:obj:`Biomodel`, optional): model
             model_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): model parameter changes
             algorithm (:obj:`Algorithm`, optional): simulation algorithm
             algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes
-            created (:obj:`datetime.datetime`, optional): date that the simulation was created
-            updated (:obj:`datetime.datetime`, optional): date that the simulation was last updated
+            metadata (:obj:`ResourceMetadata`, optional): metadata
         """
         self.id = id
-        self.name = name
-        self.image = image
-        self.description = description
-        self.tags = tags or []
-        self.identifiers = identifiers or []
-        self.references = references or []
-        self.authors = authors or []
-        self.license = license
         self.format = format
         self.model = model
         self.model_parameter_changes = model_parameter_changes or []
         self.algorithm = algorithm
         self.algorithm_parameter_changes = algorithm_parameter_changes or []
-        self.created = created
-        self.updated = updated
+        self.metadata = metadata or ResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two simulations are semantically equal
@@ -117,14 +87,6 @@ class Simulation(object):
         """
         return other.__class__ == self.__class__ \
             and self.id == other.id \
-            and self.name == other.name \
-            and self.image == other.image \
-            and self.description == other.description \
-            and sorted(self.tags) == sorted(other.tags) \
-            and sorted(self.identifiers, key=Identifier.sort_key) == sorted(other.identifiers, key=Identifier.sort_key) \
-            and sorted(self.references, key=JournalReference.sort_key) == sorted(other.references, key=JournalReference.sort_key) \
-            and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
-            and self.license == other.license \
             and self.format == other.format \
             and self.model == other.model \
             and sorted(self.model_parameter_changes, key=ParameterChange.sort_key) == \
@@ -132,8 +94,7 @@ class Simulation(object):
             and self.algorithm == other.algorithm \
             and sorted(self.algorithm_parameter_changes, key=ParameterChange.sort_key) == \
             sorted(other.algorithm_parameter_changes, key=ParameterChange.sort_key) \
-            and self.created == other.created \
-            and self.updated == other.updated
+            and self.metadata == other.metadata
 
     def to_json(self):
         """ Export to JSON
@@ -143,21 +104,12 @@ class Simulation(object):
         """
         return {
             'id': self.id,
-            'name': self.name,
-            'image': self.image.to_json() if self.image else None,
-            'description': self.description,
-            'tags': self.tags or [],
-            'identifiers': [identifier.to_json() for identifier in self.identifiers],
-            'references': [ref.to_json() for ref in self.references],
-            'authors': [author.to_json() for author in self.authors],
-            'license': self.license.value if self.license else None,
             'format': self.format.to_json() if self.format else None,
             'model': self.model.to_json() if self.model else None,
             'modelParameterChanges': [change.to_json() for change in self.model_parameter_changes],
             'algorithm': self.algorithm.to_json() if self.algorithm else None,
             'algorithmParameterChanges': [change.to_json() for change in self.algorithm_parameter_changes],
-            'created': self.created.strftime('%Y-%m-%dT%H:%M:%SZ') if self.created else None,
-            'updated': self.updated.strftime('%Y-%m-%dT%H:%M:%SZ') if self.updated else None,
+            'metadata': self.metadata.to_json() if self.metadata else None,
         }
 
     @classmethod
@@ -180,14 +132,6 @@ class Simulation(object):
         else:
             return cls(
                 id=val.get('id', None),
-                name=val.get('name', None),
-                image=RemoteFile.from_json(val.get('image')) if val.get('image', None) else None,
-                description=val.get('description', None),
-                tags=val.get('tags', []),
-                identifiers=[Identifier.from_json(identifier) for identifier in val.get('identifiers', [])],
-                references=[JournalReference.from_json(ref) for ref in val.get('references', [])],
-                authors=[Person.from_json(author) for author in val.get('authors', [])],
-                license=License(val.get('license')) if val.get('license', None) else None,
                 format=Format.from_json(val.get('format')) if val.get('format', None) else None,
                 model=Biomodel.from_json(val.get('model')) if val.get('model', None) else None,
                 model_parameter_changes=[ParameterChange.from_json(change, BiomodelParameter)
@@ -195,8 +139,7 @@ class Simulation(object):
                 algorithm=Algorithm.from_json(val.get('algorithm')) if val.get('algorithm', None) else None,
                 algorithm_parameter_changes=[ParameterChange.from_json(change, AlgorithmParameter)
                                              for change in val.get('algorithmParameterChanges', [])],
-                created=dateutil.parser.parse(val.get('created')) if val.get('created', None) else None,
-                updated=dateutil.parser.parse(val.get('updated')) if val.get('updated', None) else None,
+                metadata=ResourceMetadata.from_json(val.get('metadata')) if val.get('metadata', None) else None,
             )
 
 
@@ -210,23 +153,14 @@ class TimecourseSimulation(Simulation):
         num_time_points (:obj:`int`): number of time points to record
     """
 
-    def __init__(self, id=None, name=None, image=None, description=None,
-                 tags=None, identifiers=None, references=None, authors=None, license=None, format=None,
+    def __init__(self, id=None, format=None,
                  model=None, model_parameter_changes=None,
                  start_time=None, output_start_time=None, end_time=None, num_time_points=None,
                  algorithm=None, algorithm_parameter_changes=None,
-                 created=None, updated=None):
+                 metadata=None):
         """
         Args:
             id (:obj:`str`, optional): id
-            name (:obj:`str`, optional): name
-            image (:obj:`RemoteFile`, optional): image file
-            description (:obj:`str`, optional): description
-            tags (:obj:`list` of :obj:`str`, optional): tags
-            identifiers (:obj:`list` of :obj:`Identifier`, optional): identifiers
-            references (:obj:`list` of :obj:`JournalReference`, optional): references
-            authors (:obj:`list` of :obj:`Person`, optional): authors
-            license (:obj:`License`, optional): license
             format (:obj:`Format`, optional): format
             model (:obj:`Biomodel`, optional): model
             model_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): model parameter changes
@@ -236,15 +170,12 @@ class TimecourseSimulation(Simulation):
             num_time_points (:obj:`int`, optional): number of time points to record
             algorithm (:obj:`Algorithm`, optional): simulation algorithm
             algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes
-            created (:obj:`datetime.datetime`, optional): date that the model was created
-            updated (:obj:`datetime.datetime`, optional): date that the model was last updated
+            metadata (:obj:`ResourceMetadata`, optional): metadata
         """
-        super(TimecourseSimulation, self).__init__(id=id, name=name, image=image, description=description,
-                                                   tags=tags, identifiers=identifiers,
-                                                   references=references, authors=authors, license=license, format=format,
+        super(TimecourseSimulation, self).__init__(id=id, format=format,
                                                    model=model, model_parameter_changes=model_parameter_changes,
                                                    algorithm=algorithm, algorithm_parameter_changes=algorithm_parameter_changes,
-                                                   created=created, updated=updated)
+                                                   metadata=metadata)
         self.start_time = start_time
         self.output_start_time = output_start_time
         self.end_time = end_time

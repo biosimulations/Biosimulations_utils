@@ -12,17 +12,31 @@ import enum
 import wc_utils.util.enumerate
 
 __all__ = [
+    'AccessLevel',
     'Format',
     'Identifier',
-    'JournalReference',
+    'JournalCitation',
     'License',
     'OntologyTerm',
     'Person',
     'RemoteFile',
+    'Resource',
     'ResourceMetadata',
+    'ResourceReferences',
     'Taxon',
     'Type',
+    'User',
 ]
+
+
+class Resource(object):
+    """ A resource
+
+    Attributes:
+        id (:obj:`str`): id
+        metadata (:obj:`ResourceMetadata`): metadata
+    """
+    TYPE = None
 
 
 class Format(object):
@@ -35,13 +49,13 @@ class Format(object):
         edam_id (:obj:`str`): EDAM identifier
         url (:obj:`str`): URL
         spec_url (:obj:`str`): URL for specification
-        mime_type (:obj:`str`): Multipurpose Internet Mail Extensions (MIME) type. Also known as media type.
+        mimetype (:obj:`str`): Multipurpose Internet Mail Extensions (MIME) type. Also known as media type.
         extension (:obj:`str`): file extension (e.g., `xml`)
         sed_urn (:obj:`str`): SED-ML URN
     """
 
     def __init__(self, id=None, name=None, version=None, edam_id=None, url=None,
-                 spec_url=None, mime_type=None, extension=None, sed_urn=None):
+                 spec_url=None, mimetype=None, extension=None, sed_urn=None):
         """
         Args:
             id (:obj:`str`, optional): name (e.g., SBML)
@@ -50,7 +64,7 @@ class Format(object):
             edam_id (:obj:`str`, optional): EDAM identifier
             url (:obj:`str`, optional): URL
             spec_url (:obj:`str`, optional): URL for specification
-            mime_type (:obj:`str`, optional): Multipurpose Internet Mail Extensions (MIME) type. Also known as media type.
+            mimetype (:obj:`str`, optional): Multipurpose Internet Mail Extensions (MIME) type. Also known as media type.
             extension (:obj:`str`, optional): file extension (e.g., `xml`)
             sed_urn (:obj:`str`, optional): SED-ML URN
         """
@@ -60,7 +74,7 @@ class Format(object):
         self.edam_id = edam_id
         self.url = url
         self.spec_url = spec_url
-        self.mime_type = mime_type
+        self.mimetype = mimetype
         self.extension = extension
         self.sed_urn = sed_urn
 
@@ -80,7 +94,7 @@ class Format(object):
             and self.edam_id == other.edam_id \
             and self.url == other.url \
             and self.spec_url == other.spec_url \
-            and self.mime_type == other.mime_type \
+            and self.mimetype == other.mimetype \
             and self.extension == other.extension \
             and self.sed_urn == other.sed_urn
 
@@ -97,7 +111,7 @@ class Format(object):
             'edamId': self.edam_id,
             'url': self.url,
             'specUrl': self.spec_url,
-            'mimeType': self.mime_type,
+            'mimetype': self.mimetype,
             'extension': self.extension,
             'sedUrn': self.sed_urn,
         }
@@ -119,7 +133,7 @@ class Format(object):
             edam_id=val.get('edamId', None),
             url=val.get('url', None),
             spec_url=val.get('specUrl', None),
-            mime_type=val.get('mimeType', None),
+            mimetype=val.get('mimetype', None),
             extension=val.get('extension', None),
             sed_urn=val.get('sedUrn', None),
         )
@@ -135,7 +149,7 @@ class Format(object):
             :obj:`tuple`
         """
         return (format.id, format.name, format.version, format.edam_id, format.url,
-                format.spec_url, format.mime_type, format.extension, format.sed_urn)
+                format.spec_url, format.mimetype, format.extension, format.sed_urn)
 
 
 class Identifier(object):
@@ -230,7 +244,7 @@ License = wc_utils.util.enumerate.CaseInsensitiveEnum('License', {
 """ A license """
 
 
-class JournalReference(object):
+class JournalCitation(object):
     """ A format
 
     Attributes:
@@ -309,7 +323,7 @@ class JournalReference(object):
             val (:obj:`dict`)
 
         Returns:
-            :obj:`JournalReference`
+            :obj:`JournalCitation`
         """
         return cls(
             authors=val.get('authors', None),
@@ -323,24 +337,24 @@ class JournalReference(object):
         )
 
     @staticmethod
-    def sort_key(ref):
+    def sort_key(citation):
         """ Get a key to sort a reference
 
         Args:
-            ref (:obj:`JournalReference`): reference
+            citation (:obj:`JournalCitation`): reference
 
         Returns:
             :obj:`tuple`
         """
         return (
-            ref.authors,
-            ref.title,
-            ref.journal,
-            ref.volume,
-            ref.issue,
-            ref.pages,
-            ref.year,
-            ref.doi,
+            citation.authors,
+            citation.title,
+            citation.journal,
+            citation.volume,
+            citation.issue,
+            citation.pages,
+            citation.year,
+            citation.doi,
         )
 
 
@@ -506,22 +520,82 @@ class Person(object):
         return (person.last_name, person.first_name, person.middle_name)
 
 
-class RemoteFile(object):
+class User(Resource):
+    """ A user
+
+    Attributes:
+        id (:obj:`str`): id
+    """
+    TYPE = 'user'
+
+    def __init__(self, id=None):
+        """
+        Args:
+            id (:obj:`str`, optional): id
+        """
+        self.id = id
+
+    def __eq__(self, other):
+        """ Determine if two users are semantically equal
+
+        Args:
+            other (:obj:`User`): other user
+
+        Returns:
+            :obj:`bool`
+        """
+        return other.__class__ == self.__class__ \
+            and self.id == other.id
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'data': {
+                'type': self.TYPE,
+                'id': self.id
+            }
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create a user from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`User`
+        """
+        data = val.get('data', {})
+        return cls(
+            id=data.get('id', None)
+        )
+
+
+class RemoteFile(Resource):
     """ A remote file
 
     Attributes:
+        id (:obj:`str`): id
         name (:obj:`str`): name (e.g., model.xml)
         type (:obj:`str`): MIME type (e.g., application/sbml+xml)
         size (:obj:`int`): size in bytes
     """
+    TYPE = 'file'
 
-    def __init__(self, name=None, type=None, size=None):
+    def __init__(self, id=None, name=None, type=None, size=None):
         """
         Args:
+            id (:obj:`str`, optional): id
             name (:obj:`str`, optional): name (e.g., model.xml)
             type (:obj:`str`, optional): MIME type (e.g., application/sbml+xml)
             size (:obj:`int`, optional): size in bytes
         """
+        self.id = id
         self.name = name
         self.type = type
         self.size = size
@@ -536,6 +610,7 @@ class RemoteFile(object):
             :obj:`bool`
         """
         return other.__class__ == self.__class__ \
+            and self.id == other.id \
             and self.name == other.name \
             and self.type == other.type \
             and self.size == other.size
@@ -547,9 +622,15 @@ class RemoteFile(object):
             :obj:`dict`
         """
         return {
-            'name': self.name,
-            'type': self.type,
-            'size': self.size,
+            'data': {
+                'type': self.TYPE,
+                'id': self.id,
+                'attributes': {
+                    'name': self.name,
+                    'type': self.type,
+                    'size': self.size,
+                },
+            }
         }
 
     @classmethod
@@ -562,10 +643,13 @@ class RemoteFile(object):
         Returns:
             :obj:`RemoteFile`
         """
+        data = val.get('data', {})
+        attrs = data.get('attributes', {})
         return cls(
-            name=val.get('name', None),
-            type=val.get('type', None),
-            size=val.get('size', None),
+            id=data.get('id', None),
+            name=attrs.get('name', None),
+            type=attrs.get('type', None),
+            size=attrs.get('size', None),
         )
 
 
@@ -634,32 +718,62 @@ class Type(str, enum.Enum):
     string = 'string'
 
 
+class AccessLevel(wc_utils.util.enumerate.CaseInsensitiveEnum):
+    """ An access level """
+    private = 'private'
+    public = 'public'
+    protected = 'password protected'
+
+
 class ResourceMetadata(object):
     """ Metadata about a top-level resource such as a model
 
     Attributes:
         name (:obj:`str`): name
         image (:obj:`RemoteFile`): image file
+        summary (:obj:`str`): short description
         description (:obj:`str`): description
         tags (:obj:`list` of :obj:`str`): tags
-        identifiers (:obj:`list` of :obj:`Identifier`): identifiers
-        references (:obj:`list` of :obj:`JournalReference`): references
+        references (:obj:`ResourceReferences`): external references
         authors (:obj:`list` of :obj:`Person`): authors
+        parent (:obj:`object`): parent resource
         license (:obj:`License`): license
+        owner (:obj:`User`): owner
+        access_level (:obj:`AccessLevel`): access level
         created (:obj:`datetime.datetime`): date that the model was created
         updated (:obj:`datetime.datetime`): date that the model was last updated
     """
 
-    def __init__(self, name=None, image=None, description=None, tags=None, identifiers=None,
-                 references=None, authors=None, license=None, created=None, updated=None):
+    def __init__(self, name=None, image=None, summary=None, description=None, tags=None,
+                 references=None, authors=None, parent=None, license=None, owner=None,
+                 access_level=AccessLevel.private, created=None, updated=None):
+        """
+        Args:
+            name (:obj:`str`, optional): name
+            image (:obj:`RemoteFile`, optional): image file
+            summary (:obj:`str`, optional): short description
+            description (:obj:`str`, optional): description
+            tags (:obj:`list` of :obj:`str`, optional): tags
+            references (:obj:`ResourceReferences`, optional): external references
+            authors (:obj:`list` of :obj:`Person`, optional): authors
+            parent (:obj:`object`, optional): parent resource
+            license (:obj:`License`, optional): license
+            owner (:obj:`user`, optional): owner
+            access_level (:obj:`AccessLevel`, optional): access level
+            created (:obj:`datetime.datetime`, optional): date that the model was created
+            updated (:obj:`datetime.datetime`, optional): date that the model was last updated
+        """
         self.name = name
         self.image = image
+        self.summary = summary
         self.description = description
         self.tags = tags or []
-        self.identifiers = identifiers or []
-        self.references = references or []
+        self.references = references or ResourceReferences()
         self.authors = authors or []
+        self.parent = parent
         self.license = license
+        self.owner = owner
+        self.access_level = access_level
         self.created = created
         self.updated = updated
 
@@ -675,12 +789,15 @@ class ResourceMetadata(object):
         return other.__class__ == self.__class__ \
             and self.name == other.name \
             and self.image == other.image \
+            and self.summary == other.summary \
             and self.description == other.description \
             and sorted(self.tags) == sorted(other.tags) \
-            and sorted(self.identifiers, key=Identifier.sort_key) == sorted(other.identifiers, key=Identifier.sort_key) \
-            and sorted(self.references, key=JournalReference.sort_key) == sorted(other.references, key=JournalReference.sort_key) \
+            and self.references == other.references \
             and sorted(self.authors, key=Person.sort_key) == sorted(other.authors, key=Person.sort_key) \
+            and self.parent == other.parent \
             and self.license == other.license \
+            and self.owner == other.owner \
+            and self.access_level == other.access_level \
             and self.created == other.created \
             and self.updated == other.updated
 
@@ -692,13 +809,13 @@ class ResourceMetadata(object):
         """
         return {
             'name': self.name,
-            'image': self.image.to_json() if self.image else None,
+            'summary': self.summary,
             'description': self.description,
             'tags': self.tags or [],
-            'identifiers': [identifier.to_json() for identifier in self.identifiers],
-            'references': [ref.to_json() for ref in self.references],
+            'references': self.references.to_json(),
             'authors': [author.to_json() for author in self.authors],
             'license': self.license.value if self.license else None,
+            'accessLevel': self.access_level.value if self.access_level else None,
             'created': self.created.strftime('%Y-%m-%dT%H:%M:%SZ') if self.created else None,
             'updated': self.updated.strftime('%Y-%m-%dT%H:%M:%SZ') if self.updated else None,
         }
@@ -715,13 +832,70 @@ class ResourceMetadata(object):
         """
         return cls(
             name=val.get('name', None),
-            image=RemoteFile.from_json(val.get('image')) if val.get('image', None) else None,
+            summary=val.get('summary', None),
             description=val.get('description', None),
             tags=val.get('tags', []),
-            identifiers=[Identifier.from_json(identifier) for identifier in val.get('identifiers', [])],
-            references=[JournalReference.from_json(ref) for ref in val.get('references', [])],
+            references=ResourceReferences.from_json(val.get('references')) if val.get('references', None) else None,
             authors=[Person.from_json(author) for author in val.get('authors', [])],
             license=License(val.get('license')) if val.get('license', None) else None,
+            access_level=AccessLevel(val.get('accessLevel')) if val.get('accessLevel', None) else None,
             created=dateutil.parser.parse(val.get('created')) if val.get('created', None) else None,
             updated=dateutil.parser.parse(val.get('updated')) if val.get('updated', None) else None,
+        )
+
+
+class ResourceReferences(object):
+    """ External references for a resource
+
+    Attributes:
+        identifiers (:obj:`list` of :obj:`Identifier`): identifiers
+        citations (:obj:`list` of :obj:`JournalCitation`): citations
+        doi (:obj:`str`): DOI
+    """
+
+    def __init__(self, identifiers=None, citations=None, doi=None):
+        self.identifiers = identifiers or []
+        self.citations = citations or []
+        self.doi = doi
+
+    def __eq__(self, other):
+        """ Determine if two metadata containers are semantically equal
+
+        Args:
+            other (:obj:`ResourceReferences`): other model
+
+        Returns:
+            :obj:`bool`
+        """
+        return other.__class__ == self.__class__ \
+            and sorted(self.identifiers, key=Identifier.sort_key) == sorted(other.identifiers, key=Identifier.sort_key) \
+            and sorted(self.citations, key=JournalCitation.sort_key) == sorted(other.citations, key=JournalCitation.sort_key) \
+            and self.doi == other.doi
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'identifiers': [identifier.to_json() for identifier in self.identifiers],
+            'citations': [ref.to_json() for ref in self.citations],
+            'doi': self.doi
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create metadata from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`ResourceReferences`
+        """
+        return cls(
+            identifiers=[Identifier.from_json(identifier) for identifier in val.get('identifiers', [])],
+            citations=[JournalCitation.from_json(ref) for ref in val.get('citations', [])],
+            doi=val.get('doi', None),
         )

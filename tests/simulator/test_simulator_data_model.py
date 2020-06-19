@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.archive.data_model import ArchiveFormat
-from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person, ResourceMetadata, Type
+from Biosimulations_utils.data_model import JournalCitation, License, OntologyTerm, Person, ResourceMetadata, Type
 from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import Algorithm, AlgorithmParameter, SimulationFormat
 from Biosimulations_utils.simulator.data_model import Simulator
@@ -54,9 +54,9 @@ class SimulatorDataModelTestCase(unittest.TestCase):
                                            recommended_range=[0.12, 12.],
                                            kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
                     ],
-                    references=[
-                        JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                         volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                    citations=[
+                        JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                        volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
                     ],
                 )
             ],

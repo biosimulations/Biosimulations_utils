@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from ..data_model import Format, JournalReference, OntologyTerm, ResourceMetadata, Type
+from ..data_model import Format, JournalCitation, OntologyTerm, RemoteFile, Resource, ResourceMetadata, Type, User
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
 import wc_utils.util.enumerate
 
@@ -26,7 +26,7 @@ class SimulationFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id='format_3685',
         url='https://sed-ml.org/',
         spec_url='http://identifiers.org/combine.specifications/sed-ml',
-        mime_type='application/xml',
+        mimetype='application/xml',
         extension='sedml',
     )
 
@@ -36,12 +36,12 @@ class SimulationFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='http://sessl.org',
         spec_url='http://sessl.org',
-        mime_type='text/plain',
+        mimetype='text/plain',
         extension='scala',
     )
 
 
-class Simulation(object):
+class Simulation(Resource):
     """ Simulation experiments
 
     Attributes:
@@ -53,6 +53,8 @@ class Simulation(object):
         algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`): simulation algorithm parameter changes
         metadata (:obj:`ResourceMetadata`): metadata
     """
+
+    TYPE = 'simulation'
 
     def __init__(self, id=None, format=None,
                  model=None, model_parameter_changes=None,
@@ -102,22 +104,56 @@ class Simulation(object):
         Returns:
             :obj:`dict`
         """
-        return {
+        json = {
             'data': {
-                'type': 'simulation',
+                'type': self.TYPE,
                 'id': self.id,
                 'attributes': {
                     'format': self.format.to_json() if self.format else None,
                     'modelParameterChanges': [change.to_json() for change in self.model_parameter_changes],
                     'algorithm': self.algorithm.to_json() if self.algorithm else None,
                     'algorithmParameterChanges': [change.to_json() for change in self.algorithm_parameter_changes],
+                    'metadata': self.metadata.to_json() if self.metadata else None,
                 },
                 'relationships': {
-                    'model': self.model.to_json() if self.model else None,
+                    'owner': None,
+                    'model': None,
+                    'image': None,
+                    'parent': None,
                 },
-                'metadata': self.metadata.to_json() if self.metadata else None,
             },
         }
+
+        if self.metadata.owner:
+            json['data']['relationships']['owner'] = {
+                'data': {
+                    'type': self.metadata.owner.TYPE,
+                    'id': self.metadata.owner.id,
+                },
+            }
+        if self.model:
+            json['data']['relationships']['model'] = {
+                'data': {
+                    'type': self.model.TYPE,
+                    'id': self.model.id,
+                },
+            }
+        if self.metadata.image:
+            json['data']['relationships']['image'] = {
+                'data': {
+                    'type': self.metadata.image.TYPE,
+                    'id': self.metadata.image.id,
+                },
+            }
+        if self.metadata.parent:
+            json['data']['relationships']['parent'] = {
+                'data': {
+                    'type': self.metadata.parent.TYPE,
+                    'id': self.metadata.parent.id
+                }
+            }
+
+        return json
 
     @classmethod
     def from_json(cls, val):
@@ -130,11 +166,10 @@ class Simulation(object):
             :obj:`Simulation`
         """
         data = val.get('data', {})
-        if data.get('type', None) != 'Simulation'.lower():
-            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), 'Simulation'.lower()))
+        if data.get('type', None) != cls.TYPE:
+            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
 
         attrs = data.get('attributes', {})
-        rel = data.get('relationships', {})
 
         if cls == Simulation:
             if 'startTime' in attrs or 'endTime' in attrs or 'numTimePoints' in attrs:
@@ -144,17 +179,24 @@ class Simulation(object):
             return subcls.from_json(val)
 
         else:
-            return cls(
+            obj = cls(
                 id=data.get('id', None),
                 format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
-                model=Biomodel.from_json(rel.get('model')) if rel.get('model', None) else None,
+                model=Biomodel(id=data.get('model')) if data.get('model', None) else None,
                 model_parameter_changes=[ParameterChange.from_json(change, BiomodelParameter)
                                          for change in attrs.get('modelParameterChanges', [])],
                 algorithm=Algorithm.from_json(attrs.get('algorithm')) if attrs.get('algorithm', None) else None,
                 algorithm_parameter_changes=[ParameterChange.from_json(change, AlgorithmParameter)
                                              for change in attrs.get('algorithmParameterChanges', [])],
-                metadata=ResourceMetadata.from_json(data.get('metadata')) if data.get('metadata', None) else None,
+                metadata=ResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
             )
+            if data.get('owner', None):
+                obj.metadata.owner = User(id=data.get('owner'))
+            if data.get('image', None):
+                obj.metadata.image = RemoteFile(id=data.get('image'))
+            if data.get('parent', None):
+                obj.metadata.parent = Simulation(id=data.get('parent'))
+            return obj
 
 
 class TimecourseSimulation(Simulation):
@@ -266,13 +308,13 @@ class Algorithm(object):
         model_formats (:obj:`list` of :obj:`Format`): supported model formats (e.g., SBML)
         simulation_formats (:obj:`list` of :obj:`Format`): supported simulation formats (e.g., SED-ML)
         archive_formats (:obj:`list` of :obj:`Format`): supported archive formats (e.g., COMBINE)
-        references (:obj:`list` of :obj:`JournalReference`): references
+        citations (:obj:`list` of :obj:`JournalCitation`): citations
     """
 
     def __init__(self, id=None, name=None, kisao_term=None, ontology_terms=None,
                  parameters=None, modeling_frameworks=None,
                  model_formats=None, simulation_formats=None, archive_formats=None,
-                 references=None):
+                 citations=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -285,7 +327,7 @@ class Algorithm(object):
             model_formats (:obj:`list` of :obj:`Format`, optional): supported model formats (e.g., SBML)
             simulation_formats (:obj:`list` of :obj:`Format`, optional): supported simulation formats (e.g., SED-ML)
             archive_formats (:obj:`list` of :obj:`Format`, optional): supported archive formats (e.g., COMBINE)
-            references (:obj:`list` of :obj:`JournalReference`, optional): references
+            citations (:obj:`list` of :obj:`JournalCitation`, optional): citations
         """
         self.id = id
         self.name = name
@@ -296,7 +338,7 @@ class Algorithm(object):
         self.model_formats = model_formats or []
         self.simulation_formats = simulation_formats or []
         self.archive_formats = archive_formats or []
-        self.references = references or []
+        self.citations = citations or []
 
     def __eq__(self, other):
         """ Determine if two algorithms are semantically equal
@@ -318,7 +360,7 @@ class Algorithm(object):
             and sorted(self.model_formats, key=Format.sort_key) == sorted(other.model_formats, key=Format.sort_key) \
             and sorted(self.simulation_formats, key=Format.sort_key) == sorted(other.simulation_formats, key=Format.sort_key) \
             and sorted(self.archive_formats, key=Format.sort_key) == sorted(other.archive_formats, key=Format.sort_key) \
-            and sorted(self.references, key=JournalReference.sort_key) == sorted(other.references, key=JournalReference.sort_key)
+            and sorted(self.citations, key=JournalCitation.sort_key) == sorted(other.citations, key=JournalCitation.sort_key)
 
     def to_json(self):
         """ Export to JSON
@@ -336,7 +378,7 @@ class Algorithm(object):
             'modelFormats': [format.to_json() for format in self.model_formats],
             'simulationFormats': [format.to_json() for format in self.simulation_formats],
             'archiveFormats': [format.to_json() for format in self.archive_formats],
-            'references': [format.to_json() for format in self.references],
+            'citations': [format.to_json() for format in self.citations],
         }
 
     @classmethod
@@ -359,7 +401,7 @@ class Algorithm(object):
             model_formats=[Format.from_json(format) for format in val.get('modelFormats', [])],
             simulation_formats=[Format.from_json(format) for format in val.get('simulationFormats', [])],
             archive_formats=[Format.from_json(format) for format in val.get('archiveFormats', [])],
-            references=[JournalReference.from_json(format) for format in val.get('references', [])],
+            citations=[JournalCitation.from_json(format) for format in val.get('citations', [])],
         )
 
     @staticmethod
@@ -382,7 +424,7 @@ class Algorithm(object):
             tuple([format.sort_key(format) for format in algorithm.model_formats]),
             tuple([format.sort_key(format) for format in algorithm.simulation_formats]),
             tuple([format.sort_key(format) for format in algorithm.archive_formats]),
-            tuple([ref.sort_key(ref) for ref in algorithm.references]),
+            tuple([ref.sort_key(ref) for ref in algorithm.citations]),
         )
 
 

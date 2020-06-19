@@ -434,7 +434,7 @@ class SbmlBiomodelReader(BiomodelReader):
                 parameters.pop(param_id)
 
         # return parameters
-        model.parameters = parameters.values()
+        model.parameters = list(parameters.values())
         return model.parameters
 
     def _read_parameter(self, param_sbml, model, rxn_sbml=None, rxn_id=None, rxn_name=None):

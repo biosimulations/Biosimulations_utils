@@ -1,0 +1,522 @@
+{
+    "data": {
+        "type": "model",
+        "id": "BIOMD0000000242",
+        "attributes": {
+            "format": {
+                "id": "SBML",
+                "name": "Systems Biology Markup Language",
+                "version": "L2V4",
+                "edamId": "format_2585",
+                "url": "http://sbml.org/",
+                "specUrl": "http://identifiers.org/combine.specifications/sbml",
+                "mimetype": "application/sbml+xml",
+                "extension": "xml",
+                "sedUrn": "urn:sedml:language:sbml"
+            },
+            "framework": {
+                "ontology": "SBO",
+                "id": "0000293",
+                "name": "non-spatial continuous framework",
+                "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
+                "iri": "http://biomodels.net/SBO/SBO_0000293"
+            },
+            "taxon": {
+                "id": 39107,
+                "name": "Murinae"
+            },
+            "parameters": [{
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='GF_1']/@value",
+                "group": "Other global parameters",
+                "id": "GF_1",
+                "name": "GF",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 6.3,
+                "recommendedRange": [0.63, 63.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='k1_1']/@value",
+                "group": "Other global parameters",
+                "id": "k1_1",
+                "name": "k1",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.05,
+                "recommendedRange": [0.005000000000000001, 0.5],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='dD_1']/@value",
+                "group": "Other global parameters",
+                "id": "dD_1",
+                "name": "dD",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.4,
+                "recommendedRange": [0.04000000000000001, 4.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='aD_1']/@value",
+                "group": "Other global parameters",
+                "id": "aD_1",
+                "name": "aD",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.4,
+                "recommendedRange": [0.04000000000000001, 4.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='aE_1']/@value",
+                "group": "Other global parameters",
+                "id": "aE_1",
+                "name": "aE",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.16,
+                "recommendedRange": [0.016, 1.6],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='k2_1']/@value",
+                "group": "Other global parameters",
+                "id": "k2_1",
+                "name": "k2",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 1000.0,
+                "recommendedRange": [100.0, 10000.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='aF_1']/@value",
+                "group": "Other global parameters",
+                "id": "aF_1",
+                "name": "aF",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.9,
+                "recommendedRange": [0.09000000000000001, 9.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='pX_1']/@value",
+                "group": "Other global parameters",
+                "id": "pX_1",
+                "name": "pX",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.48,
+                "recommendedRange": [0.048, 4.8],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='RT_1']/@value",
+                "group": "Other global parameters",
+                "id": "RT_1",
+                "name": "RT",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 2.5,
+                "recommendedRange": [0.25, 25.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='qX_1']/@value",
+                "group": "Other global parameters",
+                "id": "qX_1",
+                "name": "qX",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.8,
+                "recommendedRange": [0.08000000000000002, 8.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='pS_1']/@value",
+                "group": "Other global parameters",
+                "id": "pS_1",
+                "name": "pS",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.6,
+                "recommendedRange": [0.06, 6.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='pD_1']/@value",
+                "group": "Other global parameters",
+                "id": "pD_1",
+                "name": "pD",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.48,
+                "recommendedRange": [0.048, 4.8],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='qD_1']/@value",
+                "group": "Other global parameters",
+                "id": "qD_1",
+                "name": "qD",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.6,
+                "recommendedRange": [0.06, 6.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='pE_1']/@value",
+                "group": "Other global parameters",
+                "id": "pE_1",
+                "name": "pE",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.096,
+                "recommendedRange": [0.009600000000000001, 0.96],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='qE_1']/@value",
+                "group": "Other global parameters",
+                "id": "qE_1",
+                "name": "qE",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.6,
+                "recommendedRange": [0.06, 6.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='atheta_1']/@value",
+                "group": "Other global parameters",
+                "id": "atheta_1",
+                "name": "atheta",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.05,
+                "recommendedRange": [0.005000000000000001, 0.5],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='k3_1']/@value",
+                "group": "Other global parameters",
+                "id": "k3_1",
+                "name": "k3",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 1.5,
+                "recommendedRange": [0.15000000000000002, 15.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='dtheta_1']/@value",
+                "group": "Other global parameters",
+                "id": "dtheta_1",
+                "name": "dtheta",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.12,
+                "recommendedRange": [0.012, 1.2],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='qtheta_1']/@value",
+                "group": "Other global parameters",
+                "id": "qtheta_1",
+                "name": "qtheta",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.3,
+                "recommendedRange": [0.03, 3.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='aX_1']/@value",
+                "group": "Other global parameters",
+                "id": "aX_1",
+                "name": "aX",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.08,
+                "recommendedRange": [0.008, 0.8],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='f_1']/@value",
+                "group": "Other global parameters",
+                "id": "f_1",
+                "name": "f",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.35,
+                "recommendedRange": [0.034999999999999996, 3.5],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='g_1']/@value",
+                "group": "Other global parameters",
+                "id": "g_1",
+                "name": "g",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.528,
+                "recommendedRange": [0.05280000000000001, 5.28],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='dX_1']/@value",
+                "group": "Other global parameters",
+                "id": "dX_1",
+                "name": "dX",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 1.04,
+                "recommendedRange": [0.10400000000000001, 10.4],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='dE_1']/@value",
+                "group": "Other global parameters",
+                "id": "dE_1",
+                "name": "dE",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.2,
+                "recommendedRange": [0.020000000000000004, 2.0],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='fC_1_1']/@value",
+                "group": "Other global parameters",
+                "id": "fC_1_1",
+                "name": "fe",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.003,
+                "recommendedRange": [0.00030000000000000003, 0.03],
+                "units": null
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfCompartments/sbml:compartment[@id='cell']/@size",
+                "group": "Initial compartment sizes",
+                "id": "init_size_cell",
+                "name": "Initial size of cell",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 1.0,
+                "recommendedRange": [0.1, 10.0],
+                "units": "liter"
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='D_1']/@initialAmount",
+                "group": "Initial species amounts/concentrations",
+                "id": "init_amount_D_1",
+                "name": "Initial amount of D",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.0,
+                "recommendedRange": [0.0, 10.0],
+                "units": ""
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='E_1']/@initialAmount",
+                "group": "Initial species amounts/concentrations",
+                "id": "init_amount_E_1",
+                "name": "Initial amount of E",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.0,
+                "recommendedRange": [0.0, 10.0],
+                "units": ""
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='R_1']/@initialAmount",
+                "group": "Initial species amounts/concentrations",
+                "id": "init_amount_R_1",
+                "name": "Initial amount of R",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 2.5,
+                "recommendedRange": [0.25, 25.0],
+                "units": ""
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='RS_1']/@initialAmount",
+                "group": "Initial species amounts/concentrations",
+                "id": "init_amount_RS_1",
+                "name": "Initial amount of RS",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.0,
+                "recommendedRange": [0.0, 10.0],
+                "units": ""
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='theta_1']/@initialAmount",
+                "group": "Initial species amounts/concentrations",
+                "id": "init_amount_theta_1",
+                "name": "Initial amount of theta",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.0,
+                "recommendedRange": [0.0, 10.0],
+                "units": ""
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='X_1']/@initialAmount",
+                "group": "Initial species amounts/concentrations",
+                "id": "init_amount_X_1",
+                "name": "Initial amount of X",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "value": 0.0,
+                "recommendedRange": [0.0, 10.0],
+                "units": ""
+            }],
+            "variables": [{
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='D_1']",
+                "group": "Species amounts/concentrations",
+                "id": "D_1",
+                "name": "D",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "units": "mole / liter"
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='E_1']",
+                "group": "Species amounts/concentrations",
+                "id": "E_1",
+                "name": "E",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "units": "mole / liter"
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='R_1']",
+                "group": "Species amounts/concentrations",
+                "id": "R_1",
+                "name": "R",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "units": "mole / liter"
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='RS_1']",
+                "group": "Species amounts/concentrations",
+                "id": "RS_1",
+                "name": "RS",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "units": "mole / liter"
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='theta_1']",
+                "group": "Species amounts/concentrations",
+                "id": "theta_1",
+                "name": "theta",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "units": "mole / liter"
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='X_1']",
+                "group": "Species amounts/concentrations",
+                "id": "X_1",
+                "name": "X",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "units": "mole / liter"
+            }, {
+                "target": "/sbml:sbml/sbml:model/sbml:listOfParameters/sbml:parameter[@id='Rb_phos']",
+                "group": "Other",
+                "id": "Rb_phos",
+                "name": "Rb_phosphorylated",
+                "description": null,
+                "identifiers": [],
+                "type": "float",
+                "units": null
+            }],
+            "metadata": {
+                "name": "Bai2003_G1phaseRegulation",
+                "summary": null,
+                "description": "<notes xmlns=\"http://www.sbml.org/sbml/level2/version4\">\r\n      <body xmlns=\"http://www.w3.org/1999/xhtml\">\r\n        <p>This a model from the article:      <br />\r\n                <strong>Theoretical and experimental evidence for hysteresis in cell proliferation.</strong>\r\n                <br />\r\n          Bai S, Goodrich D, Thron CD, Tecarro E, Obeyesekere M.      <em>Cell Cycle.</em>\r\n          2003 Jan-Feb;2(1):46-52.      <a href=\"http://www.ncbi.nlm.nih.gov/pubmed/12695688\">12695688</a>\r\n          ,      <br />\r\n                <strong>Abstract:</strong>\r\n                <br />\r\n          We propose a mathematical model for the regulation of the G1-phase of the mammalian cell cycle taking into account interactions of cyclin D/cdk4, cyclin E/cdk2, Rb and E2F. Mathematical analysis of this model predicts that a change in the proliferative status in response to a change in concentrations of serum growth factors will exhibit the property of hysteresis: the concentration of growth factors required to induce proliferation is higher than the concentration required to maintain proliferation. We experimentally confirmed this prediction in mouse embryonic fibroblasts in vitro. In agreement with the mathematical model, this indicates that changes in proliferative mode caused by small changes in concentrations of growth factors are not easily reversible. Based on this study, we discuss the importance of proliferation hysteresis for cell cycle regulation.      </p>\r\n            <br />\r\n        The original model was taken from the Cell Cycle DataBase (CCDB).    <p>Variable added: assignment rule for denoting phosphorylated Rb (Rb_phosphorylated i.e(RT-RS-R)) created.</p>\r\n            <p>To the extent possible under law, all copyright and related or neighbouring rights to this encoded model have been dedicated to the public domain worldwide. Please refer to      <a href=\"http://creativecommons.org/publicdomain/zero/1.0/\" title=\"Creative Commons CC0\">CC0 Public Domain Dedication</a>\r\n          for more information.      </p>\r\n            <p>In summary, you are entitled to use this encoded model in absolutely any manner you deem suitable, verbatim, or with modification, alone or embedded it in a larger context, redistribute it, commercially or not, in a restricted way or not.</p>\r\n            <p>To cite BioModels Database, please use:      <a href=\"http://www.ncbi.nlm.nih.gov/pubmed/20587024\" target=\"_blank\">Li C, Donizelli M, Rodriguez N, Dharuri H, Endler L, Chelliah V, Li L, He E, Henry A, Stefan MI, Snoep JL, Hucka M, Le Nov\u00e8re N, Laibe C (2010) BioModels Database: An enhanced, curated and annotated resource for published quantitative kinetic models. BMC Syst Biol., 4:92.</a>\r\n                </p>\r\n            </body>\r\n      \r\n    </notes>",
+                "tags": [],
+                "references": {
+                    "identifiers": [{
+                        "namespace": "biomodels.db",
+                        "id": "BIOMD0000000242",
+                        "url": "http://www.ebi.ac.uk/biomodels/BIOMD0000000242"
+                    }],
+                    "citations": [{
+                        "authors": "Shaochun Bai, David Goodrich, C Dennis Thron, Edwin Tecarro & Mandri Obeyesekere",
+                        "title": "Theoretical and experimental evidence for hysteresis in cell proliferation.",
+                        "journal": "Cell cycle (Georgetown, Tex.)",
+                        "volume": "2",
+                        "issue": null,
+                        "pages": "46-52",
+                        "year": 2003,
+                        "doi": "10.4161/cc.2.1.186"
+                    }],
+                    "doi": null
+                },
+                "authors": [{
+                    "firstName": "Shaochun",
+                    "middleName": null,
+                    "lastName": "Bai"
+                }, {
+                    "firstName": "David",
+                    "middleName": null,
+                    "lastName": "Goodrich"
+                }, {
+                    "firstName": "C",
+                    "middleName": "Dennis",
+                    "lastName": "Thron"
+                }, {
+                    "firstName": "Edwin",
+                    "middleName": null,
+                    "lastName": "Tecarro"
+                }, {
+                    "firstName": "Mandri",
+                    "middleName": null,
+                    "lastName": "Obeyesekere"
+                }],
+                "license": "CC0",
+                "accessLevel": "public",
+                "created": null,
+                "updated": null
+            }
+        },
+        "relationships": {
+            "owner": {
+                "data": {
+                    "type": "user",
+                    "id": "string"
+                }
+            },
+            "file": {
+                "data": {
+                    "type": "file",
+                    "id": "string"
+                }
+            },
+            "image": {
+                "data": {
+                    "type": "file",
+                    "id": "string"
+                }
+            },
+            "parent": {
+                "data": {
+                    "type": "model",
+                    "id": "string"
+                }
+            }
+        }
+    }
+}

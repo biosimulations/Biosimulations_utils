@@ -6,6 +6,7 @@
 :License: MIT
 """
 
+from ..data_model import Resource
 import enum
 
 __all__ = [
@@ -13,12 +14,14 @@ __all__ = [
 ]
 
 
-class Chart(object):
+class Chart(Resource):
     """ Chart type
 
     Attributes:
         id (:obj:`str`): id
     """
+
+    TYPE = 'chart'
 
     def __init__(self, id=None):
         """

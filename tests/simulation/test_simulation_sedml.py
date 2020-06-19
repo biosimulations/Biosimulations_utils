@@ -37,6 +37,7 @@ class WriteSedMlTestCase(unittest.TestCase):
         sim.model = Biomodel(
             id='sbml_model',
             file=RemoteFile(
+                id='sbml_model-file',
                 name=os.path.join(self.dirname, 'model.sbml.xml'),
                 type='application/sbml+xml',
             ),
@@ -69,6 +70,11 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(sim_2.algorithm, sim.algorithm)
         self.assertEqual(sim_2.metadata.created, sim.metadata.created)
         self.assertEqual(sim_2.metadata.updated, sim.metadata.updated)
+
+        sim_2.metadata.image = sim.metadata.image
+        sim_2.metadata.owner = sim.metadata.owner
+        sim_2.metadata.access_level = sim.metadata.access_level
+        sim_2.metadata.parent = sim.metadata.parent
         self.assertEqual(sim_2, sim)
 
         with self.assertRaisesRegex(NotImplementedError, 'not supported'):

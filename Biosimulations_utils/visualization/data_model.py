@@ -7,7 +7,7 @@
 """
 
 from ..chart.data_model import Chart, ChartDataField
-from ..data_model import Format, ResourceMetadata
+from ..data_model import Format, RemoteFile, Resource, ResourceMetadata, User
 from ..simulation.data_model import SimulationResult
 
 __all__ = [
@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-class Visualization(object):
+class Visualization(Resource):
     """ Visualization of the results of one or more simulations
 
     Attributes:
@@ -26,6 +26,8 @@ class Visualization(object):
             (i.e. the cells in the grid of visualizations)
         metadata (:obj:`ResourceMetadata`): metadata
     """
+
+    TYPE = 'visualization'
 
     def __init__(self, id=None, format=None,
                  columns=None, layout=None, metadata=None):
@@ -67,18 +69,47 @@ class Visualization(object):
         Returns:
             :obj:`dict`
         """
-        return {
+        json = {
             'data': {
-                'type': 'visualization',
+                'type': self.TYPE,
                 'id': self.id,
                 'attributes': {
                     'format': self.format.to_json() if self.format else None,
                     'columns': self.columns,
                     'layout': [el.to_json() for el in self.layout],
+                    'metadata': self.metadata.to_json() if self.metadata else None,
                 },
-                'metadata': self.metadata.to_json() if self.metadata else None,
+                'relationships': {
+                    'owner': None,
+                    'image': None,
+                    'parent': None,
+                },
             },
         }
+
+        if self.metadata.owner:
+            json['data']['relationships']['owner'] = {
+                'data': {
+                    'type': self.metadata.owner.TYPE,
+                    'id': self.metadata.owner.id,
+                },
+            }
+        if self.metadata.image:
+            json['data']['relationships']['image'] = {
+                'data': {
+                    'type': self.metadata.image.TYPE,
+                    'id': self.metadata.image.id,
+                },
+            }
+        if self.metadata.parent:
+            json['data']['relationships']['parent'] = {
+                'data': {
+                    'type': self.metadata.parent.TYPE,
+                    'id': self.metadata.parent.id
+                }
+            }
+
+        return json
 
     @classmethod
     def from_json(cls, val):
@@ -91,17 +122,27 @@ class Visualization(object):
             :obj:`Simulation`
         """
         data = val.get('data', {})
-        if data.get('type', None) != cls.__name__.lower():
-            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.__name__.lower()))
+        if data.get('type', None) != cls.TYPE:
+            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
 
         attrs = data.get('attributes', {})
-        return cls(
+
+        obj = cls(
             id=data.get('id', None),
             format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
             columns=attrs.get('columns', None),
             layout=[VisualizationLayoutElement.from_json(el) for el in attrs.get('layout', [])],
-            metadata=ResourceMetadata.from_json(data.get('metadata')) if data.get('metadata', None) else None,
+            metadata=ResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
         )
+
+        if data.get('owner', None):
+            obj.metadata.owner = User(id=data.get('owner'))
+        if data.get('image', None):
+            obj.metadata.image = RemoteFile(id=data.get('image'))
+        if data.get('parent', None):
+            obj.metadata.parent = Visualization(id=data.get('parent'))
+
+        return obj
 
 
 class VisualizationLayoutElement(object):

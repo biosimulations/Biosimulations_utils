@@ -7,6 +7,7 @@
 """
 
 from Biosimulations_utils import api_client
+import json
 import os
 import unittest
 import unittest.mock
@@ -46,28 +47,32 @@ class ConfigTestCase(unittest.TestCase):
         client = api_client.ApiClient()
         client.login()
 
-        id = 'api-client-test-model'
-        name = 'API client test model'
-        owner = 'jonrkarr'
+        response = client.exec('delete', '/models/', response_type=api_client.ResponseType.bytes)
+        self.assertEqual(response, '')
 
-        response = client.exec('put', '/models/' + id, data={
-            'id': id,
-            'owner': owner,
-        })
-        assert response['name'] is None
+        response = client.exec('get', '/models/')
+        self.assertEqual(response, [])
 
-        response = client.exec('get', '/models/' + id)
-        assert response['name'] is None
+        with open('tests/fixtures/model.json', 'r') as file:
+            model = json.load(file)
+        response = client.exec('post', '/models/', data=model)
 
-        response = client.exec('put', '/models/' + id, data={
-            'id': id,
-            'owner': owner,
-            'name': name
-        })
-        assert response['name'] == name
+        response = client.exec('get', '/models/')
+        self.assertEqual(len(response), 1)
+        model2 = response[0]
+        model2.pop('_id')
+        model2.pop('__v')
+        model['data'].pop('type')
+        model['data']['owner'] = model['data']['relationships']['owner']['data']['id']
+        model['data']['file'] = model['data']['relationships']['file']['data']['id']
+        # model['data']['image'] = model['data']['relationships']['image']['data']['id']
+        model['data']['parent'] = model['data']['relationships']['parent']['data']['id']
+        model['data'].pop('relationships')
 
-        response = client.exec('get', '/models/' + id)
-        assert response['name'] == name
+        for key in model['data'].keys():
+            self.assertEqual(response[0][key], model['data'][key])
+
+        self.assertEqual(response[0], model['data'])
 
         # logout
         client.logout()

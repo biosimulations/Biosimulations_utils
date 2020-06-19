@@ -7,7 +7,8 @@
 """
 
 from Biosimulations_utils.archive.data_model import ArchiveFormat
-from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person, RemoteFile, ResourceMetadata, Type
+from Biosimulations_utils.data_model import (JournalCitation, License, OntologyTerm, Person,
+                                             RemoteFile, ResourceMetadata, ResourceReferences, Type)
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelingFramework, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import (
     Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange,
@@ -22,7 +23,7 @@ class SimulationDataModelTestCase(unittest.TestCase):
         sim = TimecourseSimulation(
             id='model_1',
             format=BiomodelFormat.sbml.value,
-            model=Biomodel(id='model_1', metadata=ResourceMetadata(name='model 1')),
+            model=Biomodel(id='model_1'),
             model_parameter_changes=[
                 ParameterChange(parameter=BiomodelParameter(id='param_1', name='param 1', type=Type.float, value=3.5),
                                 value=5.3),
@@ -43,13 +44,15 @@ class SimulationDataModelTestCase(unittest.TestCase):
             ],
             metadata=ResourceMetadata(
                 name='model 1',
-                image=RemoteFile(name='model.png', type='image/png'),
+                image=RemoteFile(id='model_1-thumbnail'),
                 description='description',
                 tags=['a', 'b', 'c'],
-                references=[
-                    JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                     volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
-                ],
+                references=ResourceReferences(
+                    citations=[
+                        JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                        volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                    ]
+                ),
                 authors=[
                     Person(first_name='John', middle_name='C', last_name='Doe'),
                     Person(first_name='Jane', middle_name='D', last_name='Doe'),
@@ -59,14 +62,21 @@ class SimulationDataModelTestCase(unittest.TestCase):
                 updated=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
             ),
         )
-        self.assertEqual(TimecourseSimulation.from_json(sim.to_json()), sim)
-        self.assertEqual(Simulation.from_json(sim.to_json()), sim)
+        sim2 = TimecourseSimulation.from_json(sim.to_json())
+        sim2.model = sim.model
+        sim2.metadata.image = sim.metadata.image
+        self.assertEqual(sim2, sim)
+
+        sim2 = Simulation.from_json(sim.to_json())
+        sim2.model = sim.model
+        sim2.metadata.image = sim.metadata.image
+        self.assertEqual(sim2, sim)
 
     def test_SteadyStateSimulation(self):
         sim = SteadyStateSimulation(
             id='model_1',
             format=BiomodelFormat.sbml.value,
-            model=Biomodel(id='model_1', metadata=ResourceMetadata(name='model 1')),
+            model=Biomodel(id='model_1'),
             model_parameter_changes=[
                 ParameterChange(parameter=BiomodelParameter(id='param_1', name='param 1', type=Type.float, value=3.5),
                                 value=5.3),
@@ -86,13 +96,15 @@ class SimulationDataModelTestCase(unittest.TestCase):
             ],
             metadata=ResourceMetadata(
                 name='model 1',
-                image=RemoteFile(name='model.png', type='image/png'),
+                image=RemoteFile(id='model_1-thumbnail'),
                 description='description',
                 tags=['a', 'b', 'c'],
-                references=[
-                    JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                     volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
-                ],
+                references=ResourceReferences(
+                    citations=[
+                        JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                        volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                    ]
+                ),
                 authors=[
                     Person(first_name='John', middle_name='C', last_name='Doe'),
                     Person(first_name='Jane', middle_name='D', last_name='Doe'),
@@ -100,8 +112,15 @@ class SimulationDataModelTestCase(unittest.TestCase):
                 license=License.cc0,
             ),
         )
-        self.assertEqual(SteadyStateSimulation.from_json(sim.to_json()), sim)
-        self.assertEqual(Simulation.from_json(sim.to_json()), sim)
+        sim2 = SteadyStateSimulation.from_json(sim.to_json())
+        sim2.model = sim.model
+        sim2.metadata.image = sim.metadata.image
+        self.assertEqual(sim2, sim)
+
+        sim2 = Simulation.from_json(sim.to_json())
+        sim2.model = sim.model
+        sim2.metadata.image = sim.metadata.image
+        self.assertEqual(sim2, sim)
 
     def test_Algorithm(self):
         alg = Algorithm(
@@ -133,9 +152,9 @@ class SimulationDataModelTestCase(unittest.TestCase):
             archive_formats=[
                 ArchiveFormat.combine.value,
             ],
-            references=[
-                JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                 volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+            citations=[
+                JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
             ],
         )
         self.assertEqual(Algorithm.from_json(alg.to_json()), alg)

@@ -11,7 +11,7 @@ from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation
                          Algorithm, AlgorithmParameter, ParameterChange, SimulationResult,
                          SimulationFormat)
 from ..chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from ..data_model import Format, JournalReference, License, OntologyTerm, Person, RemoteFile, ResourceMetadata
+from ..data_model import Format, JournalCitation, License, OntologyTerm, Person, RemoteFile, ResourceMetadata
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 from ..utils import assert_exception, get_enum_format_by_attr, get_logger
@@ -162,26 +162,26 @@ class SedMlSimulationWriter(SimulationWriter):
             namespaces.add('rdf')
             namespaces.add('vcard')
 
-        if obj.metadata.references:
+        if obj.metadata.references.citations:
             refs_xml = []
-            for ref in obj.metadata.references:
+            for citation in obj.metadata.references.citations:
                 props_xml = []
-                if ref.authors:
-                    props_xml.append(XmlNode(prefix='bibo', name='authorList', children=ref.authors))
-                if ref.title:
-                    props_xml.append(XmlNode(prefix='dc', name='title', children=ref.title))
-                if ref.journal:
-                    props_xml.append(XmlNode(prefix='bibo', name='journal', children=ref.journal))
-                if ref.volume:
-                    props_xml.append(XmlNode(prefix='bibo', name='volume', children=ref.volume))
-                if ref.issue:
-                    props_xml.append(XmlNode(prefix='bibo', name='issue', children=ref.issue))
-                if ref.pages:
-                    props_xml.append(XmlNode(prefix='bibo', name='pages', children=ref.pages))
-                if ref.year:
-                    props_xml.append(XmlNode(prefix='dc', name='date', children=ref.year))
-                if ref.doi:
-                    props_xml.append(XmlNode(prefix='bibo', name='doi', children=ref.doi))
+                if citation.authors:
+                    props_xml.append(XmlNode(prefix='bibo', name='authorList', children=citation.authors))
+                if citation.title:
+                    props_xml.append(XmlNode(prefix='dc', name='title', children=citation.title))
+                if citation.journal:
+                    props_xml.append(XmlNode(prefix='bibo', name='journal', children=citation.journal))
+                if citation.volume:
+                    props_xml.append(XmlNode(prefix='bibo', name='volume', children=citation.volume))
+                if citation.issue:
+                    props_xml.append(XmlNode(prefix='bibo', name='issue', children=citation.issue))
+                if citation.pages:
+                    props_xml.append(XmlNode(prefix='bibo', name='pages', children=citation.pages))
+                if citation.year:
+                    props_xml.append(XmlNode(prefix='dc', name='date', children=citation.year))
+                if citation.doi:
+                    props_xml.append(XmlNode(prefix='bibo', name='doi', children=citation.doi))
 
                 refs_xml.append(XmlNode(prefix='rdf', name='li', children=[
                     XmlNode(prefix='bibo', name='Article', children=props_xml)
@@ -952,28 +952,28 @@ class SedMlSimulationReader(SimulationReader):
                             if child_2.prefix == 'rdf' and child_2.name == 'li':
                                 for child_3 in child_2.children:
                                     if child_3.prefix == 'bibo' and child_3.name == 'Article':
-                                        ref = JournalReference()
+                                        citation = JournalCitation()
                                         for prop in child_3.children:
                                             if prop.prefix == 'bibo' and prop.name == 'authorList' and isinstance(prop.children, str):
-                                                ref.authors = prop.children
+                                                citation.authors = prop.children
                                             elif prop.prefix == 'dc' and prop.name == 'title' and isinstance(prop.children, str):
-                                                ref.title = prop.children
+                                                citation.title = prop.children
                                             elif prop.prefix == 'bibo' and prop.name == 'journal' and isinstance(prop.children, str):
-                                                ref.journal = prop.children
+                                                citation.journal = prop.children
                                             elif prop.prefix == 'bibo' and prop.name == 'volume' and isinstance(prop.children, str):
                                                 try:
-                                                    ref.volume = int(prop.children)
+                                                    citation.volume = int(prop.children)
                                                 except Exception:
-                                                    ref.volume = prop.children
+                                                    citation.volume = prop.children
                                             elif prop.prefix == 'bibo' and prop.name == 'issue' and isinstance(prop.children, str):
-                                                ref.issue = int(prop.children)
+                                                citation.issue = int(prop.children)
                                             elif prop.prefix == 'bibo' and prop.name == 'pages' and isinstance(prop.children, str):
-                                                ref.pages = prop.children
+                                                citation.pages = prop.children
                                             elif prop.prefix == 'dc' and prop.name == 'date' and isinstance(prop.children, str):
-                                                ref.year = int(prop.children)
+                                                citation.year = int(prop.children)
                                             elif prop.prefix == 'bibo' and prop.name == 'doi' and isinstance(prop.children, str):
-                                                ref.doi = prop.children
-                                        sim.metadata.references.append(ref)
+                                                citation.doi = prop.children
+                                        sim.metadata.references.citations.append(citation)
             elif node.prefix == 'dcterms' and node.name == 'license' and isinstance(node.children, str):
                 sim.metadata.license = License(node.children)
             elif node.prefix == 'dcterms' and node.name == 'created' and isinstance(node.children, str):
@@ -999,7 +999,7 @@ class SedMlSimulationReader(SimulationReader):
         sim.model = Biomodel(
             id=model_sed.getId() or None,
             format=format,
-            file=RemoteFile(name=model_sed.getSource(), type=format.mime_type),
+            file=RemoteFile(id=model_sed.getId() + '-file', name=model_sed.getSource(), type=format.mimetype),
             metadata=ResourceMetadata(name=model_sed.getName() or None),
         )
 

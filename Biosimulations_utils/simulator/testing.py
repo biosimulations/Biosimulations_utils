@@ -9,7 +9,7 @@
 from Biosimulations_utils.archive import read_archive
 from Biosimulations_utils.archive.data_model import ArchiveFormat
 from Biosimulations_utils.archive.exec import gen_archive_for_sim, exec_archive
-from Biosimulations_utils.data_model import JournalReference, License, OntologyTerm, Person, ResourceMetadata
+from Biosimulations_utils.data_model import JournalCitation, License, OntologyTerm, Person, ResourceMetadata, ResourceReferences
 from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat, BiomodelParameter
 from Biosimulations_utils.simulation import read_simulation
@@ -243,10 +243,12 @@ class SimulatorValidator(object):
         model.file.name = 'BIOMD0000000297_url.xml'
         model.metadata.description = 'Description of model 1'
         model.metadata.tags = ['tag-model-a', 'tag-model-b', 'tag-model-c']
-        model.metadata.references = [
-            JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                             volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
-        ]
+        model.metadata.references = ResourceReferences(
+            citations=[
+                JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+            ]
+        )
         model.metadata.authors = [
             Person(first_name='Jack', middle_name='A', last_name='Doe'),
             Person(first_name='Jill', middle_name='B', last_name='Doe'),
@@ -312,10 +314,12 @@ class SimulatorValidator(object):
                 name='simulation 1',
                 description='Description of simulation 1',
                 tags=['tag-simulation-a', 'tag-simulation-b', 'tag-simulation-c'],
-                references=[
-                    JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                     volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
-                ],
+                references=ResourceReferences(
+                    citations=[
+                        JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                        volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                    ]
+                ),
                 authors=[
                     Person(first_name='John', middle_name='C', last_name='Doe'),
                     Person(first_name='Jane', middle_name='D', last_name='Doe'),

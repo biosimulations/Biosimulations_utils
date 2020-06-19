@@ -6,13 +6,13 @@
 :License: MIT
 """
 
-from ..data_model import Format, ResourceMetadata
+from ..data_model import Format, Resource, ResourceMetadata
 from ..simulation.data_model import Algorithm
 
 __all__ = ['Simulator']
 
 
-class Simulator(object):
+class Simulator(Resource):
     """ A simulator
 
     Attributes:
@@ -24,6 +24,7 @@ class Simulator(object):
         algorithms (:obj:`list` of :obj:`Algorithm`): supported algorithms
         metadata (:obj:`ResourceMetadata`): metadata
     """
+    TYPE = 'simulator'
 
     def __init__(self, id=None, version=None, url=None,
                  format=None, docker_hub_image_id=None, algorithms=None, metadata=None):
@@ -71,7 +72,7 @@ class Simulator(object):
         """
         return {
             'data': {
-                'type': 'simulator',
+                'type': self.TYPE,
                 'id': self.id,
                 'attributes': {
                     'version': self.version,
@@ -79,8 +80,8 @@ class Simulator(object):
                     'format': self.format.to_json() if self.format else None,
                     'dockerHubImageId': self.docker_hub_image_id,
                     'algorithms': [alg.to_json() for alg in self.algorithms],
+                    'metadata': self.metadata.to_json() if self.metadata else None,
                 },
-                'metadata': self.metadata.to_json() if self.metadata else None,
             }
         }
 
@@ -95,8 +96,8 @@ class Simulator(object):
             :obj:`Simulation`
         """
         data = val.get('data', {})
-        if data.get('type', None) != cls.__name__.lower():
-            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.__name__.lower()))
+        if data.get('type', None) != cls.TYPE:
+            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
 
         attrs = data.get('attributes', {})
         return cls(
@@ -106,5 +107,5 @@ class Simulator(object):
             format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
             docker_hub_image_id=attrs.get('dockerHubImageId', None),
             algorithms=[Algorithm.from_json(alg) for alg in attrs.get('algorithms', [])],
-            metadata=ResourceMetadata.from_json(data.get('metadata')) if data.get('metadata', None) else None,
+            metadata=ResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
         )

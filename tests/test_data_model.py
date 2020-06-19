@@ -7,8 +7,8 @@
 """
 
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from Biosimulations_utils.data_model import (Format, Identifier, JournalReference,
-                                             License, OntologyTerm, Person, RemoteFile, Taxon, Type)
+from Biosimulations_utils.data_model import (Format, Identifier, JournalCitation,
+                                             License, OntologyTerm, Person, RemoteFile, ResourceReferences, Taxon, Type)
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import TimecourseSimulation, SimulationResult
 from Biosimulations_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
@@ -23,7 +23,7 @@ class DataModelTestCase(unittest.TestCase):
         format = BiomodelFormat.sbml.value
         self.assertEqual(Format.from_json(format.to_json()), format)
         self.assertEqual(Format.sort_key(format), (format.id, format.name, format.version, format.edam_id, format.url,
-                                                   format.spec_url, format.mime_type, format.extension, format.sed_urn))
+                                                   format.spec_url, format.mimetype, format.extension, format.sed_urn))
 
     def test_Identifier(self):
         id = Identifier(namespace='biomodels.db', id='BIOMD0000000924')
@@ -32,11 +32,11 @@ class DataModelTestCase(unittest.TestCase):
         self.assertEqual(Identifier.sort_key(id), (id.namespace, id.id, None))
 
     def test_JournalReference(self):
-        ref = JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                               volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX')
-        self.assertEqual(JournalReference.from_json(ref.to_json()), ref)
-        self.assertEqual(JournalReference.sort_key(ref), (ref.authors, ref.title,
-                                                          ref.journal, ref.volume, ref.issue, ref.pages, ref.year, ref.doi))
+        ref = JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                              volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX')
+        self.assertEqual(JournalCitation.from_json(ref.to_json()), ref)
+        self.assertEqual(JournalCitation.sort_key(ref), (ref.authors, ref.title,
+                                                         ref.journal, ref.volume, ref.issue, ref.pages, ref.year, ref.doi))
 
     def test_OntologyTerm(self):
         term = OntologyTerm(ontology='KISAO', id='0000497', name='KLU',
@@ -51,7 +51,7 @@ class DataModelTestCase(unittest.TestCase):
         self.assertEqual(Person.sort_key(person), (person.last_name, person.first_name, person.middle_name))
 
     def test_RemoteFile(self):
-        file = RemoteFile(name='model.xml', type='application/sbml+xml', size=1000)
+        file = RemoteFile(id='model-file', name='model.xml', type='application/sbml+xml', size=1000)
         self.assertEqual(RemoteFile.from_json(file.to_json()), file)
 
     def test_Taxon(self):
@@ -75,8 +75,8 @@ class ApiConsistencyTestCase(unittest.TestCase):
         model = Biomodel(
             id='model_1',
             name='model 1',
-            file=RemoteFile(name='model.xml', type='application/sbml+xml'),
-            image=RemoteFile(name='model.png', type='image/png'),
+            file=RemoteFile(id='model_1-file', name='model.xml', type='application/sbml+xml'),
+            image=RemoteFile(id='model_1-thumbnail', name='model.png', type='image/png'),
             description='description',
             format=BiomodelFormat.sbml.value,
             framework=OntologyTerm(ontology='KISAO', id='0000497', name='KLU',
@@ -84,11 +84,13 @@ class ApiConsistencyTestCase(unittest.TestCase):
                                    iri='http://www.biomodels.net/kisao/KISAO#KISAO_0000497'),
             taxon=Taxon(id=9606, name='Homo sapiens'),
             tags=['a', 'b', 'c'],
-            identifiers=[Identifier(namespace='biomodels.db', id='BIOMD0000000924')],
-            references=[
-                JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                 volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
-            ],
+            references=ResourceReferences(
+                identifiers=[Identifier(namespace='biomodels.db', id='BIOMD0000000924')],
+                citations=[
+                    JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                    volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                ]
+            ),
             authors=[
                 Person(first_name='John', middle_name='C', last_name='Doe'),
                 Person(first_name='Jane', middle_name='D', last_name='Doe'),
@@ -140,14 +142,16 @@ class ApiConsistencyTestCase(unittest.TestCase):
         py = Visualization(
             id='viz_1',
             name='viz 1',
-            image=RemoteFile(name='viz.png', type='image/png'),
+            image=RemoteFile(id='viz-thumbnail', name='viz.png', type='image/png'),
             description='description',
             tags=['a', 'b', 'c'],
-            identifiers=[Identifier(namespace='biomodels.db', id='XXX')],
-            references=[
-                JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                 volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
-            ],
+            references=ResourceReferences(
+                identifiers=[Identifier(namespace='biomodels.db', id='XXX')],
+                citations=[
+                    JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                    volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                ]
+            ),
             authors=[
                 Person(first_name='John', middle_name='C', last_name='Doe'),
                 Person(first_name='Jane', middle_name='D', last_name='Doe'),

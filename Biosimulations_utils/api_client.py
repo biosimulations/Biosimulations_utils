@@ -10,8 +10,16 @@ from . import config
 from unittest import mock
 import collections
 import click
+import enum
 import requests
 import webbrowser
+
+
+class ResponseType(int, enum.Enum):
+    """ API response type """
+    json = 1
+    bytes = 2
+    other = 3
 
 
 class ApiClient(object):
@@ -135,7 +143,7 @@ class ApiClient(object):
         if self._dry_run:
             patch.stop()
 
-    def exec(self, method, route, data=None):
+    def exec(self, method, route, data=None, response_type=ResponseType.json):
         """ Execute a route of the BioSimulations API
 
         Args:
@@ -144,6 +152,7 @@ class ApiClient(object):
                 information about model with id `model-id`)
             data (:obj:`object`): data for the route (e.g., `{name: 'model name', ...}` to
                 use 'put' `/models/model-id` to change the name of the model with id `model-id`)
+            response_type (:obj:`ResponseType`, optional): expected response type
 
         Raises:
             :obj:`requests.exceptions.HTTPError`: if the route was not successfully executed
@@ -170,10 +179,12 @@ class ApiClient(object):
 
         response = request_func(self.config.api.endpoint + route, **opts)
         response.raise_for_status()
-        if response.content:
+        if response_type == ResponseType.json:
             content = response.json()
+        elif response_type == ResponseType.bytes:
+            content = response.content.decode()
         else:
-            content = None
+            content = response.content
 
         if self._dry_run:
             patch.stop()

@@ -6,7 +6,8 @@
 :License: MIT
 """
 
-from Biosimulations_utils.data_model import Identifier, JournalReference, License, Person, Taxon
+from Biosimulations_utils.api_client import ApiClient, ResponseType
+from Biosimulations_utils.data_model import Identifier, JournalCitation, License, Person, Taxon, User
 from Biosimulations_utils.import_resources import biomodels
 from Biosimulations_utils.biomodel.data_model import Biomodel
 from Biosimulations_utils.simulation.data_model import Simulation
@@ -16,6 +17,7 @@ try:
     import docker
 except ModuleNotFoundError:
     docker = None
+import os
 import shutil
 import tempfile
 import unittest
@@ -29,11 +31,30 @@ class BioModelsImporterTestCase(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dirname)
 
-    def test_import(self):
+    def test_import_dry_run(self):
         importer = biomodels.BioModelsImporter(exec_simulations=docker is not None,
                                                _max_models=3, _cache_dir=self.dirname, _dry_run=True)
         models, sims, vizs, stats = importer.run()
         self.assertEqual(len(models), 3)
+
+    @unittest.skipIf(os.getenv('CI', '0') in ['1', 'true'], 'CI does not have credentials to log into BioSimulations')
+    def test_import_and_post(self):
+        api_client = ApiClient()
+        api_client.login()
+
+        api_client.exec('delete', '/models/', response_type=ResponseType.bytes)
+        models2 = api_client.exec('get', '/models/')
+        self.assertEqual(models2, [])
+
+        max_models = 20
+        cache_dir = self.dirname
+        importer = biomodels.BioModelsImporter(exec_simulations=False, user=User(id='jonrkarr'),
+                                               _max_models=max_models, _cache_dir=cache_dir)
+        models, sims, vizs, stats = importer.run()
+        self.assertEqual(len(models), max_models)
+
+        models2 = api_client.exec('get', '/models/')
+        self.assertEqual(len(models2), max_models)
 
     def test_import_diverse_set_of_models(self):
         importer = biomodels.BioModelsImporter(exec_simulations=docker is not None,
@@ -90,11 +111,12 @@ class BioModelsImporterTestCase(unittest.TestCase):
             name="Tetronarce californica",
         ))
         self.assertEqual(models[0].metadata.tags, [])
-        self.assertEqual(models[0].metadata.identifiers, [Identifier(
+        self.assertEqual(models[0].metadata.references.identifiers, [Identifier(
             namespace="biomodels.db",
             id="BIOMD0000000001",
+            url="http://www.ebi.ac.uk/biomodels/BIOMD0000000001"
         )])
-        self.assertEqual(models[0].metadata.references, [JournalReference(
+        self.assertEqual(models[0].metadata.references.citations, [JournalCitation(
             authors="S J Edelstein, O Schaad, E Henry, D Bertrand & J P Changeux",
             title="A kinetic mechanism for nicotinic acetylcholine receptors based on multiple allosteric transitions.",
             journal="Biological cybernetics",
@@ -177,11 +199,19 @@ class BioModelsImporterTestCase(unittest.TestCase):
 
         # verify models can be uploaded to the REST API
         for model in models:
-            self.assertEqual(Biomodel.from_json(model.to_json()), model)
+            model.file = None
+            model.metadata.image = None
+            model2 = Biomodel.from_json(model.to_json())
+            self.assertEqual(model2, model)
         for sim in sims:
-            self.assertEqual(Simulation.from_json(sim.to_json()), sim)
+            sim.model = None
+            sim.metadata.image = None
+            sim2 = Simulation.from_json(sim.to_json())
+            self.assertEqual(sim2, sim)
         for viz in vizs:
-            self.assertEqual(Visualization.from_json(viz.to_json()), viz)
+            viz.metadata.image = None
+            viz2 = Visualization.from_json(viz.to_json())
+            self.assertEqual(viz2, viz)
 
         models_2, sims_2, vizs_2, stats_2 = importer.read_data()
         for model, model_2 in zip(models, models_2):

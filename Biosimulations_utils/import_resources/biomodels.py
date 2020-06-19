@@ -12,7 +12,7 @@ from ..biomodel import read_biomodel
 from ..biomodel.core import BiomodelIoError
 from ..biomodel.data_model import BiomodelFormat, Biomodel  # noqa: F401
 from ..biomodel.sbml import visualize_biomodel
-from ..data_model import Identifier, JournalReference, License, Person, RemoteFile
+from ..data_model import AccessLevel, Identifier, JournalCitation, License, Person, RemoteFile, User
 from ..simulation import read_simulation
 from ..simulation.core import SimulationIoError, SimulationIoWarning
 from ..simulation.data_model import SimulationFormat, Simulation, TimecourseSimulation
@@ -42,6 +42,7 @@ class BioModelsImporter(object):
 
     Attributes:
         exec_simulations (:obj:`bool`): if :obj:`True`, execute simulation experiments
+        user (:obj:`User`): user to post resources to BioSimulations database
         _max_models (:obj:`int`): maximum number of models to download from BioModels
         _cache_dir (:obj:`str`): directory to cache models from BioModels
         _dry_run (:obj:`bool`): if :obj:`True`, do not post models to BioModels
@@ -56,15 +57,17 @@ class BioModelsImporter(object):
     MAX_RETRIES = 5
     SIMULATOR_DOCKERHUB_ID = 'crbm/biosimulations_tellurium'
 
-    def __init__(self, exec_simulations=True, _max_models=float('inf'), _cache_dir=None, _dry_run=False):
+    def __init__(self, exec_simulations=True, user=None, _max_models=float('inf'), _cache_dir=None, _dry_run=False):
         """
         Args:
             exec_simulations (:obj:`bool`, optional): if :obj:`True`, execute simulation experiments
+            user (:obj:`User`, optional): user to post resources to BioSimulations database
             _max_models (:obj:`int`, optional): maximum number of models to download from BioModels
             _cache_dir (:obj:`str`, optional): directory to cache models from BioModels
             _dry_run (:obj:`bool`, optional): if :obj:`True`, do not post models to BioModels
         """
         self.exec_simulations = exec_simulations
+        self.user = user
         self._max_models = _max_models
         self._cache_dir = _cache_dir
         self._dry_run = _dry_run
@@ -94,6 +97,7 @@ class BioModelsImporter(object):
                 * :obj:`list` of :obj:`Visualization`: visualizations
                 * :obj:`dict`: statistics about the models
         """
+        # import models from BioModels
         with warnings.catch_warnings(record=True) as caught_warnings:
             warnings.simplefilter('ignore')
             warnings.simplefilter('always', SimulationIoWarning)
@@ -106,6 +110,16 @@ class BioModelsImporter(object):
 
             warnings.warn('Unable to import all simulations:\n  ' + '\n  '.join(
                 str(w.message) for w in caught_warnings if w.category == SimulationIoWarning), UserWarning)
+
+        # set access levels
+        for model in models:
+            model.metadata.access_level = AccessLevel.public
+        for sim in sims:
+            sim.metadata.access_level = AccessLevel.public
+        for viz in vizs:
+            viz.metadata.access_level = AccessLevel.public
+
+        # upload to BioSimulations database
         self.submit_models(models, sims, vizs)
         stats = self.get_stats(models, sims, vizs)
         self.write_data(models, sims, vizs, stats)
@@ -144,8 +158,10 @@ class BioModelsImporter(object):
 
                 try:
                     model.metadata.image = self.visualize_biomodel(model)
+                    model.metadata.image.id = model.id + '-thumbnail'
                     for sim in model_sims:
                         sim.metadata.image = RemoteFile(
+                            id=sim.id + '-thumbnail',
                             name=sim.id + '.png',
                             type='image/png',
                             size=model.metadata.image.size)
@@ -202,11 +218,13 @@ class BioModelsImporter(object):
                                 crop_image(sim_png_filename, background_to_transparent=[255, 255, 255])
                                 shutil.copyfile(sim_png_filename, viz_png_filename)
                                 sim.metadata.image = RemoteFile(
+                                    id=sim.id + '-thumbnail',
                                     name=sim.id + '.png',
                                     type='image/png',
                                     size=os.path.getsize(sim_png_filename),
                                 )
                                 viz.metadata.image = RemoteFile(
+                                    id=viz.id + '-thumbnail',
                                     name=viz.id + '.png',
                                     type='image/png',
                                     size=os.path.getsize(viz_png_filename),
@@ -372,8 +390,8 @@ class BioModelsImporter(object):
             else:
                 authors_str = ', '.join(authors_str[0:-1]) + ' & ' + authors_str[-1]
 
-            references = [
-                JournalReference(
+            citations = [
+                JournalCitation(
                     authors=authors_str,
                     title=metadata['publication']['title'],
                     journal=metadata['publication']['journal'],
@@ -386,7 +404,7 @@ class BioModelsImporter(object):
             ]
         else:
             authors = []
-            references = []
+            citations = []
 
         model_filename = files_metadata['main'][0]['name']
         local_path = os.path.join(self._cache_dir, id + '.xml')
@@ -397,6 +415,7 @@ class BioModelsImporter(object):
         model.id = id
         model.metadata.name = metadata['name']
         model.file = RemoteFile(
+            id=model.id + '-file',
             name=model_filename,
             type='application/sbml+xml',
             size=os.path.getsize(local_path),
@@ -411,8 +430,14 @@ class BioModelsImporter(object):
                         model.metadata.description = div_xml.toxml()
             except Exception:
                 pass
-        model.metadata.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
-        model.metadata.references = references
+        model.metadata.references.identifiers = [
+            Identifier(
+                namespace='biomodels.db',
+                id=metadata['publicationId'],
+                url="http://www.ebi.ac.uk/biomodels/" + metadata['publicationId']
+            )
+        ]
+        model.metadata.references.citations = citations
         model.metadata.authors = authors
         model.metadata.license = License.cc0
 
@@ -461,8 +486,8 @@ class BioModelsImporter(object):
                     sim.id = '{}_sim_{}'.format(model.id, len(sims) + 1)
                     sim.metadata.name = file_metadata['name'][0:-6]
                     sim.metadata.description = file_metadata['description']
-                    sim.metadata.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
-                    sim.metadata.references = copy.deepcopy(model.metadata.references)
+                    sim.metadata.references.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
+                    sim.metadata.references.citations = copy.deepcopy(model.metadata.references.citations)
                     sim.metadata.authors = copy.deepcopy(model.metadata.authors)
                     sim.metadata.license = License.cc0
                     sim.model.id = model.id
@@ -475,8 +500,8 @@ class BioModelsImporter(object):
                     model_viz.id = '{}_viz_{}'.format(model.id, len(vizs) + 1)
                     model_viz.metadata.name = file_metadata['name'][0:-6]
                     model_viz.metadata.description = file_metadata['description']
-                    model_viz.metadata.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
-                    model_viz.metadata.references = copy.deepcopy(model.metadata.references)
+                    model_viz.metadata.references.identifiers = [Identifier(namespace='biomodels.db', id=metadata['publicationId'])]
+                    model_viz.metadata.references.citations = copy.deepcopy(model.metadata.references.citations)
                     model_viz.metadata.authors = copy.deepcopy(model.metadata.authors)
                     model_viz.metadata.license = License.cc0
 
@@ -638,13 +663,25 @@ class BioModelsImporter(object):
         api_client.login()
 
         for model in models:
-            api_client.exec('post', '/models/' + model.id, data=model.to_json())
+            model.metadata.owner = self.user
 
-        for sim in sims:
-            api_client.exec('post', '/simulations/' + sim.id, data=sim.to_json())
+            # todo: remove
+            if model.metadata.description:
+                model.metadata.description = model.metadata.description[0:min(1000, len(model.metadata.description))]
 
-        for viz in vizs:
-            api_client.exec('post', '/visualization/' + viz.id, data=viz.to_json())
+            model.parameters = model.parameters[0:min(100, len(model.parameters))]
+            model.variables = model.variables[0:min(100, len(model.variables))]
+
+            model.metadata.parent = Biomodel(id='root-model')
+            # end remove
+
+            api_client.exec('post', '/models/', data=model.to_json())
+
+        # for sim in sims:
+        #    api_client.exec('post', '/simulations/', data=sim.to_json())
+
+        # for viz in vizs:
+        #    api_client.exec('post', '/visualization/', data=viz.to_json())
 
     def write_data(self, models, sims, vizs, stats):
         """ Save models and simulations to JSON files

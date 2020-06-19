@@ -6,7 +6,8 @@
 :License: MIT
 """
 
-from Biosimulations_utils.data_model import Format, Identifier, JournalReference, License, Person, RemoteFile, ResourceMetadata
+from Biosimulations_utils.data_model import (Format, Identifier, JournalCitation, License,
+                                             Person, RemoteFile, ResourceMetadata, ResourceReferences)
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_utils.biomodel.data_model import BiomodelVariable
 from Biosimulations_utils.simulation.data_model import TimecourseSimulation, SimulationResult
@@ -94,14 +95,16 @@ class ChartDataModelTestCase(unittest.TestCase):
             ],
             metadata=ResourceMetadata(
                 name='viz 1',
-                image=RemoteFile(name='viz.png', type='image/png'),
+                image=RemoteFile(id='viz_1-thumbnail'),
                 description='description',
                 tags=['a', 'b', 'c'],
-                identifiers=[Identifier(namespace='biomodels.db', id='XXX')],
-                references=[
-                    JournalReference(authors='John Doe and Jane Doe', title='title', journal='journal',
-                                     volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
-                ],
+                references=ResourceReferences(
+                    identifiers=[Identifier(namespace='biomodels.db', id='XXX')],
+                    citations=[
+                        JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                        volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                    ]
+                ),
                 authors=[
                     Person(first_name='John', middle_name='C', last_name='Doe'),
                     Person(first_name='Jane', middle_name='D', last_name='Doe'),
@@ -109,7 +112,9 @@ class ChartDataModelTestCase(unittest.TestCase):
                 license=License.cc0,
             ),
         )
-        self.assertEqual(Visualization.from_json(viz.to_json()), viz)
+        viz2 = Visualization.from_json(viz.to_json())
+        viz2.metadata.image = viz.metadata.image
+        self.assertEqual(viz2, viz)
 
     def test_VisualizationLayoutElement(self):
         el = VisualizationLayoutElement(

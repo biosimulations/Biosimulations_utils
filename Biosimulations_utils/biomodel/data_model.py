@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from ..data_model import Format, Identifier, OntologyTerm, RemoteFile, ResourceMetadata, Taxon, Type
+from ..data_model import Format, Identifier, OntologyTerm, RemoteFile, Resource, ResourceMetadata, Taxon, Type, User
 import enum
 import wc_utils.util.enumerate
 
@@ -94,7 +94,7 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='https://bionetgen.org/',
         spec_url='https://bionetgen.org/',
-        mime_type='text/plain',
+        mimetype='text/plain',
         extension='bngl',
     )
 
@@ -104,7 +104,7 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id='format_3240',
         url='https://bionetgen.org/',
         spec_url='http://identifiers.org/combine.specifications/cellml',
-        mime_type='application/cellml+xml',
+        mimetype='application/cellml+xml',
         extension='cellml',
         sed_urn='urn:sedml:language:cellml',
     )
@@ -115,7 +115,7 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='https://bionetgen.org/',
         spec_url='https://bionetgen.org/',
-        mime_type='text/plain',
+        mimetype='text/plain',
         extension='ka',
     )
 
@@ -125,7 +125,7 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='https://doi.org/10.1016/j.procs.2010.04.089',
         spec_url='https://doi.org/10.1016/j.procs.2010.04.089',
-        mime_type='application/xml',
+        mimetype='application/xml',
         extension='xml',
     )
 
@@ -135,7 +135,7 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='https://bionetgen.org/',
         spec_url='http://identifiers.org/combine.specifications/neuroml',
-        mime_type='application/xml',
+        mimetype='application/xml',
         extension='nml',
         sed_urn='urn:sedml:language:neuroml',
     )
@@ -146,7 +146,7 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id=None,
         url='http://www.pharmml.org/',
         spec_url='http://www.pharmml.org/',
-        mime_type='application/xml',
+        mimetype='application/xml',
         extension='xml',
     )
 
@@ -156,13 +156,13 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         edam_id='format_2585',
         url='http://sbml.org/',
         spec_url='http://identifiers.org/combine.specifications/sbml',
-        mime_type='application/sbml+xml',
+        mimetype='application/sbml+xml',
         extension='xml',
         sed_urn='urn:sedml:language:sbml',
     )
 
 
-class Biomodel(object):
+class Biomodel(Resource):
     """ A biomodel
 
     Attributes:
@@ -175,6 +175,8 @@ class Biomodel(object):
         variables (:obj:`list` of :obj:`BiomodelVariable`): variables (e.g., model predictions)
         metadata (:obj:`ResourceMetadata`): metadata
     """
+
+    TYPE = 'model'
 
     def __init__(self, id=None, file=None, format=None, framework=None, taxon=None, parameters=None, variables=None, metadata=None):
         """
@@ -222,9 +224,9 @@ class Biomodel(object):
         Returns:
             :obj:`dict`
         """
-        return {
+        json = {
             'data': {
-                'type': 'biomodel',
+                'type': self.TYPE,
                 'id': self.id,
                 'attributes': {
                     'format': self.format.to_json() if self.format else None,
@@ -232,13 +234,47 @@ class Biomodel(object):
                     'taxon': self.taxon.to_json() if self.taxon else None,
                     'parameters': [parameter.to_json() for parameter in self.parameters],
                     'variables': [variable.to_json() for variable in self.variables],
+                    'metadata': self.metadata.to_json() if self.metadata else None,
                 },
                 'relationships': {
-                    'file': self.file.to_json() if self.file else None,
+                    'owner': None,
+                    'file': None,
+                    'image': None,
+                    'parent': None,
                 },
-                'metadata': self.metadata.to_json() if self.metadata else None,
             },
         }
+
+        if self.metadata.owner:
+            json['data']['relationships']['owner'] = {
+                'data': {
+                    'type': self.metadata.owner.TYPE,
+                    'id': self.metadata.owner.id,
+                },
+            }
+        if self.file:
+            json['data']['relationships']['file'] = {
+                'data': {
+                    'type': self.file.TYPE,
+                    'id': self.file.id,
+                },
+            }
+        if self.metadata.image:
+            json['data']['relationships']['image'] = {
+                'data': {
+                    'type': self.metadata.image.TYPE,
+                    'id': self.metadata.image.id,
+                },
+            }
+        if self.metadata.parent:
+            json['data']['relationships']['parent'] = {
+                'data': {
+                    'type': self.metadata.parent.TYPE,
+                    'id': self.metadata.parent.id
+                }
+            }
+
+        return json
 
     @classmethod
     def from_json(cls, val):
@@ -251,21 +287,29 @@ class Biomodel(object):
             :obj:`Biomodel`
         """
         data = val.get('data', {})
-        if data.get('type', None) != cls.__name__.lower():
-            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.__name__.lower()))
+        if data.get('type', None) != cls.TYPE:
+            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
 
         attrs = data.get('attributes', {})
-        rel = data.get('relationships', {})
-        return cls(
+        obj = cls(
             id=data.get('id', None),
-            file=RemoteFile.from_json(rel.get('file')) if rel.get('file', None) else None,
+            file=RemoteFile.from_json(id=data.get('file')) if data.get('file', None) else None,
             format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
             framework=OntologyTerm.from_json(attrs.get('framework')) if attrs.get('framework', None) else None,
             taxon=Taxon.from_json(attrs.get('taxon')) if attrs.get('taxon', None) else None,
             parameters=[BiomodelParameter.from_json(parameter) for parameter in attrs.get('parameters', [])],
             variables=[BiomodelVariable.from_json(variable) for variable in attrs.get('variables', [])],
-            metadata=ResourceMetadata.from_json(data.get('metadata')) if data.get('metadata', None) else None,
+            metadata=ResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
         )
+
+        if data.get('owner', None):
+            obj.metadata.owner = User(id=data.get('owner'))
+        if data.get('image', None):
+            obj.metadata.image = RemoteFile(id=data.get('image'))
+        if data.get('parent', None):
+            obj.metadata.parent = Biomodel(id=data.get('parent'))
+
+        return obj
 
 
 class BiomodelParameter(object):

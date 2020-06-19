@@ -66,7 +66,7 @@
               "edamId": "format_2585",
               "url": "http://sbml.org",
               "specUrl": "http://identifiers.org/combine.specifications/sbml",
-              "mimeType": "application/sbml+xml",
+              "mimetype": "application/sbml+xml",
               "extension": "xml",
               "sedUrn": "urn:sedml:language:sbml"
             }
@@ -79,7 +79,7 @@
               "edamId": "format_3685",
               "url": "https://sed-ml.org",
               "specUrl": "http://identifiers.org/combine.specifications/sed-ml",
-              "mimeType": "application/xml",
+              "mimetype": "application/xml",
               "extension": "sedml"
             }
           ],
@@ -91,7 +91,7 @@
               "edamId": "format_3686",
               "url": "https://combinearchive.org/",
               "specUrl": "http://identifiers.org/combine.specifications/omex",
-              "mimeType": "application/zip",
+              "mimetype": "application/zip",
               "extension": "omex"
             }
           ],
@@ -221,7 +221,7 @@
               "edamId": "format_2585",
               "url": "http://sbml.org",
               "specUrl": "http://identifiers.org/combine.specifications/sbml",
-              "mimeType": "application/sbml+xml",
+              "mimetype": "application/sbml+xml",
               "extension": "xml",
               "sedUrn": "urn:sedml:language:sbml"
             }
@@ -234,7 +234,7 @@
               "edamId": "format_3685",
               "url": "https://sed-ml.org",
               "specUrl": "http://identifiers.org/combine.specifications/sed-ml",
-              "mimeType": "application/xml",
+              "mimetype": "application/xml",
               "extension": "sedml"
             }
           ],
@@ -246,7 +246,7 @@
               "edamId": "format_3686",
               "url": "https://combinearchive.org/",
               "specUrl": "http://identifiers.org/combine.specifications/omex",
-              "mimeType": "application/zip",
+              "mimetype": "application/zip",
               "extension": "omex"
             }
           ],
@@ -410,7 +410,7 @@
               "edamId": "format_2585",
               "url": "http://sbml.org",
               "specUrl": "http://identifiers.org/combine.specifications/sbml",
-              "mimeType": "application/sbml+xml",
+              "mimetype": "application/sbml+xml",
               "extension": "xml",
               "sedUrn": "urn:sedml:language:sbml"
             }
@@ -423,7 +423,7 @@
               "edamId": "format_3685",
               "url": "https://sed-ml.org",
               "specUrl": "http://identifiers.org/combine.specifications/sed-ml",
-              "mimeType": "application/xml",
+              "mimetype": "application/xml",
               "extension": "sedml"
             }
           ],
@@ -435,7 +435,7 @@
               "edamId": "format_3686",
               "url": "https://combinearchive.org/",
               "specUrl": "http://identifiers.org/combine.specifications/omex",
-              "mimeType": "application/zip",
+              "mimetype": "application/zip",
               "extension": "omex"
             }
           ],
@@ -581,7 +581,7 @@
               "edamId": "format_2585",
               "url": "http://sbml.org",
               "specUrl": "http://identifiers.org/combine.specifications/sbml",
-              "mimeType": "application/sbml+xml",
+              "mimetype": "application/sbml+xml",
               "extension": "xml",
               "sedUrn": "urn:sedml:language:sbml"
             }
@@ -594,7 +594,7 @@
               "edamId": "format_3685",
               "url": "https://sed-ml.org",
               "specUrl": "http://identifiers.org/combine.specifications/sed-ml",
-              "mimeType": "application/xml",
+              "mimetype": "application/xml",
               "extension": "sedml"
             }
           ],
@@ -606,7 +606,7 @@
               "edamId": "format_3686",
               "url": "https://combinearchive.org/",
               "specUrl": "http://identifiers.org/combine.specifications/omex",
-              "mimeType": "application/zip",
+              "mimetype": "application/zip",
               "extension": "omex"
             }
           ],

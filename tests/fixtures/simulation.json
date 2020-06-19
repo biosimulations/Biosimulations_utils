@@ -10,24 +10,10 @@
         "edamId": "format_3685",
         "url": "https://sed-ml.org/",
         "specUrl": "http://identifiers.org/combine.specifications/sed-ml",
-        "mimeType": "application/xml",
+        "mimetype": "application/xml",
         "extension": "sedml"
       },
-      "model": {
-        "format": {
-          "id": "SBML",
-          "name": "Systems Biology Markup Language",
-          "version": "L3V2",
-          "edamId": "format_2585",
-          "url": "http://sbml.org",
-          "specUrl": "http://identifiers.org/combine.specifications/sbml",
-          "mimeType": "application/sbml+xml",
-          "extension": "xml",
-          "sedUrn": "urn:sedml:language:sbml"
-        }
-      },
-      "modelParameterChanges": [
-        {
+      "modelParameterChanges": [{
           "parameter": {
             "id": "k_1",
             "name": "Kinetic constant 1",
@@ -56,8 +42,7 @@
         "id": "CVODE",
         "name": "C-language Variable-coefficient Ordinary Differential Equation solver"
       },
-      "algorithmParameterChanges": [
-        {
+      "algorithmParameterChanges": [{
           "parameter": {
             "kisaoTerm": {
               "ontology": "KISAO",
@@ -79,52 +64,78 @@
           },
           "value": 4.4
         }
-      ]
+      ],
+      "metadata": {
+        "name": "simulation 1",
+        "description": "Description of simulation 1",
+        "tags": [
+          "tag-1",
+          "tag-2"
+        ],
+        "references": {
+          "citations": [{
+              "authors": "Doe JC & Doe JD",
+              "title": "Title-1",
+              "journal": "Journal-1",
+              "volume": 1,
+              "issue": 1,
+              "pages": "1-10",
+              "year": 2019,
+              "doi": "10.1016/XXXX"
+            },
+            {
+              "authors": "Doe JC & Doe JD",
+              "title": "Title-2",
+              "journal": "Journal-2",
+              "volume": "Database issue",
+              "issue": 2,
+              "pages": "11-20",
+              "year": 2020,
+              "doi": "10.1016/XXXX"
+            }
+          ]
+        },
+        "authors": [{
+            "firstName": "John",
+            "middleName": "C",
+            "lastName": "Doe"
+          },
+          {
+            "firstName": "Jane",
+            "middleName": "D",
+            "lastName": "Doe"
+          }
+        ],
+        "license": "CC0",
+        "created": "2020-04-01T12:00:00Z",
+        "updated": "2020-04-02T12:00:00Z"
+      }
     },
-    "metadata": {
-      "name": "simulation 1",
-      "description": "Description of simulation 1",
-      "tags": [
-        "tag-1",
-        "tag-2"
-      ],
-      "references": [
-        {
-          "authors": "Doe JC & Doe JD",
-          "title": "Title-1",
-          "journal": "Journal-1",
-          "volume": 1,
-          "issue": 1,
-          "pages": "1-10",
-          "year": 2019,
-          "doi": "10.1016/XXXX"
-        },
-        {
-          "authors": "Doe JC & Doe JD",
-          "title": "Title-2",
-          "journal": "Journal-2",
-          "volume": "Database issue",
-          "issue": 2,
-          "pages": "11-20",
-          "year": 2020,
-          "doi": "10.1016/XXXX"
+    "relationships": {
+      "owner": {
+        "data": {
+          "type": "user",
+          "id": "jonrkarr"
         }
-      ],
-      "authors": [
-        {
-          "firstName": "John",
-          "middleName": "C",
-          "lastName": "Doe"
-        },
-        {
-          "firstName": "Jane",
-          "middleName": "D",
-          "lastName": "Doe"
+      },
+      "model": {
+        "data": {
+          "type": "model",
+          "id": "model-id"
         }
-      ],
-      "license": "CC0",
-      "created": "2020-04-01T12:00:00Z",
-      "updated": "2020-04-02T12:00:00Z"
+      },
+      "image": {
+        "data": {
+          "type": "file",
+          "id": "simulation_1-thumbail"
+        }
+      },
+      "parent": {
+        "data": {
+          "type": "simulation",
+          "id": "parent-simulation-id"
+        }
+      }
     }
   }
 }

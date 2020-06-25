@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from ..data_model import Resource
+from ..data_model import PrimaryResource, PrimaryResourceMetadata, RemoteFile, User
 import enum
 
 __all__ = [
@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class Chart(Resource):
+class Chart(PrimaryResource):
     """ Chart type
 
     Attributes:
@@ -23,12 +23,14 @@ class Chart(Resource):
 
     TYPE = 'chart'
 
-    def __init__(self, id=None):
+    def __init__(self, id=None, metadata=None):
         """
         Args:
             id (:obj:`str`, optional): id
+            metadata (:obj:`PrimaryResourceMetadata`, optional): metadata
         """
         self.id = id
+        self.metadata = metadata or PrimaryResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two chart types are semantically equal
@@ -40,7 +42,8 @@ class Chart(Resource):
             :obj:`bool`
         """
         return other.__class__ == self.__class__ \
-            and self.id == other.id
+            and self.id == other.id \
+            and self.metadata == other.metadata
 
     def to_json(self):
         """ Export to JSON
@@ -48,9 +51,44 @@ class Chart(Resource):
         Returns:
             :obj:`dict`
         """
-        return {
-            'id': self.id
+        json = {
+            'data': {
+                'type': self.TYPE,
+                'id': self.id,
+                'attributes': {
+                    'metadata': self.metadata.to_json() if self.metadata else None,
+                },
+                'relationships': {
+                    'owner': None,
+                    'image': None,
+                    'parent': None,
+                },
+            },
         }
+
+        if self.metadata.owner:
+            json['data']['relationships']['owner'] = {
+                'data': {
+                    'type': self.metadata.owner.TYPE,
+                    'id': self.metadata.owner.id,
+                },
+            }
+        if self.metadata.image:
+            json['data']['relationships']['image'] = {
+                'data': {
+                    'type': self.metadata.image.TYPE,
+                    'id': self.metadata.image.id,
+                },
+            }
+        if self.metadata.parent:
+            json['data']['relationships']['parent'] = {
+                'data': {
+                    'type': self.metadata.parent.TYPE,
+                    'id': self.metadata.parent.id
+                }
+            }
+
+        return json
 
     @classmethod
     def from_json(cls, val):
@@ -62,9 +100,26 @@ class Chart(Resource):
         Returns:
             :obj:`Chart`
         """
-        return cls(
-            id=val.get('id', None)
+        data = val.get('data', {})
+        if data.get('type', None) != cls.TYPE:
+            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
+
+        attrs = data.get('attributes', {})
+        rel = data.get('relationships', {})
+
+        obj = cls(
+            id=data.get('id', None),
+            metadata=PrimaryResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
         )
+
+        if rel.get('owner', None):
+            obj.metadata.owner = User.from_json(rel.get('owner'))
+        if rel.get('image', None):
+            obj.metadata.image = RemoteFile.from_json(rel.get('image'))
+        if rel.get('parent', None):
+            obj.metadata.parent = Chart.from_json(rel.get('parent'))
+
+        return obj
 
 
 class ChartDataField(object):

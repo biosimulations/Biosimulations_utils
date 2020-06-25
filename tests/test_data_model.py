@@ -7,11 +7,14 @@
 """
 
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from Biosimulations_utils.data_model import (Format, Identifier, JournalCitation,
-                                             License, OntologyTerm, Person, RemoteFile, ResourceReferences, Taxon, Type)
+from Biosimulations_utils.data_model import (AccessLevel, Format, Identifier, JournalCitation,
+                                             License, OntologyTerm, Person, RemoteFile, PrimaryResourceMetadata, ResourceReferences,
+                                             Taxon, Type, User)
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import TimecourseSimulation, SimulationResult
 from Biosimulations_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
+import datetime
+import dateutil
 import inflect
 import json
 import requests
@@ -54,9 +57,62 @@ class DataModelTestCase(unittest.TestCase):
         file = RemoteFile(id='model-file', name='model.xml', type='application/sbml+xml', size=1000)
         self.assertEqual(RemoteFile.from_json(file.to_json()), file)
 
+        json = file.to_json()
+        json['data']['type'] = None
+        with self.assertRaisesRegex(ValueError, '`type`'):
+            RemoteFile.from_json(json)
+
     def test_Taxon(self):
         taxon = Taxon(id=9606, name='Homo sapiens')
         self.assertEqual(Taxon.from_json(taxon.to_json()), taxon)
+
+    def test_User(self):
+        user = User(id='user-id')
+        self.assertEqual(User.from_json(user.to_json()), user)
+
+        json = user.to_json()
+        json['data']['type'] = None
+        with self.assertRaisesRegex(ValueError, '`type`'):
+            User.from_json(json)
+
+    def test_ResourceMetadata(self):
+        now = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
+        md = PrimaryResourceMetadata(
+            name='name',
+            # image=RemoteFile(),
+            summary='summary',
+            description='description',
+            tags=['tag1', 'tag2'],
+            references=ResourceReferences(
+                identifiers=[Identifier(namespace='biomodels', id='BIOMD0000000924')],
+                citations=[
+                    JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                    volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+                ],
+                doi='10.0.1/XXX',
+            ),
+            authors=[
+                Person(first_name='John', middle_name='C', last_name='Doe'),
+                Person(first_name='Jane', middle_name='D', last_name='Doe'),
+            ],
+            # parent=Biomodel(id='biomodel-0'),
+            license=License.cc0,
+            # owner=User(id='user-id'),
+            access_level=AccessLevel.private,
+            created=now,
+            updated=now,
+        )
+        self.assertEqual(PrimaryResourceMetadata.from_json(md.to_json()), md)
+
+    def test_ResourceReferences(self):
+        refs = ResourceReferences(
+            identifiers=[Identifier(namespace='biomodels', id='BIOMD0000000924')],
+            citations=[
+                JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
+                                volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
+            ],
+            doi='10.0.1/XXX')
+        self.assertEqual(refs.from_json(refs.to_json()), refs)
 
 
 @unittest.skip('API is in development')

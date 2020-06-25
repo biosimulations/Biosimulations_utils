@@ -1,6 +1,6 @@
 {
   "data": {
-    "type": "simulation",
+    "type": "timecourse-simulation",
     "id": "simulation_1",
     "attributes": {
       "format": {
@@ -132,7 +132,7 @@
       },
       "parent": {
         "data": {
-          "type": "simulation",
+          "type": "timecourse-simulation",
           "id": "parent-simulation-id"
         }
       }

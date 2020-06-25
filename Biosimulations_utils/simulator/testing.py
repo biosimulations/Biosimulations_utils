@@ -9,7 +9,7 @@
 from Biosimulations_utils.archive import read_archive
 from Biosimulations_utils.archive.data_model import ArchiveFormat
 from Biosimulations_utils.archive.exec import gen_archive_for_sim, exec_archive
-from Biosimulations_utils.data_model import JournalCitation, License, OntologyTerm, Person, ResourceMetadata, ResourceReferences
+from Biosimulations_utils.data_model import JournalCitation, License, OntologyTerm, Person, PrimaryResourceMetadata, ResourceReferences
 from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat, BiomodelParameter
 from Biosimulations_utils.simulation import read_simulation
@@ -310,7 +310,7 @@ class SimulatorValidator(object):
                 ),
             ],
             format=copy.copy(SimulationFormat.sedml.value),
-            metadata=ResourceMetadata(
+            metadata=PrimaryResourceMetadata(
                 name='simulation 1',
                 description='Description of simulation 1',
                 tags=['tag-simulation-a', 'tag-simulation-b', 'tag-simulation-c'],

@@ -6,8 +6,8 @@
 :License: MIT
 """
 
-from Biosimulations_utils.data_model import (Identifier, JournalCitation,
-                                             License, OntologyTerm, Person, RemoteFile, ResourceMetadata, ResourceReferences, Taxon, Type)
+from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, OntologyTerm, Person, RemoteFile,
+                                             PrimaryResourceMetadata, ResourceReferences, Taxon, Type, User)
 from Biosimulations_utils.biomodel.data_model import (Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat)
 import datetime
 import dateutil.tz
@@ -26,9 +26,10 @@ class BiomodelDataModelTestCase(unittest.TestCase):
             taxon=Taxon(id=9606, name='Homo sapiens'),
             parameters=[BiomodelParameter(id='k_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
             variables=[BiomodelVariable(id='species_1', type=Type.float, identifiers=[Identifier(namespace='a', id='x')])],
-            metadata=ResourceMetadata(
+            metadata=PrimaryResourceMetadata(
                 name='model 1',
                 image=RemoteFile(id='model_1-thumbnail'),
+                summary='summary',
                 description='description',
                 tags=['a', 'b', 'c'],
                 references=ResourceReferences(
@@ -37,19 +38,20 @@ class BiomodelDataModelTestCase(unittest.TestCase):
                         JournalCitation(authors='John Doe and Jane Doe', title='title', journal='journal',
                                         volume=10, issue=3, pages='1-10', year=2020, doi='10.1016/XXXX'),
                     ],
+                    doi='10.0.1/XXX',
                 ),
                 authors=[
                     Person(first_name='John', middle_name='C', last_name='Doe'),
                     Person(first_name='Jane', middle_name='D', last_name='Doe'),
                 ],
+                parent=Biomodel(id='model_0'),
                 license=License.cc0,
+                owner=User(id='user-0'),
                 created=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
                 updated=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
             ),
         )
         model2 = Biomodel.from_json(model.to_json())
-        model2.file = model.file
-        model2.metadata.image = model.metadata.image
         self.assertEqual(model2, model)
 
     def test_Parameter(self):

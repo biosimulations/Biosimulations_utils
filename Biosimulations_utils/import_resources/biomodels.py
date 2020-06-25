@@ -12,7 +12,7 @@ from ..biomodel import read_biomodel
 from ..biomodel.core import BiomodelIoError
 from ..biomodel.data_model import BiomodelFormat, Biomodel  # noqa: F401
 from ..biomodel.sbml import visualize_biomodel
-from ..data_model import AccessLevel, Identifier, JournalCitation, License, Person, RemoteFile, User
+from ..data_model import AccessLevel, Identifier, JournalCitation, License, Person, RemoteFile, Taxon, User  # noqa: F401
 from ..simulation import read_simulation
 from ..simulation.core import SimulationIoError, SimulationIoWarning
 from ..simulation.data_model import SimulationFormat, Simulation, TimecourseSimulation
@@ -159,14 +159,6 @@ class BioModelsImporter(object):
                 try:
                     model.metadata.image = self.visualize_biomodel(model)
                     model.metadata.image.id = model.id + '-thumbnail'
-                    for sim in model_sims:
-                        sim.metadata.image = RemoteFile(
-                            id=sim.id + '-thumbnail',
-                            name=sim.id + '.png',
-                            type='image/png',
-                            size=model.metadata.image.size)
-                        shutil.copyfile(os.path.join(self._cache_dir, model.id + '.png'),
-                                        os.path.join(self._cache_dir, sim.metadata.image.name))
 
                 except BiomodelIoError:
                     unvisualizable_models.append(model_result['id'])
@@ -662,8 +654,14 @@ class BioModelsImporter(object):
         api_client = ApiClient(_dry_run=self._dry_run)
         api_client.login()
 
-        for model in models:
+        print('Posting {} models'.format(len(models)))
+        for i_model, model in enumerate(models):
+            print('  {}. {}: {}'.format(i_model + 1, model.id, model.metadata.name))
+
             model.metadata.owner = self.user
+
+            with open(os.path.join('biomodels', model.id + '.json'), 'w') as file:
+                json.dump(model.to_json(), file)
 
             # todo: remove
             if model.metadata.description:
@@ -672,7 +670,8 @@ class BioModelsImporter(object):
             model.parameters = model.parameters[0:min(100, len(model.parameters))]
             model.variables = model.variables[0:min(100, len(model.variables))]
 
-            model.metadata.parent = Biomodel(id='root-model')
+            if not model.taxon:
+                model.taxon = Taxon(id=-1, name='No taxon')
             # end remove
 
             api_client.exec('post', '/models/', data=model.to_json())

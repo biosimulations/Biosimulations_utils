@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.api_client import ApiClient, ResponseType
-from Biosimulations_utils.data_model import Identifier, JournalCitation, License, Person, Taxon, User
+from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, Person, RemoteFile, Taxon, User)
 from Biosimulations_utils.import_resources import biomodels
 from Biosimulations_utils.biomodel.data_model import Biomodel
 from Biosimulations_utils.simulation.data_model import Simulation
@@ -53,8 +53,23 @@ class BioModelsImporterTestCase(unittest.TestCase):
         models, sims, vizs, stats = importer.run()
         self.assertEqual(len(models), max_models)
 
-        models2 = api_client.exec('get', '/models/')
-        self.assertEqual(len(models2), max_models)
+        models2_json = api_client.exec('get', '/models/')
+        self.assertEqual(len(models2_json), max_models)
+
+        """
+        import PrimaryResourceMetadata
+        for model, model2_json in zip(models, models2_json):
+            model2_json['attributes']['parameters'] = model2_json['attributes']['parameters'][0]
+            model2_json['attributes']['variables'] = model2_json['attributes']['variables'][0]
+            model2 = Biomodel.from_json({'data': model2_json})
+            model.file = RemoteFile(id=model.file.id)
+            model.metadata = PrimaryResourceMetadata(
+                image=RemoteFile(id=model.metadata.image.id),
+                owner=User(id=model.metadata.owner.id),
+                parent=Biomodel(id=model.metadata.parent.id),
+            )
+            self.assertEqual(model, model2)
+        """
 
     def test_import_diverse_set_of_models(self):
         importer = biomodels.BioModelsImporter(exec_simulations=docker is not None,
@@ -199,17 +214,19 @@ class BioModelsImporterTestCase(unittest.TestCase):
 
         # verify models can be uploaded to the REST API
         for model in models:
-            model.file = None
-            model.metadata.image = None
+            model.file = RemoteFile(id=model.file.id)
+            model.metadata.image = RemoteFile(id=model.metadata.image.id)
             model2 = Biomodel.from_json(model.to_json())
             self.assertEqual(model2, model)
         for sim in sims:
-            sim.model = None
-            sim.metadata.image = None
+            sim.model = Biomodel(id=sim.model.id)
+            if sim.metadata.image:
+                sim.metadata.image = RemoteFile(id=sim.metadata.image.id)
             sim2 = Simulation.from_json(sim.to_json())
             self.assertEqual(sim2, sim)
         for viz in vizs:
-            viz.metadata.image = None
+            if viz.metadata.image:
+                viz.metadata.image = RemoteFile(id=viz.metadata.image.id)
             viz2 = Visualization.from_json(viz.to_json())
             self.assertEqual(viz2, viz)
 

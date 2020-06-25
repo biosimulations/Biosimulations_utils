@@ -19,9 +19,10 @@ __all__ = [
     'License',
     'OntologyTerm',
     'Person',
+    'PrimaryResource',
     'RemoteFile',
     'Resource',
-    'ResourceMetadata',
+    'PrimaryResourceMetadata',
     'ResourceReferences',
     'Taxon',
     'Type',
@@ -34,9 +35,17 @@ class Resource(object):
 
     Attributes:
         id (:obj:`str`): id
-        metadata (:obj:`ResourceMetadata`): metadata
     """
     TYPE = None
+
+
+class PrimaryResource(Resource):
+    """ A primary resource
+
+    Attributes:
+        metadata (:obj:`PrimaryResourceMetadata`): metadata
+    """
+    pass
 
 
 class Format(object):
@@ -571,6 +580,8 @@ class User(Resource):
             :obj:`User`
         """
         data = val.get('data', {})
+        if data.get('type', None) != cls.TYPE:
+            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
         return cls(
             id=data.get('id', None)
         )
@@ -644,6 +655,9 @@ class RemoteFile(Resource):
             :obj:`RemoteFile`
         """
         data = val.get('data', {})
+        if data.get('type', None) != cls.TYPE:
+            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
+
         attrs = data.get('attributes', {})
         return cls(
             id=data.get('id', None),
@@ -725,7 +739,7 @@ class AccessLevel(wc_utils.util.enumerate.CaseInsensitiveEnum):
     protected = 'password protected'
 
 
-class ResourceMetadata(object):
+class PrimaryResourceMetadata(object):
     """ Metadata about a top-level resource such as a model
 
     Attributes:
@@ -781,7 +795,7 @@ class ResourceMetadata(object):
         """ Determine if two metadata containers are semantically equal
 
         Args:
-            other (:obj:`ResourceMetadata`): other model
+            other (:obj:`PrimaryResourceMetadata`): other model
 
         Returns:
             :obj:`bool`
@@ -828,7 +842,7 @@ class ResourceMetadata(object):
             val (:obj:`dict`)
 
         Returns:
-            :obj:`ResourceMetadata`
+            :obj:`PrimaryResourceMetadata`
         """
         return cls(
             name=val.get('name', None),

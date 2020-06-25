@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from ..data_model import Format, Identifier, OntologyTerm, RemoteFile, Resource, ResourceMetadata, Taxon, Type, User
+from ..data_model import Format, Identifier, OntologyTerm, RemoteFile, PrimaryResource, PrimaryResourceMetadata, Taxon, Type, User
 import enum
 import wc_utils.util.enumerate
 
@@ -162,7 +162,7 @@ class BiomodelFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
     )
 
 
-class Biomodel(Resource):
+class Biomodel(PrimaryResource):
     """ A biomodel
 
     Attributes:
@@ -173,7 +173,7 @@ class Biomodel(Resource):
         taxon (:obj:`Taxon`): taxon
         parameters (:obj:`list` of :obj:`BiomodelParameter`): parameters (e.g., initial conditions and rate constants)
         variables (:obj:`list` of :obj:`BiomodelVariable`): variables (e.g., model predictions)
-        metadata (:obj:`ResourceMetadata`): metadata
+        metadata (:obj:`PrimaryResourceMetadata`): metadata
     """
 
     TYPE = 'model'
@@ -188,7 +188,7 @@ class Biomodel(Resource):
             taxon (:obj:`Taxon`, optional): taxon
             parameters (:obj:`list` of :obj:`BiomodelParameter`, optional): parameters (e.g., initial conditions and rate constants)
             variables (:obj:`list` of :obj:`BiomodelVariable`, optional): variables (e.g., model predictions)
-            metadata (:obj:`ResourceMetadata`, optional): metadata
+            metadata (:obj:`PrimaryResourceMetadata`, optional): metadata
         """
         self.id = id
         self.file = file
@@ -197,7 +197,7 @@ class Biomodel(Resource):
         self.taxon = taxon
         self.parameters = parameters or []
         self.variables = variables or []
-        self.metadata = metadata or ResourceMetadata()
+        self.metadata = metadata or PrimaryResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two models are semantically equal
@@ -291,23 +291,24 @@ class Biomodel(Resource):
             raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
 
         attrs = data.get('attributes', {})
+        rel = data.get('relationships', {})
         obj = cls(
             id=data.get('id', None),
-            file=RemoteFile.from_json(id=data.get('file')) if data.get('file', None) else None,
+            file=RemoteFile.from_json(rel.get('file')) if rel.get('file', None) else None,
             format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
             framework=OntologyTerm.from_json(attrs.get('framework')) if attrs.get('framework', None) else None,
             taxon=Taxon.from_json(attrs.get('taxon')) if attrs.get('taxon', None) else None,
             parameters=[BiomodelParameter.from_json(parameter) for parameter in attrs.get('parameters', [])],
             variables=[BiomodelVariable.from_json(variable) for variable in attrs.get('variables', [])],
-            metadata=ResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
+            metadata=PrimaryResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
         )
 
-        if data.get('owner', None):
-            obj.metadata.owner = User(id=data.get('owner'))
-        if data.get('image', None):
-            obj.metadata.image = RemoteFile(id=data.get('image'))
-        if data.get('parent', None):
-            obj.metadata.parent = Biomodel(id=data.get('parent'))
+        if rel.get('owner', None):
+            obj.metadata.owner = User.from_json(rel.get('owner'))
+        if rel.get('image', None):
+            obj.metadata.image = RemoteFile.from_json(rel.get('image'))
+        if rel.get('parent', None):
+            obj.metadata.parent = Biomodel.from_json(rel.get('parent'))
 
         return obj
 

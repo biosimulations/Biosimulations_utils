@@ -7,7 +7,7 @@
 """
 
 from ..chart.data_model import Chart, ChartDataField
-from ..data_model import Format, RemoteFile, Resource, ResourceMetadata, User
+from ..data_model import Format, RemoteFile, PrimaryResource, PrimaryResourceMetadata, User
 from ..simulation.data_model import SimulationResult
 
 __all__ = [
@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-class Visualization(Resource):
+class Visualization(PrimaryResource):
     """ Visualization of the results of one or more simulations
 
     Attributes:
@@ -24,7 +24,7 @@ class Visualization(Resource):
         columns (:obj:`int`): number of columns
         layout (:obj:`list` of :obj:`VisualizationLayoutElement`): element of the visualization
             (i.e. the cells in the grid of visualizations)
-        metadata (:obj:`ResourceMetadata`): metadata
+        metadata (:obj:`PrimaryResourceMetadata`): metadata
     """
 
     TYPE = 'visualization'
@@ -38,13 +38,13 @@ class Visualization(Resource):
             columns (:obj:`int`, optional): number of columns
             layout (:obj:`list` of :obj:`VisualizationLayoutElement`, optional): element of the visualization
                 (i.e. the cells in the grid of visualizations)
-            metadata (:obj:`ResourceMetadata`, optional): metadata
+            metadata (:obj:`PrimaryResourceMetadata`, optional): metadata
         """
         self.id = id
         self.format = format
         self.columns = columns
         self.layout = layout or []
-        self.metadata = metadata or ResourceMetadata()
+        self.metadata = metadata or PrimaryResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two simulations are semantically equal
@@ -126,21 +126,22 @@ class Visualization(Resource):
             raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
 
         attrs = data.get('attributes', {})
+        rel = data.get('relationships', {})
 
         obj = cls(
             id=data.get('id', None),
             format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
             columns=attrs.get('columns', None),
             layout=[VisualizationLayoutElement.from_json(el) for el in attrs.get('layout', [])],
-            metadata=ResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
+            metadata=PrimaryResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
         )
 
-        if data.get('owner', None):
-            obj.metadata.owner = User(id=data.get('owner'))
-        if data.get('image', None):
-            obj.metadata.image = RemoteFile(id=data.get('image'))
-        if data.get('parent', None):
-            obj.metadata.parent = Visualization(id=data.get('parent'))
+        if rel.get('owner', None):
+            obj.metadata.owner = User.from_json(rel.get('owner'))
+        if rel.get('image', None):
+            obj.metadata.image = RemoteFile.from_json(rel.get('image'))
+        if rel.get('parent', None):
+            obj.metadata.parent = Visualization.from_json(rel.get('parent'))
 
         return obj
 

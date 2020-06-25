@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from ..data_model import Format, JournalCitation, OntologyTerm, RemoteFile, Resource, ResourceMetadata, Type, User
+from ..data_model import Format, JournalCitation, OntologyTerm, RemoteFile, PrimaryResource, PrimaryResourceMetadata, Type, User
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable
 import wc_utils.util.enumerate
 
@@ -41,7 +41,7 @@ class SimulationFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
     )
 
 
-class Simulation(Resource):
+class Simulation(PrimaryResource):
     """ Simulation experiments
 
     Attributes:
@@ -51,7 +51,7 @@ class Simulation(Resource):
         model_parameter_changes (:obj:`list` of :obj:`ParameterChange`): model parameter changes
         algorithm (:obj:`Algorithm`): simulation algorithm
         algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`): simulation algorithm parameter changes
-        metadata (:obj:`ResourceMetadata`): metadata
+        metadata (:obj:`PrimaryResourceMetadata`): metadata
     """
 
     TYPE = 'simulation'
@@ -68,7 +68,7 @@ class Simulation(Resource):
             model_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): model parameter changes
             algorithm (:obj:`Algorithm`, optional): simulation algorithm
             algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes
-            metadata (:obj:`ResourceMetadata`, optional): metadata
+            metadata (:obj:`PrimaryResourceMetadata`, optional): metadata
         """
         self.id = id
         self.format = format
@@ -76,7 +76,7 @@ class Simulation(Resource):
         self.model_parameter_changes = model_parameter_changes or []
         self.algorithm = algorithm
         self.algorithm_parameter_changes = algorithm_parameter_changes or []
-        self.metadata = metadata or ResourceMetadata()
+        self.metadata = metadata or PrimaryResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two simulations are semantically equal
@@ -166,36 +166,47 @@ class Simulation(Resource):
             :obj:`Simulation`
         """
         data = val.get('data', {})
-        if data.get('type', None) != cls.TYPE:
-            raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
-
-        attrs = data.get('attributes', {})
 
         if cls == Simulation:
-            if 'startTime' in attrs or 'endTime' in attrs or 'numTimePoints' in attrs:
+            type = data.get('type')
+            if type == TimecourseSimulation.TYPE:
                 subcls = TimecourseSimulation
-            else:
+            elif type == SteadyStateSimulation.TYPE:
                 subcls = SteadyStateSimulation
+            else:
+                raise ValueError("Unknown type '{}'".format(type))
             return subcls.from_json(val)
 
         else:
+            if data.get('type', None) != cls.TYPE:
+                raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
+
+            attrs = data.get('attributes', {})
+            rel = data.get('relationships', {})
+
             obj = cls(
                 id=data.get('id', None),
                 format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
-                model=Biomodel(id=data.get('model')) if data.get('model', None) else None,
+                model=Biomodel.from_json(rel.get('model')) if rel.get('model', None) else None,
                 model_parameter_changes=[ParameterChange.from_json(change, BiomodelParameter)
                                          for change in attrs.get('modelParameterChanges', [])],
                 algorithm=Algorithm.from_json(attrs.get('algorithm')) if attrs.get('algorithm', None) else None,
                 algorithm_parameter_changes=[ParameterChange.from_json(change, AlgorithmParameter)
                                              for change in attrs.get('algorithmParameterChanges', [])],
-                metadata=ResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
+                metadata=PrimaryResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
             )
-            if data.get('owner', None):
-                obj.metadata.owner = User(id=data.get('owner'))
-            if data.get('image', None):
-                obj.metadata.image = RemoteFile(id=data.get('image'))
-            if data.get('parent', None):
-                obj.metadata.parent = Simulation(id=data.get('parent'))
+            if rel.get('owner', None):
+                obj.metadata.owner = User.from_json(rel.get('owner'))
+            if rel.get('image', None):
+                obj.metadata.image = RemoteFile.from_json(rel.get('image'))
+            if rel.get('parent', None):
+                parent_type = rel.get('parent').get('data', {}).get('type', None)
+                if parent_type == TimecourseSimulation.TYPE:
+                    obj.metadata.parent = TimecourseSimulation.from_json(rel.get('parent'))
+                elif parent_type == SteadyStateSimulation.TYPE:
+                    obj.metadata.parent = SteadyStateSimulation.from_json(rel.get('parent'))
+                else:
+                    raise ValueError("Unknown parent type '{}'".format(parent_type))
             return obj
 
 
@@ -208,6 +219,8 @@ class TimecourseSimulation(Simulation):
         end_time (:obj:`float`): end time
         num_time_points (:obj:`int`): number of time points to record
     """
+
+    TYPE = 'timecourse-simulation'
 
     def __init__(self, id=None, format=None,
                  model=None, model_parameter_changes=None,
@@ -226,7 +239,7 @@ class TimecourseSimulation(Simulation):
             num_time_points (:obj:`int`, optional): number of time points to record
             algorithm (:obj:`Algorithm`, optional): simulation algorithm
             algorithm_parameter_changes (:obj:`list` of :obj:`ParameterChange`, optional): simulation algorithm parameter changes
-            metadata (:obj:`ResourceMetadata`, optional): metadata
+            metadata (:obj:`PrimaryResourceMetadata`, optional): metadata
         """
         super(TimecourseSimulation, self).__init__(id=id, format=format,
                                                    model=model, model_parameter_changes=model_parameter_changes,
@@ -291,7 +304,7 @@ class TimecourseSimulation(Simulation):
 
 class SteadyStateSimulation(Simulation):
     """ Steady-state simulation """
-    pass
+    TYPE = 'steady-state-simulation'
 
 
 class Algorithm(object):

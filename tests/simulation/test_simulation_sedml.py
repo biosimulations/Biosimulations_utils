@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from Biosimulations_utils.data_model import OntologyTerm, RemoteFile, ResourceMetadata
+from Biosimulations_utils.data_model import OntologyTerm, RemoteFile, PrimaryResourceMetadata
 from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelVariable, BiomodelFormat
 from Biosimulations_utils.simulation import write_simulation, read_simulation, sedml
@@ -46,7 +46,7 @@ class WriteSedMlTestCase(unittest.TestCase):
                 BiomodelVariable(id='species_1', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_1']"),
                 BiomodelVariable(id='species_2', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_2']"),
             ],
-            metadata=ResourceMetadata(name='SBML model'),
+            metadata=PrimaryResourceMetadata(name='SBML model'),
         )
         sim.model.format.version = 'L1V3'
         sim_filename = os.path.join(self.dirname, 'simulation.sedml')

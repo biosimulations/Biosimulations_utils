@@ -6,13 +6,13 @@
 :License: MIT
 """
 
-from ..data_model import Format, Resource, ResourceMetadata
+from ..data_model import Format, RemoteFile, PrimaryResource, PrimaryResourceMetadata, User
 from ..simulation.data_model import Algorithm
 
 __all__ = ['Simulator']
 
 
-class Simulator(Resource):
+class Simulator(PrimaryResource):
     """ A simulator
 
     Attributes:
@@ -22,7 +22,7 @@ class Simulator(Resource):
         format (:obj:`Format`): format
         docker_hub_image_id (:obj:`str`): id for image in DockerHub (e.g., "crbm/biosimulations_tellurium:2.4.1")
         algorithms (:obj:`list` of :obj:`Algorithm`): supported algorithms
-        metadata (:obj:`ResourceMetadata`): metadata
+        metadata (:obj:`PrimaryResourceMetadata`): metadata
     """
     TYPE = 'simulator'
 
@@ -36,7 +36,7 @@ class Simulator(Resource):
             format (:obj:`Format`, optional): format
             docker_hub_image_id (:obj:`str`, optional): id for image in DockerHub (e.g., "crbm/biosimulations_tellurium:2.4.1")
             algorithms (:obj:`list` of :obj:`Algorithm`, optional): supported algorithms
-            metadata (:obj:`ResourceMetadata`, optional): metadata
+            metadata (:obj:`PrimaryResourceMetadata`, optional): metadata
         """
         self.id = id
         self.version = version
@@ -44,7 +44,7 @@ class Simulator(Resource):
         self.format = format
         self.docker_hub_image_id = docker_hub_image_id
         self.algorithms = algorithms or []
-        self.metadata = metadata or ResourceMetadata()
+        self.metadata = metadata or PrimaryResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two simulators are semantically equal
@@ -70,7 +70,7 @@ class Simulator(Resource):
         Returns:
             :obj:`dict`
         """
-        return {
+        json = {
             'data': {
                 'type': self.TYPE,
                 'id': self.id,
@@ -82,8 +82,37 @@ class Simulator(Resource):
                     'algorithms': [alg.to_json() for alg in self.algorithms],
                     'metadata': self.metadata.to_json() if self.metadata else None,
                 },
+                'relationships': {
+                    'owner': None,
+                    'image': None,
+                    'parent': None,
+                },
             }
         }
+
+        if self.metadata.owner:
+            json['data']['relationships']['owner'] = {
+                'data': {
+                    'type': self.metadata.owner.TYPE,
+                    'id': self.metadata.owner.id,
+                },
+            }
+        if self.metadata.image:
+            json['data']['relationships']['image'] = {
+                'data': {
+                    'type': self.metadata.image.TYPE,
+                    'id': self.metadata.image.id,
+                },
+            }
+        if self.metadata.parent:
+            json['data']['relationships']['parent'] = {
+                'data': {
+                    'type': self.metadata.parent.TYPE,
+                    'id': self.metadata.parent.id
+                }
+            }
+
+        return json
 
     @classmethod
     def from_json(cls, val):
@@ -100,12 +129,23 @@ class Simulator(Resource):
             raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
 
         attrs = data.get('attributes', {})
-        return cls(
+        rel = data.get('relationships', {})
+
+        obj = cls(
             id=data.get('id', None),
             version=attrs.get('version', None),
             url=attrs.get('url', None),
             format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
             docker_hub_image_id=attrs.get('dockerHubImageId', None),
             algorithms=[Algorithm.from_json(alg) for alg in attrs.get('algorithms', [])],
-            metadata=ResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
+            metadata=PrimaryResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
         )
+
+        if rel.get('owner', None):
+            obj.metadata.owner = User.from_json(rel.get('owner'))
+        if rel.get('image', None):
+            obj.metadata.image = RemoteFile.from_json(rel.get('image'))
+        if rel.get('parent', None):
+            obj.metadata.parent = Simulator.from_json(rel.get('parent'))
+
+        return obj

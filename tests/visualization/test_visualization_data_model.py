@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.data_model import (Format, Identifier, JournalCitation, License,
-                                             Person, RemoteFile, ResourceMetadata, ResourceReferences)
+                                             Person, RemoteFile, PrimaryResourceMetadata, ResourceReferences, User)
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_utils.biomodel.data_model import BiomodelVariable
 from Biosimulations_utils.simulation.data_model import TimecourseSimulation, SimulationResult
@@ -93,7 +93,7 @@ class ChartDataModelTestCase(unittest.TestCase):
                     ],
                 )
             ],
-            metadata=ResourceMetadata(
+            metadata=PrimaryResourceMetadata(
                 name='viz 1',
                 image=RemoteFile(id='viz_1-thumbnail'),
                 description='description',
@@ -110,10 +110,11 @@ class ChartDataModelTestCase(unittest.TestCase):
                     Person(first_name='Jane', middle_name='D', last_name='Doe'),
                 ],
                 license=License.cc0,
+                owner=User(id='user-id'),
+                parent=Visualization(id='parent-viz'),
             ),
         )
         viz2 = Visualization.from_json(viz.to_json())
-        viz2.metadata.image = viz.metadata.image
         self.assertEqual(viz2, viz)
 
     def test_VisualizationLayoutElement(self):

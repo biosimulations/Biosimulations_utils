@@ -8,7 +8,7 @@
 
 from Biosimulations_utils.archive.data_model import ArchiveFormat
 from Biosimulations_utils.data_model import (JournalCitation, License, OntologyTerm, Person,
-                                             RemoteFile, ResourceMetadata, ResourceReferences, Type)
+                                             RemoteFile, PrimaryResourceMetadata, ResourceReferences, Type, User)
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelingFramework, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import (
     Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange,
@@ -42,7 +42,7 @@ class SimulationDataModelTestCase(unittest.TestCase):
                                                              kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
                                 value=2.1),
             ],
-            metadata=ResourceMetadata(
+            metadata=PrimaryResourceMetadata(
                 name='model 1',
                 image=RemoteFile(id='model_1-thumbnail'),
                 description='description',
@@ -58,18 +58,16 @@ class SimulationDataModelTestCase(unittest.TestCase):
                     Person(first_name='Jane', middle_name='D', last_name='Doe'),
                 ],
                 license=License.cc0,
+                owner=User(id='user-id'),
                 created=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
                 updated=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
+                parent=TimecourseSimulation(id='parent-sim'),
             ),
         )
         sim2 = TimecourseSimulation.from_json(sim.to_json())
-        sim2.model = sim.model
-        sim2.metadata.image = sim.metadata.image
         self.assertEqual(sim2, sim)
 
         sim2 = Simulation.from_json(sim.to_json())
-        sim2.model = sim.model
-        sim2.metadata.image = sim.metadata.image
         self.assertEqual(sim2, sim)
 
     def test_SteadyStateSimulation(self):
@@ -94,7 +92,7 @@ class SimulationDataModelTestCase(unittest.TestCase):
                                                              kisao_term=OntologyTerm(ontology='KISAO', id='00001')),
                                 value=2.1),
             ],
-            metadata=ResourceMetadata(
+            metadata=PrimaryResourceMetadata(
                 name='model 1',
                 image=RemoteFile(id='model_1-thumbnail'),
                 description='description',
@@ -110,16 +108,14 @@ class SimulationDataModelTestCase(unittest.TestCase):
                     Person(first_name='Jane', middle_name='D', last_name='Doe'),
                 ],
                 license=License.cc0,
+                owner=User(id='user-id'),
+                parent=SteadyStateSimulation(id='parent-sim'),
             ),
         )
         sim2 = SteadyStateSimulation.from_json(sim.to_json())
-        sim2.model = sim.model
-        sim2.metadata.image = sim.metadata.image
         self.assertEqual(sim2, sim)
 
         sim2 = Simulation.from_json(sim.to_json())
-        sim2.model = sim.model
-        sim2.metadata.image = sim.metadata.image
         self.assertEqual(sim2, sim)
 
     def test_Algorithm(self):

@@ -11,7 +11,7 @@ from .data_model import (Simulation, TimecourseSimulation, SteadyStateSimulation
                          Algorithm, AlgorithmParameter, ParameterChange, SimulationResult,
                          SimulationFormat)
 from ..chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from ..data_model import Format, JournalCitation, License, OntologyTerm, Person, RemoteFile, ResourceMetadata
+from ..data_model import Format, JournalCitation, License, OntologyTerm, Person, RemoteFile, PrimaryResourceMetadata
 from ..biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from ..visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 from ..utils import assert_exception, get_enum_format_by_attr, get_logger
@@ -1000,7 +1000,7 @@ class SedMlSimulationReader(SimulationReader):
             id=model_sed.getId() or None,
             format=format,
             file=RemoteFile(id=model_sed.getId() + '-file', name=model_sed.getSource(), type=format.mimetype),
-            metadata=ResourceMetadata(name=model_sed.getName() or None),
+            metadata=PrimaryResourceMetadata(name=model_sed.getName() or None),
         )
 
         # parameter changes

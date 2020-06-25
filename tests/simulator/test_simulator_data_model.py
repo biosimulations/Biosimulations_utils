@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.archive.data_model import ArchiveFormat
-from Biosimulations_utils.data_model import JournalCitation, License, OntologyTerm, Person, ResourceMetadata, Type
+from Biosimulations_utils.data_model import JournalCitation, License, OntologyTerm, Person, RemoteFile, PrimaryResourceMetadata, Type
 from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import Algorithm, AlgorithmParameter, SimulationFormat
 from Biosimulations_utils.simulator.data_model import Simulator
@@ -60,8 +60,9 @@ class SimulatorDataModelTestCase(unittest.TestCase):
                     ],
                 )
             ],
-            metadata=ResourceMetadata(
+            metadata=PrimaryResourceMetadata(
                 name='tellurium',
+                image=RemoteFile(id='simulator-thumbnail'),
                 description='description of tellurium',
                 authors=[
                     Person(first_name='John', middle_name='C', last_name='Doe'),

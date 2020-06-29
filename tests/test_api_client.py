@@ -14,16 +14,6 @@ import unittest.mock
 
 
 class ConfigTestCase(unittest.TestCase):
-    @unittest.skip('API under development')
-    def test_get_models(self):
-        client = api_client.ApiClient()
-        response = client.exec('get', '/models')
-        self.assertIsInstance(response, list)
-        self.assertIsInstance(response[0], dict)
-        self.assertIn('id', response[0])
-        self.assertIn('owner', response[0])
-        self.assertIn('created', response[0])
-
     def test_login_logout_dry_run(self):
         client = api_client.ApiClient(_dry_run=True)
         client.login()
@@ -39,52 +29,50 @@ class ConfigTestCase(unittest.TestCase):
         client = api_client.ApiClient()
         client.login()
 
-        self.assertEqual(client.exec('get', '/hello', response_type=api_client.ResponseType.bytes), 'jonrkarr')
+        self.assertTrue(client.exec('get', '/hello', response_type=api_client.ResponseType.bytes).startswith('Welcome '))
 
         client.logout()
         self.assertEqual(client._device_code, None)
         self.assertEqual(client._auth, None)
 
-    @unittest.skip('API under development')
-    def test_put(self):
-        client = api_client.ApiClient(_dry_run=True)
-        client._auth = {'type': 'bearer', 'token': 'ZZZ'}
-        result = client.exec('post', '/models/new-model', {
-            'id': 'new-model',
-        })
-        self.assertEqual(result, None)
-
     @unittest.skipIf(os.getenv('CI', '0') in ['1', 'true'], 'CI does not have credentials to log into BioSimulations')
     def test_complete_example(self):
+        # login
         client = api_client.ApiClient()
         client.login()
 
+        # delete models
         response = client.exec('delete', '/models', response_type=api_client.ResponseType.bytes)
         self.assertEqual(response, '')
 
+        # check that there are no models
         response = client.exec('get', '/models')
-        self.assertEqual(response, [])
+        self.assertEqual(response, {'data': []})
 
-        with open('tests/fixtures/model.json', 'r') as file:
-            model = json.load(file)
-        response = client.exec('post', '/models', data=model)
+        # post a model
+        with open('tests/fixtures/biomd0000000001.json', 'r') as file:
+            model_json = json.load(file)['data']
+        response = client.exec('post', '/models', data={'data': model_json})
 
+        # check that the model was posted
         response = client.exec('get', '/models')
-        self.assertEqual(len(response), 1)
-        model2 = response[0]
-        model2.pop('_id')
-        model2.pop('__v')
-        model['data'].pop('type')
-        model['data']['owner'] = model['data']['relationships']['owner']['data']['id']
-        model['data']['file'] = model['data']['relationships']['file']['data']['id']
-        # model['data']['image'] = model['data']['relationships']['image']['data']['id']
-        model['data']['parent'] = model['data']['relationships']['parent']['data']['id']
-        model['data'].pop('relationships')
+        self.assertEqual(len(response['data']), 1)
+        model2_json = response['data'][0]
 
-        for key in model['data'].keys():
-            self.assertEqual(response[0][key], model['data'][key])
+        # check that the stored model is equal to the posted model
+        self.assertEqual(model2_json.keys(), model_json.keys())
 
-        self.assertEqual(response[0], model['data'])
+        for key in model_json['attributes'].keys():
+            self.assertEqual(model_json['attributes'][key], model2_json['attributes']
+                             [key], "Values of attribute '{}' should be equal".format(key))
+
+        if model2_json['relationships']['parent'] and model2_json['relationships']['parent']['data'] is None:
+            model2_json['relationships']['parent'] = None
+        model_json['meta']['created'] = model2_json['meta']['created']
+        model_json['meta']['updated'] = model2_json['meta']['updated']
+        model_json['meta']['version'] = model2_json['meta']['version']
+
+        self.assertEqual(model2_json, model_json)
 
         # logout
         client.logout()

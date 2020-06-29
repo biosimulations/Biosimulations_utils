@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 auth0 = attrdict.AttrDict({
-    'endpoint': 'https://crbm.auth0.com',
+    'endpoint': 'https://auth.biosimulations.org',
     'audience': 'api.biosimulations.org',
     'client_id': "3SN7foOQTrHQpdgjzjKwDsQjJTiYW9Js",
     'scope': None,

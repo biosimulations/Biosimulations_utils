@@ -183,7 +183,7 @@ class BioModelsImporter(object):
                             viz_of_sim = viz
                             break
 
-                    model_filename = os.path.join(self._cache_dir, model_result['id'] + '.xml')
+                    model_filename = os.path.join(self._cache_dir, model_result['id'].lower() + '.xml')
                     archive_filename = os.path.join(self._cache_dir, sim.id + '.omex')
 
                     if self.exec_simulations:
@@ -399,12 +399,12 @@ class BioModelsImporter(object):
             citations = []
 
         model_filename = files_metadata['main'][0]['name']
-        local_path = os.path.join(self._cache_dir, id + '.xml')
+        local_path = os.path.join(self._cache_dir, id.lower() + '.xml')
         with open(local_path, 'wb') as file:
             file.write(self.get_model_file(id, model_filename))
 
         model = read_biomodel(local_path, format=BiomodelFormat.sbml)
-        model.id = id
+        model.id = id.lower()
         model.metadata.name = metadata['name']
         model.file = RemoteFile(
             id=model.id + '-file',
@@ -512,7 +512,7 @@ class BioModelsImporter(object):
 
                                     if not variable:
                                         self._sedml_logger.log(logging.ERROR, '{}: target {} is invalid'.format(
-                                            id, sim_result.variable.target))
+                                            id.lower(), sim_result.variable.target))
 
                                         match = re.match(r"^/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species\[@id='(.*?)'\]$",
                                                          sim_result.variable.target)
@@ -657,30 +657,20 @@ class BioModelsImporter(object):
         print('Posting {} models'.format(len(models)))
         for i_model, model in enumerate(models):
             print('  {}. {}: {}'.format(i_model + 1, model.id, model.metadata.name))
-
             model.metadata.owner = self.user
+            api_client.exec('post', '/models', data=model.to_json())
 
-            with open(os.path.join('biomodels', model.id + '.json'), 'w') as file:
-                json.dump(model.to_json(), file)
+        # print('Posting {} simulations'.format(len(sims)))
+        # for i_sim, sim in enumerate(sims):
+        #     print('  {}. {}: {}'.format(i_sim + 1, sim.id, sim.metadata.name))
+        #     sim.metadata.owner = self.user
+        #     api_client.exec('post', '/simulations', data=sim.to_json())
 
-            # todo: remove
-            if model.metadata.description:
-                model.metadata.description = model.metadata.description[0:min(1000, len(model.metadata.description))]
-
-            model.parameters = model.parameters[0:min(100, len(model.parameters))]
-            model.variables = model.variables[0:min(100, len(model.variables))]
-
-            if not model.taxon:
-                model.taxon = Taxon(id=-1, name='No taxon')
-            # end remove
-
-            api_client.exec('post', '/models/', data=model.to_json())
-
-        # for sim in sims:
-        #    api_client.exec('post', '/simulations/', data=sim.to_json())
-
-        # for viz in vizs:
-        #    api_client.exec('post', '/visualization/', data=viz.to_json())
+        # print('Posting {} vizualizations'.format(len(vizs)))
+        # for i_viz, viz in enumerate(vizs):
+        #     print('  {}. {}: {}'.format(i_viz + 1, viz.id, viz.metadata.name))
+        #     viz.metadata.owner = self.user
+        #     api_client.exec('post', '/visualization', data=viz.to_json())
 
     def write_data(self, models, sims, vizs, stats):
         """ Save models and simulations to JSON files

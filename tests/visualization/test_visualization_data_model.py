@@ -7,16 +7,19 @@
 """
 
 from Biosimulations_utils.data_model import (Format, Identifier, JournalCitation, License,
-                                             Person, RemoteFile, PrimaryResourceMetadata, ResourceReferences, User)
+                                             Person, PrimaryResourceMetadata, RemoteFile, ResourceMetadata, ResourceReferences, User)
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_utils.biomodel.data_model import BiomodelVariable
 from Biosimulations_utils.simulation.data_model import TimecourseSimulation, SimulationResult
 from Biosimulations_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
+import datetime
+import dateutil
 import unittest
 
 
 class ChartDataModelTestCase(unittest.TestCase):
     def test_Visualization(self):
+        now = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
         viz = Visualization(
             id='viz_1',
             format=Format(name='Vega', version='5.10.1', url='https://vega.github.io/vega/'),
@@ -112,6 +115,11 @@ class ChartDataModelTestCase(unittest.TestCase):
                 license=License.cc0,
                 owner=User(id='user-id'),
                 parent=Visualization(id='parent-viz'),
+            ),
+            _metadata=ResourceMetadata(
+                version=3,
+                created=now,
+                updated=now,
             ),
         )
         viz2 = Visualization.from_json(viz.to_json())

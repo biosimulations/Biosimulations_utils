@@ -7,7 +7,7 @@
 """
 
 from ..chart.data_model import Chart, ChartDataField
-from ..data_model import Format, RemoteFile, PrimaryResource, PrimaryResourceMetadata, User
+from ..data_model import Format, PrimaryResource, PrimaryResourceMetadata, ResourceMetadata, RemoteFile, User
 from ..simulation.data_model import SimulationResult
 
 __all__ = [
@@ -24,13 +24,12 @@ class Visualization(PrimaryResource):
         columns (:obj:`int`): number of columns
         layout (:obj:`list` of :obj:`VisualizationLayoutElement`): element of the visualization
             (i.e. the cells in the grid of visualizations)
-        metadata (:obj:`PrimaryResourceMetadata`): metadata
     """
 
     TYPE = 'visualization'
 
     def __init__(self, id=None, format=None,
-                 columns=None, layout=None, metadata=None):
+                 columns=None, layout=None, metadata=None, _metadata=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -38,13 +37,15 @@ class Visualization(PrimaryResource):
             columns (:obj:`int`, optional): number of columns
             layout (:obj:`list` of :obj:`VisualizationLayoutElement`, optional): element of the visualization
                 (i.e. the cells in the grid of visualizations)
-            metadata (:obj:`PrimaryResourceMetadata`, optional): metadata
+            metadata (:obj:`PrimaryResourceMetadata`, optional): public metadata
+            _metadata (:obj:`ResourceMetadata`, optional): private metadata
         """
         self.id = id
         self.format = format
         self.columns = columns
         self.layout = layout or []
         self.metadata = metadata or PrimaryResourceMetadata()
+        self._metadata = _metadata or ResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two simulations are semantically equal
@@ -61,7 +62,8 @@ class Visualization(PrimaryResource):
             and self.columns == other.columns \
             and sorted(self.layout, key=VisualizationLayoutElement.sort_key) == \
             sorted(other.layout, key=VisualizationLayoutElement.sort_key) \
-            and self.metadata == other.metadata
+            and self.metadata == other.metadata \
+            and self._metadata == other._metadata
 
     def to_json(self):
         """ Export to JSON
@@ -84,6 +86,7 @@ class Visualization(PrimaryResource):
                     'image': None,
                     'parent': None,
                 },
+                'meta': self._metadata.to_json() if self._metadata else None,
             },
         }
 
@@ -121,6 +124,9 @@ class Visualization(PrimaryResource):
         Returns:
             :obj:`Simulation`
         """
+        if val is None or val.get('data', None) is None:
+            return None
+
         data = val.get('data', {})
         if data.get('type', None) != cls.TYPE:
             raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
@@ -134,6 +140,7 @@ class Visualization(PrimaryResource):
             columns=attrs.get('columns', None),
             layout=[VisualizationLayoutElement.from_json(el) for el in attrs.get('layout', [])],
             metadata=PrimaryResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
+            _metadata=ResourceMetadata.from_json(data.get('meta')) if data.get('meta', None) else None,
         )
 
         if rel.get('owner', None):

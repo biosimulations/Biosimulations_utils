@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, OntologyTerm, Person, RemoteFile,
-                                             PrimaryResourceMetadata, ResourceReferences, Taxon, Type, User)
+                                             PrimaryResourceMetadata, ResourceMetadata, ResourceReferences, Taxon, Type, User)
 from Biosimulations_utils.biomodel.data_model import (Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat)
 import datetime
 import dateutil.tz
@@ -47,6 +47,9 @@ class BiomodelDataModelTestCase(unittest.TestCase):
                 parent=Biomodel(id='model_0'),
                 license=License.cc0,
                 owner=User(id='user-0'),
+            ),
+            _metadata=ResourceMetadata(
+                version=3,
                 created=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
                 updated=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
             ),

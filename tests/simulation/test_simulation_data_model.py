@@ -8,7 +8,7 @@
 
 from Biosimulations_utils.archive.data_model import ArchiveFormat
 from Biosimulations_utils.data_model import (JournalCitation, License, OntologyTerm, Person,
-                                             RemoteFile, PrimaryResourceMetadata, ResourceReferences, Type, User)
+                                             RemoteFile, PrimaryResourceMetadata, ResourceMetadata, ResourceReferences, Type, User)
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelingFramework, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import (
     Simulation, TimecourseSimulation, SteadyStateSimulation, Algorithm, AlgorithmParameter, ParameterChange,
@@ -59,9 +59,12 @@ class SimulationDataModelTestCase(unittest.TestCase):
                 ],
                 license=License.cc0,
                 owner=User(id='user-id'),
+                parent=TimecourseSimulation(id='parent-sim'),
+            ),
+            _metadata=ResourceMetadata(
+                version=3,
                 created=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
                 updated=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
-                parent=TimecourseSimulation(id='parent-sim'),
             ),
         )
         sim2 = TimecourseSimulation.from_json(sim.to_json())

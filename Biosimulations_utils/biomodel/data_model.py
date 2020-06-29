@@ -6,7 +6,8 @@
 :License: MIT
 """
 
-from ..data_model import Format, Identifier, OntologyTerm, RemoteFile, PrimaryResource, PrimaryResourceMetadata, Taxon, Type, User
+from ..data_model import (Format, Identifier, OntologyTerm, RemoteFile, ResourceMetadata,
+                          PrimaryResource, PrimaryResourceMetadata, Taxon, Type, User)
 import enum
 import wc_utils.util.enumerate
 
@@ -173,12 +174,12 @@ class Biomodel(PrimaryResource):
         taxon (:obj:`Taxon`): taxon
         parameters (:obj:`list` of :obj:`BiomodelParameter`): parameters (e.g., initial conditions and rate constants)
         variables (:obj:`list` of :obj:`BiomodelVariable`): variables (e.g., model predictions)
-        metadata (:obj:`PrimaryResourceMetadata`): metadata
     """
 
     TYPE = 'model'
 
-    def __init__(self, id=None, file=None, format=None, framework=None, taxon=None, parameters=None, variables=None, metadata=None):
+    def __init__(self, id=None, file=None, format=None, framework=None, taxon=None, parameters=None, variables=None,
+                 metadata=None, _metadata=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -188,7 +189,8 @@ class Biomodel(PrimaryResource):
             taxon (:obj:`Taxon`, optional): taxon
             parameters (:obj:`list` of :obj:`BiomodelParameter`, optional): parameters (e.g., initial conditions and rate constants)
             variables (:obj:`list` of :obj:`BiomodelVariable`, optional): variables (e.g., model predictions)
-            metadata (:obj:`PrimaryResourceMetadata`, optional): metadata
+            metadata (:obj:`PrimaryResourceMetadata`, optional): public metadata
+            _metadata (:obj:`ResourceMetadata`, optional): private metadata
         """
         self.id = id
         self.file = file
@@ -198,6 +200,7 @@ class Biomodel(PrimaryResource):
         self.parameters = parameters or []
         self.variables = variables or []
         self.metadata = metadata or PrimaryResourceMetadata()
+        self._metadata = _metadata or ResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two models are semantically equal
@@ -216,7 +219,8 @@ class Biomodel(PrimaryResource):
             and self.taxon == other.taxon \
             and sorted(self.parameters, key=BiomodelParameter.sort_key) == sorted(other.parameters, key=BiomodelParameter.sort_key) \
             and sorted(self.variables, key=BiomodelVariable.sort_key) == sorted(other.variables, key=BiomodelVariable.sort_key) \
-            and self.metadata == other.metadata
+            and self.metadata == other.metadata \
+            and self._metadata == other._metadata
 
     def to_json(self):
         """ Export to JSON
@@ -242,6 +246,7 @@ class Biomodel(PrimaryResource):
                     'image': None,
                     'parent': None,
                 },
+                'meta': self._metadata.to_json() if self._metadata else None,
             },
         }
 
@@ -286,6 +291,9 @@ class Biomodel(PrimaryResource):
         Returns:
             :obj:`Biomodel`
         """
+        if val is None or val.get('data', None) is None:
+            return None
+
         data = val.get('data', {})
         if data.get('type', None) != cls.TYPE:
             raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
@@ -301,6 +309,7 @@ class Biomodel(PrimaryResource):
             parameters=[BiomodelParameter.from_json(parameter) for parameter in attrs.get('parameters', [])],
             variables=[BiomodelVariable.from_json(variable) for variable in attrs.get('variables', [])],
             metadata=PrimaryResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
+            _metadata=ResourceMetadata.from_json(data.get('meta')) if data.get('meta', None) else None,
         )
 
         if rel.get('owner', None):

@@ -24,11 +24,23 @@ class ConfigTestCase(unittest.TestCase):
         self.assertIn('owner', response[0])
         self.assertIn('created', response[0])
 
-    def test_login_logout(self):
+    def test_login_logout_dry_run(self):
         client = api_client.ApiClient(_dry_run=True)
         client.login()
         self.assertEqual(client._device_code, '')
         self.assertEqual(client._auth, {'type': '', 'token': ''})
+
+        client.logout()
+        self.assertEqual(client._device_code, None)
+        self.assertEqual(client._auth, None)
+
+    @unittest.skipIf(os.getenv('CI', '0') in ['1', 'true'], 'CI does not have credentials to log into BioSimulations')
+    def test_login_logout_real(self):
+        client = api_client.ApiClient()
+        client.login()
+
+        self.assertEqual(client.exec('get', '/hello', response_type=api_client.ResponseType.bytes), 'jonrkarr')
+
         client.logout()
         self.assertEqual(client._device_code, None)
         self.assertEqual(client._auth, None)
@@ -47,17 +59,17 @@ class ConfigTestCase(unittest.TestCase):
         client = api_client.ApiClient()
         client.login()
 
-        response = client.exec('delete', '/models/', response_type=api_client.ResponseType.bytes)
+        response = client.exec('delete', '/models', response_type=api_client.ResponseType.bytes)
         self.assertEqual(response, '')
 
-        response = client.exec('get', '/models/')
+        response = client.exec('get', '/models')
         self.assertEqual(response, [])
 
         with open('tests/fixtures/model.json', 'r') as file:
             model = json.load(file)
-        response = client.exec('post', '/models/', data=model)
+        response = client.exec('post', '/models', data=model)
 
-        response = client.exec('get', '/models/')
+        response = client.exec('get', '/models')
         self.assertEqual(len(response), 1)
         model2 = response[0]
         model2.pop('_id')

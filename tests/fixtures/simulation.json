@@ -106,9 +106,7 @@
             "lastName": "Doe"
           }
         ],
-        "license": "CC0",
-        "created": "2020-04-01T12:00:00Z",
-        "updated": "2020-04-02T12:00:00Z"
+        "license": "CC0"        
       }
     },
     "relationships": {
@@ -136,6 +134,11 @@
           "id": "parent-simulation-id"
         }
       }
+    },
+    "meta": {
+      "version": 3,
+      "created": 1585742400000,
+      "updated": 1585828800000
     }
   }
 }

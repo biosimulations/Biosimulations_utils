@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from ..data_model import PrimaryResource, PrimaryResourceMetadata, RemoteFile, User
+from ..data_model import PrimaryResource, PrimaryResourceMetadata, RemoteFile, ResourceMetadata, User
 import enum
 
 __all__ = [
@@ -23,14 +23,16 @@ class Chart(PrimaryResource):
 
     TYPE = 'chart'
 
-    def __init__(self, id=None, metadata=None):
+    def __init__(self, id=None, metadata=None, _metadata=None):
         """
         Args:
             id (:obj:`str`, optional): id
-            metadata (:obj:`PrimaryResourceMetadata`, optional): metadata
+            metadata (:obj:`PrimaryResourceMetadata`, optional): public metadata
+            _metadata (:obj:`ResourceMetadata`, optional): private metadata
         """
         self.id = id
         self.metadata = metadata or PrimaryResourceMetadata()
+        self._metadata = _metadata or ResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two chart types are semantically equal
@@ -43,7 +45,8 @@ class Chart(PrimaryResource):
         """
         return other.__class__ == self.__class__ \
             and self.id == other.id \
-            and self.metadata == other.metadata
+            and self.metadata == other.metadata \
+            and self._metadata == other._metadata
 
     def to_json(self):
         """ Export to JSON
@@ -63,6 +66,7 @@ class Chart(PrimaryResource):
                     'image': None,
                     'parent': None,
                 },
+                'meta': self._metadata.to_json() if self._metadata else None,
             },
         }
 
@@ -100,6 +104,9 @@ class Chart(PrimaryResource):
         Returns:
             :obj:`Chart`
         """
+        if val is None or val.get('data', None) is None:
+            return None
+
         data = val.get('data', {})
         if data.get('type', None) != cls.TYPE:
             raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
@@ -110,6 +117,7 @@ class Chart(PrimaryResource):
         obj = cls(
             id=data.get('id', None),
             metadata=PrimaryResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
+            _metadata=ResourceMetadata.from_json(data.get('meta')) if data.get('meta', None) else None,
         )
 
         if rel.get('owner', None):

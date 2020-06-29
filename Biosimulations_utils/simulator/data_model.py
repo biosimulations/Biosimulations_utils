@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from ..data_model import Format, RemoteFile, PrimaryResource, PrimaryResourceMetadata, User
+from ..data_model import Format, PrimaryResource, PrimaryResourceMetadata, RemoteFile, ResourceMetadata, User
 from ..simulation.data_model import Algorithm
 
 __all__ = ['Simulator']
@@ -22,12 +22,11 @@ class Simulator(PrimaryResource):
         format (:obj:`Format`): format
         docker_hub_image_id (:obj:`str`): id for image in DockerHub (e.g., "crbm/biosimulations_tellurium:2.4.1")
         algorithms (:obj:`list` of :obj:`Algorithm`): supported algorithms
-        metadata (:obj:`PrimaryResourceMetadata`): metadata
     """
     TYPE = 'simulator'
 
     def __init__(self, id=None, version=None, url=None,
-                 format=None, docker_hub_image_id=None, algorithms=None, metadata=None):
+                 format=None, docker_hub_image_id=None, algorithms=None, metadata=None, _metadata=None):
         """
         Args:
             id (:obj:`str`, optional): id
@@ -36,7 +35,8 @@ class Simulator(PrimaryResource):
             format (:obj:`Format`, optional): format
             docker_hub_image_id (:obj:`str`, optional): id for image in DockerHub (e.g., "crbm/biosimulations_tellurium:2.4.1")
             algorithms (:obj:`list` of :obj:`Algorithm`, optional): supported algorithms
-            metadata (:obj:`PrimaryResourceMetadata`, optional): metadata
+            metadata (:obj:`PrimaryResourceMetadata`, optional): public metadata
+            _metadata (:obj:`ResourceMetadata`, optional): private metadata
         """
         self.id = id
         self.version = version
@@ -45,6 +45,7 @@ class Simulator(PrimaryResource):
         self.docker_hub_image_id = docker_hub_image_id
         self.algorithms = algorithms or []
         self.metadata = metadata or PrimaryResourceMetadata()
+        self._metadata = _metadata or ResourceMetadata()
 
     def __eq__(self, other):
         """ Determine if two simulators are semantically equal
@@ -62,7 +63,8 @@ class Simulator(PrimaryResource):
             and self.format == other.format \
             and self.docker_hub_image_id == other.docker_hub_image_id \
             and sorted(self.algorithms, key=Algorithm.sort_key) == sorted(other.algorithms, key=Algorithm.sort_key) \
-            and self.metadata == other.metadata
+            and self.metadata == other.metadata \
+            and self._metadata == other._metadata
 
     def to_json(self):
         """ Export to JSON
@@ -87,6 +89,7 @@ class Simulator(PrimaryResource):
                     'image': None,
                     'parent': None,
                 },
+                'meta': self._metadata.to_json() if self._metadata else None,
             }
         }
 
@@ -124,6 +127,9 @@ class Simulator(PrimaryResource):
         Returns:
             :obj:`Simulation`
         """
+        if val is None or val.get('data', None) is None:
+            return None
+
         data = val.get('data', {})
         if data.get('type', None) != cls.TYPE:
             raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
@@ -139,6 +145,7 @@ class Simulator(PrimaryResource):
             docker_hub_image_id=attrs.get('dockerHubImageId', None),
             algorithms=[Algorithm.from_json(alg) for alg in attrs.get('algorithms', [])],
             metadata=PrimaryResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
+            _metadata=ResourceMetadata.from_json(data.get('meta')) if data.get('meta', None) else None,
         )
 
         if rel.get('owner', None):

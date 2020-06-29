@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from Biosimulations_utils.data_model import OntologyTerm, RemoteFile, PrimaryResourceMetadata
+from Biosimulations_utils.data_model import OntologyTerm, PrimaryResourceMetadata, RemoteFile, ResourceMetadata
 from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelVariable, BiomodelFormat
 from Biosimulations_utils.simulation import write_simulation, read_simulation, sedml
@@ -47,6 +47,7 @@ class WriteSedMlTestCase(unittest.TestCase):
                 BiomodelVariable(id='species_2', target="/sbml:sbml/sbml:model/sbml:listOfSpecies/sbml:species[@id='species_2']"),
             ],
             metadata=PrimaryResourceMetadata(name='SBML model'),
+            _metadata=ResourceMetadata(),
         )
         sim.model.format.version = 'L1V3'
         sim_filename = os.path.join(self.dirname, 'simulation.sedml')
@@ -68,13 +69,16 @@ class WriteSedMlTestCase(unittest.TestCase):
         self.assertEqual(sim_2.model.file.name, sim.model.file.name)
         self.assertEqual(sim_2.algorithm.id, sim.algorithm.id)
         self.assertEqual(sim_2.algorithm, sim.algorithm)
-        self.assertEqual(sim_2.metadata.created, sim.metadata.created)
-        self.assertEqual(sim_2.metadata.updated, sim.metadata.updated)
+        self.assertEqual(sim_2._metadata.version, sim._metadata.version)
+        self.assertEqual(sim_2._metadata.created, sim._metadata.created)
+        self.assertEqual(sim_2._metadata.updated, sim._metadata.updated)
+        self.assertEqual(sim_2._metadata, sim._metadata)
 
         sim_2.metadata.image = sim.metadata.image
         sim_2.metadata.owner = sim.metadata.owner
         sim_2.metadata.access_level = sim.metadata.access_level
         sim_2.metadata.parent = sim.metadata.parent
+        self.assertEqual(sim_2.metadata, sim.metadata)
         self.assertEqual(sim_2, sim)
 
         with self.assertRaisesRegex(NotImplementedError, 'not supported'):

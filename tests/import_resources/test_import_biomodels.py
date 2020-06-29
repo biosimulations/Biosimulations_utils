@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.api_client import ApiClient, ResponseType
-from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, Person, RemoteFile, Taxon, User)
+from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, Person, PrimaryResourceMetadata, RemoteFile, Taxon, User)
 from Biosimulations_utils.import_resources import biomodels
 from Biosimulations_utils.biomodel.data_model import Biomodel
 from Biosimulations_utils.simulation.data_model import Simulation
@@ -17,6 +17,7 @@ try:
     import docker
 except ModuleNotFoundError:
     docker = None
+import json
 import os
 import shutil
 import tempfile
@@ -29,7 +30,8 @@ class BioModelsImporterTestCase(unittest.TestCase):
         shutil.rmtree(self.dirname)
 
     def tearDown(self):
-        shutil.rmtree(self.dirname)
+        if os.path.isdir(self.dirname):
+            shutil.rmtree(self.dirname)
 
     def test_import_dry_run(self):
         importer = biomodels.BioModelsImporter(exec_simulations=docker is not None,
@@ -39,37 +41,45 @@ class BioModelsImporterTestCase(unittest.TestCase):
 
     @unittest.skipIf(os.getenv('CI', '0') in ['1', 'true'], 'CI does not have credentials to log into BioSimulations')
     def test_import_and_post(self):
-        api_client = ApiClient()
-        api_client.login()
+        # api_client = ApiClient()
+        # api_client.login()
 
-        api_client.exec('delete', '/models/', response_type=ResponseType.bytes)
-        models2 = api_client.exec('get', '/models/')
-        self.assertEqual(models2, [])
+        # api_client.exec('delete', '/models', response_type=ResponseType.bytes)
+        # models2 = api_client.exec('get', '/models')
+        # self.assertEqual(models2, [])
 
         max_models = 20
         cache_dir = self.dirname
         importer = biomodels.BioModelsImporter(exec_simulations=False, user=User(id='jonrkarr'),
-                                               _max_models=max_models, _cache_dir=cache_dir)
+                                               _max_models=max_models, _cache_dir=cache_dir,
+                                               _dry_run=True)
         models, sims, vizs, stats = importer.run()
-        self.assertEqual(len(models), max_models)
+        # self.assertEqual(len(models), max_models)
 
-        models2_json = api_client.exec('get', '/models/')
-        self.assertEqual(len(models2_json), max_models)
+        # for model in models:
+        #     with open(os.path.join('biomodels', model.id + '.json'), 'w') as file:
+        #         json.dump(model.to_json(), file)
 
-        """
-        import PrimaryResourceMetadata
-        for model, model2_json in zip(models, models2_json):
-            model2_json['attributes']['parameters'] = model2_json['attributes']['parameters'][0]
-            model2_json['attributes']['variables'] = model2_json['attributes']['variables'][0]
+        # models2_json = api_client.exec('get', '/models')
+        # self.assertEqual(len(models2_json), max_models)
+
+        with open('tests/fixtures/biomodels-20.json', 'r') as file:
+            models2_json = json.load(file)
+
+        models2 = {}
+        for model2_json in models2_json['data']:
             model2 = Biomodel.from_json({'data': model2_json})
+            models2[model2.id] = model2
+
+        for model in models[0:20]:
+            model2 = models2[model.id]
+
             model.file = RemoteFile(id=model.file.id)
-            model.metadata = PrimaryResourceMetadata(
-                image=RemoteFile(id=model.metadata.image.id),
-                owner=User(id=model.metadata.owner.id),
-                parent=Biomodel(id=model.metadata.parent.id),
-            )
+            model.metadata.image = RemoteFile(id=model.metadata.image.id)
+            model.metadata.owner = User(id=model.metadata.owner.id)
+            model._metadata = model2._metadata
+
             self.assertEqual(model, model2)
-        """
 
     def test_import_diverse_set_of_models(self):
         importer = biomodels.BioModelsImporter(exec_simulations=docker is not None,
@@ -102,7 +112,7 @@ class BioModelsImporterTestCase(unittest.TestCase):
             models, sims, vizs, stats = importer.run()
         self.assertEqual(len(models), 7)
 
-        self.assertEqual(models[0].id, 'BIOMD0000000001')
+        self.assertEqual(models[0].id, 'biomd0000000001')
         self.assertEqual(models[0].metadata.name, 'Edelstein1996 - EPSP ACh event')
 
         self.assertEqual(models[0].file.name, 'BIOMD0000000001_url.xml')

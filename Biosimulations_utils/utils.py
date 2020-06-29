@@ -6,6 +6,7 @@
 :License: MIT
 """
 
+import datetime
 import logging
 import math
 import numpy
@@ -13,7 +14,8 @@ import os
 import PIL
 import pint
 
-__all__ = ['get_enum_format_by_attr', 'unit_registry', 'pretty_print_units', 'crop_image', 'assert_exception', 'get_logger']
+__all__ = ['get_enum_format_by_attr', 'unit_registry', 'pretty_print_units', 'crop_image', 'assert_exception', 'get_logger',
+           'time_since_epoch_to_datetime', 'datetime_to_time_since_epoch']
 
 
 def get_enum_format_by_attr(FormatEnum, attr_name, attr_val):
@@ -197,3 +199,29 @@ def config_logger(logger, name='log'):
         'Log initialized\n'
         '==============='
     ))
+
+
+def datetime_to_time_since_epoch(local_datetime):
+    """ Convert date/time to milliseconds since epoch (1970)
+
+    Args:
+        local_datetime (:obj:`datetime.datetime`): date/time
+
+    Returns:
+        :obj:`int`: milliseconds since epoch (1970)
+    """
+    utc_datetime = local_datetime.astimezone(datetime.timezone.utc)
+    return round((utc_datetime - datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)).total_seconds() * 1e3)
+
+
+def time_since_epoch_to_datetime(milliseconds_since_epoch):
+    """ Convet milliseconds since epoch (1970) to datetime
+
+    Args:
+        :obj:`int`: milliseconds since epoch (1970)
+
+    Returns:
+        :obj:`datetime.datetime`: date/time (in UTC)
+    """
+    return datetime.datetime(1970, 1, 1, 0, 0, 0, tzinfo=datetime.timezone.utc) \
+        + datetime.timedelta(seconds=milliseconds_since_epoch * 1e-3)

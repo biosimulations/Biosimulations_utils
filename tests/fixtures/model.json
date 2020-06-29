@@ -487,9 +487,7 @@
                     "lastName": "Obeyesekere"
                 }],
                 "license": "CC0",
-                "accessLevel": "public",
-                "created": null,
-                "updated": null
+                "accessLevel": "public"                
             }
         },
         "relationships": {
@@ -517,6 +515,11 @@
                     "id": "string"
                 }
             }
+        },
+        "meta": {
+            "version": 1,
+            "created": null,
+            "updated": null
         }
     }
 }

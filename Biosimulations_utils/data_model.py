@@ -6,8 +6,8 @@
 :License: MIT
 """
 
+from .utils import time_since_epoch_to_datetime, datetime_to_time_since_epoch
 import datetime  # noqa: F401
-import dateutil.tz
 import enum
 import wc_utils.util.enumerate
 
@@ -20,9 +20,10 @@ __all__ = [
     'OntologyTerm',
     'Person',
     'PrimaryResource',
+    'PrimaryResourceMetadata',
     'RemoteFile',
     'Resource',
-    'PrimaryResourceMetadata',
+    'ResourceMetadata',
     'ResourceReferences',
     'Taxon',
     'Type',
@@ -35,6 +36,7 @@ class Resource(object):
 
     Attributes:
         id (:obj:`str`): id
+        _metadata (:obj:`ResourceMetadata`): private metadata
     """
     TYPE = None
 
@@ -43,7 +45,7 @@ class PrimaryResource(Resource):
     """ A primary resource
 
     Attributes:
-        metadata (:obj:`PrimaryResourceMetadata`): metadata
+        metadata (:obj:`PrimaryResourceMetadata`): public metadata
     """
     pass
 
@@ -579,6 +581,9 @@ class User(Resource):
         Returns:
             :obj:`User`
         """
+        if val is None or val.get('data', None) is None:
+            return None
+
         data = val.get('data', {})
         if data.get('type', None) != cls.TYPE:
             raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
@@ -654,6 +659,9 @@ class RemoteFile(Resource):
         Returns:
             :obj:`RemoteFile`
         """
+        if val is None or val.get('data', None) is None:
+            return None
+
         data = val.get('data', {})
         if data.get('type', None) != cls.TYPE:
             raise ValueError("`type` '{}' != '{}'".format(data.get('type', ''), cls.TYPE))
@@ -739,6 +747,69 @@ class AccessLevel(wc_utils.util.enumerate.CaseInsensitiveEnum):
     protected = 'password protected'
 
 
+class ResourceMetadata(object):
+    """ Metadata about a top-level resource such as a model
+
+    Attributes:
+        version (:obj:`int`): version
+        created (:obj:`datetime.datetime`): date that the model was created
+        updated (:obj:`datetime.datetime`): date that the model was last updated
+    """
+
+    def __init__(self, version=None, created=None, updated=None):
+        """
+        Args:
+            version (:obj:`int`): version
+            created (:obj:`datetime.datetime`, optional): date that the model was created
+            updated (:obj:`datetime.datetime`, optional): date that the model was last updated
+        """
+        self.version = version
+        self.created = created
+        self.updated = updated
+
+    def __eq__(self, other):
+        """ Determine if two metadata containers are semantically equal
+
+        Args:
+            other (:obj:`ResourceMetadata`): other model
+
+        Returns:
+            :obj:`bool`
+        """
+        return other.__class__ == self.__class__ \
+            and self.version == other.version \
+            and self.created == other.created \
+            and self.updated == other.updated
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'version': self.version,
+            'created': datetime_to_time_since_epoch(self.created) if self.created else None,
+            'updated': datetime_to_time_since_epoch(self.updated) if self.updated else None,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create metadata from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`ResourceMetadata`
+        """
+        return cls(
+            version=val.get('version', None),
+            created=time_since_epoch_to_datetime(val.get('created')) if val.get('created', None) else None,
+            updated=time_since_epoch_to_datetime(val.get('updated')) if val.get('updated', None) else None,
+        )
+
+
 class PrimaryResourceMetadata(object):
     """ Metadata about a top-level resource such as a model
 
@@ -754,13 +825,11 @@ class PrimaryResourceMetadata(object):
         license (:obj:`License`): license
         owner (:obj:`User`): owner
         access_level (:obj:`AccessLevel`): access level
-        created (:obj:`datetime.datetime`): date that the model was created
-        updated (:obj:`datetime.datetime`): date that the model was last updated
     """
 
     def __init__(self, name=None, image=None, summary=None, description=None, tags=None,
                  references=None, authors=None, parent=None, license=None, owner=None,
-                 access_level=AccessLevel.private, created=None, updated=None):
+                 access_level=AccessLevel.private):
         """
         Args:
             name (:obj:`str`, optional): name
@@ -774,8 +843,6 @@ class PrimaryResourceMetadata(object):
             license (:obj:`License`, optional): license
             owner (:obj:`user`, optional): owner
             access_level (:obj:`AccessLevel`, optional): access level
-            created (:obj:`datetime.datetime`, optional): date that the model was created
-            updated (:obj:`datetime.datetime`, optional): date that the model was last updated
         """
         self.name = name
         self.image = image
@@ -788,8 +855,6 @@ class PrimaryResourceMetadata(object):
         self.license = license
         self.owner = owner
         self.access_level = access_level
-        self.created = created
-        self.updated = updated
 
     def __eq__(self, other):
         """ Determine if two metadata containers are semantically equal
@@ -811,9 +876,7 @@ class PrimaryResourceMetadata(object):
             and self.parent == other.parent \
             and self.license == other.license \
             and self.owner == other.owner \
-            and self.access_level == other.access_level \
-            and self.created == other.created \
-            and self.updated == other.updated
+            and self.access_level == other.access_level
 
     def to_json(self):
         """ Export to JSON
@@ -830,8 +893,6 @@ class PrimaryResourceMetadata(object):
             'authors': [author.to_json() for author in self.authors],
             'license': self.license.value if self.license else None,
             'accessLevel': self.access_level.value if self.access_level else None,
-            'created': self.created.strftime('%Y-%m-%dT%H:%M:%SZ') if self.created else None,
-            'updated': self.updated.strftime('%Y-%m-%dT%H:%M:%SZ') if self.updated else None,
         }
 
     @classmethod
@@ -853,8 +914,6 @@ class PrimaryResourceMetadata(object):
             authors=[Person.from_json(author) for author in val.get('authors', [])],
             license=License(val.get('license')) if val.get('license', None) else None,
             access_level=AccessLevel(val.get('accessLevel')) if val.get('accessLevel', None) else None,
-            created=dateutil.parser.parse(val.get('created')) if val.get('created', None) else None,
-            updated=dateutil.parser.parse(val.get('updated')) if val.get('updated', None) else None,
         )
 
 

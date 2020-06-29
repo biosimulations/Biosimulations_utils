@@ -7,13 +7,16 @@
 """
 
 from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, Person,
-                                             PrimaryResourceMetadata, RemoteFile, ResourceReferences, User)
+                                             PrimaryResourceMetadata, RemoteFile, ResourceMetadata, ResourceReferences, User)
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
+import datetime
+import dateutil
 import unittest
 
 
 class ChartDataModelTestCase(unittest.TestCase):
     def test_Chart(self):
+        now = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
         chart = Chart(
             id='chart type 1',
             metadata=PrimaryResourceMetadata(
@@ -35,6 +38,11 @@ class ChartDataModelTestCase(unittest.TestCase):
                 license=License.cc0,
                 owner=User(id='user-id'),
                 parent=Chart(id='parent-viz'),
+            ),
+            _metadata=ResourceMetadata(
+                version=3,
+                created=now,
+                updated=now,
             ),
         )
         self.assertEqual(Chart.from_json(chart.to_json()), chart)

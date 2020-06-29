@@ -8,8 +8,8 @@
 
 from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 from Biosimulations_utils.data_model import (AccessLevel, Format, Identifier, JournalCitation,
-                                             License, OntologyTerm, Person, RemoteFile, PrimaryResourceMetadata, ResourceReferences,
-                                             Taxon, Type, User)
+                                             License, OntologyTerm, Person, PrimaryResourceMetadata, RemoteFile,
+                                             ResourceMetadata, ResourceReferences, Taxon, Type, User)
 from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import TimecourseSimulation, SimulationResult
 from Biosimulations_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
@@ -77,9 +77,17 @@ class DataModelTestCase(unittest.TestCase):
 
     def test_ResourceMetadata(self):
         now = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
+        md = ResourceMetadata(
+            version='1.0.0',
+            created=now,
+            updated=now,
+        )
+        self.assertEqual(ResourceMetadata.from_json(md.to_json()), md)
+
+    def test_PrimaryResourceMetadata(self):
         md = PrimaryResourceMetadata(
             name='name',
-            # image=RemoteFile(),
+            # image=RemoteFile(id='thumbnail'),
             summary='summary',
             description='description',
             tags=['tag1', 'tag2'],
@@ -99,8 +107,6 @@ class DataModelTestCase(unittest.TestCase):
             license=License.cc0,
             # owner=User(id='user-id'),
             access_level=AccessLevel.private,
-            created=now,
-            updated=now,
         )
         self.assertEqual(PrimaryResourceMetadata.from_json(md.to_json()), md)
 

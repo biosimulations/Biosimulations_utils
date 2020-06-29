@@ -7,7 +7,8 @@
 """
 
 from Biosimulations_utils.biomodel.data_model import BiomodelFormat
-from Biosimulations_utils.utils import get_enum_format_by_attr, pretty_print_units, assert_exception
+from Biosimulations_utils.utils import (get_enum_format_by_attr, pretty_print_units, assert_exception,
+                                        datetime_to_time_since_epoch, time_since_epoch_to_datetime)
 import unittest
 
 
@@ -47,3 +48,8 @@ class UtilsTestCase(unittest.TestCase):
         assert_exception(True, Exception('message'))
         with self.assertRaisesRegex(Exception, 'message'):
             assert_exception(False, Exception('message'))
+
+    def test_datetime_to_from_time_since_epoch(self):
+        sec_since_epoch = 1593377284
+        milliseconds_since_epoch = sec_since_epoch * 1e3
+        self.assertEqual(datetime_to_time_since_epoch(time_since_epoch_to_datetime(milliseconds_since_epoch)), milliseconds_since_epoch)

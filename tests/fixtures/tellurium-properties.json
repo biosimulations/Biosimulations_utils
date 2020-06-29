@@ -729,9 +729,12 @@
           "lastName": "Stocking"
         }
       ],
-      "license": "MIT",
-      "created": "2020-04-13T12:00:00Z",
-      "updated": "2020-04-13T12:00:00Z"
+      "license": "MIT"
     }
+  },
+  "meta": {
+    "version": 3,
+    "created": 1586779200000,
+    "updated": 1586779200000
   }
 }

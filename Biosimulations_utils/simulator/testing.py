@@ -9,7 +9,8 @@
 from Biosimulations_utils.archive import read_archive
 from Biosimulations_utils.archive.data_model import ArchiveFormat
 from Biosimulations_utils.archive.exec import gen_archive_for_sim, exec_archive
-from Biosimulations_utils.data_model import JournalCitation, License, OntologyTerm, Person, PrimaryResourceMetadata, ResourceReferences
+from Biosimulations_utils.data_model import (JournalCitation, License, OntologyTerm, Person,
+                                             PrimaryResourceMetadata, ResourceMetadata, ResourceReferences)
 from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat, BiomodelParameter
 from Biosimulations_utils.simulation import read_simulation
@@ -254,8 +255,8 @@ class SimulatorValidator(object):
             Person(first_name='Jill', middle_name='B', last_name='Doe'),
         ]
         model.metadata.license = License.cc0
-        model.metadata.created = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
-        model.metadata.updated = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
+        model._metadata.created = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
+        model._metadata.updated = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
         return model
 
     def _gen_example_simulation(self, model):
@@ -325,6 +326,8 @@ class SimulatorValidator(object):
                     Person(first_name='Jane', middle_name='D', last_name='Doe'),
                 ],
                 license=License.cc0,
+            ),
+            _metadata=ResourceMetadata(
                 created=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
                 updated=datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC),
             ),

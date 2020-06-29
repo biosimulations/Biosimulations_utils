@@ -205,12 +205,15 @@ class SedMlSimulationWriter(SimulationWriter):
             namespaces.add('dcterms')
 
         metadata.append(XmlNode(prefix='dcterms', name='mediator', children='BioSimulations'))
-        if obj.metadata.created:
+        if obj._metadata.version is not None:
+            metadata.append(XmlNode(prefix='dc', name='description', type='version',
+                                    children=obj._metadata.version))
+        if obj._metadata.created is not None:
             metadata.append(XmlNode(prefix='dcterms', name='created',
-                                    children=obj.metadata.created.strftime('%Y-%m-%dT%H:%M:%SZ')))
-        if obj.metadata.updated:
+                                    children=obj._metadata.created.strftime('%Y-%m-%dT%H:%M:%SZ')))
+        if obj._metadata.updated is not None:
             metadata.append(XmlNode(prefix='dcterms', name='date', type='update',
-                                    children=obj.metadata.updated.strftime('%Y-%m-%dT%H:%M:%SZ')))
+                                    children=obj._metadata.updated.strftime('%Y-%m-%dT%H:%M:%SZ')))
         namespaces.add('dcterms')
 
         self._set_meta_id(doc_sed, obj_sed)
@@ -976,10 +979,12 @@ class SedMlSimulationReader(SimulationReader):
                                         sim.metadata.references.citations.append(citation)
             elif node.prefix == 'dcterms' and node.name == 'license' and isinstance(node.children, str):
                 sim.metadata.license = License(node.children)
+            elif node.prefix == 'dc' and node.name == 'description' and node.type == 'version':
+                sim._metadata.version = int(node.children)
             elif node.prefix == 'dcterms' and node.name == 'created' and isinstance(node.children, str):
-                sim.metadata.created = dateutil.parser.parse(node.children)
+                sim._metadata.created = dateutil.parser.parse(node.children)
             elif node.prefix == 'dcterms' and node.name == 'date' and node.type == 'update' and isinstance(node.children, str):
-                sim.metadata.updated = dateutil.parser.parse(node.children)
+                sim._metadata.updated = dateutil.parser.parse(node.children)
 
         sim.format = copy.copy(SimulationFormat.sedml.value)
         sim.format.version = "L{}V{}".format(doc_sed.getLevel(), doc_sed.getVersion())

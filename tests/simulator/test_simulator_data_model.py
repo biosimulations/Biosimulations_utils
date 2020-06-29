@@ -7,7 +7,8 @@
 """
 
 from Biosimulations_utils.archive.data_model import ArchiveFormat
-from Biosimulations_utils.data_model import JournalCitation, License, OntologyTerm, Person, RemoteFile, PrimaryResourceMetadata, Type
+from Biosimulations_utils.data_model import (JournalCitation, License, OntologyTerm, Person,
+                                             PrimaryResourceMetadata, RemoteFile, ResourceMetadata, Type)
 from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import Algorithm, AlgorithmParameter, SimulationFormat
 from Biosimulations_utils.simulator.data_model import Simulator
@@ -69,6 +70,9 @@ class SimulatorDataModelTestCase(unittest.TestCase):
                     Person(first_name='Jane', middle_name='D', last_name='Doe'),
                 ],
                 license=License.cc0,
+            ),
+            _metadata=ResourceMetadata(
+                version=3,
                 created=now,
                 updated=now,
             ),

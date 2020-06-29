@@ -7,7 +7,7 @@
 """
 
 from Biosimulations_utils.api_client import ApiClient, ResponseType
-from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, Person, PrimaryResourceMetadata, RemoteFile, Taxon, User)
+from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, Person, RemoteFile, Taxon, User)
 from Biosimulations_utils.import_resources import biomodels
 from Biosimulations_utils.biomodel.data_model import Biomodel
 from Biosimulations_utils.simulation.data_model import Simulation
@@ -17,7 +17,6 @@ try:
     import docker
 except ModuleNotFoundError:
     docker = None
-import json
 import os
 import shutil
 import tempfile
@@ -41,37 +40,36 @@ class BioModelsImporterTestCase(unittest.TestCase):
 
     @unittest.skipIf(os.getenv('CI', '0') in ['1', 'true'], 'CI does not have credentials to log into BioSimulations')
     def test_import_and_post(self):
-        # api_client = ApiClient()
-        # api_client.login()
+        # login to API
+        api_client = ApiClient()
+        api_client.login()
 
-        # api_client.exec('delete', '/models', response_type=ResponseType.bytes)
-        # models2 = api_client.exec('get', '/models')
-        # self.assertEqual(models2, [])
+        # delete models
+        api_client.exec('delete', '/models', response_type=ResponseType.bytes)
 
-        max_models = 20
+        # check that the database has no models
+        models2 = api_client.exec('get', '/models')
+        self.assertEqual(models2, {'data': []})
+
+        # post a few models
+        max_models = 3
         cache_dir = self.dirname
         importer = biomodels.BioModelsImporter(exec_simulations=False, user=User(id='jonrkarr'),
                                                _max_models=max_models, _cache_dir=cache_dir,
-                                               _dry_run=True)
+                                               _dry_run=False)
         models, sims, vizs, stats = importer.run()
-        # self.assertEqual(len(models), max_models)
+        self.assertEqual(len(models), max_models)
 
-        # for model in models:
-        #     with open(os.path.join('biomodels', model.id + '.json'), 'w') as file:
-        #         json.dump(model.to_json(), file)
-
-        # models2_json = api_client.exec('get', '/models')
-        # self.assertEqual(len(models2_json), max_models)
-
-        with open('tests/fixtures/biomodels-20.json', 'r') as file:
-            models2_json = json.load(file)
+        # check that the models have been posted
+        models2_json = api_client.exec('get', '/models')
+        self.assertEqual(len(models2_json['data']), max_models)
 
         models2 = {}
         for model2_json in models2_json['data']:
             model2 = Biomodel.from_json({'data': model2_json})
             models2[model2.id] = model2
 
-        for model in models[0:20]:
+        for model in models:
             model2 = models2[model.id]
 
             model.file = RemoteFile(id=model.file.id)

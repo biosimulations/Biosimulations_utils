@@ -7,12 +7,15 @@
 """
 
 import attrdict
+import os
 
 __all__ = [
     'auth0',
     'api',
+    'combine_test_suite',
 ]
 
+# Auth0
 auth0 = attrdict.AttrDict({
     'endpoint': 'https://auth.biosimulations.org',
     'audience': 'api.biosimulations.org',
@@ -28,6 +31,22 @@ for method in scope_methods:
         scopes.append('{}:{}'.format(method, module))
 auth0['scope'] = ' '.join(scopes)
 
+# REST API
 api = attrdict.AttrDict({
     'endpoint': 'https://api.biosimulations.dev',
+})
+
+# test suite
+combine_test_suite = attrdict.AttrDict({
+    'dirname': os.getenv(
+        'COMBINE_TEST_SUITE_DIR',
+        os.path.expanduser(
+            os.path.join(
+                '~',
+                'Documents',
+                'Biosimulations_COMBINE_archive_test_suite',
+                'Biosimulations_combine_archive_test_suite',
+            ),
+        ),
+    ),
 })

@@ -31,11 +31,14 @@ jobs:
           pip install git+https://github.com/KarrLab/pkg_utils.git#egg=pkg_utils
           pip install git+https://github.com/KarrLab/wc_utils.git#egg=wc_utils
           pip install git+https://github.com/reproducible-biomedical-modeling/Biosimulations_tellurium.git#egg=Biosimulations_tellurium
+          git clone git+https://github.com/reproducible-biomedical-modeling/Biosimulations_COMBINE_archive_test_suite.git
           pip install -e .[tests]
       - name: Test with pytest
+        env:
+          COMBINE_TEST_SUITE_DIR: Biosimulations_COMBINE_archive_test_suite/Biosimulations_combine_archive_test_suite
         run: |
           pip install pytest pytest-cov
-          pytest --cov=./Biosimulations_utils --cov-report=xml
+          pytest --cov=./Biosimulations_utils --cov-report=xml        
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1.0.3
         with:

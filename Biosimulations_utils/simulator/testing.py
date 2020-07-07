@@ -6,13 +6,14 @@
 :License: MIT
 """
 
+from Biosimulations_utils import config
 from Biosimulations_utils.archive import read_archive
 from Biosimulations_utils.archive.data_model import ArchiveFormat
 from Biosimulations_utils.archive.exec import gen_archive_for_sim, exec_archive
-from Biosimulations_utils.data_model import (JournalCitation, License, OntologyTerm, Person,
-                                             PrimaryResourceMetadata, ResourceMetadata, ResourceReferences)
 from Biosimulations_utils.biomodel import read_biomodel
 from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat, BiomodelParameter
+from Biosimulations_utils.data_model import (JournalCitation, License, OntologyTerm, Person,
+                                             PrimaryResourceMetadata, ResourceMetadata, ResourceReferences)
 from Biosimulations_utils.simulation import read_simulation
 from Biosimulations_utils.simulation.data_model import (
     TimecourseSimulation, Algorithm, AlgorithmParameter, ParameterChange, SimulationFormat)
@@ -21,11 +22,11 @@ import copy
 import datetime
 import dateutil.tz
 import enum
+import glob
 import json
 import os
 import numpy.testing
 import pandas
-import pkg_resources
 import shutil
 import tempfile
 
@@ -70,15 +71,59 @@ class TestCase(object):
         self.simulation_format = simulation_format
         self.archive_format = archive_format
 
-    @staticmethod
-    def get_full_filename(filename):
-        """ Get the full path to the file
+    def __eq__(self, other):
+        """ Determine if two test cases are semantically equal
+
+        Args:
+            other (:obj:`TestCase`): other test case
 
         Returns:
-            :obj:`str`: full path to the file
+            :obj:`bool`
         """
-        return pkg_resources.resource_filename('Biosimulations_utils',
-                                               os.path.join('simulator', 'test-cases', filename))
+        return other.__class__ == self.__class__ \
+            and self.id == other.id \
+            and self.filename == other.filename \
+            and self.type == other.type \
+            and self.modeling_framework == other.modeling_framework \
+            and self.model_format == other.model_format \
+            and self.simulation_format == other.simulation_format \
+            and self.archive_format == other.archive_format
+
+    def to_json(self):
+        """ Export to JSON
+
+        Returns:
+            :obj:`dict`
+        """
+        return {
+            'id': self.id,
+            'filename': self.filename,
+            'type': self.type.name if self.type else None,
+            'modeling-framework': self.modeling_framework.name if self.modeling_framework else None,
+            'model-format': self.model_format.name if self.model_format else None,
+            'simulation-format': self.simulation_format.name if self.simulation_format else None,
+            'archive-format': self.archive_format.name if self.archive_format else None,
+        }
+
+    @classmethod
+    def from_json(cls, val):
+        """ Create a test case from JSON
+
+        Args:
+            val (:obj:`dict`)
+
+        Returns:
+            :obj:`TestCase`
+        """
+        return cls(
+            id=val.get('id', None),
+            filename=val.get('filename', None),
+            type=TestCaseType[val.get('type')] if val.get('type', None) else None,
+            modeling_framework=BiomodelingFramework[val.get('modeling-framework')] if val.get('modeling-framework', None) else None,
+            model_format=BiomodelFormat[val.get('model-format')] if val.get('model-format', None) else None,
+            simulation_format=SimulationFormat[val.get('simulation-format')] if val.get('simulation-format', None) else None,
+            archive_format=ArchiveFormat[val.get('archive-format')] if val.get('archive-format', None) else None,
+        )
 
 
 class TestCaseException(object):
@@ -102,48 +147,33 @@ class TestCaseException(object):
 class SimulatorValidator(object):
     """ Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
     checking that the image produces the correct outputs for one of more test cases (e.g., COMBINE archive)
+
+    Attributes:
+        test_cases (:obj:`list` of :obj:`TestCase`): test cases
     """
 
-    # TODO: add more test cases and more detailed assertions; potentially use SBML test suite
+    def __init__(self):
+        dirname = config.combine_test_suite.dirname
+        self.test_cases = self.get_test_cases(dirname)
 
-    TEST_CASES = (
-        TestCase(
-            id='BIOMD0000000297.xml',
-            filename='BIOMD0000000297.xml',
-            type=TestCaseType.biomodel,
-            modeling_framework=BiomodelingFramework.non_spatial_continuous,
-            model_format=BiomodelFormat.sbml,
-            simulation_format=SimulationFormat.sedml,
-            archive_format=ArchiveFormat.combine,
-        ),
-        TestCase(
-            id='BIOMD0000000297.omex',
-            filename='BIOMD0000000297.omex',
-            type=TestCaseType.archive,
-            modeling_framework=BiomodelingFramework.non_spatial_continuous,
-            model_format=BiomodelFormat.sbml,
-            simulation_format=SimulationFormat.sedml,
-            archive_format=ArchiveFormat.combine,
-        ),
-        TestCase(
-            id='BIOMD0000000734.omex',
-            filename='BIOMD0000000734.omex',
-            type=TestCaseType.archive,
-            modeling_framework=BiomodelingFramework.non_spatial_continuous,
-            model_format=BiomodelFormat.sbml,
-            simulation_format=SimulationFormat.sedml,
-            archive_format=ArchiveFormat.combine,
-        ),
-        TestCase(
-            id='test-bngl.omex',
-            filename='test-bngl.omex',
-            type=TestCaseType.archive,
-            modeling_framework=BiomodelingFramework.non_spatial_discrete,
-            model_format=BiomodelFormat.bngl,
-            simulation_format=SimulationFormat.sedml,
-            archive_format=ArchiveFormat.combine,
-        ),
-    )
+    def get_test_cases(self, dirname):
+        """ Collect test cases from a directory
+
+        Args:
+            dirname (:obj:`str`): path to test cases and metadata about each test case (one JSON file per test case)
+
+        Returns:
+            test_cases (:obj:`list` of :obj:`TestCase`): test cases
+        """
+        test_cases = []
+
+        for md_filename in glob.glob(os.path.join(dirname, '*.json')):
+            with open(md_filename, 'r') as md_file:
+                test_case = TestCase.from_json(json.load(md_file))
+                test_case.filename = os.path.join(dirname, test_case.filename)
+                test_cases.append(test_case)
+
+        return test_cases
 
     def run(self, dockerhub_id, properties_filename, test_case_ids=None):
         """ Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
@@ -165,7 +195,7 @@ class SimulatorValidator(object):
         valid_test_cases = []
         test_case_exceptions = []
         skipped_test_cases = []
-        for test_case in self.TEST_CASES:
+        for test_case in self.test_cases:
             if test_case_ids is not None and test_case.id not in test_case_ids:
                 skipped_test_cases.append(test_case)
                 continue
@@ -203,7 +233,7 @@ class SimulatorValidator(object):
 
             if use_test_case:
                 if test_case.type == TestCaseType.biomodel:
-                    model_filename = test_case.get_full_filename(test_case.filename)
+                    model_filename = test_case.filename
                     model = self._gen_example_model(model_filename)
                     simulation = self._gen_example_simulation(model)
                     simulation.model_parameter_changes = [
@@ -212,7 +242,7 @@ class SimulatorValidator(object):
                     ]
                     _, archive_filename = self._gen_example_archive(model_filename, simulation)
                 else:
-                    archive_filename = test_case.get_full_filename(test_case.filename)
+                    archive_filename = test_case.filename
 
                 try:
                     self._validate_test_case(test_case, archive_filename, dockerhub_id)

@@ -12,6 +12,7 @@ from Biosimulations_utils.data_model import (JournalCitation, License, OntologyT
 from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat
 from Biosimulations_utils.simulation.data_model import Algorithm, AlgorithmParameter, SimulationFormat
 from Biosimulations_utils.simulator.data_model import Simulator
+from Biosimulations_utils.simulator.testing import TestCase, TestCaseType
 import datetime
 import dateutil.tz
 import unittest
@@ -78,3 +79,16 @@ class SimulatorDataModelTestCase(unittest.TestCase):
             ),
         )
         self.assertEqual(Simulator.from_json(simulator.to_json()), simulator)
+
+    def test_TestCase(self):
+        test_case = TestCase(
+            id='BIOMD0000000297.omex',
+            filename='BIOMD0000000297.omex',
+            type=TestCaseType.archive,
+            modeling_framework=BiomodelingFramework.non_spatial_continuous,
+            model_format=BiomodelFormat.sbml,
+            simulation_format=SimulationFormat.sedml,
+            archive_format=ArchiveFormat.combine,
+        )
+
+        self.assertEqual(TestCase.from_json(test_case.to_json()), test_case)

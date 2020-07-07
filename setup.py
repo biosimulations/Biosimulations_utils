@@ -18,9 +18,7 @@ import pkg_utils
 name = 'Biosimulations_utils'
 dirname = os.path.dirname(__file__)
 package_data = {
-    name: [
-        'simulator/test-cases/*',
-    ],
+    name: [],
 }
 
 # get package metadata

@@ -174,14 +174,14 @@ class SimulationDataModelTestCase(unittest.TestCase):
                  ('Modelling approach, pioneered by Rene Thomas and Stuart Kaufman, where the '
                   'evolution of a system is described by the transitions between discrete activity '
                   'states of "genes" that control each other.'),
-                 'http://biomodels.net/SBO/SBO_0000234',
+                 'https://www.ebi.ac.uk/sbo/main/SBO:0000234',
                  ),
                 ('SBO', '0000624', 'flux balance framework',
                  ('Modelling approach, typically used for metabolic models, where the flow '
                   'of metabolites (flux) through a network can be calculated. This approach '
                   'will generally produce a set of solutions (solution space), which may be '
                   'reduced using objective functions and constraints on individual fluxes.'),
-                 'http://biomodels.net/SBO/SBO_0000624',
+                 'https://www.ebi.ac.uk/sbo/main/SBO:0000624',
                  ),
             ),
             (

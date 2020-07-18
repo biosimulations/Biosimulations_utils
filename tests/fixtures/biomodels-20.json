@@ -151,7 +151,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -815,7 +815,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -2742,7 +2742,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -4570,7 +4570,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -5049,7 +5049,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -5490,7 +5490,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -6350,7 +6350,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -6719,7 +6719,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -7107,7 +7107,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -7724,7 +7724,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -8586,7 +8586,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -9048,7 +9048,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -11061,7 +11061,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -11982,7 +11982,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -12472,7 +12472,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -14018,7 +14018,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -17702,7 +17702,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -21129,7 +21129,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -21503,7 +21503,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",
@@ -21797,7 +21797,7 @@
           "id": "0000293",
           "name": "non-spatial continuous framework",
           "description": "Modelling approach where the quantities of participants are considered continuous, and represented by real values. The associated simulation methods make use of differential equations. The models do not take into account the distribution of the entities and describe only the temporal fluxes.",
-          "iri": "http://biomodels.net/SBO/SBO_0000293"
+          "iri": "https://www.ebi.ac.uk/sbo/main/SBO:0000293"
         },
         "format": {
           "id": "SBML",

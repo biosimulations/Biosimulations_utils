@@ -29,7 +29,7 @@ class BiomodelingFramework(enum.Enum):
                      'of metabolites (flux) through a network can be calculated. This approach '
                      'will generally produce a set of solutions (solution space), which may be '
                      'reduced using objective functions and constraints on individual fluxes.'),
-        iri='http://biomodels.net/SBO/SBO_0000624',
+        iri='https://www.ebi.ac.uk/sbo/main/SBO:0000624',
     )
 
     logical = OntologyTerm(
@@ -39,7 +39,7 @@ class BiomodelingFramework(enum.Enum):
         description=('Modelling approach, pioneered by Rene Thomas and Stuart Kaufman, where the '
                      'evolution of a system is described by the transitions between discrete activity '
                      'states of "genes" that control each other.'),
-        iri='http://biomodels.net/SBO/SBO_0000234',
+        iri='https://www.ebi.ac.uk/sbo/main/SBO:0000234',
     )
 
     non_spatial_continuous = OntologyTerm(
@@ -50,7 +50,7 @@ class BiomodelingFramework(enum.Enum):
                      'and represented by real values. The associated simulation methods make use of '
                      'differential equations. The models do not take into account the distribution of the '
                      'entities and describe only the temporal fluxes.'),
-        iri='http://biomodels.net/SBO/SBO_0000293',
+        iri='https://www.ebi.ac.uk/sbo/main/SBO:0000293',
     )
 
     non_spatial_discrete = OntologyTerm(
@@ -61,7 +61,7 @@ class BiomodelingFramework(enum.Enum):
                      'and represented by integer values. The associated simulation methods can be '
                      'deterministic or stochastic.The models do not take into account the distribution '
                      'of the entities and describe only the temporal fluxes.'),
-        iri='http://biomodels.net/SBO/SBO_0000295',
+        iri='https://www.ebi.ac.uk/sbo/main/SBO:0000295',
     )
 
     spatial_continuous = OntologyTerm(
@@ -72,7 +72,7 @@ class BiomodelingFramework(enum.Enum):
                      'and represented by real values. The associated simulation methods make use of '
                      'differential equations. The models take into account the distribution of the '
                      'entities and describe the spatial fluxes.'),
-        iri='http://biomodels.net/SBO/SBO_0000292 ',
+        iri='https://www.ebi.ac.uk/sbo/main/SBO:0000292 ',
     )
 
     spatial_discrete = OntologyTerm(
@@ -83,7 +83,7 @@ class BiomodelingFramework(enum.Enum):
                      'and represented by integer values. The associated simulation methods can be '
                      'deterministic or stochastic. The models take into account the distribution of '
                      'the entities and describe the spatial fluxes.'),
-        iri='http://biomodels.net/SBO/SBO_0000294',
+        iri='https://www.ebi.ac.uk/sbo/main/SBO:0000294',
     )
 
 

@@ -22,6 +22,18 @@ Copyright:
 License:
    MIT
 
+exception Biosimulations_utils.biomodel.core.BiomodelIoError
+
+   Bases: "Exception"
+
+   Model IO error
+
+exception Biosimulations_utils.biomodel.core.BiomodelIoWarning
+
+   Bases: "UserWarning"
+
+   Model IO warning
+
 class Biosimulations_utils.biomodel.core.BiomodelReader
 
    Bases: "abc.ABC"
@@ -147,18 +159,6 @@ class Biosimulations_utils.biomodel.core.BiomodelReader
       Return type:
          "Biomodel"
 
-exception Biosimulations_utils.biomodel.core.BiomodelIoError
-
-   Bases: "Exception"
-
-   Model IO error
-
-exception Biosimulations_utils.biomodel.core.BiomodelIoWarning
-
-   Bases: "UserWarning"
-
-   Model IO warning
-
 Biosimulations_utils.biomodel.data_model module
 
 Data model for biomodels
@@ -178,44 +178,6 @@ Copyright:
 
 License:
    MIT
-
-class Biosimulations_utils.biomodel.data_model.BiomodelingFramework
-
-   Bases: "enum.Enum"
-
-   An enumeration.
-
-   flux_balance = <Biosimulations_utils.data_model.OntologyTerm object>
-
-   logical = <Biosimulations_utils.data_model.OntologyTerm object>
-
-   non_spatial_continuous = <Biosimulations_utils.data_model.OntologyTerm object>
-
-   non_spatial_discrete = <Biosimulations_utils.data_model.OntologyTerm object>
-
-   spatial_continuous = <Biosimulations_utils.data_model.OntologyTerm object>
-
-   spatial_discrete = <Biosimulations_utils.data_model.OntologyTerm object>
-
-class Biosimulations_utils.biomodel.data_model.BiomodelFormat
-
-   Bases: "wc_utils.util.enumerate.CaseInsensitiveEnum"
-
-   Model format metadata
-
-   bngl = <Biosimulations_utils.data_model.Format object>
-
-   cellml = <Biosimulations_utils.data_model.Format object>
-
-   kappa = <Biosimulations_utils.data_model.Format object>
-
-   mml = <Biosimulations_utils.data_model.Format object>
-
-   neuroml = <Biosimulations_utils.data_model.Format object>
-
-   pharmml = <Biosimulations_utils.data_model.Format object>
-
-   sbml = <Biosimulations_utils.data_model.Format object>
 
 class Biosimulations_utils.biomodel.data_model.Biomodel(id=None, name=None, file=None, image=None, description=None, format=None, framework=None, taxon=None, tags=None, identifiers=None, references=None, authors=None, license=None, parameters=None, variables=None, created=None, updated=None)
 
@@ -380,6 +342,26 @@ class Biosimulations_utils.biomodel.data_model.Biomodel(id=None, name=None, file
 
       Returns:
          "dict"
+
+class Biosimulations_utils.biomodel.data_model.BiomodelFormat(value)
+
+   Bases: "wc_utils.util.enumerate.CaseInsensitiveEnum"
+
+   Model format metadata
+
+   bngl = <Biosimulations_utils.data_model.Format object>
+
+   cellml = <Biosimulations_utils.data_model.Format object>
+
+   kappa = <Biosimulations_utils.data_model.Format object>
+
+   mml = <Biosimulations_utils.data_model.Format object>
+
+   neuroml = <Biosimulations_utils.data_model.Format object>
+
+   pharmml = <Biosimulations_utils.data_model.Format object>
+
+   sbml = <Biosimulations_utils.data_model.Format object>
 
 class Biosimulations_utils.biomodel.data_model.BiomodelParameter(target=None, group=None, id=None, name=None, description=None, identifiers=None, type=None, value=None, recommended_range=None, units=None)
 
@@ -630,6 +612,24 @@ class Biosimulations_utils.biomodel.data_model.BiomodelVariable(target=None, gro
 
       Returns:
          "dict"
+
+class Biosimulations_utils.biomodel.data_model.BiomodelingFramework(value)
+
+   Bases: "enum.Enum"
+
+   An enumeration.
+
+   flux_balance = <Biosimulations_utils.data_model.OntologyTerm object>
+
+   logical = <Biosimulations_utils.data_model.OntologyTerm object>
+
+   non_spatial_continuous = <Biosimulations_utils.data_model.OntologyTerm object>
+
+   non_spatial_discrete = <Biosimulations_utils.data_model.OntologyTerm object>
+
+   spatial_continuous = <Biosimulations_utils.data_model.OntologyTerm object>
+
+   spatial_discrete = <Biosimulations_utils.data_model.OntologyTerm object>
 
 Biosimulations_utils.biomodel.sbml module
 

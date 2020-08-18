@@ -148,7 +148,7 @@ class Biosimulations_utils.chart.data_model.ChartDataField(name=None, shape=None
       Returns:
          "dict"
 
-class Biosimulations_utils.chart.data_model.ChartDataFieldShape
+class Biosimulations_utils.chart.data_model.ChartDataFieldShape(value)
 
    Bases: "str", "enum.Enum"
 
@@ -170,7 +170,7 @@ class Biosimulations_utils.chart.data_model.ChartDataFieldShape
 
    scalar = 'scalar'
 
-class Biosimulations_utils.chart.data_model.ChartDataFieldType
+class Biosimulations_utils.chart.data_model.ChartDataFieldType(value)
 
    Bases: "str", "enum.Enum"
 

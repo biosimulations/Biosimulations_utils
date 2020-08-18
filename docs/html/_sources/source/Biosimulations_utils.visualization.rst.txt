@@ -146,6 +146,75 @@ class Biosimulations_utils.visualization.data_model.Visualization(id=None, name=
       Returns:
          "dict"
 
+class Biosimulations_utils.visualization.data_model.VisualizationDataField(data_field=None, simulation_results=None)
+
+   Bases: "object"
+
+   data_field
+
+      data field
+
+      Type:
+         "ChartDataField"
+
+   simulation_results
+
+      simulation results
+
+      Type:
+         "list" of "SimulationResult"
+
+   __eq__(other)
+
+      Determine if two fields are semantically equal
+
+      Parameters:
+         other
+
+          (
+
+         VisualizationDataField
+
+         ) -- other field
+
+      Returns:
+         "bool"
+
+   classmethod from_json(val)
+
+      Create field from JSON
+
+      Parameters:
+         val
+
+          ("dict") --
+
+      Returns:
+         VisualizationDataField
+
+   static sort_key(field)
+
+      Get a key to sort a field
+
+      Parameters:
+         field
+
+          (
+
+         VisualizationDataField
+
+         ) -- field
+
+      Returns:
+         "tuple"
+
+   to_json()
+
+      Export to JSON
+
+      Returns:
+         "dict"
+
 class Biosimulations_utils.visualization.data_model.VisualizationLayoutElement(chart=None, data=None)
 
    Bases: "object"
@@ -209,75 +278,6 @@ class Biosimulations_utils.visualization.data_model.VisualizationLayoutElement(c
          VisualizationLayoutElement
 
          ) -- element
-
-      Returns:
-         "tuple"
-
-   to_json()
-
-      Export to JSON
-
-      Returns:
-         "dict"
-
-class Biosimulations_utils.visualization.data_model.VisualizationDataField(data_field=None, simulation_results=None)
-
-   Bases: "object"
-
-   data_field
-
-      data field
-
-      Type:
-         "ChartDataField"
-
-   simulation_results
-
-      simulation results
-
-      Type:
-         "list" of "SimulationResult"
-
-   __eq__(other)
-
-      Determine if two fields are semantically equal
-
-      Parameters:
-         other
-
-          (
-
-         VisualizationDataField
-
-         ) -- other field
-
-      Returns:
-         "bool"
-
-   classmethod from_json(val)
-
-      Create field from JSON
-
-      Parameters:
-         val
-
-          ("dict") --
-
-      Returns:
-         VisualizationDataField
-
-   static sort_key(field)
-
-      Get a key to sort a field
-
-      Parameters:
-         field
-
-          (
-
-         VisualizationDataField
-
-         ) -- field
 
       Returns:
          "tuple"

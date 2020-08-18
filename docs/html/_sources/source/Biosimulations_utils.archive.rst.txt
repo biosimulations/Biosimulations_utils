@@ -22,42 +22,6 @@ Copyright:
 License:
    MIT
 
-class Biosimulations_utils.archive.combine.CombineArchiveWriter
-
-   Bases:
-
-   Biosimulations_utils.archive.core.ArchiveWriter
-
-   Writer for COMBINE/OMEX archives
-
-   _abc_impl = <_abc_data object>
-
-   _write_metadata(obj, archive_comb, filename)
-
-      Write metadata about an archive or a file in an archive :param
-      obj: archive or file in an archive :type obj: "Archive" or
-      "ArchiveFile" :param archive_comb: archive :type archive_comb:
-      "libcombine.CombineArchive" :param filename: path of object with
-      archive :type filename: "str"
-
-   run(archive, in_dir, out_file)
-
-      Write an archive to a file
-
-      Parameters:
-         archive (Archive) -- description of archive
-
-         in_dir (str) -- directory which contains the files in the
-         archive
-
-         out_file (str) -- path to save archive
-
-      Raises:
-         AssertionError
-
-          -- if files could not be added to the archive or the archive
-         could not be     saved
-
 class Biosimulations_utils.archive.combine.CombineArchiveReader
 
    Bases:
@@ -102,6 +66,42 @@ class Biosimulations_utils.archive.combine.CombineArchiveReader
 
           -- archive is invalid
 
+class Biosimulations_utils.archive.combine.CombineArchiveWriter
+
+   Bases:
+
+   Biosimulations_utils.archive.core.ArchiveWriter
+
+   Writer for COMBINE/OMEX archives
+
+   _abc_impl = <_abc_data object>
+
+   _write_metadata(obj, archive_comb, filename)
+
+      Write metadata about an archive or a file in an archive :param
+      obj: archive or file in an archive :type obj: "Archive" or
+      "ArchiveFile" :param archive_comb: archive :type archive_comb:
+      "libcombine.CombineArchive" :param filename: path of object with
+      archive :type filename: "str"
+
+   run(archive, in_dir, out_file)
+
+      Write an archive to a file
+
+      Parameters:
+         archive (Archive) -- description of archive
+
+         in_dir (str) -- directory which contains the files in the
+         archive
+
+         out_file (str) -- path to save archive
+
+      Raises:
+         AssertionError
+
+          -- if files could not be added to the archive or the archive
+         could not be     saved
+
 Biosimulations_utils.archive.core module
 
 Base clases for reading and writing archives
@@ -122,25 +122,17 @@ Copyright:
 License:
    MIT
 
-class Biosimulations_utils.archive.core.ArchiveWriter
+exception Biosimulations_utils.archive.core.ArchiveIoError
 
-   Bases: "abc.ABC"
+   Bases: "Exception"
 
-   Writer for archives
+   Archive IO error
 
-   _abc_impl = <_abc_data object>
+exception Biosimulations_utils.archive.core.ArchiveIoWarning
 
-   abstract run(in_dir, out_file)
+   Bases: "UserWarning"
 
-      Write an archive to a file
-
-      Parameters:
-         archive (Archive) -- description of archive
-
-         in_dir (str) -- directory which contains the files in the
-         archive
-
-         out_file (str) -- path to save archive
+   Archive IO warning
 
 class Biosimulations_utils.archive.core.ArchiveReader
 
@@ -166,17 +158,25 @@ class Biosimulations_utils.archive.core.ArchiveReader
       Return type:
          "Archive"
 
-exception Biosimulations_utils.archive.core.ArchiveIoError
+class Biosimulations_utils.archive.core.ArchiveWriter
 
-   Bases: "Exception"
+   Bases: "abc.ABC"
 
-   Archive IO error
+   Writer for archives
 
-exception Biosimulations_utils.archive.core.ArchiveIoWarning
+   _abc_impl = <_abc_data object>
 
-   Bases: "UserWarning"
+   abstract run(in_dir, out_file)
 
-   Archive IO warning
+      Write an archive to a file
+
+      Parameters:
+         archive (Archive) -- description of archive
+
+         in_dir (str) -- directory which contains the files in the
+         archive
+
+         out_file (str) -- path to save archive
 
 Biosimulations_utils.archive.data_model module
 
@@ -197,14 +197,6 @@ Copyright:
 
 License:
    MIT
-
-class Biosimulations_utils.archive.data_model.ArchiveFormat
-
-   Bases: "wc_utils.util.enumerate.CaseInsensitiveEnum"
-
-   Simulation format metadata
-
-   combine = <Biosimulations_utils.data_model.Format object>
 
 class Biosimulations_utils.archive.data_model.Archive(master_file=None, files=None, description=None, authors=None, format=None, created=None, updated=None)
 
@@ -357,6 +349,14 @@ class Biosimulations_utils.archive.data_model.ArchiveFile(filename=None, format=
       Returns:
          "tuple"
 
+class Biosimulations_utils.archive.data_model.ArchiveFormat(value)
+
+   Bases: "wc_utils.util.enumerate.CaseInsensitiveEnum"
+
+   Simulation format metadata
+
+   combine = <Biosimulations_utils.data_model.Format object>
+
 Biosimulations_utils.archive.exec module
 
 Utilities for generating COMBINE archives for simulations and
@@ -377,6 +377,22 @@ Copyright:
 
 License:
    MIT
+
+Biosimulations_utils.archive.exec.exec_archive(archive_filename, dockerhub_id, out_dir)
+
+   Execute the tasks described in a archive
+
+   Parameters:
+      archive_filename (str) -- path to archive
+
+      dockerhub_id (str) -- DockerHub id of simulator
+
+      out_dir (str) -- directory where simulation results where saved
+
+   Raises:
+      RuntimeError
+
+       -- if the execution failed
 
 Biosimulations_utils.archive.exec.gen_archive_for_sim(model_filename, simulation, archive_filename, simulation_format_opts=None, visualization=None)
 
@@ -400,22 +416,6 @@ Biosimulations_utils.archive.exec.gen_archive_for_sim(model_filename, simulation
    Return type:
       "Archive"
 
-Biosimulations_utils.archive.exec.exec_archive(archive_filename, dockerhub_id, out_dir)
-
-   Execute the tasks described in a archive
-
-   Parameters:
-      archive_filename (str) -- path to archive
-
-      dockerhub_id (str) -- DockerHub id of simulator
-
-      out_dir (str) -- directory where simulation results where saved
-
-   Raises:
-      RuntimeError
-
-       -- if the execution failed
-
 Module contents
 
 Module for representing, reading, and writing archives
@@ -436,25 +436,6 @@ Copyright:
 License:
    MIT
 
-Biosimulations_utils.archive.write_archive(archive, in_dir, out_file, format=<ArchiveFormat.combine: <Biosimulations_utils.data_model.Format object>>)
-
-   Write an archive
-
-   Parameters:
-      archive (Archive) -- description of archive
-
-      in_dir (str) -- directory which contains the files in the
-      archive
-
-      out_file (str) -- path to save archive
-
-      format (ArchiveFormat, optional) -- archive format
-
-   Raises:
-      NotImplementedError
-
-       -- the format is not supported
-
 Biosimulations_utils.archive.read_archive(in_file, out_dir, format=<ArchiveFormat.combine: <Biosimulations_utils.data_model.Format object>>)
 
    Read an archive
@@ -472,6 +453,25 @@ Biosimulations_utils.archive.read_archive(in_file, out_dir, format=<ArchiveForma
 
    Return type:
       "Archive"
+
+   Raises:
+      NotImplementedError
+
+       -- the format is not supported
+
+Biosimulations_utils.archive.write_archive(archive, in_dir, out_file, format=<ArchiveFormat.combine: <Biosimulations_utils.data_model.Format object>>)
+
+   Write an archive
+
+   Parameters:
+      archive (Archive) -- description of archive
+
+      in_dir (str) -- directory which contains the files in the
+      archive
+
+      out_file (str) -- path to save archive
+
+      format (ArchiveFormat, optional) -- archive format
 
    Raises:
       NotImplementedError

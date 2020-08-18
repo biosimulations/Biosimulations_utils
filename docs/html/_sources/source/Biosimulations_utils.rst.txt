@@ -467,7 +467,7 @@ class Biosimulations_utils.data_model.JournalReference(authors=None, title=None,
       Returns:
          "dict"
 
-class Biosimulations_utils.data_model.License
+class Biosimulations_utils.data_model.License(value)
 
    Bases: "wc_utils.util.enumerate.CaseInsensitiveEnum"
 
@@ -774,7 +774,7 @@ class Biosimulations_utils.data_model.Taxon(id=None, name=None)
       Returns:
          "dict"
 
-class Biosimulations_utils.data_model.Type
+class Biosimulations_utils.data_model.Type(value)
 
    Bases: "str", "enum.Enum"
 
@@ -820,6 +820,30 @@ Copyright:
 License:
    MIT
 
+Biosimulations_utils.utils.assert_exception(success, exception)
+
+   Raise an error if "success" is "False"
+
+   Parameters:
+      success (bool) --
+
+      exception (Exception) --
+
+   Raises:
+      Exception
+
+       --
+
+Biosimulations_utils.utils.crop_image(filename, background_to_transparent=None)
+
+   Crop an image and, optionally, make the background transparent
+
+   Parameters:
+      filename (str) -- path to image
+
+      background_to_transparent (list of int, optional) -- background
+      to make transparent
+
 Biosimulations_utils.utils.get_enum_format_by_attr(FormatEnum, attr_name, attr_val)
 
    Get a biomodel format by its specification URL
@@ -838,45 +862,6 @@ Biosimulations_utils.utils.get_enum_format_by_attr(FormatEnum, attr_name, attr_v
    Return type:
       "Format"
 
-Biosimulations_utils.utils.pretty_print_units(units_str)
-
-   Pretty print units
-
-   Parameters:
-      units_str
-
-       ("str") -- units
-
-   Returns:
-      pretty printed units
-
-   Return type:
-      "str"
-
-Biosimulations_utils.utils.crop_image(filename, background_to_transparent=None)
-
-   Crop an image and, optionally, make the background transparent
-
-   Parameters:
-      filename (str) -- path to image
-
-      background_to_transparent (list of int, optional) -- background
-      to make transparent
-
-Biosimulations_utils.utils.assert_exception(success, exception)
-
-   Raise an error if "success" is "False"
-
-   Parameters:
-      success (bool) --
-
-      exception (Exception) --
-
-   Raises:
-      Exception
-
-       --
-
 Biosimulations_utils.utils.get_logger(name='log')
 
    Get a logger
@@ -891,5 +876,20 @@ Biosimulations_utils.utils.get_logger(name='log')
 
    Return type:
       "logging.Logger"
+
+Biosimulations_utils.utils.pretty_print_units(units_str)
+
+   Pretty print units
+
+   Parameters:
+      units_str
+
+       ("str") -- units
+
+   Returns:
+      pretty printed units
+
+   Return type:
+      "str"
 
 Module contents

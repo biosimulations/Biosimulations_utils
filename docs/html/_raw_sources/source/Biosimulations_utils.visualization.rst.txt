@@ -13,7 +13,6 @@ Biosimulations\_utils.visualization.data\_model module
    :show-inheritance:
    :private-members:
 
-
 Module contents
 ---------------
 

@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   <script type="text/javascript">
@@ -23,12 +22,18 @@
   
 
   
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -36,15 +41,11 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="1.1.1.6. Biosimulations_utils.simulator package" href="Biosimulations_utils.simulator.html" /> 
@@ -61,7 +62,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Biosimulations_utils
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Biosimulations_utils
           
 
           
@@ -88,6 +89,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -124,6 +126,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -162,7 +165,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html"><span class="section-number">1. </span>Biosimulations_utils</a> &raquo;</li>
         
@@ -387,6 +390,87 @@
 </dd></dl>
 
 <dl class="py class">
+<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.visualization.data_model.</code><code class="sig-name descname">VisualizationDataField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_field</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">simulation_results</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.data_field">
+<code class="sig-name descname">data_field</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.data_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>data field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChartDataField</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.simulation_results">
+<code class="sig-name descname">simulation_results</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.simulation_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>simulation results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">SimulationResult</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if two fields are semantically equal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField" title="Biosimulations_utils.visualization.data_model.VisualizationDataField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisualizationDataField</span></code></a>) – other field</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.from_json">
+<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create field from JSON</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>val</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField" title="Biosimulations_utils.visualization.data_model.VisualizationDataField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisualizationDataField</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.sort_key">
+<em class="property">static </em><code class="sig-name descname">sort_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.sort_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a key to sort a field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>field</strong> (<a class="reference internal" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField" title="Biosimulations_utils.visualization.data_model.VisualizationDataField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisualizationDataField</span></code></a>) – field</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.to_json">
+<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export to JSON</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="Biosimulations_utils.visualization.data_model.VisualizationLayoutElement">
 <em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.visualization.data_model.</code><code class="sig-name descname">VisualizationLayoutElement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chart</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationLayoutElement" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -468,87 +552,6 @@
 
 </dd></dl>
 
-<dl class="py class">
-<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField">
-<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.visualization.data_model.</code><code class="sig-name descname">VisualizationDataField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_field</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">simulation_results</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py attribute">
-<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.data_field">
-<code class="sig-name descname">data_field</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.data_field" title="Permalink to this definition">¶</a></dt>
-<dd><p>data field</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChartDataField</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.simulation_results">
-<code class="sig-name descname">simulation_results</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.simulation_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>simulation results</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">SimulationResult</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.__eq__">
-<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.__eq__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if two fields are semantically equal</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField" title="Biosimulations_utils.visualization.data_model.VisualizationDataField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisualizationDataField</span></code></a>) – other field</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.from_json">
-<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.from_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create field from JSON</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>val</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField" title="Biosimulations_utils.visualization.data_model.VisualizationDataField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisualizationDataField</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.sort_key">
-<em class="property">static </em><code class="sig-name descname">sort_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.sort_key" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a key to sort a field</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>field</strong> (<a class="reference internal" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField" title="Biosimulations_utils.visualization.data_model.VisualizationDataField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisualizationDataField</span></code></a>) – field</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.visualization.data_model.VisualizationDataField.to_json">
-<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/visualization/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.visualization.data_model.VisualizationDataField.to_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Export to JSON</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="module-Biosimulations_utils.visualization">
 <span id="module-contents"></span><h2><span class="section-number">1.1.1.7.3. </span>Module contents<a class="headerlink" href="#module-Biosimulations_utils.visualization" title="Permalink to this headline">¶</a></h2>
@@ -573,6 +576,7 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Center for Reproducible Biomedical Modeling
 
     </p>
@@ -587,7 +591,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

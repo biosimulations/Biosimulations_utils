@@ -691,4 +691,699 @@ class Biosimulations_utils.simulation.data_model.SimulationResult(simulation=Non
 
 Biosimulations_utils.simulation.sedml module
 
+Utilities for working with SED-ML
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-03-20
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+class Biosimulations_utils.simulation.sedml.SedMlSimulationWriter
+
+   Bases:
+
+   Biosimulations_utils.simulation.core.SimulationWriter
+
+   SED-ML writer
+
+   _num_meta_id
+
+      number of assigned meta ids
+
+      Type:
+         "int"
+
+   _abc_impl = <_abc_data object>
+
+   _add_algorithm_to_sim(algorithm, doc_sed, sim_sed)
+
+      Add a simulation algorithm to a SED document
+
+      Parameters:
+         algorithm (Algorithm) -- simulation algorithm
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         sim_sed (libsedml.SedSimulation) -- SED simulation
+
+      Returns:
+         SED simulation algorithm
+
+      Return type:
+         "libsedml.SedAlgorithm"
+
+   _add_annotation_to_obj(nodes, doc_sed, obj_sed, namespaces)
+
+      Add annotation to a SED object
+
+      Parameters:
+         nodes (list of XmlNode) -- annotation
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         obj_sed (libsedml.SedBase) -- SED object
+
+         namespaces (set of str) -- list of namespaces
+
+   _add_curve_to_plot(x_sim_res, y_sim_res, log_x, log_y, plot_sed)
+
+      Parameters:
+         x_sim_res (SimulationResult) -- X simulation result
+
+         y_sim_res (SimulationResult) -- Y simulation result
+
+         log_x (bool) -- if True, plot X axis in log scale
+
+         log_y (bool) -- if True, plot Y axis in log scale
+
+         plot_sed (libsedml.Plot2D) -- plot
+
+   _add_data_gen_to_doc(id, name, doc_sed)
+
+      Add a data generator to a SED document
+
+      Parameters:
+         id (str) -- id
+
+         name (str) -- name
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+      Returns:
+         SED data generator
+
+      Return type:
+         "libsedml.SedDataGenerator"
+
+   _add_data_set_to_report(id, name, doc_sed, report_sed, data_gen_sed)
+
+      Add a dataset to a SED report
+
+      Parameters:
+         id (str) -- id
+
+         name (str) -- name
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         report_sed (libsedml.SedReport) -- SED report
+
+         data_gen_sed (libsedml.SedDataGenerator) -- SED data
+         generator
+
+      Returns:
+         SED data set
+
+      Return type:
+         "libsedml.SedDataSet"
+
+   _add_metadata_to_obj(obj, doc_sed, obj_sed)
+
+      Add the metadata about a resource to the annotation of a SED
+      object
+
+      Name
+
+      Authors
+
+      Description
+
+      Tags
+
+      References
+
+      License
+
+      Parameters:
+         obj (object) -- object
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         obj_sed (libsedml.SedBase) -- SED object
+
+   _add_model_to_doc(model, doc_sed)
+
+      Add a model to a SED document
+
+      Parameters:
+         model (Biomodel) -- model
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+      Returns:
+         SED model
+
+      Return type:
+         "libsedml.SedModel"
+
+   _add_param_change_to_alg(change, doc_sed, alg_sed)
+
+      Add simulation algorithm parameter change to a SED document
+
+      Parameters:
+         change (ParameterChange) -- simulation algorithm parameter
+         change
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         alg_sed (libsedml.SedAlgorithm) -- SED simulation algorithm
+
+      Returns:
+         SED simulation algorithm parameter change
+
+      Return type:
+         "libsedml.SedAlgorithmParameter"
+
+   _add_param_changes_to_alg(changes, doc_sed, alg_sed)
+
+      Add simulation algorithm parameter changes to a SED document
+
+      Parameters:
+         changes (list of ParameterChange) -- simulation algorithm
+         parameter changes
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         alg_sed (libsedml.SedAlgorithm) -- SED simulation algorithm
+
+      Returns:
+         list of SED simulation algorithm
+            parameter changes
+
+      Return type:
+         "list" of "libsedml.SedAlgorithmParameter"
+
+   _add_parameter_change_to_model(change, doc_sed, model_sed)
+
+      Add a model parameter change to a SED document
+
+      Parameters:
+         change (ParameterChange) -- model parameter change
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         model_sed (libsedml.SedModel) -- SED model
+
+      Returns:
+         SED model parameter change
+
+      Return type:
+         "libsedml.SedChangeAttribute"
+
+   _add_parameter_changes_to_model(changes, doc_sed, model_sed)
+
+      Add model parameter changes to a SED document
+
+      Parameters:
+         changes (list of ParameterChange) -- model parameter changes
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         model_sed (libsedml.SedModel) -- SED model
+
+      Returns:
+         list of SED model parameter changes
+
+      Return type:
+         "list" of "libsedml.SedChangeAttribute"
+
+   _add_report_to_doc(id, name, doc_sed)
+
+      Add a report to a SED document
+
+      Parameters:
+         id (str) -- id
+
+         name (str) -- name
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+      Returns:
+         SED report
+
+      Return type:
+         "libsedml.SedReport"
+
+   _add_sim_task_to_doc(id, name, doc_sed, model_sed, sim_sed)
+
+      Add a task to simulate a model to a SED document
+
+      Parameters:
+         id (str) -- id
+
+         name (str) -- name
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         model_sed (libsedml.SedModel) -- SED model
+
+         sim_sed (libsedml.SedSimulation) -- SED simulation
+
+      Returns:
+         SED task
+
+      Return type:
+         "libsedml.SedTask"
+
+   _add_sim_to_doc(sim, doc_sed)
+
+      Add a simulation to a SED document
+
+      Parameters:
+         sim (Simulation) -- simulation experiment
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+      Returns:
+         timecourse simulation
+
+      Return type:
+         "libsedml.SedUniformTimeCourse"
+
+   _add_task_results_to_report(vars, doc_sed, task_sed, report_sed)
+
+      Add simulation predictions to a SED report
+
+      Parameters:
+         vars (list of BiomodelVariable) -- variables predicted by a
+         model
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         task_sed (libsedml.SedTask) -- SED task
+
+         report_sed (libsedml.SedReport) -- SED report
+
+      Returns:
+         list of dictionary of data generators and variables for each
+            simulation prediction
+
+      Return type:
+         "list" of "dict"
+
+   _add_var_to_data_gen(id, name, symbol, doc_sed, data_gen_sed, task_sed)
+
+      Add a variable to a SED data generator
+
+      Parameters:
+         id (str) -- id
+
+         name (str) -- name
+
+         symbol (str) -- symbol
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         data_gen_sed (libsedml.SedDataGenerator) -- SED data
+         generator
+
+         task_sed (libsedml.SedTask) -- SED task
+
+      Returns:
+         SED variable
+
+      Return type:
+         "libsedml.SedVariable"
+
+   _add_viz_to_doc(visualization, doc_sed)
+
+      Encode visualization into 2D plots in SED document
+
+      Parameters:
+         visualization (Visualization) -- visualization
+
+         doc_sed (libsedml.SedDocument) -- SED document
+
+   static _call_libsedml_method(doc_sed, obj_sed, method_name, *args, **kwargs)
+
+      Call a method of a SED object and check if there's an error
+
+      Parameters:
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         obj_sed (libsedml.SedBase) -- SED object
+
+         method_name (str) -- method name
+
+         *args (list) -- positional arguments to the method
+
+         **kwargs (dict, optional) -- keyword arguments to the method
+
+      Returns:
+         libsedml return code
+
+      Return type:
+         "int"
+
+      Raises:
+         ValueError
+
+          -- if there was a libSED-ML error
+
+   _create_doc(level, version)
+
+      Create a SED document
+
+      Parameters:
+         level (int) -- SED-ML level
+
+         version (int) -- SED-ML version
+
+      Returns:
+         SED document
+
+      Return type:
+         "libsedml.SedDocument"
+
+   _export_doc(doc_sed, filename)
+
+      Export a SED document to an XML file
+
+      Parameters:
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         filename (str) -- path to save document in XML format
+
+   _set_meta_id(doc_sed, obj_sed)
+
+      Generate and set a unique meta id for a SED object
+
+      Parameters:
+         obj_sed
+
+          ("libsedml.SedBase") -- SED object
+
+   run(sim, filename, level=1, version=3, visualization=None)
+
+      Parameters:
+         sim (Simulation) -- Simulation experiment
+
+         filename (str) -- Path to save simulation experiment in SED-
+         ML format
+
+         level (int, optional) -- SED-ML level
+
+         version (int, optional) -- SED-ML version
+
+         visualization (Visualization, optional) -- visualization
+
+      Returns:
+         SED document
+
+      Return type:
+         "libsedml.SedDocument"
+
+      Raises:
+         ValueError
+
+          -- the SED-ML version of the simulation and the desired
+         output version are different
+
+class Biosimulations_utils.simulation.sedml.SedMlSimulationReader
+
+   Bases:
+
+   Biosimulations_utils.simulation.core.SimulationReader
+
+   SED-ML reader
+
+   _filename
+
+      Path to save simulation experiment in SED-ML format
+
+      Type:
+         "str"
+
+   _logger
+
+      logger
+
+      Type:
+         "logging.Logger"
+
+   _abc_impl = <_abc_data object>
+
+   _create_sim(sim_sed)
+
+      Create a simulation for a SED simulation
+
+      Parameters:
+         sim_sed
+
+          ("libsedml.SedSimulation") -- SED simulation
+
+      Returns
+         "Simulation": simulation
+
+      Raises:
+         SimulationIoError
+
+          -- if the simulation type is not supported
+
+   _decode_obj_from_xml(obj_xml)
+
+      Decode an object from its XML representation
+
+      Parameters:
+         obj_xml
+
+          ("libsedml.XMLNode") -- XML representation of an object
+
+      Returns:
+         object
+
+      Return type:
+         "XmlNode"
+
+   _get_model_var_by_data_gen_id(data_gen_id, data_gen_id_to_var_target, time_data_gen_ids, variables)
+
+      Get a model variable by the data generator which records it
+
+      Parameters:
+         data_gen_id (str) -- id of data generator
+
+         data_gen_id_to_var_target (dict) -- dictionary that maps the
+         ids of data generators to the targets of model variables
+
+         time_data_gen_ids (list of str) -- list of ids of data
+         generators that represent time
+
+         variables (list of BiomodelVariable) -- model variables
+
+      Returns:
+         variable
+
+      Return type:
+         "BiomodelVariable"
+
+   _get_obj_annotation(obj_sed)
+
+      Get the annotated properies of a SED object
+
+      Parameters:
+         obj_sed
+
+          ("libsedml.SedBase") -- SED object
+
+      Returns:
+         list of annotations
+
+      Return type:
+         "list" of "XmlNode"
+
+   _get_parameter_change_from_model(change_sed)
+
+      Get a model parameter change from a SED change attribute
+
+      Parameters:
+         change_sed
+
+          ("libsedml.SedChangeAttribute") -- SED change attribute
+
+      Returns:
+         model parameter change
+
+      Return type:
+         "ParameterChange"
+
+   _parse_string(str_value)
+
+      Parse a string to a Boolean, integer, float, or string
+
+      Parameters:
+         str_value
+
+          ("str") -- string
+
+      Returns:
+         value
+
+      Return type:
+         "bool", "int", "float", or "str"
+
+   _read_metadata(doc_sed, sim)
+
+      Read metadata from a SED document
+
+      Parameters:
+         doc_sed (libsedml.SedDocument) -- SED document
+
+         sim (Simulation) -- simulation
+
+   _read_model(model_sed, sim)
+
+      Read a SED model
+
+      Parameters:
+         model_sed (libsedml.SedModel) -- SED model
+
+         sim (Simulation) -- simulation
+
+   _read_model_variables(task_sed, sim)
+
+      Read model variables from SED data generators
+
+      Parameters:
+         task_sed (libsedml.Sed) -- SED task
+
+         sim (Simulation) -- simulation
+
+   _read_sim(sim_sed, sim_filename, sim)
+
+      Read a SED simulation
+
+      Parameters:
+         sim_sed (libsedml.SedSimulation) -- SED simulation
+
+         sim_filename (:ob:`str`) -- path to SED-ML file in which SED
+         simulation was defined
+
+         sim (Simulation) -- simulation
+
+      Raises:
+         SimulationIoError -- the output start time is less than the
+         start time
+
+         AssertionError -- a KiSAO term uses a different ontology or
+         doesn't have an id
+
+   run(filename)
+
+      Base class for reading a simulation experiment from a SED
+      document
+
+      Parameters:
+         filename
+
+          ("str") -- path to SED-ML document that describes a
+         simulation experiment
+
+      Returns:
+         list of Simulation: simulations
+
+         Visualization: visualization
+
+      Return type:
+         "tuple"
+
+      Raises:
+         SimulationIoError
+
+          -- if any of the following conditions are met          * The
+         SED document contains changes other than instances of
+         SedChangeAttribute     * The models or simulations don't have
+         unique ids     * A model or simulation references cannot be
+         resolved
+
+Biosimulations_utils.simulation.sedml.modify_xml_model_for_simulation(simulation, in_model_filename, out_model_filename, default_namespace=None, pretty_print=True)
+
+   Modify an XML-encoded model according to the model changes in a
+   simulation
+
+   Parameters:
+      simulation (Simulation) -- simulation
+
+      in_model_filename (str) -- path to model
+
+      out_model_filename (str) -- path to save modified model
+
+      default_namespace (str, optional) -- default XML namespace URI
+      (e.g., sbml)
+
+      pretty_print (bool, optional) -- if True, pretty print output
+
 Module contents
+
+Utilities for working with simulation experiments
+
+Author:
+   Jonathan Karr <
+
+   karr@mssm.edu
+
+   >
+
+Date:
+   2020-03-22
+
+Copyright:
+   2020, Center for Reproducible Biomedical Modeling
+
+License:
+   MIT
+
+Biosimulations_utils.simulation.write_simulation(sim, filename, format=<SimulationFormat.sedml: <Biosimulations_utils.data_model.Format object>>, visualization=None, **format_opts)
+
+   Write a simulation experiment to a file
+
+   Parameters:
+      sim (dict) -- Simulation experiment
+
+      filename (str) -- Path to save simulation experiment in SED-ML
+      format
+
+      visualization (Visualization, optional) -- visualization
+
+      format (SimulationFormat, optional) -- simulation experiment
+      format
+
+      format_opts (dict, optional) -- options to the simulation
+      experiment format (e.g., level, version)
+
+   Raises:
+      NotImplementedError
+
+       -- the format is not supported
+
+Biosimulations_utils.simulation.read_simulation(filename, format=<SimulationFormat.sedml: <Biosimulations_utils.data_model.Format object>>)
+
+   Read a simulation experiment from a file
+
+   Parameters:
+      filename (str) -- path to save simulation
+
+      format (SimulationFormat, optional) -- simulation experiment
+      format
+
+   Returns:
+      "tuple"
+
+         list of Simulation: simulations
+
+         Visualization: visualization
+
+   Raises:
+      NotImplementedError
+
+       -- the format is not supported

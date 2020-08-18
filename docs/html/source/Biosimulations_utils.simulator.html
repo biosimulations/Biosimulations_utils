@@ -19,7 +19,7 @@
     </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>1.1.1.6. Biosimulations_utils.simulator package &mdash; Biosimulations_utils 0.1.1 documentation</title>
+  <title>1.1.1.6. Biosimulations_utils.simulator package &mdash; Biosimulations_utils 0.1.3 documentation</title>
   
 
   
@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.3
               </div>
             
           
@@ -431,11 +431,372 @@
 </dd></dl>
 
 </div>
-<div class="section" id="biosimulations-utils-simulator-testing-module">
-<h2><span class="section-number">1.1.1.6.3. </span>Biosimulations_utils.simulator.testing module<a class="headerlink" href="#biosimulations-utils-simulator-testing-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-Biosimulations_utils.simulator.testing">
+<span id="biosimulations-utils-simulator-testing-module"></span><h2><span class="section-number">1.1.1.6.3. </span>Biosimulations_utils.simulator.testing module<a class="headerlink" href="#module-Biosimulations_utils.simulator.testing" title="Permalink to this headline">¶</a></h2>
+<p>Utilities for validate containerized simulators</p>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Jonathan Karr &lt;<a class="reference external" href="mailto:karr&#37;&#52;&#48;mssm&#46;edu">karr<span>&#64;</span>mssm<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Date</dt>
+<dd class="field-even"><p>2020-04-13</p>
+</dd>
+<dt class="field-odd">Copyright</dt>
+<dd class="field-odd"><p>2020, Center for Reproducible Biomedical Modeling</p>
+</dd>
+<dt class="field-even">License</dt>
+<dd class="field-even"><p>MIT</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseType">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulator.testing.</code><code class="sig-name descname">TestCaseType</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>Type of test case</p>
+<dl class="py method">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseType._generate_next_value_">
+<code class="sig-name descname">_generate_next_value_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">last_values</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseType._generate_next_value_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseType._member_map_">
+<code class="sig-name descname">_member_map_</code><em class="property"> = {'archive': &lt;TestCaseType.archive: 1&gt;, 'biomodel': &lt;TestCaseType.biomodel: 2&gt;}</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseType._member_map_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseType._member_names_">
+<code class="sig-name descname">_member_names_</code><em class="property"> = ['archive', 'biomodel']</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseType._member_names_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseType._member_type_">
+<code class="sig-name descname">_member_type_</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseType._member_type_" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">builtins.int</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseType._value2member_map_">
+<code class="sig-name descname">_value2member_map_</code><em class="property"> = {1: &lt;TestCaseType.archive: 1&gt;, 2: &lt;TestCaseType.biomodel: 2&gt;}</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseType._value2member_map_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseType.archive">
+<code class="sig-name descname">archive</code><em class="property"> = 1</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseType.archive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseType.biomodel">
+<code class="sig-name descname">biomodel</code><em class="property"> = 2</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseType.biomodel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Biosimulations_utils.simulator.testing.TestCase">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulator.testing.</code><code class="sig-name descname">TestCase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">modeling_framework</span></em>, <em class="sig-param"><span class="n">model_format</span></em>, <em class="sig-param"><span class="n">simulation_format</span></em>, <em class="sig-param"><span class="n">archive_format</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An example archive to validate simulators</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCase.id">
+<code class="sig-name descname">id</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCase.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCase.filename">
+<code class="sig-name descname">filename</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCase.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>path to archive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCase.type">
+<code class="sig-name descname">type</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCase.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>type of test case</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#Biosimulations_utils.simulator.testing.TestCaseType" title="Biosimulations_utils.simulator.testing.TestCaseType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestCaseType</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCase.modeling_framework">
+<code class="sig-name descname">modeling_framework</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCase.modeling_framework" title="Permalink to this definition">¶</a></dt>
+<dd><p>modeling framework</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">BiomodelingFramework</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCase.model_format">
+<code class="sig-name descname">model_format</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCase.model_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>model format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">BiomodelFormat</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCase.simulation_format">
+<code class="sig-name descname">simulation_format</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCase.simulation_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>simulation format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimulationFormat</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCase.archive_format">
+<code class="sig-name descname">archive_format</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCase.archive_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>archive format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ArchiveFormat</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulator.testing.TestCase.get_full_filename">
+<em class="property">static </em><code class="sig-name descname">get_full_filename</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCase.get_full_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the full path to the file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>full path to the file</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseException">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulator.testing.</code><code class="sig-name descname">TestCaseException</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">test_case</span></em>, <em class="sig-param"><span class="n">exception</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An exception of a test case</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseException.test_case">
+<code class="sig-name descname">test_case</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseException.test_case" title="Permalink to this definition">¶</a></dt>
+<dd><p>test case</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#Biosimulations_utils.simulator.testing.TestCase" title="Biosimulations_utils.simulator.testing.TestCase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestCase</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.TestCaseException.exception">
+<code class="sig-name descname">exception</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.TestCaseException.exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>exception</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Biosimulations_utils.simulator.testing.SimulatorValidator">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulator.testing.</code><code class="sig-name descname">SimulatorValidator</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.SimulatorValidator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
+checking that the image produces the correct outputs for one of more test cases (e.g., COMBINE archive)</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulator.testing.SimulatorValidator.TEST_CASES">
+<code class="sig-name descname">TEST_CASES</code><em class="property"> = (&lt;Biosimulations_utils.simulator.testing.TestCase object&gt;, &lt;Biosimulations_utils.simulator.testing.TestCase object&gt;, &lt;Biosimulations_utils.simulator.testing.TestCase object&gt;, &lt;Biosimulations_utils.simulator.testing.TestCase object&gt;)</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.SimulatorValidator.TEST_CASES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulator.testing.SimulatorValidator._assert_archive_output_valid">
+<code class="sig-name descname">_assert_archive_output_valid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">test_case</span></em>, <em class="sig-param"><span class="n">archive_filename</span></em>, <em class="sig-param"><span class="n">out_dir</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.SimulatorValidator._assert_archive_output_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate that the outputs of an archive were correctly generated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_case</strong> (<a class="reference internal" href="#Biosimulations_utils.simulator.testing.TestCase" title="Biosimulations_utils.simulator.testing.TestCase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestCase</span></code></a>) – test case</p></li>
+<li><p><strong>archive_filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to archive</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – directory which contains the simulation results</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – simulator did not generate the specified outputs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulator.testing.SimulatorValidator._gen_example_archive">
+<code class="sig-name descname">_gen_example_archive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_filename</span></em>, <em class="sig-param"><span class="n">simulation</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.SimulatorValidator._gen_example_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode a simulation into SED-ML and generate an example COMBINE archive for it</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to example model</p></li>
+<li><p><strong>simulation</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>) – simulation of model</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Archive</span></code>: properties of the archive</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>: path to archive</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulator.testing.SimulatorValidator._gen_example_model">
+<code class="sig-name descname">_gen_example_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_filename</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.SimulatorValidator._gen_example_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an example model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model_filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to example model</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>example model</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Biomodel</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulator.testing.SimulatorValidator._gen_example_simulation">
+<code class="sig-name descname">_gen_example_simulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.SimulatorValidator._gen_example_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an example simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Biomodel</span></code>) – model</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>example simulation</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulator.testing.SimulatorValidator._validate_test_case">
+<code class="sig-name descname">_validate_test_case</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">test_case</span></em>, <em class="sig-param"><span class="n">archive_filename</span></em>, <em class="sig-param"><span class="n">dockerhub_id</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.SimulatorValidator._validate_test_case" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate that a simulator correctly produces the outputs for a test case</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_case</strong> (<a class="reference internal" href="#Biosimulations_utils.simulator.testing.TestCase" title="Biosimulations_utils.simulator.testing.TestCase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestCase</span></code></a>) – test case</p></li>
+<li><p><strong>archive_filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to archive</p></li>
+<li><p><strong>dockerhub_id</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – DockerHub id of simulator</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulator.testing.SimulatorValidator.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dockerhub_id</span></em>, <em class="sig-param"><span class="n">properties_filename</span></em>, <em class="sig-param"><span class="n">test_case_ids</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/testing.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.testing.SimulatorValidator.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
+checking that the image produces the correct outputs for test cases (e.g., COMBINE archive)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dockerhub_id</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – DockerHub id of simulator</p></li>
+<li><p><strong>properties_filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to the properties of the simulator</p></li>
+<li><p><strong>test_case_ids</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – List of ids of test cases to verify. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">test_case_ids</span></code>
+is none, all test cases are verified.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>valid test cases
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> <a class="reference internal" href="#Biosimulations_utils.simulator.testing.TestCaseException" title="Biosimulations_utils.simulator.testing.TestCaseException"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestCaseException</span></code></a>: invalid test cases</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> <a class="reference internal" href="#Biosimulations_utils.simulator.testing.TestCase" title="Biosimulations_utils.simulator.testing.TestCase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestCase</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="biosimulations-utils-simulator-utils-module">
-<h2><span class="section-number">1.1.1.6.4. </span>Biosimulations_utils.simulator.utils module<a class="headerlink" href="#biosimulations-utils-simulator-utils-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-Biosimulations_utils.simulator.utils">
+<span id="biosimulations-utils-simulator-utils-module"></span><h2><span class="section-number">1.1.1.6.4. </span>Biosimulations_utils.simulator.utils module<a class="headerlink" href="#module-Biosimulations_utils.simulator.utils" title="Permalink to this headline">¶</a></h2>
+<p>Utilities for generating COMBINE archives for simulations and
+executing simulations in archives</p>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Jonathan Karr &lt;<a class="reference external" href="mailto:karr&#37;&#52;&#48;mssm&#46;edu">karr<span>&#64;</span>mssm<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Date</dt>
+<dd class="field-even"><p>2020-04-10</p>
+</dd>
+<dt class="field-odd">Copyright</dt>
+<dd class="field-odd"><p>2020, Center for Reproducible Biomedical Modeling</p>
+</dd>
+<dt class="field-even">License</dt>
+<dd class="field-even"><p>MIT</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt id="Biosimulations_utils.simulator.utils.exec_simulations_in_archive">
+<code class="sig-prename descclassname">Biosimulations_utils.simulator.utils.</code><code class="sig-name descname">exec_simulations_in_archive</code><span class="sig-paren">(</span><em class="sig-param">archive_filename</em>, <em class="sig-param">task_executer</em>, <em class="sig-param">out_dir</em>, <em class="sig-param">archive_format=&lt;ArchiveFormat.combine: &lt;Biosimulations_utils.data_model.Format object&gt;&gt;</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulator/utils.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulator.utils.exec_simulations_in_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the SED tasks represented by an archive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>archive_filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to COMBINE archive</p></li>
+<li><p><strong>task_executer</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">types.FunctionType</span></code>) – <p>Function to execute each SED task in the archive.
+The function must implement the following interface:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">task_executer</span><span class="p">(</span><span class="n">model_filename</span><span class="p">,</span> <span class="n">model_sed_urn</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="n">out_filename</span><span class="p">,</span> <span class="n">out_format</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Execute a simulation and save its results</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">       model_filename (:obj:`str`): path to the model</span>
+<span class="sd">       model_sed_urn (:obj:`str`): SED URN for the format of the model (e.g., `urn:sedml:language:sbml`)</span>
+<span class="sd">       simulation (:obj:`Simulation`): simulation</span>
+<span class="sd">       working_dir (:obj:`str`): directory of the SED-ML file</span>
+<span class="sd">       out_filename (:obj:`str`): path to save the results of the simulation</span>
+<span class="sd">       out_format (:obj:`str`): format to save the results of the simulation (e.g., `csv`)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – Directory to store the results of the tasks</p></li>
+<li><p><strong>archive_format</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ArchiveFormat</span></code>, optional) – archive format</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-Biosimulations_utils.simulator">
 <span id="module-contents"></span><h2><span class="section-number">1.1.1.6.5. </span>Module contents<a class="headerlink" href="#module-Biosimulations_utils.simulator" title="Permalink to this headline">¶</a></h2>

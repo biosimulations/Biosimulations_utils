@@ -13,7 +13,6 @@ Biosimulations\_utils.import\_resources.biomodels module
    :show-inheritance:
    :private-members:
 
-
 Module contents
 ---------------
 

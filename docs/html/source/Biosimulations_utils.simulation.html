@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   <script type="text/javascript">
@@ -23,12 +22,18 @@
   
 
   
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -36,15 +41,11 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="1.1.1.6. Biosimulations_utils.simulator package" href="Biosimulations_utils.simulator.html" />
@@ -62,7 +63,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Biosimulations_utils
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Biosimulations_utils
           
 
           
@@ -89,6 +90,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -125,6 +127,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -163,7 +166,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html"><span class="section-number">1. </span>Biosimulations_utils</a> &raquo;</li>
         
@@ -208,16 +211,18 @@
 <dd class="field-even"><p>MIT</p>
 </dd>
 </dl>
-<dl class="py class">
-<dt id="Biosimulations_utils.simulation.core.SimulationWriter">
-<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.core.</code><code class="sig-name descname">SimulationWriter</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.core.SimulationWriter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
-<p>Base class for simulation writers</p>
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.core.SimulationWriter._abc_impl">
-<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.core.SimulationWriter._abc_impl" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py exception">
+<dt id="Biosimulations_utils.simulation.core.SimulationIoError">
+<em class="property">exception </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.core.</code><code class="sig-name descname">SimulationIoError</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.core.SimulationIoError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Simulation IO error</p>
+</dd></dl>
 
+<dl class="py exception">
+<dt id="Biosimulations_utils.simulation.core.SimulationIoWarning">
+<em class="property">exception </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.core.</code><code class="sig-name descname">SimulationIoWarning</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.core.SimulationIoWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserWarning</span></code></p>
+<p>Simulation IO warning</p>
 </dd></dl>
 
 <dl class="py class">
@@ -232,18 +237,16 @@
 
 </dd></dl>
 
-<dl class="py exception">
-<dt id="Biosimulations_utils.simulation.core.SimulationIoError">
-<em class="property">exception </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.core.</code><code class="sig-name descname">SimulationIoError</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.core.SimulationIoError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>Simulation IO error</p>
-</dd></dl>
+<dl class="py class">
+<dt id="Biosimulations_utils.simulation.core.SimulationWriter">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.core.</code><code class="sig-name descname">SimulationWriter</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.core.SimulationWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Base class for simulation writers</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.core.SimulationWriter._abc_impl">
+<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.core.SimulationWriter._abc_impl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<dl class="py exception">
-<dt id="Biosimulations_utils.simulation.core.SimulationIoWarning">
-<em class="property">exception </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.core.</code><code class="sig-name descname">SimulationIoWarning</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/core.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.core.SimulationIoWarning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserWarning</span></code></p>
-<p>Simulation IO warning</p>
 </dd></dl>
 
 </div>
@@ -264,342 +267,6 @@
 <dd class="field-even"><p>MIT</p>
 </dd>
 </dl>
-<dl class="py class">
-<dt id="Biosimulations_utils.simulation.data_model.SimulationFormat">
-<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.data_model.</code><code class="sig-name descname">SimulationFormat</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.SimulationFormat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wc_utils.util.enumerate.CaseInsensitiveEnum</span></code></p>
-<p>Simulation format metadata</p>
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.SimulationFormat.sedml">
-<code class="sig-name descname">sedml</code><em class="property"> = &lt;Biosimulations_utils.data_model.Format object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.SimulationFormat.sedml" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.SimulationFormat.sessl">
-<code class="sig-name descname">sessl</code><em class="property"> = &lt;Biosimulations_utils.data_model.Format object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.SimulationFormat.sessl" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation">
-<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.data_model.</code><code class="sig-name descname">Simulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">image</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">identifiers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">references</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">authors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">license</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">created</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">updated</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Simulation experiments</p>
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.id">
-<code class="sig-name descname">id</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>id</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.name">
-<code class="sig-name descname">name</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.name" title="Permalink to this definition">¶</a></dt>
-<dd><p>name</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.image">
-<code class="sig-name descname">image</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.image" title="Permalink to this definition">¶</a></dt>
-<dd><p>image file</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteFile</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.description">
-<code class="sig-name descname">description</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.description" title="Permalink to this definition">¶</a></dt>
-<dd><p>description</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.tags">
-<code class="sig-name descname">tags</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.tags" title="Permalink to this definition">¶</a></dt>
-<dd><p>tags</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.identifiers">
-<code class="sig-name descname">identifiers</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.identifiers" title="Permalink to this definition">¶</a></dt>
-<dd><p>identifiers</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Identifier</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.references">
-<code class="sig-name descname">references</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.references" title="Permalink to this definition">¶</a></dt>
-<dd><p>references</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">JournalReference</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.authors">
-<code class="sig-name descname">authors</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.authors" title="Permalink to this definition">¶</a></dt>
-<dd><p>authors</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Person</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.license">
-<code class="sig-name descname">license</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.license" title="Permalink to this definition">¶</a></dt>
-<dd><p>license</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">License</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.format">
-<code class="sig-name descname">format</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.format" title="Permalink to this definition">¶</a></dt>
-<dd><p>format</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Format</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.model">
-<code class="sig-name descname">model</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.model" title="Permalink to this definition">¶</a></dt>
-<dd><p>model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Biomodel</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.model_parameter_changes">
-<code class="sig-name descname">model_parameter_changes</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.model_parameter_changes" title="Permalink to this definition">¶</a></dt>
-<dd><p>model parameter changes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#Biosimulations_utils.simulation.data_model.ParameterChange" title="Biosimulations_utils.simulation.data_model.ParameterChange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParameterChange</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.algorithm">
-<code class="sig-name descname">algorithm</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.algorithm" title="Permalink to this definition">¶</a></dt>
-<dd><p>simulation algorithm</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#Biosimulations_utils.simulation.data_model.Algorithm" title="Biosimulations_utils.simulation.data_model.Algorithm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Algorithm</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.algorithm_parameter_changes">
-<code class="sig-name descname">algorithm_parameter_changes</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.algorithm_parameter_changes" title="Permalink to this definition">¶</a></dt>
-<dd><p>simulation algorithm parameter changes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#Biosimulations_utils.simulation.data_model.ParameterChange" title="Biosimulations_utils.simulation.data_model.ParameterChange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParameterChange</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.created">
-<code class="sig-name descname">created</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.created" title="Permalink to this definition">¶</a></dt>
-<dd><p>date that the simulation was created</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.updated">
-<code class="sig-name descname">updated</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.updated" title="Permalink to this definition">¶</a></dt>
-<dd><p>date that the simulation was last updated</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.__eq__">
-<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.__eq__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if two simulations are semantically equal</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#Biosimulations_utils.simulation.data_model.Simulation" title="Biosimulations_utils.simulation.data_model.Simulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code></a>) – other simulation</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.from_json">
-<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.from_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create simulation from JSON</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>val</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#Biosimulations_utils.simulation.data_model.Simulation" title="Biosimulations_utils.simulation.data_model.Simulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.data_model.Simulation.to_json">
-<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.to_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Export to JSON</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation">
-<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.data_model.</code><code class="sig-name descname">TimecourseSimulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">image</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">identifiers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">references</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">authors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">license</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">start_time</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_start_time</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_time</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">num_time_points</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">created</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">updated</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#Biosimulations_utils.simulation.data_model.Simulation" title="Biosimulations_utils.simulation.data_model.Simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Biosimulations_utils.simulation.data_model.Simulation</span></code></a></p>
-<p>Timecourse simulation</p>
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.start_time">
-<code class="sig-name descname">start_time</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.start_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>start time</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.output_start_time">
-<code class="sig-name descname">output_start_time</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.output_start_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>time to begin recording simulation results</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.end_time">
-<code class="sig-name descname">end_time</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.end_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>end time</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.num_time_points">
-<code class="sig-name descname">num_time_points</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.num_time_points" title="Permalink to this definition">¶</a></dt>
-<dd><p>number of time points to record</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.__eq__">
-<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.__eq__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if two simulations are semantically equal</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation" title="Biosimulations_utils.simulation.data_model.TimecourseSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimecourseSimulation</span></code></a>) – other algorithm</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.from_json">
-<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.from_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create simulation from JSON</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>val</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation" title="Biosimulations_utils.simulation.data_model.TimecourseSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimecourseSimulation</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.to_json">
-<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.to_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Export to JSON</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="Biosimulations_utils.simulation.data_model.SteadyStateSimulation">
-<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.data_model.</code><code class="sig-name descname">SteadyStateSimulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">image</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">identifiers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">references</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">authors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">license</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">created</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">updated</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.SteadyStateSimulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#Biosimulations_utils.simulation.data_model.Simulation" title="Biosimulations_utils.simulation.data_model.Simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Biosimulations_utils.simulation.data_model.Simulation</span></code></a></p>
-<p>Steady-state simulation</p>
-</dd></dl>
-
 <dl class="py class">
 <dt id="Biosimulations_utils.simulation.data_model.Algorithm">
 <em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.data_model.</code><code class="sig-name descname">Algorithm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kisao_term</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ontology_terms</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">modeling_frameworks</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_formats</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">simulation_formats</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">archive_formats</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">references</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Algorithm" title="Permalink to this definition">¶</a></dt>
@@ -983,6 +650,245 @@ KiSAO ids for the parent simulator of an algorithm</p>
 </dd></dl>
 
 <dl class="py class">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.data_model.</code><code class="sig-name descname">Simulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">image</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">identifiers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">references</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">authors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">license</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">created</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">updated</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Simulation experiments</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.id">
+<code class="sig-name descname">id</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.name">
+<code class="sig-name descname">name</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.image">
+<code class="sig-name descname">image</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.image" title="Permalink to this definition">¶</a></dt>
+<dd><p>image file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteFile</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.description">
+<code class="sig-name descname">description</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>description</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.tags">
+<code class="sig-name descname">tags</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>tags</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.identifiers">
+<code class="sig-name descname">identifiers</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.identifiers" title="Permalink to this definition">¶</a></dt>
+<dd><p>identifiers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Identifier</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.references">
+<code class="sig-name descname">references</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.references" title="Permalink to this definition">¶</a></dt>
+<dd><p>references</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">JournalReference</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.authors">
+<code class="sig-name descname">authors</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.authors" title="Permalink to this definition">¶</a></dt>
+<dd><p>authors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Person</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.license">
+<code class="sig-name descname">license</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.license" title="Permalink to this definition">¶</a></dt>
+<dd><p>license</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">License</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.format">
+<code class="sig-name descname">format</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Format</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.model">
+<code class="sig-name descname">model</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Biomodel</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.model_parameter_changes">
+<code class="sig-name descname">model_parameter_changes</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.model_parameter_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>model parameter changes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#Biosimulations_utils.simulation.data_model.ParameterChange" title="Biosimulations_utils.simulation.data_model.ParameterChange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParameterChange</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.algorithm">
+<code class="sig-name descname">algorithm</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.algorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>simulation algorithm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#Biosimulations_utils.simulation.data_model.Algorithm" title="Biosimulations_utils.simulation.data_model.Algorithm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Algorithm</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.algorithm_parameter_changes">
+<code class="sig-name descname">algorithm_parameter_changes</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.algorithm_parameter_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>simulation algorithm parameter changes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#Biosimulations_utils.simulation.data_model.ParameterChange" title="Biosimulations_utils.simulation.data_model.ParameterChange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParameterChange</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.created">
+<code class="sig-name descname">created</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.created" title="Permalink to this definition">¶</a></dt>
+<dd><p>date that the simulation was created</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.updated">
+<code class="sig-name descname">updated</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.updated" title="Permalink to this definition">¶</a></dt>
+<dd><p>date that the simulation was last updated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if two simulations are semantically equal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#Biosimulations_utils.simulation.data_model.Simulation" title="Biosimulations_utils.simulation.data_model.Simulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code></a>) – other simulation</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.from_json">
+<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create simulation from JSON</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>val</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#Biosimulations_utils.simulation.data_model.Simulation" title="Biosimulations_utils.simulation.data_model.Simulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.data_model.Simulation.to_json">
+<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.Simulation.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export to JSON</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Biosimulations_utils.simulation.data_model.SimulationFormat">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.data_model.</code><code class="sig-name descname">SimulationFormat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.SimulationFormat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wc_utils.util.enumerate.CaseInsensitiveEnum</span></code></p>
+<p>Simulation format metadata</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.SimulationFormat.sedml">
+<code class="sig-name descname">sedml</code><em class="property"> = &lt;Biosimulations_utils.data_model.Format object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.SimulationFormat.sedml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.SimulationFormat.sessl">
+<code class="sig-name descname">sessl</code><em class="property"> = &lt;Biosimulations_utils.data_model.Format object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.SimulationFormat.sessl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="Biosimulations_utils.simulation.data_model.SimulationResult">
 <em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.data_model.</code><code class="sig-name descname">SimulationResult</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">variable</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.SimulationResult" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -1064,6 +970,103 @@ KiSAO ids for the parent simulator of an algorithm</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt id="Biosimulations_utils.simulation.data_model.SteadyStateSimulation">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.data_model.</code><code class="sig-name descname">SteadyStateSimulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">image</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">identifiers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">references</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">authors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">license</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">created</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">updated</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.SteadyStateSimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Biosimulations_utils.simulation.data_model.Simulation" title="Biosimulations_utils.simulation.data_model.Simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Biosimulations_utils.simulation.data_model.Simulation</span></code></a></p>
+<p>Steady-state simulation</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.data_model.</code><code class="sig-name descname">TimecourseSimulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">image</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">identifiers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">references</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">authors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">license</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">start_time</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_start_time</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_time</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">num_time_points</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">algorithm_parameter_changes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">created</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">updated</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Biosimulations_utils.simulation.data_model.Simulation" title="Biosimulations_utils.simulation.data_model.Simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Biosimulations_utils.simulation.data_model.Simulation</span></code></a></p>
+<p>Timecourse simulation</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.start_time">
+<code class="sig-name descname">start_time</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>start time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.output_start_time">
+<code class="sig-name descname">output_start_time</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.output_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>time to begin recording simulation results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.end_time">
+<code class="sig-name descname">end_time</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.end_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>end time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.num_time_points">
+<code class="sig-name descname">num_time_points</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.num_time_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of time points to record</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if two simulations are semantically equal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation" title="Biosimulations_utils.simulation.data_model.TimecourseSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimecourseSimulation</span></code></a>) – other algorithm</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.from_json">
+<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create simulation from JSON</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>val</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation" title="Biosimulations_utils.simulation.data_model.TimecourseSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimecourseSimulation</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.data_model.TimecourseSimulation.to_json">
+<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.data_model.TimecourseSimulation.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export to JSON</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-Biosimulations_utils.simulation.sedml">
 <span id="biosimulations-utils-simulation-sedml-module"></span><h2><span class="section-number">1.1.1.5.4. </span>Biosimulations_utils.simulation.sedml module<a class="headerlink" href="#module-Biosimulations_utils.simulation.sedml" title="Permalink to this headline">¶</a></h2>
@@ -1082,6 +1085,241 @@ KiSAO ids for the parent simulator of an algorithm</p>
 <dd class="field-even"><p>MIT</p>
 </dd>
 </dl>
+<dl class="py class">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader">
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.sedml.</code><code class="sig-name descname">SedMlSimulationReader</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Biosimulations_utils.simulation.core.SimulationReader" title="Biosimulations_utils.simulation.core.SimulationReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">Biosimulations_utils.simulation.core.SimulationReader</span></code></a></p>
+<p>SED-ML reader</p>
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._filename">
+<code class="sig-name descname">_filename</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to save simulation experiment in SED-ML format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._logger">
+<code class="sig-name descname">_logger</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>logger</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">logging.Logger</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._abc_impl">
+<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._abc_impl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._create_sim">
+<code class="sig-name descname">_create_sim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sim_sed</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._create_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a simulation for a SED simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sim_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedSimulation</span></code>) – SED simulation</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns</dt><dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>: simulation</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#Biosimulations_utils.simulation.core.SimulationIoError" title="Biosimulations_utils.simulation.core.SimulationIoError"><strong>SimulationIoError</strong></a> – if the simulation type is not supported</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._decode_obj_from_xml">
+<code class="sig-name descname">_decode_obj_from_xml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj_xml</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._decode_obj_from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode an object from its XML representation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>obj_xml</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.XMLNode</span></code>) – XML representation of an object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">XmlNode</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_model_var_by_data_gen_id">
+<code class="sig-name descname">_get_model_var_by_data_gen_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_gen_id</span></em>, <em class="sig-param"><span class="n">data_gen_id_to_var_target</span></em>, <em class="sig-param"><span class="n">time_data_gen_ids</span></em>, <em class="sig-param"><span class="n">variables</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_model_var_by_data_gen_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a model variable by the data generator which records it</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_gen_id</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – id of data generator</p></li>
+<li><p><strong>data_gen_id_to_var_target</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – dictionary that maps the ids of data generators to the targets of model variables</p></li>
+<li><p><strong>time_data_gen_ids</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – list of ids of data generators that represent time</p></li>
+<li><p><strong>variables</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">BiomodelVariable</span></code>) – model variables</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>variable</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">BiomodelVariable</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_obj_annotation">
+<code class="sig-name descname">_get_obj_annotation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj_sed</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_obj_annotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the annotated properies of a SED object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>obj_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedBase</span></code>) – SED object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of annotations</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">XmlNode</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_parameter_change_from_model">
+<code class="sig-name descname">_get_parameter_change_from_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">change_sed</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_parameter_change_from_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a model parameter change from a SED change attribute</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>change_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedChangeAttribute</span></code>) – SED change attribute</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model parameter change</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParameterChange</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._parse_string">
+<code class="sig-name descname">_parse_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str_value</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._parse_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a string to a Boolean, integer, float, or string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>str_value</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – string</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>value</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_metadata">
+<code class="sig-name descname">_read_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">doc_sed</span></em>, <em class="sig-param"><span class="n">sim</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read metadata from a SED document</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>doc_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedDocument</span></code>) – SED document</p></li>
+<li><p><strong>sim</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>) – simulation</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_model">
+<code class="sig-name descname">_read_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_sed</span></em>, <em class="sig-param"><span class="n">sim</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a SED model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedModel</span></code>) – SED model</p></li>
+<li><p><strong>sim</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>) – simulation</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_model_variables">
+<code class="sig-name descname">_read_model_variables</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_sed</span></em>, <em class="sig-param"><span class="n">sim</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_model_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read model variables from SED data generators</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>task_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.Sed</span></code>) – SED task</p></li>
+<li><p><strong>sim</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>) – simulation</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_sim">
+<code class="sig-name descname">_read_sim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sim_sed</span></em>, <em class="sig-param"><span class="n">sim_filename</span></em>, <em class="sig-param"><span class="n">sim</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a SED simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sim_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedSimulation</span></code>) – SED simulation</p></li>
+<li><p><strong>sim_filename</strong> (<a href="#id1"><span class="problematic" id="id2">:ob:`str`</span></a>) – path to SED-ML file in which SED simulation was defined</p></li>
+<li><p><strong>sim</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>) – simulation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#Biosimulations_utils.simulation.core.SimulationIoError" title="Biosimulations_utils.simulation.core.SimulationIoError"><strong>SimulationIoError</strong></a> – the output start time is less than the start time</p></li>
+<li><p><strong>AssertionError</strong> – a KiSAO term uses a different ontology or doesn’t have an id</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for reading a simulation experiment from a SED document</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to SED-ML document that describes a simulation experiment</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>: simulations</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Visualization</span></code>: visualization</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#Biosimulations_utils.simulation.core.SimulationIoError" title="Biosimulations_utils.simulation.core.SimulationIoError"><strong>SimulationIoError</strong></a> – if any of the following conditions are met
+    
+    * The SED document contains changes other than instances of SedChangeAttribute
+    * The models or simulations don’t have unique ids
+    * A model or simulation references cannot be resolved</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationWriter">
 <em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.sedml.</code><code class="sig-name descname">SedMlSimulationWriter</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationWriter" title="Permalink to this definition">¶</a></dt>
@@ -1557,241 +1795,6 @@ KiSAO ids for the parent simulator of an algorithm</p>
 
 </dd></dl>
 
-<dl class="py class">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader">
-<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.simulation.sedml.</code><code class="sig-name descname">SedMlSimulationReader</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#Biosimulations_utils.simulation.core.SimulationReader" title="Biosimulations_utils.simulation.core.SimulationReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">Biosimulations_utils.simulation.core.SimulationReader</span></code></a></p>
-<p>SED-ML reader</p>
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._filename">
-<code class="sig-name descname">_filename</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._filename" title="Permalink to this definition">¶</a></dt>
-<dd><p>Path to save simulation experiment in SED-ML format</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._logger">
-<code class="sig-name descname">_logger</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._logger" title="Permalink to this definition">¶</a></dt>
-<dd><p>logger</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">logging.Logger</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._abc_impl">
-<code class="sig-name descname">_abc_impl</code><em class="property"> = &lt;_abc_data object&gt;</em><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._abc_impl" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._create_sim">
-<code class="sig-name descname">_create_sim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sim_sed</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._create_sim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a simulation for a SED simulation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>sim_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedSimulation</span></code>) – SED simulation</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>Returns</dt><dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>: simulation</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#Biosimulations_utils.simulation.core.SimulationIoError" title="Biosimulations_utils.simulation.core.SimulationIoError"><strong>SimulationIoError</strong></a> – if the simulation type is not supported</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._decode_obj_from_xml">
-<code class="sig-name descname">_decode_obj_from_xml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj_xml</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._decode_obj_from_xml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decode an object from its XML representation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>obj_xml</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.XMLNode</span></code>) – XML representation of an object</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>object</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">XmlNode</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_model_var_by_data_gen_id">
-<code class="sig-name descname">_get_model_var_by_data_gen_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_gen_id</span></em>, <em class="sig-param"><span class="n">data_gen_id_to_var_target</span></em>, <em class="sig-param"><span class="n">time_data_gen_ids</span></em>, <em class="sig-param"><span class="n">variables</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_model_var_by_data_gen_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a model variable by the data generator which records it</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data_gen_id</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – id of data generator</p></li>
-<li><p><strong>data_gen_id_to_var_target</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – dictionary that maps the ids of data generators to the targets of model variables</p></li>
-<li><p><strong>time_data_gen_ids</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – list of ids of data generators that represent time</p></li>
-<li><p><strong>variables</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">BiomodelVariable</span></code>) – model variables</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>variable</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">BiomodelVariable</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_obj_annotation">
-<code class="sig-name descname">_get_obj_annotation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj_sed</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_obj_annotation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the annotated properies of a SED object</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>obj_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedBase</span></code>) – SED object</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>list of annotations</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">XmlNode</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_parameter_change_from_model">
-<code class="sig-name descname">_get_parameter_change_from_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">change_sed</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._get_parameter_change_from_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a model parameter change from a SED change attribute</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>change_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedChangeAttribute</span></code>) – SED change attribute</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>model parameter change</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParameterChange</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._parse_string">
-<code class="sig-name descname">_parse_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str_value</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._parse_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse a string to a Boolean, integer, float, or string</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>str_value</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – string</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>value</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_metadata">
-<code class="sig-name descname">_read_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">doc_sed</span></em>, <em class="sig-param"><span class="n">sim</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read metadata from a SED document</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>doc_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedDocument</span></code>) – SED document</p></li>
-<li><p><strong>sim</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>) – simulation</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_model">
-<code class="sig-name descname">_read_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_sed</span></em>, <em class="sig-param"><span class="n">sim</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a SED model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedModel</span></code>) – SED model</p></li>
-<li><p><strong>sim</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>) – simulation</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_model_variables">
-<code class="sig-name descname">_read_model_variables</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_sed</span></em>, <em class="sig-param"><span class="n">sim</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_model_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read model variables from SED data generators</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>task_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.Sed</span></code>) – SED task</p></li>
-<li><p><strong>sim</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>) – simulation</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_sim">
-<code class="sig-name descname">_read_sim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sim_sed</span></em>, <em class="sig-param"><span class="n">sim_filename</span></em>, <em class="sig-param"><span class="n">sim</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader._read_sim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a SED simulation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sim_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">libsedml.SedSimulation</span></code>) – SED simulation</p></li>
-<li><p><strong>sim_filename</strong> (<a href="#id1"><span class="problematic" id="id2">:ob:`str`</span></a>) – path to SED-ML file in which SED simulation was defined</p></li>
-<li><p><strong>sim</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>) – simulation</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><a class="reference internal" href="#Biosimulations_utils.simulation.core.SimulationIoError" title="Biosimulations_utils.simulation.core.SimulationIoError"><strong>SimulationIoError</strong></a> – the output start time is less than the start time</p></li>
-<li><p><strong>AssertionError</strong> – a KiSAO term uses a different ontology or doesn’t have an id</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="Biosimulations_utils.simulation.sedml.SedMlSimulationReader.run">
-<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.SedMlSimulationReader.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Base class for reading a simulation experiment from a SED document</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to SED-ML document that describes a simulation experiment</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code>: simulations</p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Visualization</span></code>: visualization</p></li>
-</ul>
-</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference internal" href="#Biosimulations_utils.simulation.core.SimulationIoError" title="Biosimulations_utils.simulation.core.SimulationIoError"><strong>SimulationIoError</strong></a> – if any of the following conditions are met
-    
-    * The SED document contains changes other than instances of SedChangeAttribute
-    * The models or simulations don’t have unique ids
-    * A model or simulation references cannot be resolved</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="py function">
 <dt id="Biosimulations_utils.simulation.sedml.modify_xml_model_for_simulation">
 <code class="sig-prename descclassname">Biosimulations_utils.simulation.sedml.</code><code class="sig-name descname">modify_xml_model_for_simulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span></em>, <em class="sig-param"><span class="n">in_model_filename</span></em>, <em class="sig-param"><span class="n">out_model_filename</span></em>, <em class="sig-param"><span class="n">default_namespace</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pretty_print</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/sedml.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.sedml.modify_xml_model_for_simulation" title="Permalink to this definition">¶</a></dt>
@@ -1828,26 +1831,6 @@ KiSAO ids for the parent simulator of an algorithm</p>
 </dd>
 </dl>
 <dl class="py function">
-<dt id="Biosimulations_utils.simulation.write_simulation">
-<code class="sig-prename descclassname">Biosimulations_utils.simulation.</code><code class="sig-name descname">write_simulation</code><span class="sig-paren">(</span><em class="sig-param">sim</em>, <em class="sig-param">filename</em>, <em class="sig-param">format=&lt;SimulationFormat.sedml: &lt;Biosimulations_utils.data_model.Format object&gt;&gt;</em>, <em class="sig-param">visualization=None</em>, <em class="sig-param">**format_opts</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/__init__.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.write_simulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a simulation experiment to a file</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sim</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – Simulation experiment</p></li>
-<li><p><strong>filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – Path to save simulation experiment in SED-ML format</p></li>
-<li><p><strong>visualization</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Visualization</span></code>, optional) – visualization</p></li>
-<li><p><strong>format</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">SimulationFormat</span></code>, optional) – simulation experiment format</p></li>
-<li><p><strong>format_opts</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>, optional) – options to the simulation experiment format (e.g., level, version)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>NotImplementedError</strong> – the format is not supported</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt id="Biosimulations_utils.simulation.read_simulation">
 <code class="sig-prename descclassname">Biosimulations_utils.simulation.</code><code class="sig-name descname">read_simulation</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">format=&lt;SimulationFormat.sedml: &lt;Biosimulations_utils.data_model.Format object&gt;&gt;</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/__init__.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.read_simulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a simulation experiment from a file</p>
@@ -1870,6 +1853,26 @@ KiSAO ids for the parent simulator of an algorithm</p>
 </dd>
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><strong>NotImplementedError</strong> – the format is not supported</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Biosimulations_utils.simulation.write_simulation">
+<code class="sig-prename descclassname">Biosimulations_utils.simulation.</code><code class="sig-name descname">write_simulation</code><span class="sig-paren">(</span><em class="sig-param">sim</em>, <em class="sig-param">filename</em>, <em class="sig-param">format=&lt;SimulationFormat.sedml: &lt;Biosimulations_utils.data_model.Format object&gt;&gt;</em>, <em class="sig-param">visualization=None</em>, <em class="sig-param">**format_opts</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/simulation/__init__.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.simulation.write_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a simulation experiment to a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sim</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – Simulation experiment</p></li>
+<li><p><strong>filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – Path to save simulation experiment in SED-ML format</p></li>
+<li><p><strong>visualization</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Visualization</span></code>, optional) – visualization</p></li>
+<li><p><strong>format</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">SimulationFormat</span></code>, optional) – simulation experiment format</p></li>
+<li><p><strong>format_opts</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>, optional) – options to the simulation experiment format (e.g., level, version)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – the format is not supported</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1897,6 +1900,7 @@ KiSAO ids for the parent simulator of an algorithm</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Center for Reproducible Biomedical Modeling
 
     </p>
@@ -1911,7 +1915,6 @@ KiSAO ids for the parent simulator of an algorithm</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -196,113 +196,6 @@ Copyright:
 License:
    MIT
 
-class Biosimulations_utils.simulator.testing.TestCaseType
-
-   Bases: "int", "enum.Enum"
-
-   Type of test case
-
-   _generate_next_value_(start, count, last_values)
-
-   _member_map_ = {'archive': <TestCaseType.archive: 1>, 'biomodel': <TestCaseType.biomodel: 2>}
-
-   _member_names_ = ['archive', 'biomodel']
-
-   _member_type_
-
-      alias of "builtins.int"
-
-   _value2member_map_ = {1: <TestCaseType.archive: 1>, 2: <TestCaseType.biomodel: 2>}
-
-   archive = 1
-
-   biomodel = 2
-
-class Biosimulations_utils.simulator.testing.TestCase(id, filename, type, modeling_framework, model_format, simulation_format, archive_format)
-
-   Bases: "object"
-
-   An example archive to validate simulators
-
-   id
-
-      id
-
-      Type:
-         "str"
-
-   filename
-
-      path to archive
-
-      Type:
-         "str"
-
-   type
-
-      type of test case
-
-      Type:
-         TestCaseType
-
-   modeling_framework
-
-      modeling framework
-
-      Type:
-         "BiomodelingFramework"
-
-   model_format
-
-      model format
-
-      Type:
-         "BiomodelFormat"
-
-   simulation_format
-
-      simulation format
-
-      Type:
-         "SimulationFormat"
-
-   archive_format
-
-      archive format
-
-      Type:
-         "ArchiveFormat"
-
-   static get_full_filename(filename)
-
-      Get the full path to the file
-
-      Returns:
-         full path to the file
-
-      Return type:
-         "str"
-
-class Biosimulations_utils.simulator.testing.TestCaseException(test_case, exception)
-
-   Bases: "object"
-
-   An exception of a test case
-
-   test_case
-
-      test case
-
-      Type:
-         TestCase
-
-   exception
-
-      exception
-
-      Type:
-         "Exception"
-
 class Biosimulations_utils.simulator.testing.SimulatorValidator
 
    Bases: "object"
@@ -419,6 +312,113 @@ class Biosimulations_utils.simulator.testing.SimulatorValidator
          "list"
 
          TestCase
+
+class Biosimulations_utils.simulator.testing.TestCase(id, filename, type, modeling_framework, model_format, simulation_format, archive_format)
+
+   Bases: "object"
+
+   An example archive to validate simulators
+
+   id
+
+      id
+
+      Type:
+         "str"
+
+   filename
+
+      path to archive
+
+      Type:
+         "str"
+
+   type
+
+      type of test case
+
+      Type:
+         TestCaseType
+
+   modeling_framework
+
+      modeling framework
+
+      Type:
+         "BiomodelingFramework"
+
+   model_format
+
+      model format
+
+      Type:
+         "BiomodelFormat"
+
+   simulation_format
+
+      simulation format
+
+      Type:
+         "SimulationFormat"
+
+   archive_format
+
+      archive format
+
+      Type:
+         "ArchiveFormat"
+
+   static get_full_filename(filename)
+
+      Get the full path to the file
+
+      Returns:
+         full path to the file
+
+      Return type:
+         "str"
+
+class Biosimulations_utils.simulator.testing.TestCaseException(test_case, exception)
+
+   Bases: "object"
+
+   An exception of a test case
+
+   test_case
+
+      test case
+
+      Type:
+         TestCase
+
+   exception
+
+      exception
+
+      Type:
+         "Exception"
+
+class Biosimulations_utils.simulator.testing.TestCaseType(value)
+
+   Bases: "int", "enum.Enum"
+
+   Type of test case
+
+   _generate_next_value_(start, count, last_values)
+
+   _member_map_ = {'archive': <TestCaseType.archive: 1>, 'biomodel': <TestCaseType.biomodel: 2>}
+
+   _member_names_ = ['archive', 'biomodel']
+
+   _member_type_
+
+      alias of "builtins.int"
+
+   _value2member_map_ = {1: <TestCaseType.archive: 1>, 2: <TestCaseType.biomodel: 2>}
+
+   archive = 1
+
+   biomodel = 2
 
 Biosimulations_utils.simulator.utils module
 

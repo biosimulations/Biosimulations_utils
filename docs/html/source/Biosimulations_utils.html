@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   <script type="text/javascript">
@@ -23,12 +22,18 @@
   
 
   
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -36,15 +41,11 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="1.1.1.1. Biosimulations_utils.archive package" href="Biosimulations_utils.archive.html" />
@@ -62,7 +63,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Biosimulations_utils
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Biosimulations_utils
           
 
           
@@ -89,6 +90,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -125,6 +127,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -163,7 +166,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html"><span class="section-number">1. </span>Biosimulations_utils</a> &raquo;</li>
         
@@ -807,7 +810,7 @@ use ‘put’ <cite>/models/model-id</cite> to change the name of the model with
 
 <dl class="py class">
 <dt id="Biosimulations_utils.data_model.License">
-<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.data_model.</code><code class="sig-name descname">License</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.data_model.License" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.data_model.</code><code class="sig-name descname">License</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.data_model.License" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">wc_utils.util.enumerate.CaseInsensitiveEnum</span></code></p>
 <p>A license</p>
 <dl class="py attribute">
@@ -1204,7 +1207,7 @@ use ‘put’ <cite>/models/model-id</cite> to change the name of the model with
 
 <dl class="py class">
 <dt id="Biosimulations_utils.data_model.Type">
-<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.data_model.</code><code class="sig-name descname">Type</code><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.data_model.Type" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">Biosimulations_utils.data_model.</code><code class="sig-name descname">Type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/data_model.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.data_model.Type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
 <p>A type</p>
 <dl class="py method">
@@ -1274,6 +1277,38 @@ use ‘put’ <cite>/models/model-id</cite> to change the name of the model with
 </dd>
 </dl>
 <dl class="py function">
+<dt id="Biosimulations_utils.utils.assert_exception">
+<code class="sig-prename descclassname">Biosimulations_utils.utils.</code><code class="sig-name descname">assert_exception</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">success</span></em>, <em class="sig-param"><span class="n">exception</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/utils.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.utils.assert_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise an error if <code class="xref py py-obj docutils literal notranslate"><span class="pre">success</span></code> is <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>success</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – </p></li>
+<li><p><strong>exception</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>Exception</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Biosimulations_utils.utils.crop_image">
+<code class="sig-prename descclassname">Biosimulations_utils.utils.</code><code class="sig-name descname">crop_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">background_to_transparent</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/utils.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.utils.crop_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crop an image and, optionally, make the background transparent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to image</p></li>
+<li><p><strong>background_to_transparent</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional) – background
+to make transparent</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="Biosimulations_utils.utils.get_enum_format_by_attr">
 <code class="sig-prename descclassname">Biosimulations_utils.utils.</code><code class="sig-name descname">get_enum_format_by_attr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">FormatEnum</span></em>, <em class="sig-param"><span class="n">attr_name</span></em>, <em class="sig-param"><span class="n">attr_val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/utils.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.utils.get_enum_format_by_attr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a biomodel format by its specification URL</p>
@@ -1295,55 +1330,6 @@ use ‘put’ <cite>/models/model-id</cite> to change the name of the model with
 </dd></dl>
 
 <dl class="py function">
-<dt id="Biosimulations_utils.utils.pretty_print_units">
-<code class="sig-prename descclassname">Biosimulations_utils.utils.</code><code class="sig-name descname">pretty_print_units</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">units_str</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/utils.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.utils.pretty_print_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pretty print units</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>units_str</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – units</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>pretty printed units</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="Biosimulations_utils.utils.crop_image">
-<code class="sig-prename descclassname">Biosimulations_utils.utils.</code><code class="sig-name descname">crop_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">background_to_transparent</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/utils.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.utils.crop_image" title="Permalink to this definition">¶</a></dt>
-<dd><p>Crop an image and, optionally, make the background transparent</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – path to image</p></li>
-<li><p><strong>background_to_transparent</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional) – background
-to make transparent</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="Biosimulations_utils.utils.assert_exception">
-<code class="sig-prename descclassname">Biosimulations_utils.utils.</code><code class="sig-name descname">assert_exception</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">success</span></em>, <em class="sig-param"><span class="n">exception</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/utils.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.utils.assert_exception" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raise an error if <code class="xref py py-obj docutils literal notranslate"><span class="pre">success</span></code> is <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>success</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – </p></li>
-<li><p><strong>exception</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>Exception</strong> – </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt id="Biosimulations_utils.utils.get_logger">
 <code class="sig-prename descclassname">Biosimulations_utils.utils.</code><code class="sig-name descname">get_logger</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'log'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/utils.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.utils.get_logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a logger</p>
@@ -1356,6 +1342,23 @@ to make transparent</p></li>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">logging.Logger</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Biosimulations_utils.utils.pretty_print_units">
+<code class="sig-prename descclassname">Biosimulations_utils.utils.</code><code class="sig-name descname">pretty_print_units</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">units_str</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/reproducible-biomedical-modeling/Biosimulations_utils/blob/master/Biosimulations_utils/utils.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Biosimulations_utils.utils.pretty_print_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pretty print units</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>units_str</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – units</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>pretty printed units</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1386,6 +1389,7 @@ to make transparent</p></li>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Center for Reproducible Biomedical Modeling
 
     </p>
@@ -1400,7 +1404,6 @@ to make transparent</p></li>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

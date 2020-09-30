@@ -30,12 +30,12 @@ jobs:
         run: |
           pip install git+https://github.com/KarrLab/pkg_utils.git#egg=pkg_utils
           pip install git+https://github.com/KarrLab/wc_utils.git#egg=wc_utils
-          pip install git+https://github.com/reproducible-biomedical-modeling/Biosimulations_tellurium.git#egg=Biosimulations_tellurium
-          git clone https://github.com/reproducible-biomedical-modeling/Biosimulations_COMBINE_archive_test_suite.git
+          pip install git+https://github.com/biosimulators/Biosimulators_tellurium.git#egg=Biosimulators_tellurium
+          git clone https://github.com/biosimulators/Biosimulators_test_suite.git
           pip install -e .[tests]
       - name: Test with pytest
         env:
-          COMBINE_TEST_SUITE_DIR: Biosimulations_COMBINE_archive_test_suite/Biosimulations_combine_archive_test_suite
+          COMBINE_TEST_SUITE_DIR: Biosimulators_test_suite/Biosimulators_test_suite
         run: |
           pip install pytest pytest-cov
           pytest --cov=./Biosimulations_utils --cov-report=xml        

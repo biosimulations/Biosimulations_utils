@@ -55,7 +55,7 @@ class BioModelsImporter(object):
     BIOSIMULATIONS_ENDPOINT = 'https://api.biosimulations.dev'
     NUM_MODELS_PER_BATCH = 100
     MAX_RETRIES = 5
-    SIMULATOR_DOCKERHUB_ID = 'crbm/biosimulations_tellurium'
+    SIMULATOR_DOCKERHUB_ID = 'biosimulators/tellurium'
 
     def __init__(self, exec_simulations=True, user=None, _max_models=float('inf'), _cache_dir=None, _dry_run=False):
         """

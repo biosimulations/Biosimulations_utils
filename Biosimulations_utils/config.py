@@ -44,8 +44,8 @@ combine_test_suite = attrdict.AttrDict({
             os.path.join(
                 '~',
                 'Documents',
-                'Biosimulations_COMBINE_archive_test_suite',
-                'Biosimulations_combine_archive_test_suite',
+                'Biosimulators_test_suite',
+                'Biosimulators_test_suite',
             ),
         ),
     ),

@@ -43,7 +43,7 @@ class UtilsTestCase(unittest.TestCase):
     def test_run(self):
         validator = SimulatorValidator()
         valid_cases, case_exceptions, skipped_cases = validator.run(
-            'crbm/biosimulations_tellurium', 'tests/fixtures/tellurium-properties.json')
+            'biosimulators/tellurium', 'tests/fixtures/tellurium-properties.json')
         # TODO: update once tellurium fixed; tellurium fails on data generator for Mcmin
         self.assertEqual(
             set([case.id for case in valid_cases]),
@@ -63,7 +63,7 @@ class UtilsTestCase(unittest.TestCase):
     def test_skip_case(self):
         validator = SimulatorValidator()
         valid_cases, case_exceptions, skipped_cases = validator.run(
-            'crbm/biosimulations_tellurium', 'tests/fixtures/tellurium-properties.json', test_case_ids=[
+            'biosimulators/tellurium', 'tests/fixtures/tellurium-properties.json', test_case_ids=[
                 'BIOMD0000000297.omex',
             ])
         self.assertEqual(

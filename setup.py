@@ -31,10 +31,10 @@ setuptools.setup(
     description=("Utilities for generating and parsing documents encoded in biomodeling standards such as "
                  "the Systems Biology Markup Language (SBML) and the Simulation Experiment Description Markup Language (SED-ML)."),
     long_description=md.long_description,
-    url="https://github.com/reproducible-biomedical-modeling/" + name,
-    download_url='https://github.com/reproducible-biomedical-modeling/' + name,
+    url="https://github.com/biosimulations/" + name,
+    download_url='https://github.com/biosimulations/' + name,
     author='Center for Reproducible Biomedical Modeling',
-    author_email="info@reproduciblebiomodels.org",
+    author_email="info@biosimulations.org",
     license="MIT",
     keywords='systems biology modeling simulation',
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),

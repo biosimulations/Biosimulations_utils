@@ -1,4 +1,4 @@
-Biosimulations_tellurium
+Biosimulators_tellurium
 inflect
 numpy
 pandas

@@ -20,7 +20,7 @@ class Simulator(PrimaryResource):
         version (:obj:`str`): version
         url (:obj:`str`): URL
         format (:obj:`Format`): format
-        docker_hub_image_id (:obj:`str`): id for image in DockerHub (e.g., "crbm/biosimulations_tellurium:2.4.1")
+        docker_hub_image_id (:obj:`str`): id for image in DockerHub (e.g., "biosimulators/tellurium:2.4.1")
         algorithms (:obj:`list` of :obj:`Algorithm`): supported algorithms
     """
     TYPE = 'simulator'
@@ -33,7 +33,7 @@ class Simulator(PrimaryResource):
             version (:obj:`str`, optional): version
             url (:obj:`str`, optional): URL
             format (:obj:`Format`, optional): format
-            docker_hub_image_id (:obj:`str`, optional): id for image in DockerHub (e.g., "crbm/biosimulations_tellurium:2.4.1")
+            docker_hub_image_id (:obj:`str`, optional): id for image in DockerHub (e.g., "biosimulators/tellurium:2.4.1")
             algorithms (:obj:`list` of :obj:`Algorithm`, optional): supported algorithms
             metadata (:obj:`PrimaryResourceMetadata`, optional): public metadata
             _metadata (:obj:`ResourceMetadata`, optional): private metadata

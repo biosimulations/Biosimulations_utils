@@ -1,10 +1,10 @@
-# Contributing to the template repository for BioSimulations-compliant simulation tools
+# Contributing to the template repository for BioSimulators-compliant simulation tools
 
 We enthusiastically welcome contributions to the template repository.
 
 ## Coordinating contributions
 
-Before getting started, please contact the lead developers at [info@reproduciblebiomodels.org](mailto:info@reproduciblebiomodels.org) to coordinate your planned contributions with other ongoing efforts. Please also use GitHub issues to announce your plans to the community so that other developers can provide input into your plans and coordinate their own work. As the development community grows, we will institute additional infrastructure as needed such as a leadership committee and regular online meetings.
+Before getting started, please contact the lead developers at [info@biosimulations.org](mailto:info@biosimulations.org) to coordinate your planned contributions with other ongoing efforts. Please also use GitHub issues to announce your plans to the community so that other developers can provide input into your plans and coordinate their own work. As the development community grows, we will institute additional infrastructure as needed such as a leadership committee and regular online meetings.
 
 ## Repository organization
 
@@ -41,12 +41,12 @@ Please use GitHub pull requests to submit changes. Each request should include a
 
 ## Releasing and deploying new versions
 
-Contact [info@reproduciblebiomodels.org](mailto:info@reproduciblebiomodels.org) to request release and deployment of new changes. 
+Contact [info@biosimulations.org](mailto:info@biosimulations.org) to request release and deployment of new changes. 
 
 ## Reporting issues
 
-Please use [GitHub issues]() to report any issues to the development community.
+Please use [GitHub issues](https://github.com/biosimulations/Biosimulations_utils/issues) to report any issues to the development community.
 
 ## Getting help
 
-Please use [GitHub issues]() to post questions or contact the lead developers at [info@reproduciblebiomodels.org](mailto:info@reproduciblebiomodels.org).
+Please use [GitHub issues](https://github.com/biosimulations/Biosimulations_utils/issues) to post questions or contact the lead developers at [info@biosimulations.org](mailto:info@biosimulations.org).

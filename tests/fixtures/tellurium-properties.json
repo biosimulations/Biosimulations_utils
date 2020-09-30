@@ -5,7 +5,7 @@
     "attributes": {
       "version": "2.4.1",
       "url": "http://tellurium.analogmachine.org/",
-      "dockerHubImageId": "crbm/Biosimulations_tellurium:2.4.1",
+      "dockerHubImageId": "biosimulators/tellurium:2.4.1",
       "format": {
         "name": "Docker Image",
         "version": "1.2",

@@ -45,6 +45,7 @@ class ValidateCommitSimulatorCiActions(object):
     def commit(self):
         """ Commit a simulator (id and version) to the BioSimulators registry """
 
+        issue_number = os.getenv('ISSUE_NUMBER')
         issue = self.get_issue()
         submisssion = self.get_submission(issue)
         specUrl = submisssion['specificationsUrl']
@@ -53,8 +54,17 @@ class ValidateCommitSimulatorCiActions(object):
         # TODO: commit submission to BioSimulators database
         # requests.post(BIOSIMULATORS_ENDPOINT, data=specs)
 
+        # post success message
         self.add_comment_to_issue(
             'Your submission was committed to the BioSimulators registry. Thank you!')
+
+        # close issue
+        auth = self.get_gh_auth()
+        response = requests.patch(
+            self.ISSUE_ENDPOINT.format(issue_number),
+            auth=auth,
+            json={'state': 'closed'})
+        response.raise_for_status()
 
     def get_issue(self):
         """ Get the properties of the GitHub issue for the submission
@@ -158,15 +168,10 @@ class ValidateCommitSimulatorCiActions(object):
         """
         issue_number = os.getenv('ISSUE_NUMBER')
         auth = self.get_gh_auth()
-        print(auth)
 
         response = requests.post(
             self.ISSUE_COMMENTS_ENDPOINT.format(issue_number),
-            headers={
-                'accept': 'application/vnd.github.v3+json',
-            },
+            headers={'accept': 'application/vnd.github.v3+json'},
             auth=auth,
-            json={
-                'body': comment,
-            })
+            json={'body': comment})
         response.raise_for_status()

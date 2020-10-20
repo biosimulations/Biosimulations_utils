@@ -45,7 +45,7 @@ class ValidateCommitSimulatorCiActions(object):
         response = requests.post(
             self.ISSUE_LABELS_ENDPOINT.format(issue_number), 
             auth=auth, 
-            json={labels: ['Validated']})
+            json={'labels': ['Validated']})
         response.raise_for_status()
 
         # post success message

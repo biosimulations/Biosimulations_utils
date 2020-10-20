@@ -158,6 +158,7 @@ class ValidateCommitSimulatorCiActions(object):
         """
         issue_number = os.getenv('ISSUE_NUMBER')
         auth = self.get_gh_auth()
+        print(auth)
 
         response = requests.post(
             self.ISSUE_COMMENTS_ENDPOINT.format(issue_number),

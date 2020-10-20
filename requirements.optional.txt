@@ -1,2 +1,6 @@
+[ci-actions]
+simplejson
+yamldown
+
 [docker]
 docker

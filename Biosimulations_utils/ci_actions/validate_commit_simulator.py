@@ -16,12 +16,14 @@ import yamldown
 class ValidateCommitSimulatorCiActions(object):
     ISSUE_ENDPOINT = 'https://api.github.com/repos/biosimulators/Biosimulators/issues/{}'
     ISSUE_COMMENTS_ENDPOINT = 'https://api.github.com/repos/biosimulators/Biosimulators/issues/{}/comments'
+    ISSUE_LABELS_ENDPOINT = 'https://api.github.com/repos/biosimulators/Biosimulators/issues/{}/labels'
     BIOSIMULATORS_ENDPOINT = 'https://api.biosimulators.org/simulators'
 
     def validate(self):
         """ Validate a submission of simulator """
 
         # retrieve issue
+        issue_number = os.getenv('ISSUE_NUMBER')
         issue = self.get_issue()
         submitter = issue['user']['login']
         self.add_comment_to_issue(('Thank you @{} for your submission to the BioSimulators registry of containerized simulation tools! '
@@ -37,6 +39,14 @@ class ValidateCommitSimulatorCiActions(object):
 
         # TODO: validate container
         self.add_comment_to_issue('Your containerized simulator is valid!')
+
+        # label issue as `validated`
+        auth = self.get_gh_auth()
+        response = requests.post(
+            self.ISSUE_LABELS_ENDPOINT.format(issue_number), 
+            auth=auth, 
+            json={labels: ['Validated']})
+        response.raise_for_status()
 
         # post success message
         self.add_comment_to_issue(
@@ -103,7 +113,8 @@ class ValidateCommitSimulatorCiActions(object):
         if not specUrl:
             errors.append('A URL for the specifications of the simulator must be provided.')
         if errors:
-            comment = 'Your simulator could not be verified. Please edit the first block of this issue.\n- ' + '\n- '.join(errors)
+            comment = ('Your simulator could not be verified. '
+                       'Please edit the first block of this issue to re-initiate this validation.\n- ') + '\n- '.join(errors)
             self.add_error_comment_to_issue(comment)
 
         return submission
@@ -122,7 +133,8 @@ class ValidateCommitSimulatorCiActions(object):
             response.raise_for_status()
         except requests.RequestException as error:
             self.add_error_comment_to_issue(
-                'Your simulator could not be verified because we could not retrieve the specifications from {} ({}: {}).'.format(
+                ('Your simulator could not be verified because we could not retrieve the specifications from {} ({}: {}). '
+                    'Once the issue is fixed, edit the first block of this issue to re-initiate this validation.').format(
                     url, response.status_code, response.reason)
             )
 
@@ -130,7 +142,8 @@ class ValidateCommitSimulatorCiActions(object):
             return response.json()
         except simplejson.errors.JSONDecodeError as error:
             self.add_error_comment_to_issue(
-                'Your simulator code not be verified because the specifications are not valid JSON:\n\n  {}\n'.format(str(error)))
+                ('Your simulator code not be verified because the specifications are not valid JSON:\n\n  {}\n\n'
+                    'Once the issue is fixed, edit the first block of this issue to re-initiate this validation.').format(str(error)))
 
         # TODO: validate specifications with BioSimulators API
 

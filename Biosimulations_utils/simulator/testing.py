@@ -175,12 +175,12 @@ class SimulatorValidator(object):
 
         return test_cases
 
-    def run(self, dockerhub_id, properties_filename, test_case_ids=None):
+    def run(self, docker_image_url, properties_filename, test_case_ids=None):
         """ Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
         checking that the image produces the correct outputs for test cases (e.g., COMBINE archive)
 
         Args:
-            dockerhub_id (:obj:`str`): DockerHub id of simulator
+            docker_image_url (:obj:`str`): URL for Docker image id of simulator
             properties_filename (:obj:`str`): path to the properties of the simulator
             test_case_ids (:obj:`list` of :obj:`str`, optional): List of ids of test cases to verify. If :obj:`test_case_ids`
                 is none, all test cases are verified.
@@ -245,19 +245,19 @@ class SimulatorValidator(object):
                     archive_filename = test_case.filename
 
                 try:
-                    self._validate_test_case(test_case, archive_filename, dockerhub_id)
+                    self._validate_test_case(test_case, archive_filename, docker_image_url)
                     valid_test_cases.append(test_case)
                 except Exception as exception:
                     test_case_exceptions.append(TestCaseException(test_case, exception))
             else:
                 skipped_test_cases.append(test_case)
 
-        print('{} passed {} test cases:\n  {}'.format(dockerhub_id, len(valid_test_cases), '\n  '.join(
+        print('Passed {} test cases:\n  {}'.format(len(valid_test_cases), '\n  '.join(
             case.filename for case in valid_test_cases)))
-        print('{} failed {} test cases:\n  {}'.format(dockerhub_id, len(test_case_exceptions), '\n  '.join(
+        print('Failed {} test cases:\n  {}'.format(len(test_case_exceptions), '\n  '.join(
             '{}\n    {}'.format(test_case_exception.test_case.filename, str(test_case_exception.exception))
             for test_case_exception in test_case_exceptions)))
-        print('{} skipped {} test cases:\n  {}'.format(dockerhub_id, len(skipped_test_cases), '\n  '.join(
+        print('Skipped {} test cases:\n  {}'.format(len(skipped_test_cases), '\n  '.join(
             case.filename for case in skipped_test_cases)))
         return valid_test_cases, test_case_exceptions, skipped_test_cases
 
@@ -384,19 +384,19 @@ class SimulatorValidator(object):
         archive = gen_archive_for_sim(model_filename, simulation, archive_filename)
         return (archive, archive_filename)
 
-    def _validate_test_case(self, test_case, archive_filename, dockerhub_id):
+    def _validate_test_case(self, test_case, archive_filename, docker_image_url):
         """ Validate that a simulator correctly produces the outputs for a test case
 
         Args:
             test_case (:obj:`TestCase`): test case
             archive_filename (:obj:`str`): path to archive
-            dockerhub_id (:obj:`str`): DockerHub id of simulator
+            docker_image_url (:obj:`str`): URL for Docker image of simulator
         """
         # create output directory
         out_dir = tempfile.mkdtemp()
 
         # execute archive
-        exec_archive(archive_filename, dockerhub_id, out_dir)
+        exec_archive(archive_filename, docker_image_url, out_dir)
 
         # check output
         self._assert_archive_output_valid(test_case, archive_filename, out_dir)

@@ -104,12 +104,12 @@ def _get_omex_description(obj):
     return desc
 
 
-def exec_archive(archive_filename, dockerhub_id, out_dir):
+def exec_archive(archive_filename, docker_image_url, out_dir):
     """ Execute the tasks described in a archive
 
     Args:
         archive_filename (:obj:`str`): path to archive
-        dockerhub_id (:obj:`str`): DockerHub id of simulator
+        docker_image_url (:obj:`str`): URL for Docker image of simulator
         out_dir (:obj:`str`): directory where simulation results where saved
 
     Raises:
@@ -117,8 +117,10 @@ def exec_archive(archive_filename, dockerhub_id, out_dir):
     """
     docker_client = docker.from_env()
 
+    docker_client.images.pull(docker_image_url)
+
     container = docker_client.containers.run(
-        dockerhub_id,
+        docker_image_url,
         volumes={
             os.path.dirname(archive_filename): {
                 'bind': '/root/in',

@@ -17,7 +17,8 @@ class ValidateCommitSimulatorCiActions(object):
     ISSUE_ENDPOINT = 'https://api.github.com/repos/biosimulators/Biosimulators/issues/{}'
     ISSUE_COMMENTS_ENDPOINT = 'https://api.github.com/repos/biosimulators/Biosimulators/issues/{}/comments'
     ISSUE_LABELS_ENDPOINT = 'https://api.github.com/repos/biosimulators/Biosimulators/issues/{}/labels'
-    BIOSIMULATORS_ENDPOINT = 'https://api.biosimulators.org/simulators'
+    # BIOSIMULATORS_VALIDATE_ENDPOINT = 'https://api.biosimulators.org/simulators/validate'
+    BIOSIMULATORS_POST_ENDPOINT = 'https://api.biosimulators.org/simulators'
 
     def validate(self):
         """ Validate a submission of simulator """
@@ -106,8 +107,9 @@ class ValidateCommitSimulatorCiActions(object):
         specUrl = submisssion['specificationsUrl']
         specs = self.get_specs(specUrl)
 
-        # TODO: commit submission to BioSimulators database
-        # requests.post(BIOSIMULATORS_ENDPOINT, data=specs)
+        # commit submission to BioSimulators database
+        # TODO: incorporate authentication
+        # requests.post(BIOSIMULATORS_POST_ENDPOINT, data=specs)
 
         # post success message
         self.add_comment_to_issue(
@@ -174,6 +176,7 @@ class ValidateCommitSimulatorCiActions(object):
         """
         response = requests.get(url)
 
+        # download specifications
         try:
             response.raise_for_status()
         except requests.RequestException as error:
@@ -183,14 +186,28 @@ class ValidateCommitSimulatorCiActions(object):
                     url, response.status_code, response.reason)
             )
 
+        # check that specifications is valid JSON
         try:
-            return response.json()
+            specs = response.json()
         except simplejson.errors.JSONDecodeError as error:
             self.add_error_comment_to_issue(
                 ('Your simulator code not be verified because the specifications are not valid JSON:\n\n  {}\n\n'
                     'Once the issue is fixed, edit the first block of this issue to re-initiate this validation.').format(str(error)))
 
-        # TODO: validate specifications with BioSimulators API
+        # validate specifications
+        # TODO: set validation endpoint
+        # TODO: incorporate authentication
+        # response = requests.get(self.BIOSIMULATORS_VALIDATE_ENDPOINT, data=specs)
+        # try:
+        #    response.raise_for_status()
+        # except requests.RequestException as error:
+        #    self.add_error_comment_to_issue(
+        #        ('Your specifications are not valid.\n\n{}\n\n'
+        #            'Once the issue is fixed, edit the first block of this issue to re-initiate this validation.').format(
+        #            response.reason.rstrip().replace('\n', '\n  ')))
+
+        # return specifications
+        return specs
 
     def get_gh_auth(self):
         """ Get authorization for GitHub

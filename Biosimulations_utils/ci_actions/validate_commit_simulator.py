@@ -66,7 +66,9 @@ class ValidateCommitSimulatorCiActions(object):
 
         if not validCases:
             error_msgs.append(('No test cases are applicable to your container. '
-                               'Please use this issue to share appropriate test COMBINE/OMEX files with the BioSimulators Team.'))
+                               'Please use this issue to share appropriate test COMBINE/OMEX files for the BioSimulators test suite. '
+                               'The BioSimulators Team will add these files to the test suite and then re-review your simulator.'
+                               ))
 
         if testExceptions:
             msgs = []

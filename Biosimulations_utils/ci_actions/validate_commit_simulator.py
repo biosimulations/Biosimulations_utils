@@ -58,7 +58,7 @@ class ValidateCommitSimulatorCiActions(object):
         # validate container
         from ..simulator.testing import SimulatorValidator
         validator = SimulatorValidator()
-        validCases, testExceptions = validator.run()
+        validCases, testExceptions = validator.run(image_url, specs)
 
         self.add_comment_to_issue('Your container passed {} test cases.'.format(len(validCases)))
 

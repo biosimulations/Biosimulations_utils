@@ -175,13 +175,13 @@ class SimulatorValidator(object):
 
         return test_cases
 
-    def run(self, docker_image_url, properties_filename, test_case_ids=None):
+    def run(self, docker_image_url, properties, test_case_ids=None):
         """ Validate that a Docker image for a simulator implements the BioSimulations simulator interface by
         checking that the image produces the correct outputs for test cases (e.g., COMBINE archive)
 
         Args:
             docker_image_url (:obj:`str`): URL for Docker image id of simulator
-            properties_filename (:obj:`str`): path to the properties of the simulator
+            properties (:obj:`str` or :obj:`dict`): path to the properties of the simulator or the properties of the simulator
             test_case_ids (:obj:`list` of :obj:`str`, optional): List of ids of test cases to verify. If :obj:`test_case_ids`
                 is none, all test cases are verified.
 
@@ -189,8 +189,10 @@ class SimulatorValidator(object):
             :obj:`list` :obj:`TestCase`: valid test cases
             :obj:`list` :obj:`TestCaseException`: invalid test cases
         """
-        with open(properties_filename, 'r') as file:
-            simulator = Simulator.from_json(json.load(file))
+        if isinstance(properties, str):
+            with open(properties, 'r') as file:
+                properties = json.load(file)
+        simulator = Simulator.from_json(properties)
 
         valid_test_cases = []
         test_case_exceptions = []

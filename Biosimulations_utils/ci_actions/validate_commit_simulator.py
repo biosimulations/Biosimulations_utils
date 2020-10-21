@@ -196,7 +196,6 @@ class ValidateCommitSimulatorCiActions(object):
 
         # validate specifications
         # TODO: set validation endpoint
-        # TODO: incorporate authentication
         # response = requests.get(self.BIOSIMULATORS_VALIDATE_ENDPOINT, data=specs)
         # try:
         #    response.raise_for_status()

@@ -37,14 +37,48 @@ class ValidateCommitSimulatorCiActions(object):
         specs = self.get_specs(specUrl)
         self.add_comment_to_issue('The specifications of your simulator is valid!')
 
-        # TODO: validate container
+        # validate that container (Docker image) exists
+        import docker
+        import docker.errors
+        image_url = specs['image']
+        docker_client = docker.from_env()
+        try:
+            docker_client.images.pull(image_url)
+        except docker.errors.NotFound:
+            self.add_error_comment_to_issue((
+                'Your container could not be verified because no image is at the URL {}. '
+                'After correcting the specifications, please edit the first block of this issue to re-initiate this validation.'
+            ).format(image_url))
+        except Exception as error:
+            self.add_error_comment_to_issue((
+                'Your container could not be verified: {}. '
+                'After correcting the specifications, please edit the first block of this issue to re-initiate this validation.'
+            ).format(str(error)))
+
+        # validate container
+        from ..simulator.testing import SimulatorValidator
+        validator = SimulatorValidator()
+        validCases, testExceptions = validator.run()
+
+        self.add_comment_to_issue('Your container passed {} test cases.'.format(len(validCases)))
+
+        if testExceptions:
+            msgs = []
+            for exception in testExceptions:
+                msgs.append('- {}\n  {}\n\n'.format(exception.test_case, str(exception.exception)))
+
+            self.add_error_comment_to_issue((
+                'Your container did not pass {} test cases.\n\n{}'
+                'After correcting the container, please edit the first block of this issue to re-initiate this validation.'
+            ).format(len(testExceptions), ''.join(msgs)))
+
         self.add_comment_to_issue('Your containerized simulator is valid!')
 
         # label issue as `validated`
         auth = self.get_gh_auth()
         response = requests.post(
-            self.ISSUE_LABELS_ENDPOINT.format(issue_number), 
-            auth=auth, 
+            self.ISSUE_LABELS_ENDPOINT.format(issue_number),
+            auth=auth,
             json={'labels': ['Validated']})
         response.raise_for_status()
 
@@ -92,7 +126,7 @@ class ValidateCommitSimulatorCiActions(object):
         """ Get the properties of the submission
 
         Args:
-           issue (:obj:`dict`): properties of the GitHub issue for the submission 
+           issue (:obj:`dict`): properties of the GitHub issue for the submission
 
         Returns:
             :obj:`dict`: dictionary with `simulator`, `version`, and `specificationsUrl` keys

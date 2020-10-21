@@ -188,6 +188,7 @@ class SimulatorValidator(object):
         Returns:
             :obj:`list` :obj:`TestCase`: valid test cases
             :obj:`list` :obj:`TestCaseException`: invalid test cases
+            :obj:`list` :obj:`TestCase`: skipped test cases
         """
         if isinstance(properties, str):
             with open(properties, 'r') as file:

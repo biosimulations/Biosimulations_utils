@@ -58,19 +58,28 @@ class ValidateCommitSimulatorCiActions(object):
         # validate container
         from ..simulator.testing import SimulatorValidator
         validator = SimulatorValidator()
-        validCases, testExceptions = validator.run(image_url, specs)
+        validCases, testExceptions, skippedCases = validator.run(image_url, specs)
 
         self.add_comment_to_issue('Your container passed {} test cases.'.format(len(validCases)))
+
+        error_msgs = []
+
+        if not validCases:
+            error_msgs.append(('No test cases are applicable to your container. '
+                               'Please use this issue to share appropriate test COMBINE/OMEX files with the BioSimulators Team.'))
 
         if testExceptions:
             msgs = []
             for exception in testExceptions:
                 msgs.append('- {}\n  {}\n\n'.format(exception.test_case, str(exception.exception)))
 
-            self.add_error_comment_to_issue((
+            error_msgs.append((
                 'Your container did not pass {} test cases.\n\n{}'
                 'After correcting the container, please edit the first block of this issue to re-initiate this validation.'
             ).format(len(testExceptions), ''.join(msgs)))
+
+        if error_msgs:
+            self.add_error_comment_to_issue('\n\n'.join(error_msgs))
 
         self.add_comment_to_issue('Your containerized simulator is valid!')
 

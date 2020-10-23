@@ -45,7 +45,7 @@ class ActionErrorHandling(object):
             except ActionCaughtError:
                 raise
             except Exception as error:
-                Action.add_error_comment_to_issue(issue_number, error_msg)
+                Action.add_error_comment_to_issue(issue_number, error_msg + '\n\n  ' + str(error).replace('\n', '\n  '))
                 Action.add_labels_to_issue(issue_number, ['Action error'])
                 raise
         return wrapper
@@ -137,7 +137,8 @@ class Action(abc.ABC):
         response.raise_for_status()
         return list([label.name for label in response.json()])
 
-    def add_labels_to_issue(self, issue_number, labels):
+    @classmethod
+    def add_labels_to_issue(cls, issue_number, labels):
         """ Add one or more labels to an issue
 
         Args:
@@ -146,7 +147,7 @@ class Action(abc.ABC):
         """
         response = requests.post(
             self.ISSUE_LABELS_ENDPOINT.format(issue_number),
-            auth=self.gh_auth,
+            auth=cls.get_gh_auth(),
             json={'labels': labels})
         response.raise_for_status()
 
@@ -162,7 +163,8 @@ class Action(abc.ABC):
             auth=self.gh_auth)
         response.raise_for_status()
 
-    def add_comment_to_issue(self, issue_number, comment):
+    @classmethod
+    def add_comment_to_issue(cls, issue_number, comment):
         """ Post a comment to the GitHub issue
 
         Args:
@@ -170,13 +172,14 @@ class Action(abc.ABC):
             comment (:obj:`str`): comment
         """
         response = requests.post(
-            self.ISSUE_COMMENTS_ENDPOINT.format(issue_number),
+            cls.ISSUE_COMMENTS_ENDPOINT.format(issue_number),
             headers={'accept': 'application/vnd.github.v3+json'},
-            auth=self.gh_auth,
+            auth=cls.get_gh_auth(),
             json={'body': comment})
         response.raise_for_status()
 
-    def add_error_comment_to_issue(self, issue_number, comment):
+    @classmethod
+    def add_error_comment_to_issue(cls, issue_number, comment):
         """ Post an error to the GitHub issue
 
         Args:
@@ -186,7 +189,7 @@ class Action(abc.ABC):
         Raises:
             :obj:`ValueError`
         """
-        self.add_comment_to_issue(issue_number, ''.join([
+        cls.add_comment_to_issue(issue_number, ''.join([
             '```diff\n',
             '- ' + comment.rstrip().replace('\n', '\n- ') + '\n',
             '```\n',

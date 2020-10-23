@@ -28,7 +28,7 @@ class SimulatorAction(Action):
         Returns:
             :obj:`dict`: dictionary with `simulator`, `version`, and `specificationsUrl` keys
         """
-        submission = self.get_data_in_issue()
+        submission = self.get_data_in_issue(issue)
 
         simulator = submission.get('name', None) or None
         version = submission.get('version', None) or None

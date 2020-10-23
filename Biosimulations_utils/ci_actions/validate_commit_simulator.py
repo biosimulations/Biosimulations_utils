@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from .core import Action, ActionErrorHandling
+from .core import Action, ActionErrorHandling, IssueLabel
 import requests
 import simplejson.errors
 
@@ -104,10 +104,21 @@ class ValidateSimulatorAction(SimulatorAction):
         issue_number = self.issue_number
         issue = self.get_issue(issue_number)
         submitter = issue['user']['login']
+
+        # report message that review is starting
         self.add_comment_to_issue(issue_number,
                                   ('Thank you @{} for your submission to the BioSimulators registry of containerized simulation tools! '
                                    '[Action {}]({}) is reviewing your submission. We will discuss any issues with your submission here.'
                                    ).format(submitter, self.gh_action_run_id, self.gh_action_run_url))
+
+        # reset labels
+        labels = self.get_labels_for_issue(issue_number)
+        if IssueLabel.validated in labels:
+            self.remove_label_from_issue(issue_number, IssueLabel.validated)
+        if IssueLabel.approved in labels:
+            self.remove_label_from_issue(issue_number, IssueLabel.approved)
+        if IssueLabel.action_error in labels:
+            self.remove_label_from_issue(issue_number, IssueLabel.action_error)
 
         # parse submision
         submisssion = self.get_submission(issue)
@@ -170,10 +181,8 @@ class ValidateSimulatorAction(SimulatorAction):
 
         self.add_comment_to_issue(issue_number, 'Your containerized simulator is valid!')
 
-        # label issue as `validated`
-        self.add_labels_to_issue(self.issue, ['Validated'])
-        if 'Action error' in self.get_labels_for_issue(issue_number):
-            self.remove_label_from_issue(issue_number, 'Action error')
+        # label issue as validated
+        self.add_labels_to_issue(self.issue, [IssueLabel.validated])
 
         # post success message
         self.add_comment_to_issue(

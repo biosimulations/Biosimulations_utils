@@ -7,12 +7,19 @@
 """
 
 import abc
+import enum
 import functools
 import io
 import os
 import requests
 import types
 import yamldown
+
+
+class IssueLabel(str, enum.Enum):
+    validated = 'Validated'
+    approved = 'Approved'
+    action_error = 'Action error'
 
 
 class ActionCaughtError(Exception):
@@ -46,7 +53,7 @@ class ActionErrorHandling(object):
             except ActionCaughtError:
                 raise
             except Exception as error:
-                Action.add_labels_to_issue(issue_number, ['Action error'])
+                Action.add_labels_to_issue(issue_number, [IssueLabel.action_error])
                 Action.add_error_comment_to_issue(issue_number,
                                                   error_msg + '\n\n  ' + str(error).replace('\n', '\n  '))
                 raise
@@ -131,13 +138,13 @@ class Action(abc.ABC):
             issue_number (:obj:`str`): issue number
 
         Returns:
-            :obj:`list` of :obj:`str`: labels
+            :obj:`list` of :obj:`IssueLabel`: labels
         """
         response = requests.get(
             self.ISSUE_LABELS_ENDPOINT.format(issue_number),
             auth=self.gh_auth)
         response.raise_for_status()
-        return list([label.name for label in response.json()])
+        return list([IssueLabel(label.name) for label in response.json()])
 
     @classmethod
     def add_labels_to_issue(cls, issue_number, labels):
@@ -145,12 +152,12 @@ class Action(abc.ABC):
 
         Args:
             issue_number (:obj:`str`): issue number
-            labels (:obj:`list` of :obj:`str`): labels to add to the issue
+            labels (:obj:`list` of :obj:`IssueLabel`): labels to add to the issue
         """
         response = requests.post(
             self.ISSUE_LABELS_ENDPOINT.format(issue_number),
             auth=cls.get_gh_auth(),
-            json={'labels': labels})
+            json={'labels': [label.value for label in labels]})
         response.raise_for_status()
 
     def remove_label_from_issue(self, issue_number, label):
@@ -158,10 +165,10 @@ class Action(abc.ABC):
 
         Args:
             issue_number (:obj:`str`): issue number
-            label (:obj:`str`): labels to add to the issue
+            label (:obj:`IssueLabel`): labels to add to the issue
         """
         response = requests.delete(
-            self.ISSUE_LABELS_ENDPOINT.format(issue_number) + '/' + label,
+            self.ISSUE_LABELS_ENDPOINT.format(issue_number) + '/' + label.value,
             auth=self.gh_auth)
         response.raise_for_status()
 
@@ -199,7 +206,7 @@ class Action(abc.ABC):
         raise ActionCaughtError(comment)
 
     def close_issue(self, issue_number):
-        """ Close a GitHub issue 
+        """ Close a GitHub issue
 
         Args:
             issue_number (:obj:`str`): issue number

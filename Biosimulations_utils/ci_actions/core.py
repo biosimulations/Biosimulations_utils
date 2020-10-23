@@ -18,6 +18,7 @@ import yamldown
 
 class IssueLabel(str, enum.Enum):
     validated = 'Validated'
+    invalid = 'Invalid'
     approved = 'Approved'
     action_error = 'Action error'
 
@@ -51,6 +52,7 @@ class ActionErrorHandling(object):
             try:
                 func(*args, **kwargs)
             except ActionCaughtError:
+                Action.add_labels_to_issue(issue_number, [IssueLabel.invalid])
                 raise
             except Exception as error:
                 Action.add_labels_to_issue(issue_number, [IssueLabel.action_error])

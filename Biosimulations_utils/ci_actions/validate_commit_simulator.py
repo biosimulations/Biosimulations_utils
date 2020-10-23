@@ -115,6 +115,8 @@ class ValidateSimulatorAction(SimulatorAction):
         labels = self.get_labels_for_issue(issue_number)
         if IssueLabel.validated in labels:
             self.remove_label_from_issue(issue_number, IssueLabel.validated)
+        if IssueLabel.invalid in labels:
+            self.remove_label_from_issue(issue_number, IssueLabel.invalid)
         if IssueLabel.approved in labels:
             self.remove_label_from_issue(issue_number, IssueLabel.approved)
         if IssueLabel.action_error in labels:

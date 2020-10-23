@@ -155,7 +155,7 @@ class Action(abc.ABC):
             labels (:obj:`list` of :obj:`IssueLabel`): labels to add to the issue
         """
         response = requests.post(
-            self.ISSUE_LABELS_ENDPOINT.format(issue_number),
+            cls.ISSUE_LABELS_ENDPOINT.format(issue_number),
             auth=cls.get_gh_auth(),
             json={'labels': [label.value for label in labels]})
         response.raise_for_status()

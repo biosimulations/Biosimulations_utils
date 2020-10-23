@@ -144,7 +144,14 @@ class Action(abc.ABC):
             self.ISSUE_LABELS_ENDPOINT.format(issue_number),
             auth=self.gh_auth)
         response.raise_for_status()
-        return list([IssueLabel(label['name']) for label in response.json()])
+
+        labels = []
+        for label in response.json():
+            try:
+                labels.append(IssueLabel(label['name']))
+            except ValueError:
+                pass
+        return labels
 
     @classmethod
     def add_labels_to_issue(cls, issue_number, labels):

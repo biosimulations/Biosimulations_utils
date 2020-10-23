@@ -6,6 +6,7 @@
 :License: MIT
 """
 
+import abc
 import functools
 import io
 import os
@@ -29,8 +30,8 @@ class ActionErrorHandling(object):
         """
         return functools.partial(cls._catch_errors, issue_number, error_msg)
 
-    @classmethod
-    def _catch_errors(cls, issue_number, error_msg, func):
+    @staticmethod
+    def _catch_errors(issue_number, error_msg, func):
         """ Decorator for CI actions that catches errors and reports them as comments to an issue
 
         Args:
@@ -38,21 +39,23 @@ class ActionErrorHandling(object):
             error_msg (:obj:`str`): error message to display to users
             func (:obj:`types.FunctionType`): decorated function
         """
-        try:
-            func()
-        except ActionCaughtError:
-            raise
-        except Exception as error:
-            Action.add_error_comment_to_issue(issue_number, error_msg)
-            Action.add_labels_to_issue(issue_number, ['Action error'])
-            raise
+        def wrapper():
+            try:
+                func()
+            except ActionCaughtError:
+                raise
+            except Exception as error:
+                Action.add_error_comment_to_issue(issue_number, error_msg)
+                Action.add_labels_to_issue(issue_number, ['Action error'])
+                raise
+        return wrapper
 
 
-class Action(object):
+class Action(abc.ABC):
     """ A continuous integration action
 
     Attributes:
-        gh_auth
+        gh_auth (:obj:`tuple` of :obj:`str`): authorization for GitHub (user and access token
         gh_repo (:obj:`str`): owner and name of the repository which triggered the action
         gh_action_run_id (:obj:`str`): GitHub action run id
         gh_action_run_url (:obj:`str`): URL for the GitHub action run
@@ -68,7 +71,7 @@ class Action(object):
         self.gh_action_run_id = self.get_gh_action_run_id()
         self.gh_action_run_url = self.GH_ACTION_RUN_URL.format(self.gh_repo, self.gh_action_run_id)
 
-    @ActionErrorHandling.catch_errors
+    @abc.abstractmethod
     def run(self):
         pass
 
@@ -90,7 +93,6 @@ class Action(object):
         """
         return os.getenv('GH_ISSUE_NUMBER')
 
-    @classmethod
     def get_issue(self, issue_number):
         """ Get the properties of the GitHub issue for the submission
 
@@ -106,8 +108,8 @@ class Action(object):
         response.raise_for_status()
         return response.json()
 
-    @classmethod
-    def get_data_in_issue(self, issue):
+    @staticmethod
+    def get_data_in_issue(issue):
         """ Get the YAML-structured data in an issue
 
         Args:
@@ -120,7 +122,6 @@ class Action(object):
         data, _ = yamldown.load(body)
         return data
 
-    @classmethod
     def get_labels_for_issue(self, issue_number):
         """ Get the labels for an issue
 
@@ -136,7 +137,6 @@ class Action(object):
         response.raise_for_status()
         return list([label.name for label in response.json()])
 
-    @classmethod
     def add_labels_to_issue(self, issue_number, labels):
         """ Add one or more labels to an issue
 
@@ -150,7 +150,6 @@ class Action(object):
             json={'labels': labels})
         response.raise_for_status()
 
-    @classmethod
     def remove_label_from_issue(self, issue_number, label):
         """ Remove a label from an issue
 
@@ -163,7 +162,6 @@ class Action(object):
             auth=self.gh_auth)
         response.raise_for_status()
 
-    @classmethod
     def add_comment_to_issue(self, issue_number, comment):
         """ Post a comment to the GitHub issue
 
@@ -178,7 +176,6 @@ class Action(object):
             json={'body': comment})
         response.raise_for_status()
 
-    @classmethod
     def add_error_comment_to_issue(self, issue_number, comment):
         """ Post an error to the GitHub issue
 
@@ -196,7 +193,6 @@ class Action(object):
         ]))
         raise ActionCaughtError(comment)
 
-    @classmethod
     def close_issue(self, issue_number):
         """ Close a GitHub issue 
 
@@ -223,7 +219,7 @@ class Action(object):
         """ Get authorization for GitHub
 
         Returns:
-            :obj:`dict`: authorization for GitHub
+            :obj:`tuple` of :obj:`str`: authorization for GitHub (user and access token)
         """
         user = os.getenv('GH_ISSUES_USER')
         access_token = os.getenv('GH_ISSUES_ACCESS_TOKEN')

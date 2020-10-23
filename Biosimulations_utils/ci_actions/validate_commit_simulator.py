@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from .core import Action
+from .core import Action, ActionErrorHandling
 import requests
 import simplejson.errors
 
@@ -96,6 +96,7 @@ class SimulatorAction(Action):
 
 
 class ValidateSimulatorAction(SimulatorAction):
+    @ActionErrorHandling.catch_errors(Action.get_issue_number())
     def run(self):
         """ Validate a submission of simulator. Called by `Validate Simulator` CI action. """
 
@@ -180,6 +181,7 @@ class ValidateSimulatorAction(SimulatorAction):
 
 
 class CommitSimulatorAction(SimulatorAction):
+    @ActionErrorHandling.catch_errors(Action.get_issue_number())
     def run(self):
         """ Commit a simulator (id and version) to the BioSimulators registry. Called by the `Commit Simulator` CI action """
 

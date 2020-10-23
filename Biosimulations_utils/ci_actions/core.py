@@ -46,8 +46,9 @@ class ActionErrorHandling(object):
             except ActionCaughtError:
                 raise
             except Exception as error:
-                Action.add_error_comment_to_issue(issue_number, error_msg + '\n\n  ' + str(error).replace('\n', '\n  '))
                 Action.add_labels_to_issue(issue_number, ['Action error'])
+                Action.add_error_comment_to_issue(issue_number,
+                                                  error_msg + '\n\n  ' + str(error).replace('\n', '\n  '))
                 raise
         return wrapper
 

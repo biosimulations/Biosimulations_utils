@@ -39,9 +39,10 @@ class ActionErrorHandling(object):
             error_msg (:obj:`str`): error message to display to users
             func (:obj:`types.FunctionType`): decorated function
         """
-        def wrapper():
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
             try:
-                func()
+                func(*args, **kwargs)
             except ActionCaughtError:
                 raise
             except Exception as error:

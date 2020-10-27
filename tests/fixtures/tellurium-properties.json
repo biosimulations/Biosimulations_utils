@@ -5,7 +5,7 @@
     "attributes": {
       "version": "2.4.1",
       "url": "http://tellurium.analogmachine.org/",
-      "dockerHubImageId": "biosimulators/tellurium:2.4.1",
+      "image": "biosimulators/tellurium:2.4.1",
       "format": {
         "name": "Docker Image",
         "version": "1.2",
@@ -115,7 +115,7 @@
               },
               "name": "Relative tolerance",
               "type": "float",
-              "default": 0.000001
+              "value": 0.000001
             },
             {
               "kisaoTerm": {
@@ -124,7 +124,7 @@
               },
               "name": "Absolute tolerance",
               "type": "float",
-              "default": 1e-12
+              "value": 1e-12
             },
             {
               "kisaoTerm": {
@@ -133,7 +133,7 @@
               },
               "name": "Maximum Backward Differentiation Formula (BDF) order",
               "type": "integer",
-              "default": 5
+              "value": 5
             },
             {
               "kisaoTerm": {
@@ -142,7 +142,7 @@
               },
               "name": "Maximum Adams order",
               "type": "integer",
-              "default": 12
+              "value": 12
             },
             {
               "kisaoTerm": {
@@ -151,7 +151,7 @@
               },
               "name": "Maximum number of steps",
               "type": "integer",
-              "default": 20000
+              "value": 20000
             },
             {
               "kisaoTerm": {
@@ -160,7 +160,7 @@
               },
               "name": "Maximum time step",
               "type": "float",
-              "default": 0
+              "value": 0
             },
             {
               "kisaoTerm": {
@@ -169,7 +169,7 @@
               },
               "name": "Minimum time step",
               "type": "float",
-              "default": 0
+              "value": 0
             },
             {
               "kisaoTerm": {
@@ -178,7 +178,7 @@
               },
               "name": "Initial time step",
               "type": "float",
-              "default": 0
+              "value": 0
             },
             {
               "kisaoTerm": {
@@ -187,7 +187,7 @@
               },
               "name": "Adaptive time steps",
               "type": "boolean",
-              "default": false
+              "value": false
             }
           ]
         },
@@ -447,7 +447,7 @@
               "volume": 81,
               "issue": 25,
               "pages": "2340-2361",
-              "year": 1997,
+              "year": 1977,
               "doi": "10.1021/j100540a008"
             }
           ],
@@ -459,7 +459,7 @@
               },
               "name": "Random number generator seed",
               "type": "integer",
-              "default": 0
+              "value": 0
             },
             {
               "kisaoTerm": {
@@ -468,7 +468,7 @@
               },
               "name": "Adaptive time steps",
               "type": "boolean",
-              "default": true
+              "value": true
             },
             {
               "kisaoTerm": {
@@ -477,7 +477,7 @@
               },
               "name": "Initial time step",
               "type": "float",
-              "default": 0
+              "value": 0
             },
             {
               "kisaoTerm": {
@@ -486,7 +486,7 @@
               },
               "name": "Minimum time step",
               "type": "float",
-              "default": 0
+              "value": 0
             },
             {
               "kisaoTerm": {
@@ -495,7 +495,7 @@
               },
               "name": "Maximum time step",
               "type": "float",
-              "default": 0
+              "value": 0
             }
           ]
         },
@@ -628,7 +628,7 @@
               },
               "name": "Relative tolerance",
               "type": "float",
-              "default": 1e-12
+              "value": 1e-12
             },
             {
               "kisaoTerm": {
@@ -637,7 +637,7 @@
               },
               "name": "Maximum number of iterations",
               "type": "integer",
-              "default": 100
+              "value": 100
             },
             {
               "kisaoTerm": {
@@ -646,7 +646,7 @@
               },
               "name": "Minimum damping factor",
               "type": "float",
-              "default": 1e-29
+              "value": 1e-29
             }
           ]
         }

@@ -20,20 +20,20 @@ class Simulator(PrimaryResource):
         version (:obj:`str`): version
         url (:obj:`str`): URL
         format (:obj:`Format`): format
-        docker_hub_image_id (:obj:`str`): id for image in DockerHub (e.g., "biosimulators/tellurium:2.4.1")
+        image (:obj:`str`): id for image in DockerHub (e.g., "biosimulators/tellurium:2.4.1")
         algorithms (:obj:`list` of :obj:`Algorithm`): supported algorithms
     """
     TYPE = 'simulator'
 
     def __init__(self, id=None, version=None, url=None,
-                 format=None, docker_hub_image_id=None, algorithms=None, metadata=None, _metadata=None):
+                 format=None, image=None, algorithms=None, metadata=None, _metadata=None):
         """
         Args:
             id (:obj:`str`, optional): id
             version (:obj:`str`, optional): version
             url (:obj:`str`, optional): URL
             format (:obj:`Format`, optional): format
-            docker_hub_image_id (:obj:`str`, optional): id for image in DockerHub (e.g., "biosimulators/tellurium:2.4.1")
+            image (:obj:`str`, optional): id for image in DockerHub (e.g., "biosimulators/tellurium:2.4.1")
             algorithms (:obj:`list` of :obj:`Algorithm`, optional): supported algorithms
             metadata (:obj:`PrimaryResourceMetadata`, optional): public metadata
             _metadata (:obj:`ResourceMetadata`, optional): private metadata
@@ -42,7 +42,7 @@ class Simulator(PrimaryResource):
         self.version = version
         self.url = url
         self.format = format
-        self.docker_hub_image_id = docker_hub_image_id
+        self.image = image
         self.algorithms = algorithms or []
         self.metadata = metadata or PrimaryResourceMetadata()
         self._metadata = _metadata or ResourceMetadata()
@@ -61,7 +61,7 @@ class Simulator(PrimaryResource):
             and self.version == other.version \
             and self.url == other.url \
             and self.format == other.format \
-            and self.docker_hub_image_id == other.docker_hub_image_id \
+            and self.image == other.image \
             and sorted(self.algorithms, key=Algorithm.sort_key) == sorted(other.algorithms, key=Algorithm.sort_key) \
             and self.metadata == other.metadata \
             and self._metadata == other._metadata
@@ -80,7 +80,7 @@ class Simulator(PrimaryResource):
                     'version': self.version,
                     'url': self.url,
                     'format': self.format.to_json() if self.format else None,
-                    'dockerHubImageId': self.docker_hub_image_id,
+                    'image': self.image,
                     'algorithms': [alg.to_json() for alg in self.algorithms],
                     'metadata': self.metadata.to_json() if self.metadata else None,
                 },
@@ -142,7 +142,7 @@ class Simulator(PrimaryResource):
             version=attrs.get('version', None),
             url=attrs.get('url', None),
             format=Format.from_json(attrs.get('format')) if attrs.get('format', None) else None,
-            docker_hub_image_id=attrs.get('dockerHubImageId', None),
+            image=attrs.get('image', None),
             algorithms=[Algorithm.from_json(alg) for alg in attrs.get('algorithms', [])],
             metadata=PrimaryResourceMetadata.from_json(attrs.get('metadata')) if attrs.get('metadata', None) else None,
             _metadata=ResourceMetadata.from_json(data.get('meta')) if data.get('meta', None) else None,

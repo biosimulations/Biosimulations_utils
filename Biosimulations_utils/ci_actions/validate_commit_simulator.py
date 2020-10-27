@@ -7,17 +7,36 @@
 """
 
 from .core import Action, ActionErrorHandling, IssueLabel
+from ..simulator.testing import SimulatorValidator
+import docker
+import docker.errors
+import json
+import os
 import requests
 import simplejson.errors
 
 
 class SimulatorAction(Action):
-    # BIOSIMULATORS_VALIDATE_ENDPOINT = 'https://api.biosimulators.org/simulators/validate'
+    """ Simulator continuous integration action
+
+    Attributes:
+        issue_number (:obj:`str`): number of GitHub issue which triggered the action
+        docker_client (:obj:`docker.client.DockerClient`): Docker client
+    """
+
+    BIOSIMULATORS_VALIDATE_ENDPOINT = 'https://api.biosimulators.org/simulators/validate'
+    BIOSIMULATORS_GET_ENDPOINT = 'https://api.biosimulators.org/simulators/{}'
     BIOSIMULATORS_POST_ENDPOINT = 'https://api.biosimulators.org/simulators'
+    BIOSIMULATORS_PUT_ENDPOINT = 'https://api.biosimulators.org/simulators​/{}​/{}'
+    IMAGE_REGISTRY = 'ghcr.io'
+    IMAGE_REGISTRY_URL_PATTERN = 'ghcr.io/biosimulators/{}:{}'
+    DEFAULT_SCHEMA_VERSION = '1.0.0'
+    DEFAULT_IMAGE_VERSION = '1.0.0'
 
     def __init__(self):
         super(SimulatorAction, self).__init__()
         self.issue_number = self.get_issue_number()
+        self.docker_client = docker.from_env()
 
     def get_submission(self, issue):
         """ Get the properties of the submission
@@ -80,22 +99,76 @@ class SimulatorAction(Action):
                     'Once the issue is fixed, edit the first block of this issue to re-initiate this validation.').format(str(error)))
 
         # validate specifications
-        # TODO: set validation endpoint
-        # response = requests.get(self.BIOSIMULATORS_VALIDATE_ENDPOINT, data=specs)
-        # try:
-        #    response.raise_for_status()
-        # except requests.RequestException as error:
-        #    self.add_error_comment_to_issue(
-        #        self.issue_number,
-        #        ('Your specifications are not valid.\n\n{}\n\n'
-        #            'Once the issue is fixed, edit the first block of this issue to re-initiate this validation.').format(
-        #            response.reason.rstrip().replace('\n', '\n  ')))
+        response = requests.post(self.BIOSIMULATORS_VALIDATE_ENDPOINT, data=specs)
+        try:
+            response.raise_for_status()
+        except requests.RequestException as error:
+            self.add_error_comment_to_issue(
+                self.issue_number,
+                ('Your specifications are not valid.\n\n{}\n\n'
+                    'Once the issue is fixed, edit the first block of this issue to re-initiate this validation.').format(
+                    response.reason.rstrip().replace('\n', '\n  ')))
 
         # return specifications
         return specs
 
+    @classmethod
+    def get_image_version(cls, simulator):
+        """ Get the BioSimulators version of a simulator
+
+        Args:
+            simulator (:obj:`dict`): simulator specifications
+
+        Returns:
+            :obj:`str`: BioSimulators version of the simulator
+        """
+        return '{}-{}'.format(
+            simulator.get('biosimulators', {}).get('schemaVersion', cls.DEFAULT_SCHEMA_VERSION),
+            simulator.get('biosimulators', {}).get('imageVersion', cls.DEFAULT_IMAGE_VERSION))
+
+    def pull_docker_image(self, url):
+        """ Pull Docker image
+
+        Args:
+            url (:obj:`str`): URL for Docker image
+
+        Returns:
+            :obj:`docker.models.images.Image`: Docker image
+        """
+        try:
+            return self.docker_client.images.pull(url)
+        except docker.errors.NotFound:
+            self.add_error_comment_to_issue(
+                issue_number,
+                (
+                    'Your container could not be verified because no image is at the URL {}. '
+                    'After correcting the specifications, please edit the first block of this issue to re-initiate this validation.'
+                ).format(url))
+        except Exception as error:
+            self.add_error_comment_to_issue(
+                issue_number,
+                (
+                    'Your container could not be verified: {}. '
+                    'After correcting the specifications, please edit the first block of this issue to re-initiate this validation.'
+                ).format(str(error)))
+
+    def tag_and_push_image(self, image, tag):
+        """ Tag and push Docker image
+
+        Args:
+            image (:obj:`docker.models.images.Image`): Docker image
+            tag (:obj:`str`): tag
+        """
+        assert image.tag(tag)
+        response = self.docker_client.images.push(tag)
+        response = json.loads(response.rstrip().split('\n')[-1])
+        if 'error' in response:
+            raise Exception('Unable to push image to {}'.format(tag))
+
 
 class ValidateSimulatorAction(SimulatorAction):
+    """ Action to validate a containerized simulator """
+
     @ActionErrorHandling.catch_errors(Action.get_issue_number())
     def run(self):
         """ Validate a submission of simulator. Called by `Validate Simulator` CI action. """
@@ -131,56 +204,37 @@ class ValidateSimulatorAction(SimulatorAction):
         self.add_comment_to_issue(issue_number, 'The specifications of your simulator is valid!')
 
         # validate that container (Docker image) exists
-        import docker
-        import docker.errors
         image_url = specs['image']
-        docker_client = docker.from_env()
-        try:
-            docker_client.images.pull(image_url)
-        except docker.errors.NotFound:
-            self.add_error_comment_to_issue(
-                issue_number,
-                (
-                    'Your container could not be verified because no image is at the URL {}. '
-                    'After correcting the specifications, please edit the first block of this issue to re-initiate this validation.'
-                ).format(image_url))
-        except Exception as error:
-            self.add_error_comment_to_issue(
-                issue_number,
-                (
-                    'Your container could not be verified: {}. '
-                    'After correcting the specifications, please edit the first block of this issue to re-initiate this validation.'
-                ).format(str(error)))
+        self.pull_docker_image(image_url)
 
-        # validate container
-        from ..simulator.testing import SimulatorValidator
-        validator = SimulatorValidator()
-        validCases, testExceptions, skippedCases = validator.run(image_url, specs)
+        # TODO: validate container
+        # validator = SimulatorValidator()
+        # validCases, testExceptions, skippedCases = validator.run(image_url, specs)
 
-        self.add_comment_to_issue(issue_number, 'Your container passed {} test cases.'.format(len(validCases)))
+        # self.add_comment_to_issue(issue_number, 'Your container passed {} test cases.'.format(len(validCases)))
 
-        error_msgs = []
+        # error_msgs = []
 
-        if not validCases:
-            error_msgs.append(('No test cases are applicable to your container. '
-                               'Please use this issue to share appropriate test COMBINE/OMEX files for the BioSimulators test suite. '
-                               'The BioSimulators Team will add these files to the test suite and then re-review your simulator.'
-                               ))
+        # if not validCases:
+        #     error_msgs.append(('No test cases are applicable to your container. '
+        #                        'Please use this issue to share appropriate test COMBINE/OMEX files for the BioSimulators test suite. '
+        #                        'The BioSimulators Team will add these files to the test suite and then re-review your simulator.'
+        #                        ))
 
-        if testExceptions:
-            msgs = []
-            for exception in testExceptions:
-                msgs.append('- {}\n  {}\n\n'.format(exception.test_case, str(exception.exception)))
+        # if testExceptions:
+        #     msgs = []
+        #     for exception in testExceptions:
+        #         msgs.append('- {}\n  {}\n\n'.format(exception.test_case, str(exception.exception)))
 
-            error_msgs.append((
-                'Your container did not pass {} test cases.\n\n{}'
-                'After correcting the container, please edit the first block of this issue to re-initiate this validation.'
-            ).format(len(testExceptions), ''.join(msgs)))
+        #     error_msgs.append((
+        #         'Your container did not pass {} test cases.\n\n{}'
+        #         'After correcting the container, please edit the first block of this issue to re-initiate this validation.'
+        #     ).format(len(testExceptions), ''.join(msgs)))
 
-        if error_msgs:
-            self.add_error_comment_to_issue(issue_number, '\n\n'.join(error_msgs))
+        # if error_msgs:
+        #     self.add_error_comment_to_issue(issue_number, '\n\n'.join(error_msgs))
 
-        self.add_comment_to_issue(issue_number, 'Your containerized simulator is valid!')
+        # self.add_comment_to_issue(issue_number, 'Your containerized simulator is valid!')
 
         # label issue as validated
         self.add_labels_to_issue(self.issue, [IssueLabel.validated])
@@ -192,6 +246,8 @@ class ValidateSimulatorAction(SimulatorAction):
 
 
 class CommitSimulatorAction(SimulatorAction):
+    """ Action to commit a containerized simulator to the BioSimulators registry """
+
     @ActionErrorHandling.catch_errors(Action.get_issue_number())
     def run(self):
         """ Commit a simulator (id and version) to the BioSimulators registry. Called by the `Commit Simulator` CI action """
@@ -206,9 +262,54 @@ class CommitSimulatorAction(SimulatorAction):
                                   '[Action {}]({}) is committing your submission to the BioSimulators registry.'.format(
                                       self.gh_action_run_id, self.gh_action_run_url))
 
+        # get other versions of simulator
+        response = requests.get(self.BIOSIMULATORS_GET_ENDPOINT.format(specs['id']))
+        try:
+            response.raise_for_status()
+            existing_versions = response.json()
+        except requests.exceptions.HTTPError:
+            if response.status_code != 404:
+                raise
+            existing_versions = []
+
+        # pull image
+        original_image_url = specs['image']
+        image = self.pull_docker_image(original_image_url)
+
+        # push image to Docker container registry
+        self.docker_client.login(
+            registry=self.IMAGE_REGISTRY,
+            username=os.getenv('GH_ISSUES_USER'),
+            password=os.getenv('GH_ISSUES_ACCESS_TOKEN'),
+        )
+
+        copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN.format(
+            specs['id'],
+            specs['version'] + '-' + self.get_image_version(specs))
+        self.tag_and_push_image(image, copy_image_url)
+
+        is_latest = True
+        for v in existing_versions:
+            if v['version'] > specs['version'] or self.get_image_version(v) > self.get_image_version(specs):
+                is_latest = False
+                break
+
+        if is_latest:
+            copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN.format(
+                specs['id'],
+                'latest')
+            self.tag_and_push_image(image, copy_image_url)
+
+        # determine if container needs to be added or updated
+        update_simulator = next(True for v in existing_versions if v['version'] == specs['version'], False)
+
         # commit submission to BioSimulators database
         # TODO: incorporate authentication
-        # requests.post(self.BIOSIMULATORS_POST_ENDPOINT, data=specs)
+        if update_simulator:
+            response = requests.put(self.BIOSIMULATORS_PUT_ENDPOINT.format(specs['id'], specs['version']), data=specs)
+        else:
+            response = requests.post(self.BIOSIMULATORS_POST_ENDPOINT, data=specs)
+        response.raise_for_status()
 
         # post success message
         self.add_comment_to_issue(

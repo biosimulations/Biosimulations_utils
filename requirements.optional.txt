@@ -1,4 +1,5 @@
 [ci-actions]
+docker
 simplejson
 yamldown
 

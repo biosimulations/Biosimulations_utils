@@ -24,10 +24,12 @@ class SimulatorAction(Action):
         docker_client (:obj:`docker.client.DockerClient`): Docker client
     """
 
+    BIOSIMULATORS_AUTH_ENDPOINT = 'https://auth.biosimulations.org/oauth/token'
+    BIOSIMULATORS_AUDIENCE = 'api.biosimulations.org'
     BIOSIMULATORS_VALIDATE_ENDPOINT = 'https://api.biosimulators.org/simulators/validate'
     BIOSIMULATORS_GET_ENDPOINT = 'https://api.biosimulators.org/simulators/{}'
     BIOSIMULATORS_POST_ENDPOINT = 'https://api.biosimulators.org/simulators'
-    BIOSIMULATORS_PUT_ENDPOINT = 'https://api.biosimulators.org/simulators​/{}​/{}'
+    BIOSIMULATORS_PUT_ENDPOINT = 'https://api.biosimulators.org/simulators/{}/{}'
     IMAGE_REGISTRY = 'ghcr.io'
     IMAGE_REGISTRY_URL_PATTERN = 'ghcr.io/biosimulators/{}:{}'
     DEFAULT_SCHEMA_VERSION = '1.0.0'
@@ -99,7 +101,7 @@ class SimulatorAction(Action):
                     'Once the issue is fixed, edit the first block of this issue to re-initiate this validation.').format(str(error)))
 
         # validate specifications
-        response = requests.post(self.BIOSIMULATORS_VALIDATE_ENDPOINT, data=specs)
+        response = requests.post(self.BIOSIMULATORS_VALIDATE_ENDPOINT, json=specs)
         try:
             response.raise_for_status()
         except requests.RequestException as error:
@@ -313,12 +315,28 @@ class CommitSimulatorAction(SimulatorAction):
         update_simulator = next(True for v in existing_versions if v['version'] == specs['version'], False)
 
         # commit submission to BioSimulators database
-        # TODO: incorporate authentication
-        if update_simulator:
-            response = requests.put(self.BIOSIMULATORS_PUT_ENDPOINT.format(specs['id'], specs['version']), data=specs)
-        else:
-            response = requests.post(self.BIOSIMULATORS_POST_ENDPOINT, data=specs)
-        response.raise_for_status()
+        # TODO: get authentication working
+        # api_id = os.getenv('BIOSIMULATORS_API_CLIENT_ID')
+        # api_secret = os.getenv('BIOSIMULATORS_API_CLIENT_SECRET')
+
+        # response = requests.post(self.BIOSIMULATORS_AUTH_ENDPOINT, json={
+        #     'client_id': api_id,
+        #     'client_secret': api_secret,
+        #     'audience': self.BIOSIMULATORS_AUDIENCE,
+        #     "grant_type": "client_credentials",
+        # })
+        # response.raise_for_status()
+        # response_data = response.json()
+        # auth_headers = {'Authorization': response_data['token_type'] + ' ' + response_data['access_token']}
+
+        # if update_simulator:
+        #     endpoint = self.BIOSIMULATORS_PUT_ENDPOINT.format(specs['id'], specs['version'])
+        #     requests_method = requests.put
+        # else:
+        #     endpoint = self.BIOSIMULATORS_POST_ENDPOINT
+        #     requests_method = requests.post
+        # response = requests_method(endpoint, headers=auth_headers, json=specs)
+        # response.raise_for_status()
 
         # post success message
         self.add_comment_to_issue(

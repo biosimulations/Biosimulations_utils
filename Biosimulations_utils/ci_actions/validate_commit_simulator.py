@@ -287,18 +287,27 @@ class CommitSimulatorAction(SimulatorAction):
             specs['id'],
             specs['version'] + '-' + self.get_image_version(specs))
         self.tag_and_push_image(image, copy_image_url)
+        specs['image'] = copy_image_url
 
+        is_latest_of_version = True
         is_latest = True
         for v in existing_versions:
+            if v['version'] == specs['version'] and self.get_image_version(v) > self.get_image_version(specs):
+                is_latest_of_version = False
             if v['version'] > specs['version'] or self.get_image_version(v) > self.get_image_version(specs):
                 is_latest = False
-                break
+
+        if is_latest_of_version:
+            latest_of_version_copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN.format(
+                specs['id'],
+                specs['version'])
+            self.tag_and_push_image(image, latest_of_version_copy_image_url)
 
         if is_latest:
-            copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN.format(
+            latest_copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN.format(
                 specs['id'],
                 'latest')
-            self.tag_and_push_image(image, copy_image_url)
+            self.tag_and_push_image(image, latest_copy_image_url)
 
         # determine if container needs to be added or updated
         update_simulator = next(True for v in existing_versions if v['version'] == specs['version'], False)

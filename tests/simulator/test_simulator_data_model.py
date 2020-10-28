@@ -23,9 +23,9 @@ class SimulatorDataModelTestCase(unittest.TestCase):
         now = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=dateutil.tz.UTC)
         simulator = Simulator(
             id='tellurium',
-            version='2.4.1',
+            version='2.1.6',
             url='http://tellurium.analogmachine.org/',
-            image='docker.io/biosimulators/tellurium:2.4.1',
+            image='docker.io/biosimulators/tellurium:2.1.6',
             algorithms=[
                 Algorithm(
                     id='00001',

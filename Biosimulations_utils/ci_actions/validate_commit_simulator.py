@@ -137,6 +137,13 @@ class SimulatorAction(Action):
         Returns:
             :obj:`docker.models.images.Image`: Docker image
         """
+        # login to Docker Hub to avoid access limits for anonymous users
+        self.docker_client.login(
+            username=os.getenv('DOCKER_HUB_USERNAME'),
+            password=os.getenv('DOCKER_HUB_TOKEN'),
+        )
+
+        # pull image
         try:
             return self.docker_client.images.pull(url)
         except docker.errors.NotFound:

@@ -12,8 +12,8 @@ GH_ISSUE_ENDPOINT = 'https://api.github.com/repos/biosimulators/Biosimulators/is
 
 
 def submit_simulator_to_biosimulators(name, version, specUrl, gh_username, gh_access_token):
-    """ Submit a version of a simulation tool for review for inclusing in the BioSimulators registry. 
-    This will create a GitHub issue which will automatically review your submission.
+    """ Submit a version of a simulation tool for review for inclusion in the BioSimulators registry. 
+    This will create a GitHub issue which the BioSimulators Team will use to review your submission.
 
     This method requires a GitHub access and personal access token. This access token must have the `public_repo` scope.
     Instructions for creating an access token are available in the

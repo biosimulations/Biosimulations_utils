@@ -1,4 +1,4 @@
-[![Documentation](https://github.com/biosimulations/Biosimulations_utils/workflows/Documentation/badge.svg)](https://github.com/biosimulations/Biosimulations_utils/actions?query=workflow%3ADocument)
+[![Documentation](https://github.com/biosimulations/Biosimulations_utils/workflows/Documentation/badge.svg)](https://biosimulations-utils.readthedocs.io/)
 [![Unit tests](https://github.com/biosimulations/Biosimulations_utils/workflows/Unit%20tests/badge.svg)](https://github.com/biosimulations/Biosimulations_utils/actions?query=workflow%3A%22Unit+Test%22)
 [![Test coverage](https://codecov.io/gh/biosimulations/Biosimulations_utils/branch/master/graph/badge.svg)](https://codecov.io/gh/biosimulations/Biosimulations_utils)
 [![License](https://img.shields.io/github/license/biosimulations/Biosimulations_utils.svg)](LICENSE)

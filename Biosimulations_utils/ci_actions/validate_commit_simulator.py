@@ -319,7 +319,7 @@ class CommitSimulatorAction(SimulatorAction):
             self.tag_and_push_image(image, latest_copy_image_url)
 
         # determine if container needs to be added or updated
-        update_simulator = next(True for v in existing_versions if v['version'] == specs['version'], False)
+        update_simulator = next((True for v in existing_versions if v['version'] == specs['version']), False)
 
         # commit submission to BioSimulators database
         # TODO: get authentication working

@@ -1084,6 +1084,7 @@ class SedMlSimulationReader(SimulationReader):
             kisao_term_onto, _, kisao_term_id = kisao_term_onto_id.partition(':')
             assert kisao_term_onto == 'KISAO'
             assert kisao_term_id
+            kisao_term_id = kisao_term_onto +"_" +kisao_term_id
             kisao_term = OntologyTerm(
                 ontology=kisao_term_onto,
                 id=kisao_term_id,

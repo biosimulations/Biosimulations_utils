@@ -32,7 +32,7 @@ class SimulatorAction(Action):
     BIOSIMULATORS_PUT_ENDPOINT = 'https://api.biosimulators.org/simulators/{}/{}'
     IMAGE_REGISTRY = 'ghcr.io'
     IMAGE_REGISTRY_URL_PATTERN = 'ghcr.io/biosimulators/{}:{}'
-    DEFAULT_SCHEMA_VERSION = '1.0.0'
+    DEFAULT_SPECIFICATIONS_VERSION = '1.0.0'
     DEFAULT_IMAGE_VERSION = '1.0.0'
 
     def __init__(self):
@@ -125,7 +125,7 @@ class SimulatorAction(Action):
             :obj:`str`: BioSimulators version of the simulator
         """
         return '{}-{}'.format(
-            simulator.get('biosimulators', {}).get('schemaVersion', cls.DEFAULT_SCHEMA_VERSION),
+            simulator.get('biosimulators', {}).get('specificationsVersion', cls.DEFAULT_SPECIFICATIONS_VERSION),
             simulator.get('biosimulators', {}).get('imageVersion', cls.DEFAULT_IMAGE_VERSION))
 
     def pull_docker_image(self, url):

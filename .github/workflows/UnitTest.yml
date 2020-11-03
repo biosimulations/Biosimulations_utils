@@ -30,7 +30,7 @@ jobs:
         run: |
           pip install git+https://github.com/KarrLab/pkg_utils.git#egg=pkg_utils
           pip install git+https://github.com/KarrLab/wc_utils.git#egg=wc_utils
-          pip install git+https://github.com/biosimulators/Biosimulators_tellurium.git#egg=Biosimulators_tellurium
+          pip install git+https://github.com/biosimulators/Biosimulators_tellurium.git#egg=biosimulators_tellurium
           git clone https://github.com/biosimulators/Biosimulators_test_suite.git
           pip install -e .[tests]
       - name: Test with pytest

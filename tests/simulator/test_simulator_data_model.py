@@ -25,7 +25,7 @@ class SimulatorDataModelTestCase(unittest.TestCase):
             id='tellurium',
             version='2.1.6',
             url='http://tellurium.analogmachine.org/',
-            image='docker.io/biosimulators/tellurium:2.1.6',
+            image='ghcr.io/biosimulators/tellurium:2.1.6',
             algorithms=[
                 Algorithm(
                     id='00001',

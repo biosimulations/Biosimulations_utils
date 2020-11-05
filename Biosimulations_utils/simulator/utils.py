@@ -11,6 +11,7 @@ from ..archive import read_archive
 from ..archive.data_model import ArchiveFormat
 from ..simulation import read_simulation
 from ..simulation.data_model import Simulation, SimulationFormat  # noqa: F401
+from ..simulation.sedml import modify_xml_model_for_simulation
 import os
 import tempfile
 import shutil
@@ -19,7 +20,8 @@ import types  # noqa: F401
 __all__ = ['exec_simulations_in_archive']
 
 
-def exec_simulations_in_archive(archive_filename, task_executer, out_dir, archive_format=ArchiveFormat.combine):
+def exec_simulations_in_archive(archive_filename, task_executer, out_dir,
+                                archive_format=ArchiveFormat.combine, apply_model_changes=False):
     """ Execute the SED tasks represented by an archive
 
     Args:
@@ -42,6 +44,8 @@ def exec_simulations_in_archive(archive_filename, task_executer, out_dir, archiv
 
         out_dir (:obj:`str`): Directory to store the results of the tasks
         archive_format (:obj:`ArchiveFormat`, optional): archive format
+        apply_model_changes (:obj:`bool`): if :obj:`True`, apply any model changes specified in the simulations to the models before 
+            calling :obj:`task_executer`. Currently, this only supports changes to models that are described in XML-encoded files
     """
     # create temporary directory to unpack archive
     archive_tmp_dir = tempfile.mkdtemp()
@@ -69,8 +73,28 @@ def exec_simulations_in_archive(archive_filename, task_executer, out_dir, archiv
         # execute simulations
         working_dir = os.path.join(archive_tmp_dir, os.path.dirname(file.filename))
         for simulation in simulations:
+            # get model
             model = simulation.model
+            model_filename = os.path.join(working_dir, model.file.name)
+
+            # apply changes to model
+            if apply_model_changes and simulation.model_parameter_changes:
+                original_model_filename = model_filename
+                file_handle, modified_model_filename = tempfile.mkstemp(suffix='.xml')
+                os.close(file_handle)
+                modify_xml_model_for_simulation(
+                    simulation, original_model_filename, modified_model_filename)
+                model_filename = modified_model_filename
+                simulation.model_parameter_changes = []
+            else:
+                modified_model_filename = None
+
+            # execute task
             out_filename = os.path.join(out_subdir, simulation.id + '.csv')
-            task_executer(os.path.join(working_dir, model.file.name), model.format.sed_urn, simulation, working_dir, out_filename, 'csv')
+            task_executer(model_filename, model.format.sed_urn, simulation, working_dir, out_filename, 'csv')
+
+            # cleanup modified model
+            if modified_model_filename:
+                os.remove(modified_model_filename)
 
     shutil.rmtree(archive_tmp_dir)

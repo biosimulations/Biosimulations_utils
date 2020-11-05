@@ -340,28 +340,27 @@ class CommitSimulatorAction(SimulatorAction):
         update_simulator = specs['version'] in existing_versions
 
         # commit submission to BioSimulators database
-        # TODO: get authentication working
-        # api_id = os.getenv('BIOSIMULATORS_API_CLIENT_ID')
-        # api_secret = os.getenv('BIOSIMULATORS_API_CLIENT_SECRET')
+        api_id = os.getenv('BIOSIMULATORS_API_CLIENT_ID')
+        api_secret = os.getenv('BIOSIMULATORS_API_CLIENT_SECRET')
 
-        # response = requests.post(self.BIOSIMULATORS_AUTH_ENDPOINT, json={
-        #     'client_id': api_id,
-        #     'client_secret': api_secret,
-        #     'audience': self.BIOSIMULATORS_AUDIENCE,
-        #     "grant_type": "client_credentials",
-        # })
-        # response.raise_for_status()
-        # response_data = response.json()
-        # auth_headers = {'Authorization': response_data['token_type'] + ' ' + response_data['access_token']}
+        response = requests.post(self.BIOSIMULATORS_AUTH_ENDPOINT, json={
+            'client_id': api_id,
+            'client_secret': api_secret,
+            'audience': self.BIOSIMULATORS_AUDIENCE,
+            "grant_type": "client_credentials",
+        })
+        response.raise_for_status()
+        response_data = response.json()
+        auth_headers = {'Authorization': response_data['token_type'] + ' ' + response_data['access_token']}
 
-        # if update_simulator:
-        #     endpoint = self.BIOSIMULATORS_PUT_ENDPOINT.format(specs['id'], specs['version'])
-        #     requests_method = requests.put
-        # else:
-        #     endpoint = self.BIOSIMULATORS_POST_ENDPOINT
-        #     requests_method = requests.post
-        # response = requests_method(endpoint, headers=auth_headers, json=specs)
-        # response.raise_for_status()
+        if update_simulator:
+            endpoint = self.BIOSIMULATORS_PUT_ENDPOINT.format(specs['id'], specs['version'])
+            requests_method = requests.put
+        else:
+            endpoint = self.BIOSIMULATORS_POST_ENDPOINT
+            requests_method = requests.post
+        response = requests_method(endpoint, headers=auth_headers, json=specs)
+        response.raise_for_status()
 
         # post success message
         self.add_comment_to_issue(

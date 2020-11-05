@@ -23,6 +23,7 @@ import enum
 import libsedml
 import logging
 import os
+import re
 import warnings
 
 __all__ = [
@@ -330,7 +331,7 @@ class SedMlSimulationWriter(SimulationWriter):
         """
         alg_sed = sim_sed.createAlgorithm()
         if algorithm.kisao_term:
-            self._call_libsedml_method(doc_sed, alg_sed, 'setKisaoID', algorithm.kisao_term.ontology + ':' + algorithm.kisao_term.id)
+            self._set_kisao_term(doc_sed, alg_sed, algorithm.kisao_term)
 
         annotations_xml = []
 
@@ -384,8 +385,7 @@ class SedMlSimulationWriter(SimulationWriter):
         """
         param_sed = alg_sed.createAlgorithmParameter()
         if change.parameter.kisao_term:
-            self._call_libsedml_method(doc_sed, param_sed, 'setKisaoID',
-                                       change.parameter.kisao_term.ontology + ':' + change.parameter.kisao_term.id)
+            self._set_kisao_term(doc_sed, param_sed, change.parameter.kisao_term)
         annotations_xml = []
 
         if change.parameter.id:
@@ -586,6 +586,19 @@ class SedMlSimulationWriter(SimulationWriter):
                 x_sim_res.variable.name or x_sim_res.variable.id))
 
         curve_sed.setYDataReference(y_sim_res.variable.id)
+
+    def _set_kisao_term(doc_sed, obj_sed, term):
+        """ Set the KiSAO id of a SED object
+
+        Args:
+            doc_sed (:obj:`libsedml.SedDocument`): SED document
+            obj_sed (:obj:`libsedml.SedBase`): SED object
+            kisao_term (:obj:`OntologyTerm`): KISAO term            
+        """
+        if term.ontology and term.ontology.upper() != 'KISAO':
+            raise ValueError("KiSAO id cannot be set to a '{}' term".format(term.ontology))
+        id = normalize_kisao_id(term.id)
+        self._call_libsedml_method(doc_sed, obj_sed, 'setKisaoID', id)
 
     def _export_doc(self, doc_sed, filename):
         """ Export a SED document to an XML file
@@ -1084,17 +1097,7 @@ class SedMlSimulationReader(SimulationReader):
             elif node.prefix == 'dc' and node.name == 'description':
                 alg_name = node.children
 
-        kisao_term_onto_id = alg_sed.getKisaoID()
-        if kisao_term_onto_id:
-            kisao_term_onto, _, kisao_term_id = kisao_term_onto_id.partition(':')
-            assert kisao_term_onto == 'KISAO'
-            assert kisao_term_id
-            kisao_term = OntologyTerm(
-                ontology=kisao_term_onto,
-                id=kisao_term_id,
-            )
-        else:
-            kisao_term = None  # pragma: no cover # unreachable because SED requires kisaoID to be set
+        kisao_term = self._get_kisao_term(alg_sed)
 
         sim.algorithm = Algorithm(
             id=alg_id,
@@ -1114,17 +1117,7 @@ class SedMlSimulationReader(SimulationReader):
                 elif node.prefix == 'dc' and node.name == 'description':
                     param_name = node.children
 
-            kisao_term_onto_id = change_sed.getKisaoID()
-            if kisao_term_onto_id:
-                kisao_term_onto, _, kisao_term_id = kisao_term_onto_id.partition(':')
-                assert kisao_term_onto == 'KISAO'
-                assert kisao_term_id
-                kisao_term = OntologyTerm(
-                    ontology=kisao_term_onto,
-                    id=kisao_term_id,
-                )
-            else:
-                kisao_term = None  # pragma: no cover # unreachable because SED requires kisaoID to be set
+            kisao_term = self._get_kisao_term(change_sed)
 
             sim.algorithm_parameter_changes.append(ParameterChange(
                 parameter=AlgorithmParameter(
@@ -1161,6 +1154,22 @@ class SedMlSimulationReader(SimulationReader):
                 target=change_sed.getTarget(),
             ),
             value=self._parse_string(change_sed.getNewValue())
+        )
+
+    def _get_kisao_term(self, obj_sed):
+        """ Generate an KISAO ontology term for a SED object
+
+        Args:
+            obj_sed (:obj:`libsedml.SedBase`): SED object
+
+        Returns:
+            :obj:`OntologyTerm`: ontology term
+        """
+        id = normalize_kisao_id(obj_sed.getKisaoID())
+
+        return OntologyTerm(
+            ontology='KISAO',
+            id=id,
         )
 
     def _get_model_var_by_data_gen_id(self, data_gen_id, data_gen_id_to_var_target, time_data_gen_ids, variables):
@@ -1366,3 +1375,25 @@ def modify_xml_model_for_simulation(simulation, in_model_filename, out_model_fil
 
     # write model
     et.write(out_model_filename, xml_declaration=True, encoding="utf-8", standalone=False, pretty_print=pretty_print)
+
+
+def normalize_kisao_id(id):
+    """ Normalize an id for a KiSAO term to the official pattern `KISAO_\d{7}`.
+
+    The official id pattern for KiSAO terms is `KISAO_\d{7}`. This is often confused with `KISAO:\d{7}` and `\d{7}`.
+    This function automatically converts these other patterns to the offfical pattern.
+
+    Args:
+        id (:obj:`str`): offical KiSAO id with pattern `KISAO_\d{7}` or a variant such as `KISAO:\d{7}` or `\d{7}`
+
+    Returns:
+        :obj:`str`: normalized KiSAO id that follows the official pattern `KISAO_\d{7}`
+    """
+    if id.startswith('KISAO:'):
+        id = 'KISAO_' + id[6:]
+
+    if not id.startswith('KISAO_'):
+        id = 'KISAO_' + id
+
+    if not re.match(r'KISAO_\d{7}', id):
+        warnings.warn("'{}' is likely not a KiSAO term".format(obj_sed.getKisaoID()), SimulationIoWarning)

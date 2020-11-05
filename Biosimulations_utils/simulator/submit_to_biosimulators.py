@@ -36,7 +36,7 @@ def submit_simulator_to_biosimulators(name, version, specUrl, gh_username, gh_ac
     }
 
     data = {
-        "labels": ["Submit simulator", "Validated"],
+        "labels": ["Submit simulator"],
         "title": "Submit {} {}".format(name, version),
         "body": "\n".join([
             "---",

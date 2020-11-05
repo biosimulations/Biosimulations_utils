@@ -174,6 +174,25 @@ class SimulatorAction(Action):
         if 'error' in response:
             raise Exception('Unable to push image to {}'.format(tag))
 
+    def get_simulator_version_specs(self, id):
+        """ Get the versions of a simulator already in the BioSimulators registry
+
+        Args:
+            id (:obj:`str`): simulator id
+
+        Returns:
+            :obj:`list` of :obj:`dict`: specifications of the registered versions of the simulator
+        """
+        response = requests.get(self.BIOSIMULATORS_GET_ENDPOINT.format(id))
+        try:
+            response.raise_for_status()
+            version_specs = response.json()
+        except requests.exceptions.HTTPError:
+            if response.status_code != 404:
+                raise
+            version_specs = []
+        return version_specs
+
 
 class ValidateSimulatorAction(SimulatorAction):
     """ Action to validate a containerized simulator """
@@ -248,6 +267,11 @@ class ValidateSimulatorAction(SimulatorAction):
         # label issue as validated
         self.add_labels_to_issue(self.issue, [IssueLabel.validated])
 
+        # label the issue as approved if the issue is a revision of an existing simulator or a new version of an existing simulator
+        existing_version_specs = self.get_simulator_version_specs(specs['id'])
+        if existing_version_specs:
+            self.add_labels_to_issue(self.issue, [IssueLabel.approved])
+
         # post success message
         self.add_comment_to_issue(
             issue_number,
@@ -272,14 +296,7 @@ class CommitSimulatorAction(SimulatorAction):
                                       self.gh_action_run_id, self.gh_action_run_url))
 
         # get other versions of simulator
-        response = requests.get(self.BIOSIMULATORS_GET_ENDPOINT.format(specs['id']))
-        try:
-            response.raise_for_status()
-            existing_versions = response.json()
-        except requests.exceptions.HTTPError:
-            if response.status_code != 404:
-                raise
-            existing_versions = []
+        existing_version_specs = self.get_simulator_version_specs(specs['id'])
 
         # pull image
         original_image_url = specs['image']
@@ -300,10 +317,10 @@ class CommitSimulatorAction(SimulatorAction):
 
         is_latest_of_version = True
         is_latest = True
-        for v in existing_versions:
-            if v['version'] == specs['version'] and self.get_image_version(v) > self.get_image_version(specs):
+        for version_spec in existing_version_specs:
+            if version_spec['version'] == specs['version'] and self.get_image_version(version_spec) > self.get_image_version(specs):
                 is_latest_of_version = False
-            if v['version'] > specs['version'] or self.get_image_version(v) > self.get_image_version(specs):
+            if version_spec['version'] > specs['version'] or self.get_image_version(version_spec) > self.get_image_version(specs):
                 is_latest = False
 
         if is_latest_of_version:
@@ -319,7 +336,8 @@ class CommitSimulatorAction(SimulatorAction):
             self.tag_and_push_image(image, latest_copy_image_url)
 
         # determine if container needs to be added or updated
-        update_simulator = next((True for v in existing_versions if v['version'] == specs['version']), False)
+        existing_versions = [version_spec['version'] for version_spec in existing_version_specs]
+        update_simulator = specs['version'] in existing_versions
 
         # commit submission to BioSimulators database
         # TODO: get authentication working
@@ -348,7 +366,13 @@ class CommitSimulatorAction(SimulatorAction):
         # post success message
         self.add_comment_to_issue(
             issue_number,
-            'Your submission was committed to the BioSimulators registry. Thank you!')
+            ''.join([
+                'Your submission was committed to the BioSimulators registry. Thank you!\n',
+                '\n',
+                'Future submissions of subsequent versions of {} to the BioSimulators registry '.format(specs['id']),
+                'will be automatically validated. These submissions will not require manual review by the BioSimulators Team.',
+            ])
+        )
 
         # close issue
         self.close_issue(issue_number)

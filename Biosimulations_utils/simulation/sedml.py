@@ -1331,14 +1331,13 @@ class XmlNode(object):
                                    self.prefix, self.name)
 
 
-def modify_xml_model_for_simulation(simulation, in_model_filename, out_model_filename, default_namespace=None, pretty_print=True):
+def modify_xml_model_for_simulation(simulation, in_model_filename, out_model_filename, pretty_print=True):
     """ Modify an XML-encoded model according to the model changes in a simulation
 
     Args:
         simulation (:obj:`Simulation`): simulation
         in_model_filename (:obj:`str`): path to model
         out_model_filename (:obj:`str`): path to save modified model
-        default_namespace (:obj:`str`, optional): default XML namespace URI (e.g., `sbml`)
         pretty_print (:obj:`bool`, optional): if :obj:`True`, pretty print output
     """
     # read model
@@ -1347,9 +1346,11 @@ def modify_xml_model_for_simulation(simulation, in_model_filename, out_model_fil
     # get namespaces
     root = et.getroot()
     namespaces = root.nsmap
-    if default_namespace:
-        namespaces[default_namespace] = namespaces[None]
+    if None in namespaces:
         namespaces.pop(None)
+        match = re.match(r'^{(.*?)}(.*?)$', root.tag)
+        if match:
+            namespaces[match.group(2)] = match.group(1)
 
     # apply changes
     for change in simulation.model_parameter_changes:

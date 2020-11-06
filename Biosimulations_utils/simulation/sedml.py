@@ -1390,6 +1390,8 @@ def normalize_kisao_id(id):
     Returns:
         :obj:`str`: normalized KiSAO id that follows the official pattern `KISAO_\d{7}`
     """
+    unnormalized_id = id
+
     if id.startswith('KISAO:'):
         id = 'KISAO_' + id[6:]
 
@@ -1397,4 +1399,6 @@ def normalize_kisao_id(id):
         id = 'KISAO_' + id
 
     if not re.match(r'KISAO_\d{7}', id):
-        warnings.warn("'{}' is likely not a KiSAO term".format(obj_sed.getKisaoID()), SimulationIoWarning)
+        warnings.warn("'{}' is likely not a KiSAO term".format(unnormalized_id), SimulationIoWarning)
+
+    return id

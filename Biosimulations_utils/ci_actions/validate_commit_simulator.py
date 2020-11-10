@@ -57,16 +57,27 @@ class SimulatorAction(Action):
 
         # validate properties of submission
         errors = []
+
         if not simulator:
             errors.append('A simulator name must be provided.')
         if not version:
             errors.append('A simulator version must be provided.')
         if not specUrl:
             errors.append('A URL for the specifications of the simulator must be provided.')
+
+        extra_keys = set(submission.keys()).difference(set(['name', 'version', 'specificationsUrl', 'validateImage']))
+        if extra_keys:
+            errors.append(('Your submission should only use the keys "name", "version", "specificationsUrl", and "validateImage". '
+                           'The following keys are not valid:\n  - {}'.format('\n  - '.join(sorted(extra_keys)))))
+
         if errors:
             comment = ('Your simulator could not be verified. '
                        'Please edit the first block of this issue to re-initiate this validation.\n- ') + '\n- '.join(errors)
             self.add_error_comment_to_issue(self.issue_number, comment)
+
+        # fill in default values
+        if 'validateImage' not in submission:
+            submission['validateImage'] = False
 
         return submission
 
@@ -206,11 +217,29 @@ class ValidateSimulatorAction(SimulatorAction):
         issue = self.get_issue(issue_number)
         submitter = issue['user']['login']
 
+        # parse submision
+        submisssion = self.get_submission(issue)
+
         # report message that review is starting
+        actions = []
+        not_actions = []
+
+        actions.append('validating the specifications of your simulator')
+        if submisssion['validateImage']:
+            actions.append('validating your Docker image')
+        else:
+            not_actions.append('You have declined to have your Docker image validated.')
+
+        if len(actions) == 1:
+            actions = actions[0]
+        else:
+            actions = ', '.join(actions[0:-1]) + ' and ' + actions[-1]
+        not_actions = ''.join(action.strip() + ' ' for action in not_actions)
+
         self.add_comment_to_issue(issue_number,
                                   ('Thank you @{} for your submission to the BioSimulators registry of containerized simulation tools! '
-                                   '[Action {}]({}) is reviewing your submission. We will discuss any issues with your submission here.'
-                                   ).format(submitter, self.gh_action_run_id, self.gh_action_run_url))
+                                   '[Action {}]({}) is {} your submission. {}We will discuss any issues with your submission here.'
+                                   ).format(submitter, self.gh_action_run_id, self.gh_action_run_url, actions, not_actions))
 
         # reset labels
         labels = self.get_labels_for_issue(issue_number)
@@ -223,11 +252,8 @@ class ValidateSimulatorAction(SimulatorAction):
         if IssueLabel.action_error in labels:
             self.remove_label_from_issue(issue_number, IssueLabel.action_error)
 
-        # parse submision
-        submisssion = self.get_submission(issue)
-        specUrl = submisssion['specificationsUrl']
-
         # validate specifications
+        specUrl = submisssion['specificationsUrl']
         specs = self.get_specs(specUrl)
         self.add_comment_to_issue(issue_number, 'The specifications of your simulator is valid!')
 
@@ -236,33 +262,34 @@ class ValidateSimulatorAction(SimulatorAction):
         self.pull_docker_image(image_url)
 
         # TODO: validate container
-        # validator = SimulatorValidator()
-        # validCases, testExceptions, skippedCases = validator.run(image_url, specs)
+        if False and submisssion['validateImage']:
+            validator = SimulatorValidator()
+            validCases, testExceptions, skippedCases = validator.run(image_url, specs)
 
-        # self.add_comment_to_issue(issue_number, 'Your container passed {} test cases.'.format(len(validCases)))
+            self.add_comment_to_issue(issue_number, 'Your container passed {} test cases.'.format(len(validCases)))
 
-        # error_msgs = []
+            error_msgs = []
 
-        # if not validCases:
-        #     error_msgs.append(('No test cases are applicable to your container. '
-        #                        'Please use this issue to share appropriate test COMBINE/OMEX files for the BioSimulators test suite. '
-        #                        'The BioSimulators Team will add these files to the test suite and then re-review your simulator.'
-        #                        ))
+            if not validCases:
+                error_msgs.append(('No test cases are applicable to your container. '
+                                   'Please use this issue to share appropriate test COMBINE/OMEX files for the BioSimulators test suite. '
+                                   'The BioSimulators Team will add these files to the test suite and then re-review your simulator.'
+                                   ))
 
-        # if testExceptions:
-        #     msgs = []
-        #     for exception in testExceptions:
-        #         msgs.append('- {}\n  {}\n\n'.format(exception.test_case, str(exception.exception)))
+            if testExceptions:
+                msgs = []
+                for exception in testExceptions:
+                    msgs.append('- {}\n  {}\n\n'.format(exception.test_case, str(exception.exception)))
 
-        #     error_msgs.append((
-        #         'Your container did not pass {} test cases.\n\n{}'
-        #         'After correcting the container, please edit the first block of this issue to re-initiate this validation.'
-        #     ).format(len(testExceptions), ''.join(msgs)))
+                error_msgs.append((
+                    'Your container did not pass {} test cases.\n\n{}'
+                    'After correcting the container, please edit the first block of this issue to re-initiate this validation.'
+                ).format(len(testExceptions), ''.join(msgs)))
 
-        # if error_msgs:
-        #     self.add_error_comment_to_issue(issue_number, '\n\n'.join(error_msgs))
+            if error_msgs:
+                self.add_error_comment_to_issue(issue_number, '\n\n'.join(error_msgs))
 
-        # self.add_comment_to_issue(issue_number, 'Your containerized simulator is valid!')
+            self.add_comment_to_issue(issue_number, 'Your containerized simulator is valid!')
 
         # label issue as validated
         self.add_labels_to_issue(self.issue, [IssueLabel.validated])
@@ -289,8 +316,12 @@ class CommitSimulatorAction(SimulatorAction):
         issue = self.get_issue(issue_number)
         submisssion = self.get_submission(issue)
         specUrl = submisssion['specificationsUrl']
-        specs = self.get_specs(specUrl)
 
+        # get specifications and set validation status
+        specs = self.get_specs(specUrl)
+        specs['biosimulators']['validated'] = submisssion['validateImage']
+
+        # print status
         self.add_comment_to_issue(issue_number,
                                   '[Action {}]({}) is committing your submission to the BioSimulators registry.'.format(
                                       self.gh_action_run_id, self.gh_action_run_url))

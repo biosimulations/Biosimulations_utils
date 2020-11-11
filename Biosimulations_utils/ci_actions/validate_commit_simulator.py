@@ -340,9 +340,12 @@ class CommitSimulatorAction(SimulatorAction):
             password=os.getenv('GH_ISSUES_ACCESS_TOKEN'),
         )
 
-        copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN.format(
-            specs['id'],
-            specs['version'] + '-' + self.get_image_version(specs))
+        copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN \
+            .format(
+                specs['id'],
+                specs['version'] + '-' + self.get_image_version(specs)
+            ) \
+            .lower()
         self.tag_and_push_image(image, copy_image_url)
         specs['image'] = copy_image_url
 
@@ -355,15 +358,21 @@ class CommitSimulatorAction(SimulatorAction):
                 is_latest = False
 
         if is_latest_of_version:
-            latest_of_version_copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN.format(
-                specs['id'],
-                specs['version'])
+            latest_of_version_copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN \
+                .format(
+                    specs['id'],
+                    specs['version']
+                ) \
+                .lower()
             self.tag_and_push_image(image, latest_of_version_copy_image_url)
 
         if is_latest:
-            latest_copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN.format(
-                specs['id'],
-                'latest')
+            latest_copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN \
+                .format(
+                    specs['id'],
+                    'latest'
+                ) \
+                .lower()
             self.tag_and_push_image(image, latest_copy_image_url)
 
         # determine if container needs to be added or updated

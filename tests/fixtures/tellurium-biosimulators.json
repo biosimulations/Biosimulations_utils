@@ -5,7 +5,7 @@
     "attributes": {
       "version": "2.1.6",
       "url": "http://tellurium.analogmachine.org/",
-      "image": "biosimulators/tellurium:2.1.6",
+      "image": "ghcr.io/biosimulators/biosimulators_tellurium/tellurium:2.1.6",
       "format": {
         "name": "Docker Image",
         "version": "1.2",

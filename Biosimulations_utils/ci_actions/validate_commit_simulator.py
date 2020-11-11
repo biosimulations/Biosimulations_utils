@@ -257,12 +257,15 @@ class ValidateSimulatorAction(SimulatorAction):
         specs = self.get_specs(specUrl)
         self.add_comment_to_issue(issue_number, 'The specifications of your simulator is valid!')
 
-        # validate that container (Docker image) exists
-        image_url = specs['image']
-        self.pull_docker_image(image_url)
+        # get existing versions of simulator
+        existing_version_specs = self.get_simulator_version_specs(specs['id'])
 
         # TODO: validate container
         if False and submisssion['validateImage']:
+            # validate that container (Docker image) exists
+            image_url = specs['image']
+            self.pull_docker_image(image_url)
+
             validator = SimulatorValidator()
             validCases, testExceptions, skippedCases = validator.run(image_url, specs)
 
@@ -291,18 +294,71 @@ class ValidateSimulatorAction(SimulatorAction):
 
             self.add_comment_to_issue(issue_number, 'Your containerized simulator is valid!')
 
+        # copy image to BioSimulators GitHub Container Registry
+        original_image_url = specs['image']
+        if original_image_url:
+            image = self.pull_docker_image(original_image_url)
+
+            # push image to Docker container registry
+            self.docker_client.login(
+                registry=self.IMAGE_REGISTRY,
+                username=os.getenv('GH_ISSUES_USER'),
+                password=os.getenv('GH_ISSUES_ACCESS_TOKEN'),
+            )
+
+            copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN \
+                .format(
+                    specs['id'],
+                    specs['version'] + '-' + self.get_image_version(specs)
+                ) \
+                .lower()
+            self.tag_and_push_image(image, copy_image_url)
+            specs['image'] = copy_image_url
+
+            is_latest_of_version = True
+            is_latest = True
+            for version_spec in existing_version_specs:
+                if version_spec['version'] == specs['version'] and self.get_image_version(version_spec) > self.get_image_version(specs):
+                    is_latest_of_version = False
+                if version_spec['version'] > specs['version'] or self.get_image_version(version_spec) > self.get_image_version(specs):
+                    is_latest = False
+
+            if is_latest_of_version:
+                latest_of_version_copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN \
+                    .format(
+                        specs['id'],
+                        specs['version']
+                    ) \
+                    .lower()
+                self.tag_and_push_image(image, latest_of_version_copy_image_url)
+
+            if is_latest:
+                latest_copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN \
+                    .format(
+                        specs['id'],
+                        'latest'
+                    ) \
+                    .lower()
+                self.tag_and_push_image(image, latest_copy_image_url)
+
+            # make image public -- must be done manually; cannot be done via API as of 2020-11-11
+
         # label issue as validated
         self.add_labels_to_issue(self.issue, [IssueLabel.validated])
 
-        # label the issue as approved if the issue is a revision of an existing simulator or a new version of an existing simulator
-        existing_version_specs = self.get_simulator_version_specs(specs['id'])
+        # label the issue as approved if the issue is a revision of an existing simulator or a new version of an existing simulator        
         if existing_version_specs:
             self.add_labels_to_issue(self.issue, [IssueLabel.approved])
 
         # post success message
-        self.add_comment_to_issue(
-            issue_number,
-            'A member of the BioSimulators team will review your submission before final committment to the registry.')
+        if existing_version_specs:
+            self.add_comment_to_issue(
+                issue_number,
+                'A member of the BioSimulators team will review your submission and publish your image before final committment to the registry.')
+        else:
+            self.add_comment_to_issue(
+                issue_number,
+                'Your submission will be committed to the registry shortly.')
 
 
 class CommitSimulatorAction(SimulatorAction):
@@ -327,53 +383,7 @@ class CommitSimulatorAction(SimulatorAction):
                                       self.gh_action_run_id, self.gh_action_run_url))
 
         # get other versions of simulator
-        existing_version_specs = self.get_simulator_version_specs(specs['id'])
-
-        # pull image
-        original_image_url = specs['image']
-        image = self.pull_docker_image(original_image_url)
-
-        # push image to Docker container registry
-        self.docker_client.login(
-            registry=self.IMAGE_REGISTRY,
-            username=os.getenv('GH_ISSUES_USER'),
-            password=os.getenv('GH_ISSUES_ACCESS_TOKEN'),
-        )
-
-        copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN \
-            .format(
-                specs['id'],
-                specs['version'] + '-' + self.get_image_version(specs)
-            ) \
-            .lower()
-        self.tag_and_push_image(image, copy_image_url)
-        specs['image'] = copy_image_url
-
-        is_latest_of_version = True
-        is_latest = True
-        for version_spec in existing_version_specs:
-            if version_spec['version'] == specs['version'] and self.get_image_version(version_spec) > self.get_image_version(specs):
-                is_latest_of_version = False
-            if version_spec['version'] > specs['version'] or self.get_image_version(version_spec) > self.get_image_version(specs):
-                is_latest = False
-
-        if is_latest_of_version:
-            latest_of_version_copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN \
-                .format(
-                    specs['id'],
-                    specs['version']
-                ) \
-                .lower()
-            self.tag_and_push_image(image, latest_of_version_copy_image_url)
-
-        if is_latest:
-            latest_copy_image_url = self.IMAGE_REGISTRY_URL_PATTERN \
-                .format(
-                    specs['id'],
-                    'latest'
-                ) \
-                .lower()
-            self.tag_and_push_image(image, latest_copy_image_url)
+        existing_version_specs = self.get_simulator_version_specs(specs['id'])        
 
         # determine if container needs to be added or updated
         existing_versions = [version_spec['version'] for version_spec in existing_version_specs]

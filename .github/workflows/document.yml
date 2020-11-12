@@ -18,11 +18,12 @@ jobs:
           pip install git+https://github.com/KarrLab/pkg_utils.git#egg=pkg_utils
           pip install git+https://github.com/KarrLab/sphinxcontrib-googleanalytics.git#egg=sphinxcontrib_googleanalytics
           pip install git+https://github.com/KarrLab/wc_utils.git#egg=wc_utils
-          python -m pip install -e .[docs]
+          python -m pip install .
       - name: Document
         run: |
-          sphinx-apidoc -P -o ./docs/source/ ./Biosimulations_utils
-          sphinx-build ./docs/ ./docs/html/
+          python -m pip install -r docs-src/requirements.txt
+          sphinx-apidoc . setup.py --output-dir docs-src/source --force --module-first --no-toc
+          sphinx-build docs-src docs
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v2
         with:

@@ -10,7 +10,7 @@ executing simulations in archives
 from ..archive import read_archive
 from ..archive.data_model import ArchiveFormat
 from ..simulation import read_simulation
-from ..simulation.data_model import Simulation, SimulationFormat  # noqa: F401
+from ..simulation.data_model import Simulation, SimulationFormat, SimulationResultsFormat  # noqa: F401
 from ..simulation.sedml import modify_xml_model_for_simulation
 import os
 import tempfile
@@ -38,7 +38,7 @@ def exec_simulations_in_archive(archive_filename, task_executer, out_dir,
                        simulation (:obj:`Simulation`): simulation
                        working_dir (:obj:`str`): directory of the SED-ML file
                        out_filename (:obj:`str`): path to save the results of the simulation
-                       out_format (:obj:`str`): format to save the results of the simulation (e.g., `csv`)
+                       out_format (:obj:`SimulationResultsFormat`): format to save the results of the simulation (e.g., SimulationResultsFormat.HDF5)
                     '''
                     pass
 
@@ -90,8 +90,8 @@ def exec_simulations_in_archive(archive_filename, task_executer, out_dir,
                 modified_model_filename = None
 
             # execute task
-            out_filename = os.path.join(out_subdir, simulation.id + '.csv')
-            task_executer(model_filename, model.format.sed_urn, simulation, working_dir, out_filename, 'csv')
+            out_filename = os.path.join(out_subdir, simulation.id + '.' + SimulationResultsFormat.HDF5.extension)
+            task_executer(model_filename, model.format.sed_urn, simulation, working_dir, out_filename, SimulationResultsFormat.HDF5)
 
             # cleanup modified model
             if modified_model_filename:

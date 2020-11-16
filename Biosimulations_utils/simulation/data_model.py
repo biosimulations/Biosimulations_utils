@@ -15,7 +15,7 @@ __all__ = [
     'SimulationFormat',
     'Simulation', 'TimecourseSimulation', 'SteadyStateSimulation',
     'Algorithm', 'AlgorithmParameter', 'ParameterChange',
-    'SimulationResult',
+    'SimulationResult', 'SimulationResultsFormat',
 ]
 
 
@@ -39,6 +39,19 @@ class SimulationFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
         spec_url='http://sessl.org',
         mimetype='text/plain',
         extension='scala',
+    )
+
+
+class SimulationResultsFormat(wc_utils.util.enumerate.CaseInsensitiveEnum):
+    """ Format for the results of a simulation """
+    HDF5 = Format(
+        id='HDF5',
+        name='Hierarchical Data Format',
+        edam_id='format_3873',
+        url='https://www.hdfgroup.org/solutions/hdf5/',
+        spec_url='http://identifiers.org/combine.specifications/sed-ml',
+        mimetype='application/x-hdf5',
+        extension='h5',
     )
 
 
@@ -461,8 +474,8 @@ class AlgorithmParameter(object):
         id (:obj:`str`): id
         name (:obj:`str`): name
         type (:obj:`Type`): type
-        value (:obj:`object`): value
-        recommended_range (:obj:`list` of :obj:`object`): recommend minimum and maximum values
+        value (:obj:`string`): value
+        recommended_range (:obj:`list` of :obj:`string`): recommend range of values
         kisao_term (:obj:`OntologyTerm`): KiSAO term
     """
 
@@ -473,7 +486,7 @@ class AlgorithmParameter(object):
             name (:obj:`str`, optional): name
             type (:obj:`Type`, optional): type
             value (:obj:`object`, optional): value
-            recommended_range (:obj:`list` of :obj:`object`, optional): recommend minimum and maximum values
+            recommended_range (:obj:`list` of :obj:`object`, optional): recommend range of values
             kisao_term (:obj:`OntologyTerm`, optional): KiSAO term
         """
         self.id = id

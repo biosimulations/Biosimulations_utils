@@ -240,7 +240,7 @@ class SbmlBiomodelReader(BiomodelReader):
                 description=None,
                 identifiers=[],
                 type=Type.float,
-                value=value,
+                value=str(value),
                 recommended_range=self._calc_recommended_param_range(value),
                 units=self._format_unit_def(comp_sbml.getDerivedUnitDefinition()),
             )
@@ -291,7 +291,7 @@ class SbmlBiomodelReader(BiomodelReader):
                 description=None,
                 identifiers=[],
                 type=Type.float,
-                value=species_initial_val,
+                value=str(species_initial_val),
                 recommended_range=self._calc_recommended_param_range(species_initial_val),
                 units=species_initial_units,
             )
@@ -321,7 +321,7 @@ class SbmlBiomodelReader(BiomodelReader):
                 description=None,
                 identifiers=[],
                 type=type,
-                value=init_value,
+                value=str(init_value),
                 recommended_range=self._calc_recommended_param_range(init_value),
                 units=self._format_unit_def(symbol_sbml.getDerivedUnitDefinition()),
             )
@@ -352,7 +352,7 @@ class SbmlBiomodelReader(BiomodelReader):
                     description=None,
                     identifiers=[],
                     type=type,
-                    value=value,
+                    value=str(value),
                     recommended_range=self._calc_recommended_param_range(value),
                     units=self._format_unit_def(var_sbml.getDerivedUnitDefinition()),
                 )
@@ -386,7 +386,7 @@ class SbmlBiomodelReader(BiomodelReader):
                     description=None,
                     identifiers=[],
                     type=Type.float,
-                    value=value,
+                    value=str(value),
                     recommended_range=self._calc_recommended_param_range(value),
                     units='dimensionless',
                 )
@@ -416,7 +416,7 @@ class SbmlBiomodelReader(BiomodelReader):
                     description=None,
                     identifiers=[],
                     type=Type.integer,
-                    value=init_level,
+                    value=str(init_level),
                     recommended_range=[0, max_level],
                     units='dimensionless',
                 )
@@ -464,7 +464,7 @@ class SbmlBiomodelReader(BiomodelReader):
             description=None,
             identifiers=[],
             type=Type.float,
-            value=value,
+            value=str(value),
             recommended_range=self._calc_recommended_param_range(value),
             units=self._format_unit_def(param_sbml.getDerivedUnitDefinition()),
         )
@@ -573,6 +573,21 @@ class SbmlBiomodelReader(BiomodelReader):
                     identifiers=[],
                     type=Type.float,
                     units=flux_units,
+                ))
+
+            # species shadow prices
+            for species_sbml in model_sbml.getListOfSpecies():
+                species_id = species_sbml.getId()
+                vars.append(BiomodelVariable(
+                    target="/sbml:sbml/sbml:model/sbml:listOfSpecies/{}:{}[@id='{}']".format(
+                        species_sbml.getPrefix() or 'sbml', species_sbml.getElementName(), species_id),
+                    group='Shadow prices',
+                    id=species_id,
+                    name=species_sbml.getName() or None,
+                    description=None,
+                    identifiers=[],
+                    type=Type.float,
+                    units='dimensionless',
                 ))
 
         else:
@@ -747,16 +762,17 @@ class SbmlBiomodelReader(BiomodelReader):
                 values relative to the default value, :math:`d`, producing the recommend range :math:`d / f - d * f`.
 
         Returns:
-            :obj:`list` of :obj:`float`: recommended minimum and maximum values of the parameter
+            :obj:`list` of :obj:`str`: recommended minimum and maximum values of the parameter
         """
         if value == 0:
-            return [0., zero_fold]
+            range = [0., zero_fold]
 
         else:
-            return [
+            range = [
                 value * non_zero_fold ** -1,
                 value * non_zero_fold,
             ]
+        return [str(v) for v in range]
 
     @classmethod
     def _get_xml_child_by_names(cls, node, names):

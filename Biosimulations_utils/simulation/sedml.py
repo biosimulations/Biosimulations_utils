@@ -1125,7 +1125,7 @@ class SedMlSimulationReader(SimulationReader):
                     name=param_name,
                     kisao_term=kisao_term,
                 ),
-                value=self._parse_string(change_sed.getValue()),
+                value=change_sed.getValue(),
             ))
 
     def _get_parameter_change_from_model(self, change_sed):
@@ -1153,7 +1153,7 @@ class SedMlSimulationReader(SimulationReader):
                 name=param_name,
                 target=change_sed.getTarget(),
             ),
-            value=self._parse_string(change_sed.getNewValue())
+            value=change_sed.getNewValue()
         )
 
     def _get_kisao_term(self, obj_sed):
@@ -1188,30 +1188,6 @@ class SedMlSimulationReader(SimulationReader):
             return BiomodelVariable(id='time', target='urn:sedml:symbol:time')
         else:
             return next(var for var in variables if var.target == data_gen_id_to_var_target[data_gen_id])
-
-    def _parse_string(self, str_value):
-        """ Parse a string to a Boolean, integer, float, or string
-
-        Args:
-            str_value (:obj:`str`): string
-
-        Returns:
-            :obj:`bool`, :obj:`int`, :obj:`float`, or :obj:`str`: value
-        """
-        if str_value == 'true':
-            return True
-        elif str_value == 'false':
-            return False
-
-        try:
-            value = float(str_value)
-            if value == int(value):
-                value = int(value)
-            return value
-        except ValueError:
-            pass
-
-        return str_value
 
     def _get_obj_annotation(self, obj_sed):
         """ Get the annotated properies of a SED object

@@ -334,8 +334,8 @@ class BiomodelParameter(object):
         description (:obj:`str`): description
         identifiers (:obj:`list` of :obj:`Identifier`): identifiers
         type (:obj:`Type`): type of :obj:`value`
-        value (:obj:`object`): :obj:`value`
-        recommended_range (:obj:`list` of :obj:`object`): minimum and maximum recommended values of :obj:`value`
+        value (:obj:`string`): value
+        recommended_range (:obj:`list` of :obj:`object`): recommended range of :obj:`value`
         units (:obj:`str`): units of :obj:`value`
     """
 
@@ -351,8 +351,8 @@ class BiomodelParameter(object):
             description (:obj:`str`, optional): description
             identifiers (:obj:`list` of :obj:`Identifier`, optional): identifiers
             type (:obj:`Type`, optional): type of :obj:`value`
-            value (:obj:`object`, optional): :obj:`value`
-            recommended_range (:obj:`list` of :obj:`object`, optional): minimum and maximum recommended values of :obj:`value`
+            value (:obj:`string`, optional): value
+            recommended_range (:obj:`list` of :obj:`object`, optional): recommended range of :obj:`value`
             units (:obj:`str`, optional): units of :obj:`value`
         """
         self.target = target

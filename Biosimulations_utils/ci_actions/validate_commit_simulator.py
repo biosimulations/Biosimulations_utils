@@ -25,7 +25,7 @@ class SimulatorAction(Action):
     """
 
     BIOSIMULATORS_AUTH_ENDPOINT = 'https://auth.biosimulations.org/oauth/token'
-    BIOSIMULATORS_AUDIENCE = 'api.biosimulations.org'
+    BIOSIMULATORS_AUDIENCE = 'api.biosimulators.org'
     BIOSIMULATORS_VALIDATE_ENDPOINT = 'https://api.biosimulators.org/simulators/validate'
     BIOSIMULATORS_GET_ENDPOINT = 'https://api.biosimulators.org/simulators/{}'
     BIOSIMULATORS_POST_ENDPOINT = 'https://api.biosimulators.org/simulators'

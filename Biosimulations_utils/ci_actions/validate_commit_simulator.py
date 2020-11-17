@@ -346,15 +346,18 @@ class ValidateSimulatorAction(SimulatorAction):
         # label issue as validated
         self.add_labels_to_issue(self.issue, [IssueLabel.validated])
 
-        # label the issue as approved if the issue is a revision of an existing simulator or a new version of an existing simulator        
-        if existing_version_specs:
-            self.add_labels_to_issue(self.issue, [IssueLabel.approved])
+        # label the issue as approved if the issue is a revision of an existing simulator or a new version of an existing simulator
+        for version_spec in existing_version_specs:
+            if version_spec.get('biosimulators', {}).get('validated', None):
+                self.add_labels_to_issue(self.issue, [IssueLabel.approved])
+                break
 
         # post success message
         if existing_version_specs:
             self.add_comment_to_issue(
                 issue_number,
-                'A member of the BioSimulators team will review your submission and publish your image before final committment to the registry.')
+                ('A member of the BioSimulators team will review your submission and '
+                 'publish your image before final committment to the registry.'))
         else:
             self.add_comment_to_issue(
                 issue_number,
@@ -383,7 +386,7 @@ class CommitSimulatorAction(SimulatorAction):
                                       self.gh_action_run_id, self.gh_action_run_url))
 
         # get other versions of simulator
-        existing_version_specs = self.get_simulator_version_specs(specs['id'])        
+        existing_version_specs = self.get_simulator_version_specs(specs['id'])
 
         # determine if container needs to be added or updated
         existing_versions = [version_spec['version'] for version_spec in existing_version_specs]

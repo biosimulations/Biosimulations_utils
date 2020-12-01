@@ -6,12 +6,12 @@
 :License: MIT
 """
 
-from Biosimulations_utils import config
-from Biosimulations_utils.archive.data_model import ArchiveFormat
-from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat
-from Biosimulations_utils.simulation.data_model import SimulationFormat
+from biosimulations_utils import config
+from biosimulations_utils.archive.data_model import ArchiveFormat
+from biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat
+from biosimulations_utils.simulation.data_model import SimulationFormat
 try:
-    from Biosimulations_utils.simulator.testing import SimulatorValidator, TestCase, TestCaseType
+    from biosimulations_utils.simulator.testing import SimulatorValidator, TestCase, TestCaseType
 except ModuleNotFoundError:
     pass
 try:

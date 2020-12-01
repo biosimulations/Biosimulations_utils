@@ -6,9 +6,9 @@
 :License: MIT
 """
 
-from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, OntologyTerm, Person, RemoteFile,
+from biosimulations_utils.data_model import (Identifier, JournalCitation, License, OntologyTerm, Person, RemoteFile,
                                              PrimaryResourceMetadata, ResourceMetadata, ResourceReferences, Taxon, Type, User)
-from Biosimulations_utils.biomodel.data_model import (Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat)
+from biosimulations_utils.biomodel.data_model import (Biomodel, BiomodelParameter, BiomodelVariable, BiomodelFormat)
 import datetime
 import dateutil.tz
 import unittest

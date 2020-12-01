@@ -6,15 +6,15 @@
 :License: MIT
 """
 
-from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from Biosimulations_utils.data_model import OntologyTerm, PrimaryResourceMetadata, RemoteFile, ResourceMetadata
-from Biosimulations_utils.biomodel import read_biomodel
-from Biosimulations_utils.biomodel.data_model import Biomodel, BiomodelVariable, BiomodelFormat
-from Biosimulations_utils.simulation import write_simulation, read_simulation, sedml
-from Biosimulations_utils.simulation.core import SimulationIoError, SimulationIoWarning
-from Biosimulations_utils.simulation.data_model import SimulationFormat, TimecourseSimulation, SimulationResult
-from Biosimulations_utils.simulation.sedml import modify_xml_model_for_simulation
-from Biosimulations_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
+from biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
+from biosimulations_utils.data_model import OntologyTerm, PrimaryResourceMetadata, RemoteFile, ResourceMetadata
+from biosimulations_utils.biomodel import read_biomodel
+from biosimulations_utils.biomodel.data_model import Biomodel, BiomodelVariable, BiomodelFormat
+from biosimulations_utils.simulation import write_simulation, read_simulation, sedml
+from biosimulations_utils.simulation.core import SimulationIoError, SimulationIoWarning
+from biosimulations_utils.simulation.data_model import SimulationFormat, TimecourseSimulation, SimulationResult
+from biosimulations_utils.simulation.sedml import modify_xml_model_for_simulation
+from biosimulations_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import json
 import libsedml
 import os

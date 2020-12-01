@@ -6,12 +6,12 @@
 :License: MIT
 """
 
-from Biosimulations_utils.api_client import ApiClient, ResponseType
-from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, Person, RemoteFile, Taxon, User)
-from Biosimulations_utils.import_resources import biomodels
-from Biosimulations_utils.biomodel.data_model import Biomodel
-from Biosimulations_utils.simulation.data_model import Simulation
-from Biosimulations_utils.visualization.data_model import Visualization
+from biosimulations_utils.api_client import ApiClient, ResponseType
+from biosimulations_utils.data_model import (Identifier, JournalCitation, License, Person, RemoteFile, Taxon, User)
+from biosimulations_utils.import_resources import biomodels
+from biosimulations_utils.biomodel.data_model import Biomodel
+from biosimulations_utils.simulation.data_model import Simulation
+from biosimulations_utils.visualization.data_model import Visualization
 from unittest import mock
 try:
     import docker

@@ -77,7 +77,7 @@ class BioModelsImporter(object):
 
     def init_requests_cache(self):
         if self._cache_dir is None:
-            self._cache_dir = os.path.expanduser('~/.cache/Biosimulations_utils')
+            self._cache_dir = os.path.expanduser('~/.cache/biosimulations_utils')
         if not os.path.isdir(self._cache_dir):
             os.makedirs(self._cache_dir)
 

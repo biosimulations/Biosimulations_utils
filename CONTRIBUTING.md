@@ -1,6 +1,6 @@
-# Contributing to BioSimulations-utils
+# Contributing to BioSimulations utils
 
-We enthusiastically welcome contributions to BioSimulations-utils!
+We enthusiastically welcome contributions to BioSimulations utils!
 
 ## Coordinating contributions
 
@@ -17,7 +17,7 @@ This repository follows standard Python conventions:
 * `setup.cfg`: Configuration for the pip installation script
 * `requirements.txt`: Dependencies of this package
 * `requirements.optional.txt`: Optional dependencies of this package
-* `MANIFEST.in`: List of files to include when BioSimulations-utils is packaged for distribution through PyPI
+* `MANIFEST.in`: List of files to include when BioSimulations utils is packaged for distribution through PyPI
 * `LICENSE`: License for this package
 * `CONTRIBUTING.md`: Guide to contributing to this package (this document)
 * `CODE_OF_CONDUCT.md`: Code of conduct for developers of this package
@@ -44,8 +44,8 @@ Contact [info@biosimulations.org](mailto:info@biosimulations.org) to request rel
 
 ## Reporting issues
 
-Please use [GitHub issues](https://github.com/biosimulations/Biosimulations_utils/issues) to report any issues to the development community.
+Please use [GitHub issues](https://github.com/biosimulations/biosimulations_utils/issues) to report any issues to the development community.
 
 ## Getting help
 
-Please use [GitHub issues](https://github.com/biosimulations/Biosimulations_utils/issues) to post questions or contact the lead developers at [info@biosimulations.org](mailto:info@biosimulations.org).
+Please use [GitHub issues](https://github.com/biosimulations/biosimulations_utils/issues) to post questions or contact the lead developers at [info@biosimulations.org](mailto:info@biosimulations.org).

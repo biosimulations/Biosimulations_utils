@@ -183,7 +183,7 @@ def config_logger(logger, name='log'):
         ': %(message)s'
     )
 
-    log_dir = os.path.expanduser('~/.cache/Biosimulations_utils/')
+    log_dir = os.path.expanduser('~/.cache/biosimulations_utils/')
     if not os.path.isdir(log_dir):
         os.makedirs(log_dir)
     handler = logging.FileHandler(os.path.join(log_dir, name + '.log'))

@@ -18,8 +18,8 @@ source_dir = os.path.join(os.path.dirname(__file__), '..', 'biosimulations_utils
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # -- Project information -----------------------------------------------------
-source_base_url = 'https://github.com/biosimulations/Biosimulations_utils/blob/dev/'
-project = 'BioSimulations-utils'
+source_base_url = 'https://github.com/biosimulations/biosimulations_utils/blob/dev/'
+project = 'BioSimulations utils'
 copyright = '{}, BioSimulations Team'.format(datetime.datetime.now().year)
 author = 'BioSimulations Team'
 
@@ -103,7 +103,7 @@ html_static_path = ['_static']
 
 html_theme_options = {
     'github_user': 'biosimulations',
-    'github_repo': 'Biosimulations_utils',
+    'github_repo': 'biosimulations_utils',
     'github_banner': True,
     'github_button': True,
     'description': 'Utilities for generating and parsing documents encoded in biomodeling standards such as COMBINE/OMEX, SBML, and SED-ML',

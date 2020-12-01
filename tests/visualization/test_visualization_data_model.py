@@ -6,12 +6,12 @@
 :License: MIT
 """
 
-from Biosimulations_utils.data_model import (Format, Identifier, JournalCitation, License,
+from biosimulations_utils.data_model import (Format, Identifier, JournalCitation, License,
                                              Person, PrimaryResourceMetadata, RemoteFile, ResourceMetadata, ResourceReferences, User)
-from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
-from Biosimulations_utils.biomodel.data_model import BiomodelVariable
-from Biosimulations_utils.simulation.data_model import TimecourseSimulation, SimulationResult
-from Biosimulations_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
+from biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
+from biosimulations_utils.biomodel.data_model import BiomodelVariable
+from biosimulations_utils.simulation.data_model import TimecourseSimulation, SimulationResult
+from biosimulations_utils.visualization.data_model import Visualization, VisualizationLayoutElement, VisualizationDataField
 import datetime
 import dateutil
 import unittest

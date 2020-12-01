@@ -6,12 +6,12 @@
 :License: MIT
 """
 
-from Biosimulations_utils.archive import write_archive, read_archive
-from Biosimulations_utils.archive.core import ArchiveIoError
-from Biosimulations_utils.archive.data_model import Archive, ArchiveFile, ArchiveFormat
-from Biosimulations_utils.data_model import Format, Person
-from Biosimulations_utils.biomodel.data_model import BiomodelFormat
-from Biosimulations_utils.simulation.data_model import SimulationFormat
+from biosimulations_utils.archive import write_archive, read_archive
+from biosimulations_utils.archive.core import ArchiveIoError
+from biosimulations_utils.archive.data_model import Archive, ArchiveFile, ArchiveFormat
+from biosimulations_utils.data_model import Format, Person
+from biosimulations_utils.biomodel.data_model import BiomodelFormat
+from biosimulations_utils.simulation.data_model import SimulationFormat
 from unittest import mock
 import datetime
 import dateutil.tz

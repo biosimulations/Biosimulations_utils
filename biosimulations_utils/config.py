@@ -45,7 +45,7 @@ combine_test_suite = attrdict.AttrDict({
                 '~',
                 'Documents',
                 'Biosimulators_test_suite',
-                'Biosimulators_test_suite',
+                'biosimulators_test_suite',
             ),
         ),
     ),

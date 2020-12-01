@@ -6,13 +6,13 @@
 :License: MIT
 """
 
-from Biosimulations_utils.archive.data_model import ArchiveFormat
-from Biosimulations_utils.data_model import (JournalCitation, License, OntologyTerm, Person,
+from biosimulations_utils.archive.data_model import ArchiveFormat
+from biosimulations_utils.data_model import (JournalCitation, License, OntologyTerm, Person,
                                              PrimaryResourceMetadata, RemoteFile, ResourceMetadata, Type)
-from Biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat
-from Biosimulations_utils.simulation.data_model import Algorithm, AlgorithmParameter, SimulationFormat
-from Biosimulations_utils.simulator.data_model import Simulator
-from Biosimulations_utils.simulator.testing import TestCase, TestCaseType
+from biosimulations_utils.biomodel.data_model import BiomodelingFramework, BiomodelFormat
+from biosimulations_utils.simulation.data_model import Algorithm, AlgorithmParameter, SimulationFormat
+from biosimulations_utils.simulator.data_model import Simulator
+from biosimulations_utils.simulator.testing import TestCase, TestCaseType
 import datetime
 import dateutil.tz
 import unittest

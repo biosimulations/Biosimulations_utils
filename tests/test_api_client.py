@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from Biosimulations_utils import api_client
+from biosimulations_utils import api_client
 import json
 import os
 import unittest

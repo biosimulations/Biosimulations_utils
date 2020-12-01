@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from Biosimulations_utils.import_resources import biomodels
+from biosimulations_utils.import_resources import biomodels
 _DRY_RUN = True
 
 

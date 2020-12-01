@@ -6,9 +6,9 @@
 :License: MIT
 """
 
-from Biosimulations_utils.data_model import (Identifier, JournalCitation, License, Person,
+from biosimulations_utils.data_model import (Identifier, JournalCitation, License, Person,
                                              PrimaryResourceMetadata, RemoteFile, ResourceMetadata, ResourceReferences, User)
-from Biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
+from biosimulations_utils.chart.data_model import Chart, ChartDataField, ChartDataFieldShape, ChartDataFieldType
 import datetime
 import dateutil
 import unittest

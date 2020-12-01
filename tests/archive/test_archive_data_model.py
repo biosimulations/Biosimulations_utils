@@ -6,9 +6,9 @@
 :License: MIT
 """
 
-from Biosimulations_utils.data_model import Person
-from Biosimulations_utils.biomodel.data_model import BiomodelFormat
-from Biosimulations_utils.archive.data_model import Archive, ArchiveFile, ArchiveFormat
+from biosimulations_utils.data_model import Person
+from biosimulations_utils.biomodel.data_model import BiomodelFormat
+from biosimulations_utils.archive.data_model import Archive, ArchiveFile, ArchiveFormat
 import datetime
 import unittest
 

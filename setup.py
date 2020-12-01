@@ -15,7 +15,7 @@ except (subprocess.CalledProcessError, AssertionError):
 import os
 import pkg_utils
 
-name = 'Biosimulations_utils'
+name = 'biosimulations_utils'
 dirname = os.path.dirname(__file__)
 package_data = {
     name: [],
@@ -31,8 +31,8 @@ setuptools.setup(
     description=("Utilities for generating and parsing documents encoded in biomodeling standards such as "
                  "the Systems Biology Markup Language (SBML) and the Simulation Experiment Description Markup Language (SED-ML)."),
     long_description=md.long_description,
-    url="https://github.com/biosimulations/" + name,
-    download_url='https://github.com/biosimulations/' + name,
+    url="https://github.com/biosimulations/Biosimulations_utils",
+    download_url='https://github.com/biosimulations/Biosimulations_utils',
     author='Center for Reproducible Biomedical Modeling',
     author_email="info@biosimulations.org",
     license="MIT",

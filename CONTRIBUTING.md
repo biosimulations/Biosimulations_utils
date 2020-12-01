@@ -1,6 +1,6 @@
-# Contributing to the template repository for BioSimulators-compliant simulation tools
+# Contributing to BioSimulations-utils
 
-We enthusiastically welcome contributions to the template repository.
+We enthusiastically welcome contributions to BioSimulations-utils!
 
 ## Coordinating contributions
 
@@ -10,18 +10,17 @@ Before getting started, please contact the lead developers at [info@biosimulatio
 
 This repository follows standard Python conventions:
 
-* `README.md`: Overview of `BioSimulation-utils`
-* `Dockerfile`: file for building a Docker image for the simulator
-* `my_simulator/`: Source code for the simulator
-* `tests/`: Unit tests
-* `setup.py`: pip installation script
-* `setup.cfg`: Configuration for the pip installation
-* `requirements.txt`: Dependencies
-* `requirements.optional.txt`: Optional dependencies
-* `MANIFEST.in`: List of files to include in package
-* `LICENSE`: License
-* `CONTRIBUTING.md`: Guide to contributing to `BioSimulation-utils` (this document)
-* `CODE_OF_CONDUCT.md`: Code of conduct for developers
+* `README.md`: Overview of this repository
+* `biosimulations_utils/`: Source code for this package
+* `tests/`: Unit tests for this package
+* `setup.py`: pip installation script for this package
+* `setup.cfg`: Configuration for the pip installation script
+* `requirements.txt`: Dependencies of this package
+* `requirements.optional.txt`: Optional dependencies of this package
+* `MANIFEST.in`: List of files to include when BioSimulations-utils is packaged for distribution through PyPI
+* `LICENSE`: License for this package
+* `CONTRIBUTING.md`: Guide to contributing to this package (this document)
+* `CODE_OF_CONDUCT.md`: Code of conduct for developers of this package
 
 ## Coding convention
 
@@ -33,15 +32,15 @@ This repository follows standard Python style conventions:
 
 ## Documentation convention
 
-`BioSimulation-utils` is documented using [reStructuredText](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html) and the [napoleon Sphinx plugin](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html). The documentation can be compiled with [Sphinx](https://www.sphinx-doc.org/) by running `sphinx-build docs docs/_build/html`.
+`BioSimulation-utils` is documented using [reStructuredText](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html) and the [napoleon Sphinx plugin](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html). The documentation can be compiled with [Sphinx](https://www.sphinx-doc.org/) by running `sphinx-build docs-src docs`.
 
 ## Submitting changes
 
 Please use GitHub pull requests to submit changes. Each request should include a brief description of the new and/or modified features.
 
-## Releasing and deploying new versions
+## Releasing new versions
 
-Contact [info@biosimulations.org](mailto:info@biosimulations.org) to request release and deployment of new changes. 
+Contact [info@biosimulations.org](mailto:info@biosimulations.org) to request release of new changes. 
 
 ## Reporting issues
 

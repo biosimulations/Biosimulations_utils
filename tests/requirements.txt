@@ -1,4 +1,5 @@
 Biosimulations_tellurium
 inflect
+jsonschema
 numpy
 pandas

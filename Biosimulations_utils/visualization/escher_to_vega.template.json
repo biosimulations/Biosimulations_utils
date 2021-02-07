@@ -1,0 +1,200 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "width": 500,
+  "height": 500,
+  "padding": 0,
+  "autosize": "none",
+
+  "data": [{
+      "name": "metabolites",
+      "values": null
+    },
+    {
+      "name": "reactions",
+      "values": null
+    },
+    {
+      "name": "reactionFluxes",
+      "values": null
+    },
+    {
+      "name": "reactionsAndFluxes",
+      "source": "reactions",
+      "transform": [{
+        "type": "lookup",
+        "from": "reactionFluxes",
+        "key": "id",
+        "fields": ["id"],
+        "values": ["flux"],
+        "as": ["flux"]
+      }]
+    }
+  ],
+
+  "scales": [{
+      "name": "metaboliteSize",
+      "type": "linear",
+      "domain": {
+        "data": "metabolites",
+        "field": "node_is_primary"
+      },
+      "range": [10, 50]
+    },
+    {
+      "name": "reactionFluxColor",
+      "type": "linear",
+      "domain": {
+        "data": "reactionFluxes",
+        "field": "flux"
+      },
+      "range": {
+        "scheme": "viridis"
+      }
+    }
+  ],
+
+  "marks": [{
+      "name": "Metabolites",
+      "type": "symbol",
+      "from": {
+        "data": "metabolites"
+      },
+      "encode": {
+        "enter": {
+          "fill": {
+            "value": "rgb(224, 134, 91)"
+          },
+          "stroke": {
+            "value": "rgb(162, 69, 16)"
+          },
+          "strokeWidth": {
+            "value": 0.5
+          }
+        },
+        "update": {
+          "xc": {
+            "field": "x"
+          },
+          "yc": {
+            "field": "y"
+          },
+          "size": {
+            "field": "node_is_primary",
+            "scale": "metaboliteSize"
+          },
+          "shape": {
+            "value": "circle"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "Metabolites labels",
+      "type": "text",
+      "from": {
+        "data": "metabolites"
+      },
+      "encode": {
+        "enter": {
+          "align": {
+            "value": "left"
+          },
+          "fill": {
+            "value": "#000000"
+          },
+          "fontSize": {
+            "value": 4
+          }
+        },
+        "update": {
+          "x": {
+            "field": "label_x"
+          },
+          "y": {
+            "field": "label_y"
+          },
+          "text": {
+            "field": "name"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "Reactions",
+      "type": "path",
+      "from": {
+        "data": "reactionsAndFluxes"
+      },
+      "encode": {
+        "enter": {
+          "stroke": {
+            "field": "flux",
+            "scale": "reactionFluxColor"
+          },
+          "strokeWidth": {
+            "value": 1
+          }
+        },
+        "update": {
+          "path": {
+            "field": "path"
+          },
+          "x": {
+            "value": 0
+          },
+          "y": {
+            "value": 0
+          }
+        }
+      }
+    },
+
+    {
+      "name": "Reaction labels",
+      "type": "text",
+      "from": {
+        "data": "reactions"
+      },
+      "encode": {
+        "enter": {
+          "align": {
+            "value": "left"
+          },
+          "fill": {
+            "value": "#000000"
+          },
+          "fontSize": {
+            "value": 4
+          }
+        },
+        "update": {
+          "x": {
+            "field": "label_x"
+          },
+          "y": {
+            "field": "label_y"
+          },
+          "text": {
+            "field": "name"
+          }
+        }
+      }
+    }
+  ],
+
+  "legends": [{
+    "fill": "reactionFluxColor",
+    "type": "gradient",
+    "title": "Fluxes",
+    "titleFontSize": 10,
+    "titlePadding": 2,
+    "titleAlign": "left",
+    "orient": "none",
+    "legendX": 400,
+    "legendY": 0,
+    "direction": "vertical",
+    "gradientLength": 405
+  }]
+}

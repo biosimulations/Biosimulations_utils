@@ -2,6 +2,7 @@ from Biosimulations_utils.visualization.escher import escher_to_vega
 from jsonschema import validate
 import json
 import os
+import random
 import requests
 import shutil
 import tempfile
@@ -19,7 +20,15 @@ class EscherVisualizationTestCase(unittest.TestCase):
 
     def test_escher_to_vega(self):
         vega_filename = os.path.join(self.temp_dirname, 'vega.json')
-        escher_to_vega(self.ESCHER_FILENAME, vega_filename)
+
+        with open(self.ESCHER_FILENAME, 'r') as file:
+            map = json.load(file)
+
+        reaction_fluxes = {}
+        for id in map[1]["reactions"].keys():
+            reaction_fluxes[id] = random.random() * 2 - 1
+
+        escher_to_vega(self.ESCHER_FILENAME, vega_filename, reaction_fluxes)
 
         # test that file was created
         self.assertTrue(os.path.isfile(vega_filename))

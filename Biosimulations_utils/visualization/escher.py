@@ -9,7 +9,6 @@
 import json
 import math
 import os
-import random
 
 __all__ = ['escher_to_vega']
 
@@ -22,7 +21,6 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
         escher_filename (:obj:`str`): path to the map in Escher format
         vega_filename (:obj:`str`): path to save the map in Vega format
         reaction_fluxes (:obj:`dict`, optional): dictionary that maps the id of each reaction to its predicted flux.
-            if :obj:`None`, random fluxes are generated for each reaction
         max_width_height (:obj:`int`): maximum height/width of the metabolic map in pixels
         legend_padding (:obj:`int`): horizontal spacing between the metabolic map and legend in pixels
         legend_width (:obj:`int`): legend width in pixels, including the width of the title
@@ -118,11 +116,7 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
         reactions.append(reaction)
 
     # reaction flux data
-    if reaction_fluxes is None:
-        reaction_fluxes = {}
-        for reaction in reactions:
-            reaction_fluxes[reaction["id"]] = random.random() * 2 - 1
-
+    reaction_fluxes = reaction_fluxes or {}
     vega_reaction_fluxes = []
     for reaction in reactions:
         flux = reaction_fluxes.get(reaction["id"], None)

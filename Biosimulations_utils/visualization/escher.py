@@ -99,7 +99,7 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
             if segment["b1"]:
                 segment_path = [
                     'M{},{}'.format(from_node["x"], from_node["y"]),
-                    'C{},{}'.format((segment["b1"]["x"] - min_x) * coordinate_scale, (segment["b2"]["y"] - min_y) * coordinate_scale),
+                    'C{},{}'.format((segment["b1"]["x"] - min_x) * coordinate_scale, (segment["b1"]["y"] - min_y) * coordinate_scale),
                     '{},{}'.format((segment["b2"]["x"] - min_x) * coordinate_scale, (segment["b2"]["y"] - min_y) * coordinate_scale),
                     '{},{}'.format(to_node["x"], to_node["y"]),
                 ]

@@ -12,8 +12,8 @@ __pycache__/
 htmlcov/
 
 # Compiled documentation files
-docs/source/
-docs/_build/
+docs/_sources/*
+docs/_raw_sources/*
 docs/.doctrees/
 docs/html/_raw_sources/.doctrees/
 docs/**/.doctrees/

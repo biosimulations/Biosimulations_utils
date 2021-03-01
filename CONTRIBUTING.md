@@ -40,7 +40,20 @@ Please use GitHub pull requests to submit changes. Each request should include a
 
 ## Releasing new versions
 
-Contact [info@biosimulations.org](mailto:info@biosimulations.org) to request release of new changes. 
+To release changes, contact the [lead developers](mailto:info@biosimulations.org) to request their release.
+
+Below are instructions for releasing a new version:
+
+1. Commit the changes to this repository.
+2. Increment the `__version__` variable in `biosimulations_utils/_version.py`.
+3. Commit this change to `biosimulations_utils/_version.py`.
+4. Add a tag for the new version by running `git tag { version }`. `version` should be equal to the value of the
+   `__version__` variable in `biosimulations_utils/_version.py`.
+5. Push these commits and the new tag to GitHub by running `git push && git push --tags`.
+6. This push will trigger a GitHub action which will execute the following tasks:
+   * Create a GitHub release for the version.
+   * Push the release to PyPI.
+   * Compile the documentation and push the compiled documentation to the repository so that the new documentation is viewable at github.io.
 
 ## Reporting issues
 

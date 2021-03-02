@@ -25,8 +25,8 @@ class EscherVisualizationTestCase(unittest.TestCase):
             map = json.load(file)
 
         reaction_fluxes = {}
-        for id in map[1]["reactions"].keys():
-            reaction_fluxes[id] = random.random() * 2 - 1
+        for reaction in map[1]["reactions"].values():
+            reaction_fluxes[reaction['bigg_id']] = random.random() * 2 - 1
 
         escher_to_vega(self.ESCHER_FILENAME, vega_filename, reaction_fluxes)
 

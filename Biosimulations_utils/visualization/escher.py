@@ -6,15 +6,18 @@
 :License: MIT
 """
 
+import bezier
 import json
 import math
+import numpy
 import os
 
 __all__ = ['escher_to_vega']
 
 
 def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
-                   max_width_height=500, legend_padding=60, legend_width=40, indent=2):
+                   max_width_height=800, legend_padding=60, legend_width=40,
+                   arrow_head_gap=16., indent=2):
     """ Convert a metabolic pathway map from Escher format to Vega format.
 
     Args:
@@ -71,58 +74,187 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
     # convert metabolite circle nodes to Vega
     metabolites = []
     for id, node in nodes.items():
-        node["id"] = id
-
-        node["x"] = (node["x"] - min_x) * coordinate_scale
-        node["y"] = (node["y"] - min_y) * coordinate_scale
-
-        if "label_x" in node:
-            node["label_x"] = (node["label_x"] - min_x) * coordinate_scale
-            node["label_y"] = (node["label_y"] - min_y) * coordinate_scale
-
         if node["node_type"] == "metabolite":
-            metabolites.append(node)
+            metabolite = {}
+
+            metabolite["id"] = id
+            metabolite["biggId"] = node['bigg_id']
+            metabolite["name"] = node['name']
+
+            metabolite["x"] = (node["x"] - min_x) * coordinate_scale
+            metabolite["y"] = (node["y"] - min_y) * coordinate_scale
+
+            if node.get('node_is_primary', False):
+                metabolite['size'] = 10 ** 2 * coordinate_scale
+            else:
+                metabolite['size'] = 20 ** 2 * coordinate_scale
+
+            if "label_x" in node:
+                metabolite["labelX"] = (node["label_x"] - min_x) * coordinate_scale
+                metabolite["labelY"] = (node["label_y"] - min_y) * coordinate_scale
+
+            reaction_ids = set()
+            for rxn_id, reaction in escher[1]['reactions'].items():
+                for segment in reaction["segments"].values():
+                    if segment["from_node_id"] == id or segment["to_node_id"] == id:
+                        reaction_ids.add(rxn_id)
+                        break
+            metabolite['reactionIds'] = list(reaction_ids)
+            metabolite['metaboliteIds'] = []
+
+            related_metabolite_ids = set()
+            for reaction_id in reaction_ids:
+                reaction = escher[1]['reactions'][reaction_id]
+
+                for segment in reaction["segments"].values():
+                    from_node = nodes[segment["from_node_id"]]
+                    to_node = nodes[segment["to_node_id"]]
+
+                    if from_node["node_type"] == "metabolite":
+                        related_metabolite_ids.add(segment["from_node_id"])
+                    if to_node['node_type'] == 'metabolite':
+                        related_metabolite_ids.add(segment["to_node_id"])
+            metabolite['relatedMetaboliteIds'] = list(related_metabolite_ids)
+
+            metabolites.append(metabolite)
 
     # convert reaction paths to Vega
-    reactions = []
+    reaction_segment_coordinates = []
+    reaction_arrow_head_coordinates = []
+    reaction_labels = []
     for id, reaction in escher[1]['reactions'].items():
-        reaction["id"] = id
+        metabolite_ids = set()
+        for rxn_id, other_reaction in escher[1]['reactions'].items():
+            if other_reaction['bigg_id'] == reaction['bigg_id']:
+                for segment in reaction["segments"].values():
+                    from_node = nodes[segment["from_node_id"]]
+                    to_node = nodes[segment["to_node_id"]]
 
-        reaction["label_x"] = (reaction["label_x"] - min_x) * coordinate_scale
-        reaction["label_y"] = (reaction["label_y"] - min_x) * coordinate_scale
+                    if from_node["node_type"] == "metabolite":
+                        metabolite_ids.add(segment["from_node_id"])
+                    if to_node['node_type'] == 'metabolite':
+                        metabolite_ids.add(segment["to_node_id"])
+        metabolite_ids = list(metabolite_ids)
 
-        reaction["path"] = []
+        reaction_labels.append({
+            "id": id,
+            "biggId": reaction["bigg_id"],
+            "x": (reaction["label_x"] - min_x) * coordinate_scale,
+            "y": (reaction["label_y"] - min_y) * coordinate_scale,
+            'metaboliteIds': metabolite_ids,
+            'relatedMetaboliteIds': [],
+        })
+
         for segment in reaction["segments"].values():
             from_node = nodes[segment["from_node_id"]]
             to_node = nodes[segment["to_node_id"]]
 
-            if segment["b1"]:
-                segment_path = [
-                    'M{},{}'.format(from_node["x"], from_node["y"]),
-                    'C{},{}'.format((segment["b1"]["x"] - min_x) * coordinate_scale, (segment["b1"]["y"] - min_y) * coordinate_scale),
-                    '{},{}'.format((segment["b2"]["x"] - min_x) * coordinate_scale, (segment["b2"]["y"] - min_y) * coordinate_scale),
-                    '{},{}'.format(to_node["x"], to_node["y"]),
-                ]
+            if from_node['node_type'] == 'metabolite':
+                if segment['b1']:
+                    points = [
+                        [from_node['x'], from_node['y']],
+                        [segment['b1']['x'], segment['b1']['y']],
+                        [segment['b2']['x'], segment['b2']['y']],
+                        [to_node['x'], to_node['y']],
+                    ]
+                    segment_len = bezier.Curve(numpy.array(points).transpose(), degree=3).length
+                    t = min(1., arrow_head_gap / segment_len)
+                    x0, y0 = bezier_point(points, t)
+                    angle = bezier_angle(points, t) - 90.
+                else:
+                    segment_len = math.sqrt((from_node['x'] - to_node['x']) ** 2 (from_node['y'] - to_node['y']) ** 2)
+                    angle = math.atan2(from_node['y'] - to_node['y'], from_node['x'] - to_node['x'])
+                    t = min(1., arrow_head_gap / segment_len)
+                    x0 = from_node["x"] * (1 - t) + to_node["x"] * t
+                    y0 = from_node["y"] * (1 - t) + to_node["y"] * t
+
+                reaction_arrow_head_coordinates.append({
+                    'id': id,
+                    'biggId': reaction['bigg_id'],
+                    'start': True,
+                    'x': (x0 - min_x) * coordinate_scale,
+                    'y': (y0 - min_y) * coordinate_scale,
+                    'angle': angle,
+                    'metaboliteIds': metabolite_ids,
+                    'relatedMetaboliteIds': [],
+                })
             else:
-                segment_path = [
-                    'M{},{}'.format(from_node["x"], from_node["y"]),
-                    'L{},{}'.format(to_node["x"], to_node["y"]),
-                ]
+                x0 = from_node["x"]
+                y0 = from_node["y"]
 
-            reaction["path"].append(" ".join(segment_path))
+            if to_node['node_type'] == 'metabolite':
+                if segment['b1']:
+                    points = [
+                        [from_node['x'], from_node['y']],
+                        [segment['b1']['x'], segment['b1']['y']],
+                        [segment['b2']['x'], segment['b2']['y']],
+                        [to_node['x'], to_node['y']],
+                    ]
+                    segment_len = bezier.Curve(numpy.array(points).transpose(), degree=3).length
+                    t = max(0., 1. - arrow_head_gap / segment_len)
+                    x3, y3 = bezier_point(points, t)
+                    angle = bezier_angle(points, t) + 90.
+                else:
+                    segment_len = math.sqrt((from_node['x'] - to_node['x']) ** 2 (from_node['y'] - to_node['y']) ** 2)
+                    angle = math.atan2(to_node['y'] - from_node['y'], to_node['x'] - from_node['x'])
+                    t = max(0., 1. - arrow_head_gap / segment_len)
+                    x3 = from_node["x"] * (1 - t) + to_node["x"] * t
+                    y3 = from_node["y"] * (1 - t) + to_node["y"] * t
 
-        reaction["path"] = ''.join(reaction["path"])
+                reaction_arrow_head_coordinates.append({
+                    'id': id,
+                    'biggId': reaction['bigg_id'],
+                    'start': False,
+                    'x': (x3 - min_x) * coordinate_scale,
+                    'y': (y3 - min_y) * coordinate_scale,
+                    'angle': angle,
+                    'metaboliteIds': metabolite_ids,
+                    'relatedMetaboliteIds': [],
+                })
+            else:
+                x3 = to_node["x"]
+                y3 = to_node["y"]
 
-        reactions.append(reaction)
+            if segment["b1"]:
+                reaction_segment_coordinates.append({
+                    "id": id,
+                    "biggId": reaction["bigg_id"],
+                    "name": reaction["name"],
+                    'type': 'curve',
+                    'x0': (x0 - min_x) * coordinate_scale,
+                    'y0': (y0 - min_y) * coordinate_scale,
+                    'x1': (segment["b1"]["x"] - min_x) * coordinate_scale,
+                    'y1': (segment["b1"]["y"] - min_y) * coordinate_scale,
+                    'x2': (segment["b2"]["x"] - min_x) * coordinate_scale,
+                    'y2': (segment["b2"]["y"] - min_y) * coordinate_scale,
+                    'x3': (x3 - min_x) * coordinate_scale,
+                    'y3': (y3 - min_y) * coordinate_scale,
+                    'metaboliteIds': metabolite_ids,
+                    'relatedMetaboliteIds': [],
+                })
+            else:
+                reaction_segment_coordinates.append({
+                    "id": id,
+                    "biggId": reaction["bigg_id"],
+                    "name": reaction["name"],
+                    'type': 'line',
+                    'x0': (x0 - min_x) * coordinate_scale,
+                    'y0': (y0 - min_y) * coordinate_scale,
+                    'x1': (x3 - min_x) * coordinate_scale,
+                    'y1': (y3 - min_y) * coordinate_scale,
+                    'metaboliteIds': metabolite_ids,
+                    'relatedMetaboliteIds': [],
+                })
 
     # reaction flux data
     reaction_fluxes = reaction_fluxes or {}
     vega_reaction_fluxes = []
-    for reaction in reactions:
-        flux = reaction_fluxes.get(reaction["id"], None)
+    for reaction in escher[1]['reactions'].values():
+        id = reaction['bigg_id']
+        flux = reaction_fluxes.get(id, None)
         if flux is not None:
             vega_reaction_fluxes.append({
-                'id': reaction['id'],
+                'biggId': id,
                 'flux': flux
             })
 
@@ -133,11 +265,26 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
     vega['width'] = width + legend_padding + legend_width
     vega['height'] = height
 
-    metabolites_data = next(data for data in vega['data'] if data['name'] == 'metabolites')
+    metabolite_stroke_width_signal = next(signal for signal in vega['signals'] if signal['name'] == 'metaboliteStrokeWidthData')
+    metabolite_stroke_width_signal['value'] = 2 * coordinate_scale
+
+    reaction_stroke_width_signal = next(signal for signal in vega['signals'] if signal['name'] == 'reactionStrokeWidthData')
+    reaction_stroke_width_signal['value'] = 18 * coordinate_scale
+
+    arrow_head_stroke_width_signal = next(signal for signal in vega['signals'] if signal['name'] == 'arrowHeadStrokeWidthData')
+    arrow_head_stroke_width_signal['value'] = 1 * coordinate_scale
+
+    metabolites_data = next(data for data in vega['data'] if data['name'] == 'metabolitesData')
     metabolites_data['values'] = metabolites
 
-    reactions_data = next(data for data in vega['data'] if data['name'] == 'reactions')
-    reactions_data['values'] = reactions
+    reactions_data = next(data for data in vega['data'] if data['name'] == 'reactionSegmentCoordinatesData')
+    reactions_data['values'] = reaction_segment_coordinates
+
+    reactions_data = next(data for data in vega['data'] if data['name'] == 'reactionArrowHeadCoordinatesData')
+    reactions_data['values'] = reaction_arrow_head_coordinates
+
+    reactions_data = next(data for data in vega['data'] if data['name'] == 'reactionLabelsData')
+    reactions_data['values'] = reaction_labels
 
     reaction_fluxes_data = next(data for data in vega['data'] if data['name'] == 'reactionFluxes')
     reaction_fluxes_data['values'] = vega_reaction_fluxes
@@ -149,3 +296,34 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
     # save Vega-formatted map
     with open(vega_filename, 'w') as file:
         json.dump(vega, file, indent=indent)
+
+
+def bezier_point(points, t):
+    return (
+        (
+            ((1. - t) ** 3.) * points[0][0]
+            + 3. * t * ((1. - t) ** 2.) * points[1][0]
+            + (3. * t ** 2.) * (1. - t) * points[2][0]
+            + (t ** 3.) * points[3][0]
+        ),
+        (
+            ((1. - t) ** 3.) * points[0][1]
+            + 3. * t * ((1. - t) ** 2.) * points[1][1]
+            + 3. * (t ** 2.) * (1. - t) * points[2][1]
+            + (t ** 3.) * points[3][1]
+        ),
+    )
+
+
+def bezier_angle(points, t):
+    dx = (
+        (1 - t) ** 2 * (points[1][0] - points[0][0])
+        + 2 * t * (1 - t) * (points[2][0] - points[1][0])
+        + t ** 2 * (points[3][0] - points[2][0])
+    )
+    dy = (
+        (1 - t) ** 2 * (points[1][1] - points[0][1])
+        + 2 * t * (1 - t) * (points[2][1] - points[1][1])
+        + t ** 2 * (points[3][1] - points[2][1])
+    )
+    return math.atan2(dy, dx) * 180 / math.pi

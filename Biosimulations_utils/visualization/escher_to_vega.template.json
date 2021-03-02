@@ -5,12 +5,138 @@
   "padding": 0,
   "autosize": "none",
 
+  "signals": [{
+      "name": "metaboliteStrokeWidthData",
+      "value": null
+    },
+    {
+      "name": "reactionStrokeWidthData",
+      "value": null
+    },
+    {
+      "name": "arrowHeadStrokeWidthData",
+      "value": null
+    },
+    {
+      "name": "metaboliteFill",
+      "value": "#e0885c"
+    },
+    {
+      "name": "metaboliteStroke",
+      "value": "#a34610"
+    },
+    {
+      "name": "metaboliteLightFill",
+      "value": "#F0C4AE"
+    },
+    {
+      "name": "metaboliteLightStroke",
+      "value": "#D1A388"
+    },
+    {
+      "name": "labelColor",
+      "value": "#333333"
+    },
+    {
+      "name": "reverseArrowHeadStrokeColor",
+      "value": "#E9E9E9"
+    },
+    {
+      "name": "reverseArrowHeadFillColor",
+      "value": "#ffffff"
+    },
+    {
+      "name": "hiddenColor",
+      "value": "#E9E9E9"
+    },
+    {
+      "name": "Met_labels",
+      "value": false,
+      "bind": {
+        "input": "checkbox"
+      }
+    },
+    {
+      "name": "Reaction_labels",
+      "value": false,
+      "bind": {
+        "input": "checkbox"
+      }
+    },
+    {
+      "name": "PanAnchor",
+      "value": null,
+      "on": [{
+        "events": "mousedown",
+        "update": "[-Pan[0] + x(), -Pan[1] + y()]"
+      }]
+    },
+    {
+      "name": "Pan",
+      "value": [0, 0],
+      "on": [{
+        "events": [{
+          "source": "window",
+          "type": "mousemove",
+          "consume": true,
+          "between": [{
+              "type": "mousedown"
+            },
+            {
+              "source": "window",
+              "type": "mouseup"
+            }
+          ]
+        }],
+        "update": "[x() - PanAnchor[0], y() - PanAnchor[1]]"
+      }]
+    },
+    {
+      "name": "ZoomAnchor",
+      "value": [0, 0],
+      "on": [{
+        "events": "wheel",
+        "update": "xy()"
+      }]
+    },
+    {
+      "name": "Zoom",
+      "value": 1,
+      "on": [{
+        "events": "wheel!",
+        "force": true,
+        "update": "Zoom / pow(1.001, event.deltaY * pow(16, event.deltaMode))"
+      }]
+    },
+    {
+      "name": "hover",
+      "value": null,
+      "on": [{
+          "events": "*:mouseover",
+          "update": "item().datum"
+        },
+        {
+          "events": "*:mouseout",
+          "update": "null"
+        }
+      ]
+    }
+  ],
+
   "data": [{
-      "name": "metabolites",
+      "name": "metabolitesData",
       "values": null
     },
     {
-      "name": "reactions",
+      "name": "reactionSegmentCoordinatesData",
+      "values": null
+    },
+    {
+      "name": "reactionArrowHeadCoordinatesData",
+      "values": null
+    },
+    {
+      "name": "reactionLabelsData",
       "values": null
     },
     {
@@ -18,72 +144,358 @@
       "values": null
     },
     {
-      "name": "reactionsAndFluxes",
-      "source": "reactions",
+      "name": "metabolitesScaled",
+      "source": "metabolitesData",
       "transform": [{
-        "type": "lookup",
-        "from": "reactionFluxes",
-        "key": "id",
-        "fields": ["id"],
-        "values": ["flux"],
-        "as": ["flux"]
+          "type": "formula",
+          "expr": "datum.biggId + ': ' + datum.name",
+          "as": "idName"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.x - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "as": "xScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.y - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "as": "yScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.size * Zoom",
+          "as": "sizeScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "metaboliteStrokeWidthData * Zoom",
+          "as": "strokeWidthScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "hover ? (hover.id == datum.id ? metaboliteFill : (indexof(hover.metaboliteIds, datum.id) >= 0 ? metaboliteFill : (indexof(hover.relatedMetaboliteIds, datum.id) >= 0 ? metaboliteLightFill : hiddenColor))) : metaboliteFill",
+          "as": "fill"
+        },
+        {
+          "type": "formula",
+          "expr": "hover ? (hover.id == datum.id ? metaboliteStroke : (indexof(hover.metaboliteIds, datum.id) >= 0 ? metaboliteStroke : (indexof(hover.relatedMetaboliteIds, datum.id) >= 0 ? metaboliteLightStroke : hiddenColor))) : metaboliteStroke",
+          "as": "stroke"
+        }
+      ]
+    },
+    {
+      "name": "metaboliteLabelsVisibleScaled",
+      "source": "metabolitesData",
+      "transform": [{
+          "type": "filter",
+          "expr": "Met_labels"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.labelX - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "as": "labelXScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.labelY - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "as": "labelYScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "4 * Zoom",
+          "as": "fontSizeScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "hover ? (hover.id == datum.id ? labelColor : (indexof(hover.metaboliteIds, datum.id) >= 0 ? labelColor : (indexof(hover.relatedMetaboliteIds, datum.id) >= 0 ? labelColor : hiddenColor))) : labelColor",
+          "as": "fill"
+        }
+      ]
+    },
+    {
+      "name": "reactionAbsFluxes",
+      "source": "reactionFluxes",
+      "transform": [{
+        "type": "formula",
+        "expr": "abs(datum.flux)",
+        "as": "absFlux"
       }]
+    },
+    {
+      "name": "reactionSegmentPathsAndFluxesScaled",
+      "source": "reactionSegmentCoordinatesData",
+      "transform": [{
+          "type": "lookup",
+          "from": "reactionAbsFluxes",
+          "key": "biggId",
+          "fields": ["biggId"],
+          "values": ["flux", "absFlux"],
+          "as": ["flux", "absFlux"]
+        },
+        {
+          "type": "formula",
+          "expr": "datum.biggId + ': ' + datum.name + ' (' + (datum.flux == 0 ? '0' : format(datum.flux / floor(log(datum.absFlux)/LN10), '.3') + ' x 10^' + toString(floor(log(datum.absFlux)/LN10))) + ')'",
+          "as": "idNameFlux"
+        },
+        {
+          "type": "formula",
+          "expr": "[datum.id]",
+          "as": "reactionIds"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.x0 - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "as": "x0Scaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.y0 - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "as": "y0Scaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.x1 - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "as": "x1Scaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.y1 - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "as": "y1Scaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.x2 - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "as": "x2Scaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.y2 - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "as": "y2Scaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.x3 - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "as": "x3Scaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.y3 - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "as": "y3Scaled"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.type === 'line' ? ('M' + toString(datum.x0Scaled) + ',' + toString(datum.y0Scaled) + 'L' + toString(datum.x1Scaled) + ',' + toString(datum.y1Scaled)) : ('M' + toString(datum.x0Scaled) + ',' + toString(datum.y0Scaled) + 'C' + toString(datum.x1Scaled) + ',' + toString(datum.y1Scaled) + ' ' + toString(datum.x2Scaled) + ',' + toString(datum.y2Scaled) + ' ' + toString(datum.x3Scaled) + ',' + toString(datum.y3Scaled))",
+          "as": "path"
+        },
+        {
+          "type": "formula",
+          "expr": "reactionStrokeWidthData * Zoom",
+          "as": "strokeWidthScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "hover ? (hover.biggId == datum.biggId || indexof(hover.reactionIds, datum.id) >= 0 ? scale('reactionFluxColorScale', datum.absFlux) : hiddenColor) : scale('reactionFluxColorScale', datum.absFlux)",
+          "as": "stroke"
+        }
+      ]
+    },
+    {
+      "name": "reactionArrowHeadsAndFluxesScaled",
+      "source": "reactionArrowHeadCoordinatesData",
+      "transform": [{
+          "type": "lookup",
+          "from": "reactionAbsFluxes",
+          "key": "biggId",
+          "fields": ["biggId"],
+          "values": ["flux", "absFlux"],
+          "as": ["flux", "absFlux"]
+        },
+        {
+          "type": "formula",
+          "expr": "datum.biggId + ': ' + datum.name + ' (' + (datum.flux == 0 ? '0' : format(datum.flux / floor(log(datum.absFlux)/LN10), '.3') + ' x 10^' + toString(floor(log(datum.absFlux)/LN10))) + ')'",
+          "as": "idNameFlux"
+        },
+        {
+          "type": "formula",
+          "expr": "[datum.id]",
+          "as": "reactionIds"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.x - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "as": "xScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.y - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "as": "yScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "100 * Zoom",
+          "as": "sizeScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "hover ? (hover.biggId == datum.biggId || indexof(hover.reactionIds, datum.id) >= 0 ? (((datum.start && datum.flux > 0) || (!datum.start && datum.flux < 0)) ? scale('reactionFluxColorScale', datum.absFlux) : reverseArrowHeadFillColor) : hiddenColor) : (((datum.start && datum.flux > 0) || (!datum.start && datum.flux < 0)) ? scale('reactionFluxColorScale', datum.absFlux) : reverseArrowHeadFillColor)",
+          "as": "fill"
+        },
+        {
+          "type": "formula",
+          "expr": "hover ? (hover.biggId == datum.biggId || indexof(hover.reactionIds, datum.id) >= 0 ? (((datum.start && datum.flux > 0) || (!datum.start && datum.flux < 0)) ? null : reverseArrowHeadStrokeColor) : reverseArrowHeadStrokeColor) : (((datum.start && datum.flux > 0) || (!datum.start && datum.flux < 0)) ? null : reverseArrowHeadStrokeColor)",
+          "as": "stroke"
+        },
+        {
+          "type": "formula",
+          "expr": "arrowHeadStrokeWidthData * 4 * Zoom",
+          "as": "strokeWidthScaled"
+        }
+      ]
+    },
+    {
+      "name": "reactionLabelsVisibleScaled",
+      "source": "reactionLabelsData",
+      "transform": [{
+          "type": "filter",
+          "expr": "Reaction_labels"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.x - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "as": "xScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.y - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "as": "yScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "4 * Zoom",
+          "as": "fontSizeScaled"
+        },
+        {
+          "type": "formula",
+          "expr": "hover ? (hover.biggId == datum.biggId || indexof(hover.reactionIds, datum.id) >= 0 ? labelColor : hiddenColor) : labelColor",
+          "as": "fill"
+        }
+      ]
     }
   ],
 
   "scales": [{
-      "name": "metaboliteSize",
-      "type": "linear",
-      "domain": {
-        "data": "metabolites",
-        "field": "node_is_primary"
-      },
-      "range": [10, 50]
+    "name": "reactionFluxColorScale",
+    "type": "linear",
+    "domain": {
+      "data": "reactionAbsFluxes",
+      "field": "absFlux"
     },
-    {
-      "name": "reactionFluxColor",
-      "type": "linear",
-      "domain": {
-        "data": "reactionFluxes",
-        "field": "flux"
-      },
-      "range": {
-        "scheme": "viridis"
-      }
+    "range": {
+      "scheme": "viridis"
     }
-  ],
+  }],
 
   "marks": [{
-      "name": "Metabolites",
-      "type": "symbol",
+      "name": "Reactions",
+      "type": "path",
       "from": {
-        "data": "metabolites"
+        "data": "reactionSegmentPathsAndFluxesScaled"
       },
       "encode": {
         "enter": {
-          "fill": {
-            "value": "rgb(224, 134, 91)"
+          "tooltip": {
+            "field": "idNameFlux"
+          }
+        },
+        "update": {
+          "path": {
+            "field": "path"
           },
           "stroke": {
-            "value": "rgb(162, 69, 16)"
+            "field": "stroke"
           },
           "strokeWidth": {
-            "value": 0.5
+            "field": "strokeWidthScaled"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "ReactionsArrowHeads",
+      "type": "symbol",
+      "from": {
+        "data": "reactionArrowHeadsAndFluxesScaled"
+      },
+      "encode": {
+        "enter": {
+          "shape": {
+            "value": "triangle"
+          },
+          "angle": {
+            "field": "angle"
+          },
+          "tooltip": {
+            "field": "idNameFlux"
+          }
+        },
+        "update": {
+          "x": {
+            "field": "xScaled"
+          },
+          "y": {
+            "field": "yScaled"
+          },
+          "size": {
+            "field": "sizeScaled"
+          },
+          "fill": {
+            "field": "fill"
+          },
+          "stroke": {
+            "field": "stroke"
+          },
+          "strokeWidth": {
+            "field": "strokeWidthScaled"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "Metabolites",
+      "type": "symbol",
+      "from": {
+        "data": "metabolitesScaled"
+      },
+      "interactive": true,
+      "encode": {
+        "enter": {
+          "shape": {
+            "value": "circle"
+          },
+          "tooltip": {
+            "field": "idName"
           }
         },
         "update": {
           "xc": {
-            "field": "x"
+            "field": "xScaled"
           },
           "yc": {
-            "field": "y"
+            "field": "yScaled"
           },
           "size": {
-            "field": "node_is_primary",
-            "scale": "metaboliteSize"
+            "field": "sizeScaled"
           },
-          "shape": {
-            "value": "circle"
+          "fill": {
+            "field": "fill"
+          },
+          "stroke": {
+            "field": "stroke"
+          },
+          "strokeWidth": {
+            "field": "strokeWidthScaled"
           }
         }
       }
@@ -93,59 +505,29 @@
       "name": "Metabolites labels",
       "type": "text",
       "from": {
-        "data": "metabolites"
+        "data": "metaboliteLabelsVisibleScaled"
       },
       "encode": {
         "enter": {
+          "text": {
+            "field": "biggId"
+          },
           "align": {
             "value": "left"
+          }
+        },
+        "update": {
+          "x": {
+            "field": "labelXScaled"
           },
-          "fill": {
-            "value": "#000000"
+          "y": {
+            "field": "labelYScaled"
           },
           "fontSize": {
-            "value": 4
-          }
-        },
-        "update": {
-          "x": {
-            "field": "label_x"
+            "field": "fontSizeScaled"
           },
-          "y": {
-            "field": "label_y"
-          },
-          "text": {
-            "field": "name"
-          }
-        }
-      }
-    },
-
-    {
-      "name": "Reactions",
-      "type": "path",
-      "from": {
-        "data": "reactionsAndFluxes"
-      },
-      "encode": {
-        "enter": {
-          "stroke": {
-            "field": "flux",
-            "scale": "reactionFluxColor"
-          },
-          "strokeWidth": {
-            "value": 1
-          }
-        },
-        "update": {
-          "path": {
-            "field": "path"
-          },
-          "x": {
-            "value": 0
-          },
-          "y": {
-            "value": 0
+          "fill": {
+            "field": "fill"
           }
         }
       }
@@ -155,29 +537,29 @@
       "name": "Reaction labels",
       "type": "text",
       "from": {
-        "data": "reactions"
+        "data": "reactionLabelsVisibleScaled"
       },
       "encode": {
         "enter": {
+          "text": {
+            "field": "biggId"
+          },
           "align": {
             "value": "left"
-          },
-          "fill": {
-            "value": "#000000"
-          },
-          "fontSize": {
-            "value": 4
           }
         },
         "update": {
           "x": {
-            "field": "label_x"
+            "field": "xScaled"
           },
           "y": {
-            "field": "label_y"
+            "field": "yScaled"
           },
-          "text": {
-            "field": "name"
+          "fontSize": {
+            "field": "fontSizeScaled"
+          },
+          "fill": {
+            "field": "fill"
           }
         }
       }
@@ -185,7 +567,7 @@
   ],
 
   "legends": [{
-    "fill": "reactionFluxColor",
+    "fill": "reactionFluxColorScale",
     "type": "gradient",
     "title": "Fluxes",
     "titleFontSize": 10,

@@ -294,7 +294,7 @@
         },
         {
           "type": "formula",
-          "expr": "hover ? (hover.biggId == datum.biggId || indexof(hover.reactionIds, datum.id) >= 0 ? scale('reactionFluxColorScale', datum.absFlux) : hiddenColor) : scale('reactionFluxColorScale', datum.absFlux)",
+          "expr": "hover ? (hover.biggId == datum.biggId || indexof(hover.reactionIds, datum.id) >= 0 ? (datum.absFlux != null ? scale('reactionFluxColorScale', datum.absFlux) : hiddenColor) : hiddenColor) : (datum.absFlux != null ? scale('reactionFluxColorScale', datum.absFlux) : hiddenColor)",
           "as": "stroke"
         }
       ]
@@ -337,7 +337,7 @@
         },
         {
           "type": "formula",
-          "expr": "hover ? (hover.biggId == datum.biggId || indexof(hover.reactionIds, datum.id) >= 0 ? (((datum.start && datum.flux > 0) || (!datum.start && datum.flux < 0)) ? scale('reactionFluxColorScale', datum.absFlux) : reverseArrowHeadFillColor) : hiddenColor) : (((datum.start && datum.flux > 0) || (!datum.start && datum.flux < 0)) ? scale('reactionFluxColorScale', datum.absFlux) : reverseArrowHeadFillColor)",
+          "expr": "hover ? (hover.biggId == datum.biggId || indexof(hover.reactionIds, datum.id) >= 0 ? (((datum.start && datum.flux > 0) || (!datum.start && datum.flux < 0)) ? (datum.absFlux != null ? scale('reactionFluxColorScale', datum.absFlux) : hiddenColor) : reverseArrowHeadFillColor) : hiddenColor) : (((datum.start && datum.flux > 0) || (!datum.start && datum.flux < 0)) ? (datum.absFlux != null ? scale('reactionFluxColorScale', datum.absFlux) : hiddenColor) : reverseArrowHeadFillColor)",
           "as": "fill"
         },
         {

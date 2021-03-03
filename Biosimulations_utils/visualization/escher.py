@@ -159,8 +159,8 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
                     ]
                     segment_len = bezier.Curve(numpy.array(points).transpose(), degree=3).length
                     t = min(1., arrow_head_gap / segment_len)
-                    x0, y0 = bezier_point(points, t)
-                    angle = bezier_angle(points, t) - 90.
+                    x0, y0 = cubic_bezier_point(points, t)
+                    angle = cubic_bezier_angle(points, t) - 90.
                 else:
                     segment_len = math.sqrt((from_node['x'] - to_node['x']) ** 2 (from_node['y'] - to_node['y']) ** 2)
                     angle = math.atan2(from_node['y'] - to_node['y'], from_node['x'] - to_node['x'])
@@ -192,8 +192,8 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
                     ]
                     segment_len = bezier.Curve(numpy.array(points).transpose(), degree=3).length
                     t = max(0., 1. - arrow_head_gap / segment_len)
-                    x3, y3 = bezier_point(points, t)
-                    angle = bezier_angle(points, t) + 90.
+                    x3, y3 = cubic_bezier_point(points, t)
+                    angle = cubic_bezier_angle(points, t) + 90.
                 else:
                     segment_len = math.sqrt((from_node['x'] - to_node['x']) ** 2 (from_node['y'] - to_node['y']) ** 2)
                     angle = math.atan2(to_node['y'] - from_node['y'], to_node['x'] - from_node['x'])
@@ -304,7 +304,16 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
         json.dump(vega, file, indent=indent)
 
 
-def bezier_point(points, t):
+def cubic_bezier_point(points, t):
+    """ Get the coordinate of a point along a cubic bezier curve
+
+    Args:
+        points (:obj:`list` of :obj:`list` of :obj:`float`): control points
+        t (:obj:`float`): position along the curve [0, 1]
+
+    Returns:
+        :obj:`tuple` of :obj:`float`: position of the curve at point :obj:`t`
+    """
     return (
         (
             ((1. - t) ** 3.) * points[0][0]
@@ -321,7 +330,16 @@ def bezier_point(points, t):
     )
 
 
-def bezier_angle(points, t):
+def cubic_bezier_angle(points, t):
+    """ Get the angle of a point along a cubic bezier curve
+
+    Args:
+        points (:obj:`list` of :obj:`list` of :obj:`float`): control points
+        t (:obj:`float`): position along the curve [0, 1]
+
+    Returns:
+        :obj:`float`: angle of the curve at point :obj:`t`
+    """
     dx = (
         (1 - t) ** 2 * (points[1][0] - points[0][0])
         + 2 * t * (1 - t) * (points[2][0] - points[1][0])

@@ -6,6 +6,14 @@
   "autosize": "none",
 
   "signals": [{
+      "name": "mapWidth",
+      "value": 800
+    },
+    {
+      "name": "mapHeight",
+      "value": 800
+    },
+    {
       "name": "metaboliteStrokeWidthData",
       "value": null
     },
@@ -63,51 +71,171 @@
         "input": "checkbox"
       }
     },
+
     {
-      "name": "PanAnchor",
+      "name": "xrange",
+      "update": "[0, mapWidth]"
+    },
+    {
+      "name": "yrange",
+      "update": "[0, mapHeight]"
+    },
+    {
+      "name": "down",
       "value": null,
       "on": [{
-        "events": "mousedown",
-        "update": "[-Pan[0] + x(), -Pan[1] + y()]"
+          "events": "touchend",
+          "update": "null"
+        },
+        {
+          "events": "mousedown, touchstart",
+          "update": "xy()"
+        }
+      ]
+    },
+    {
+      "name": "xcur",
+      "value": null,
+      "on": [{
+        "events": "mousedown, touchstart, touchend",
+        "update": "slice(xdom)"
       }]
     },
     {
-      "name": "Pan",
+      "name": "ycur",
+      "value": null,
+      "on": [{
+        "events": "mousedown, touchstart, touchend",
+        "update": "slice(ydom)"
+      }]
+    },
+    {
+      "name": "delta",
       "value": [0, 0],
       "on": [{
         "events": [{
-          "source": "window",
-          "type": "mousemove",
-          "consume": true,
-          "between": [{
+            "source": "window",
+            "type": "mousemove",
+            "consume": true,
+            "between": [{
               "type": "mousedown"
-            },
-            {
+            }, {
               "source": "window",
               "type": "mouseup"
-            }
-          ]
-        }],
-        "update": "[x() - PanAnchor[0], y() - PanAnchor[1]]"
+            }]
+          },
+          {
+            "type": "touchmove",
+            "consume": true,
+            "filter": "event.touches.length === 1"
+          }
+        ],
+        "update": "down ? [down[0]-x(), down[1]-y()] : [0,0]"
       }]
     },
     {
-      "name": "ZoomAnchor",
+      "name": "anchor",
       "value": [0, 0],
       "on": [{
-        "events": "wheel",
-        "update": "xy()"
-      }]
+          "events": "wheel",
+          "update": "[invert('positionXScale', x()), invert('positionYScale', y())]"
+        },
+        {
+          "events": {
+            "type": "touchstart",
+            "filter": "event.touches.length===2"
+          },
+          "update": "[(xdom[0] + xdom[1]) / 2, (ydom[0] + ydom[1]) / 2]"
+        }
+      ]
     },
     {
-      "name": "Zoom",
+      "name": "zoom",
       "value": 1,
       "on": [{
-        "events": "wheel!",
-        "force": true,
-        "update": "Zoom / pow(1.001, event.deltaY * pow(16, event.deltaMode))"
+          "events": "wheel!",
+          "force": true,
+          "update": "pow(1.001, event.deltaY * pow(16, event.deltaMode))"
+        },
+        {
+          "events": {
+            "signal": "dist2"
+          },
+          "force": true,
+          "update": "dist1 / dist2"
+        }
+      ]
+    },
+    {
+      "name": "dist1",
+      "value": 0,
+      "on": [{
+          "events": {
+            "type": "touchstart",
+            "filter": "event.touches.length===2"
+          },
+          "update": "pinchDistance(event)"
+        },
+        {
+          "events": {
+            "signal": "dist2"
+          },
+          "update": "dist2"
+        }
+      ]
+    },
+    {
+      "name": "dist2",
+      "value": 0,
+      "on": [{
+        "events": {
+          "type": "touchmove",
+          "consume": true,
+          "filter": "event.touches.length===2"
+        },
+        "update": "pinchDistance(event)"
       }]
     },
+
+    {
+      "name": "xdom",
+      "update": "slice([0, mapWidth])",
+      "on": [{
+          "events": {
+            "signal": "delta"
+          },
+          "update": "[xcur[0] + span(xcur) * delta[0] / width, xcur[1] + span(xcur) * delta[0] / width]"
+        },
+        {
+          "events": {
+            "signal": "zoom"
+          },
+          "update": "[anchor[0] + (xdom[0] - anchor[0]) * zoom, anchor[0] + (xdom[1] - anchor[0]) * zoom]"
+        }
+      ]
+    },
+    {
+      "name": "ydom",
+      "update": "slice([0, mapHeight])",
+      "on": [{
+          "events": {
+            "signal": "delta"
+          },
+          "update": "[ycur[0] + span(ycur) * delta[1] / height, ycur[1] + span(ycur) * delta[1] / height]"
+        },
+        {
+          "events": {
+            "signal": "zoom"
+          },
+          "update": "[anchor[1] + (ydom[0] - anchor[1]) * zoom, anchor[1] + (ydom[1] - anchor[1]) * zoom]"
+        }
+      ]
+    },
+    {
+      "name": "currentZoom",
+      "update": "(xrange[1] - xrange[0]) / (xdom[1] - xdom[0])"
+    },
+
     {
       "name": "hover",
       "value": null,
@@ -153,22 +281,22 @@
         },
         {
           "type": "formula",
-          "expr": "(datum.x - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "expr": "scale('positionXScale', datum.x)",
           "as": "xScaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.y - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "expr": "scale('positionYScale', datum.y)",
           "as": "yScaled"
         },
         {
           "type": "formula",
-          "expr": "datum.size * Zoom",
+          "expr": "datum.size * currentZoom",
           "as": "sizeScaled"
         },
         {
           "type": "formula",
-          "expr": "metaboliteStrokeWidthData * Zoom",
+          "expr": "metaboliteStrokeWidthData * currentZoom",
           "as": "strokeWidthScaled"
         },
         {
@@ -192,17 +320,17 @@
         },
         {
           "type": "formula",
-          "expr": "(datum.labelX - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "expr": "scale('positionXScale', datum.labelX)",
           "as": "labelXScaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.labelY - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "expr": "scale('positionYScale', datum.labelY)",
           "as": "labelYScaled"
         },
         {
           "type": "formula",
-          "expr": "4 * Zoom",
+          "expr": "4 * currentZoom",
           "as": "fontSizeScaled"
         },
         {
@@ -244,42 +372,42 @@
         },
         {
           "type": "formula",
-          "expr": "(datum.x0 - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "expr": "scale('positionXScale', datum.x0)",
           "as": "x0Scaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.y0 - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "expr": "scale('positionYScale', datum.y0)",
           "as": "y0Scaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.x1 - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "expr": "scale('positionXScale', datum.x1)",
           "as": "x1Scaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.y1 - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "expr": "scale('positionYScale', datum.y1)",
           "as": "y1Scaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.x2 - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "expr": "scale('positionXScale', datum.x2)",
           "as": "x2Scaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.y2 - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "expr": "scale('positionYScale', datum.y2)",
           "as": "y2Scaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.x3 - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "expr": "scale('positionXScale', datum.x3)",
           "as": "x3Scaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.y3 - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "expr": "scale('positionYScale', datum.y3)",
           "as": "y3Scaled"
         },
         {
@@ -289,7 +417,7 @@
         },
         {
           "type": "formula",
-          "expr": "reactionStrokeWidthData * Zoom",
+          "expr": "reactionStrokeWidthData * currentZoom",
           "as": "strokeWidthScaled"
         },
         {
@@ -322,17 +450,17 @@
         },
         {
           "type": "formula",
-          "expr": "(datum.x - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "expr": "scale('positionXScale', datum.x)",
           "as": "xScaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.y - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "expr": "scale('positionYScale', datum.y)",
           "as": "yScaled"
         },
         {
           "type": "formula",
-          "expr": "100 * Zoom",
+          "expr": "100 * currentZoom",
           "as": "sizeScaled"
         },
         {
@@ -347,7 +475,7 @@
         },
         {
           "type": "formula",
-          "expr": "arrowHeadStrokeWidthData * 4 * Zoom",
+          "expr": "arrowHeadStrokeWidthData * 4 * currentZoom",
           "as": "strokeWidthScaled"
         }
       ]
@@ -361,17 +489,17 @@
         },
         {
           "type": "formula",
-          "expr": "(datum.x - ZoomAnchor[0]) * Zoom + ZoomAnchor[0] + Pan[0]",
+          "expr": "scale('positionXScale', datum.x)",
           "as": "xScaled"
         },
         {
           "type": "formula",
-          "expr": "(datum.y - ZoomAnchor[1]) * Zoom + ZoomAnchor[1] + Pan[1]",
+          "expr": "scale('positionYScale', datum.y)",
           "as": "yScaled"
         },
         {
           "type": "formula",
-          "expr": "4 * Zoom",
+          "expr": "4 * currentZoom",
           "as": "fontSizeScaled"
         },
         {
@@ -384,16 +512,39 @@
   ],
 
   "scales": [{
-    "name": "reactionFluxColorScale",
-    "type": "linear",
-    "domain": {
-      "data": "reactionAbsFluxes",
-      "field": "absFlux"
+      "name": "positionXScale",
+      "type": "linear",
+      "domain": {
+        "signal": "xdom"
+      },
+      "range": {
+        "signal": "xrange"
+      },
+      "zero": false
     },
-    "range": {
-      "scheme": "viridis"
+    {
+      "name": "positionYScale",
+      "type": "linear",
+      "domain": {
+        "signal": "ydom"
+      },
+      "range": {
+        "signal": "yrange"
+      },
+      "zero": false
+    },
+    {
+      "name": "reactionFluxColorScale",
+      "type": "linear",
+      "domain": {
+        "data": "reactionAbsFluxes",
+        "field": "absFlux"
+      },
+      "range": {
+        "scheme": "viridis"
+      }
     }
-  }],
+  ],
 
   "marks": [{
       "name": "Reactions",

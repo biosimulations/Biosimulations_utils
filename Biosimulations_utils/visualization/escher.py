@@ -16,7 +16,7 @@ __all__ = ['escher_to_vega']
 
 
 def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
-                   max_width_height=800, legend_padding=60, legend_width=40,
+                   max_width_height=800, legend_padding=20, legend_width=40,
                    arrow_head_gap=16., indent=2):
     """ Convert a metabolic pathway map from Escher format to Vega format.
 
@@ -264,6 +264,12 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
 
     vega['width'] = width + legend_padding + legend_width
     vega['height'] = height
+
+    map_width_signal = next(signal for signal in vega['signals'] if signal['name'] == 'mapWidth')
+    map_width_signal['value'] = width
+
+    map_height_signal = next(signal for signal in vega['signals'] if signal['name'] == 'mapHeight')
+    map_height_signal['value'] = height
 
     metabolite_stroke_width_signal = next(signal for signal in vega['signals'] if signal['name'] == 'metaboliteStrokeWidthData')
     metabolite_stroke_width_signal['value'] = 2 * coordinate_scale

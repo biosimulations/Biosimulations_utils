@@ -253,18 +253,22 @@
 
   "data": [{
       "name": "metabolitesData",
+      "_mapToSedmlReport": false,
       "values": null
     },
     {
       "name": "reactionSegmentCoordinatesData",
+      "_mapToSedmlReport": false,
       "values": null
     },
     {
       "name": "reactionArrowHeadCoordinatesData",
+      "_mapToSedmlReport": false,
       "values": null
     },
     {
       "name": "reactionLabelsData",
+      "_mapToSedmlReport": false,
       "values": null
     },
     {
@@ -273,6 +277,7 @@
     },
     {
       "name": "metabolitesScaled",
+      "_mapToSedmlReport": false,
       "source": "metabolitesData",
       "transform": [{
           "type": "formula",
@@ -313,6 +318,7 @@
     },
     {
       "name": "metaboliteLabelsVisibleScaled",
+      "_mapToSedmlReport": false,
       "source": "metabolitesData",
       "transform": [{
           "type": "filter",
@@ -342,6 +348,7 @@
     },
     {
       "name": "reactionAbsFluxes",
+      "_mapToSedmlReport": false,
       "source": "reactionFluxes",
       "transform": [{
         "type": "formula",
@@ -351,6 +358,7 @@
     },
     {
       "name": "reactionSegmentPathsAndFluxesScaled",
+      "_mapToSedmlReport": false,
       "source": "reactionSegmentCoordinatesData",
       "transform": [{
           "type": "lookup",
@@ -429,6 +437,7 @@
     },
     {
       "name": "reactionArrowHeadsAndFluxesScaled",
+      "_mapToSedmlReport": false,
       "source": "reactionArrowHeadCoordinatesData",
       "transform": [{
           "type": "lookup",
@@ -482,6 +491,7 @@
     },
     {
       "name": "reactionLabelsVisibleScaled",
+      "_mapToSedmlReport": false,
       "source": "reactionLabelsData",
       "transform": [{
           "type": "filter",

@@ -44,4 +44,7 @@ class EscherVisualizationTestCase(unittest.TestCase):
         schema = response.json()
 
         # validate that the file adheres to Vega's schema
+        for data in vega['data']:
+            if '_mapToSedmlReport' in data:
+                data.pop('_mapToSedmlReport')
         validate(instance=vega, schema=schema)

@@ -58,7 +58,7 @@
       "value": "#E9E9E9"
     },
     {
-      "name": "Met_labels",
+      "name": "Metabolite_labels",
       "value": false,
       "bind": {
         "input": "checkbox"
@@ -322,7 +322,7 @@
       "source": "metabolitesData",
       "transform": [{
           "type": "filter",
-          "expr": "Met_labels"
+          "expr": "Metabolite_labels"
         },
         {
           "type": "formula",

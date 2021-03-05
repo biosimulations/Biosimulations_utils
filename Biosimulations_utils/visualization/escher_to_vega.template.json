@@ -6,12 +6,28 @@
   "autosize": "none",
 
   "signals": [{
-      "name": "mapWidth",
+      "name": "mapMaxX",
       "value": 800
     },
     {
-      "name": "mapHeight",
+      "name": "mapMaxY",
       "value": 800
+    },
+    {
+      "name": "legendWidth",
+      "value": 40
+    },
+    {
+      "name": "legendPadding",
+      "value": 20
+    },
+    {
+      "name": "signalHeight",
+      "value": 42
+    },
+    {
+      "name": "signalPadding",
+      "value": 0
     },
     {
       "name": "metaboliteStrokeWidthData",
@@ -59,26 +75,55 @@
     },
     {
       "name": "Metabolite_labels",
-      "value": false,
+      "value": true,
       "bind": {
         "input": "checkbox"
       }
     },
     {
       "name": "Reaction_labels",
-      "value": false,
+      "value": true,
       "bind": {
         "input": "checkbox"
       }
     },
 
     {
+      "name": "mapMaxWidth",
+      "update": "width - legendWidth - legendPadding"
+    },
+    {
+      "name": "mapMaxHeight",
+      "update": "height - signalHeight - signalPadding"
+    },
+    {
+      "name": "mapSize",
+      "update": "mapMaxX / mapMaxWidth >  mapMaxY / mapMaxHeight ? [mapMaxWidth, mapMaxWidth / mapMaxX * mapMaxY] : [mapMaxHeight / mapMaxY * mapMaxX, mapMaxHeight]"
+    },
+    {
+      "name": "mapWidth",
+      "update": "mapSize[0]"
+    },
+    {
+      "name": "mapHeight",
+      "update": "mapSize[1]"
+    },
+    {
+      "name": "mapX",
+      "update": "(mapMaxWidth - mapWidth)/2"
+    },
+    {
+      "name": "mapY",
+      "update": "(mapMaxHeight - mapHeight)/2"
+    },
+
+    {
       "name": "xrange",
-      "update": "[0, mapWidth]"
+      "update": "[mapX, mapWidth + mapX]"
     },
     {
       "name": "yrange",
-      "update": "[0, mapHeight]"
+      "update": "[mapY, mapHeight + mapY]"
     },
     {
       "name": "down",
@@ -199,12 +244,12 @@
 
     {
       "name": "xdom",
-      "update": "slice([0, mapWidth])",
+      "update": "slice([0, mapMaxX])",
       "on": [{
           "events": {
             "signal": "delta"
           },
-          "update": "[xcur[0] + span(xcur) * delta[0] / width, xcur[1] + span(xcur) * delta[0] / width]"
+          "update": "[xcur[0] + span(xcur) * delta[0] / mapWidth, xcur[1] + span(xcur) * delta[0] / mapWidth]"
         },
         {
           "events": {
@@ -216,12 +261,12 @@
     },
     {
       "name": "ydom",
-      "update": "slice([0, mapHeight])",
+      "update": "slice([0, mapMaxY])",
       "on": [{
           "events": {
             "signal": "delta"
           },
-          "update": "[ycur[0] + span(ycur) * delta[1] / height, ycur[1] + span(ycur) * delta[1] / height]"
+          "update": "[ycur[0] + span(ycur) * delta[1] / mapHeight, ycur[1] + span(ycur) * delta[1] / mapHeight]"
         },
         {
           "events": {
@@ -336,7 +381,7 @@
         },
         {
           "type": "formula",
-          "expr": "4 * currentZoom",
+          "expr": "8 * currentZoom",
           "as": "fontSizeScaled"
         },
         {
@@ -513,7 +558,7 @@
         },
         {
           "type": "formula",
-          "expr": "4 * currentZoom",
+          "expr": "8 * currentZoom",
           "as": "fontSizeScaled"
         },
         {
@@ -738,10 +783,7 @@
     "titleFontSize": 10,
     "titlePadding": 2,
     "titleAlign": "left",
-    "orient": "none",
-    "legendX": 400,
-    "legendY": 0,
-    "direction": "vertical",
-    "gradientLength": 405
+    "orient": "top-right",
+    "direction": "vertical"
   }]
 }

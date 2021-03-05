@@ -16,7 +16,7 @@ __all__ = ['escher_to_vega']
 
 
 def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
-                   max_width_height=800, legend_padding=20, legend_width=40,
+                   max_width_height=800, legend_padding=20, signal_height=20, legend_width=40,
                    arrow_head_gap=16., indent=2):
     """ Convert a metabolic pathway map from Escher format to Vega format.
 
@@ -27,6 +27,7 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
         max_width_height (:obj:`int`): maximum height/width of the metabolic map in pixels
         legend_padding (:obj:`int`): horizontal spacing between the metabolic map and legend in pixels
         legend_width (:obj:`int`): legend width in pixels, including the width of the title
+        signal_height (:obj:`int`): height of signals in pixels
         indent (:obj:`int` or :obj:`None`, optional): indentation
     """
     # read the Escher version of the map
@@ -263,13 +264,25 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
         vega = json.load(file)
 
     vega['width'] = width + legend_padding + legend_width
-    vega['height'] = height
+    vega['height'] = height + signal_height
 
-    map_width_signal = next(signal for signal in vega['signals'] if signal['name'] == 'mapWidth')
+    map_width_signal = next(signal for signal in vega['signals'] if signal['name'] == 'mapMaxX')
     map_width_signal['value'] = width
 
-    map_height_signal = next(signal for signal in vega['signals'] if signal['name'] == 'mapHeight')
+    map_height_signal = next(signal for signal in vega['signals'] if signal['name'] == 'mapMaxY')
     map_height_signal['value'] = height
+
+    legend_width_signal = next(signal for signal in vega['signals'] if signal['name'] == 'legendWidth')
+    legend_width_signal['value'] = legend_width
+
+    legend_padding_signal = next(signal for signal in vega['signals'] if signal['name'] == 'legendPadding')
+    legend_padding_signal['value'] = legend_padding
+
+    signal_height_signal = next(signal for signal in vega['signals'] if signal['name'] == 'signalHeight')
+    signal_height_signal['value'] = signal_height
+
+    signal_padding_signal = next(signal for signal in vega['signals'] if signal['name'] == 'signalPadding')
+    signal_padding_signal['value'] = 0
 
     metabolite_stroke_width_signal = next(signal for signal in vega['signals'] if signal['name'] == 'metaboliteStrokeWidthData')
     metabolite_stroke_width_signal['value'] = 2 * coordinate_scale
@@ -294,10 +307,6 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
 
     reaction_fluxes_data = next(data for data in vega['data'] if data['name'] == 'reactionFluxes')
     reaction_fluxes_data['values'] = vega_reaction_fluxes
-
-    legend = vega['legends'][0]
-    legend["legendX"] = width + legend_padding
-    legend["gradientLength"] = height - 2 * legend["legendY"] - legend["titleFontSize"] - legend["titlePadding"]
 
     # save Vega-formatted map
     with open(vega_filename, 'w') as file:

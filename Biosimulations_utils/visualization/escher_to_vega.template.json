@@ -352,6 +352,10 @@
       "source": "reactionFluxes",
       "transform": [{
         "type": "formula",
+        "expr": "datum.values[0]",
+        "as": "flux"
+      }, {
+        "type": "formula",
         "expr": "abs(datum.flux)",
         "as": "absFlux"
       }]
@@ -363,7 +367,7 @@
       "transform": [{
           "type": "lookup",
           "from": "reactionAbsFluxes",
-          "key": "biggId",
+          "key": "label",
           "fields": ["biggId"],
           "values": ["flux", "absFlux"],
           "as": ["flux", "absFlux"]

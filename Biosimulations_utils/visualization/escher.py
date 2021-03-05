@@ -254,8 +254,8 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
         flux = reaction_fluxes.get(id, None)
         if flux is not None:
             vega_reaction_fluxes.append({
-                'biggId': id,
-                'flux': flux
+                'label': id,
+                'values': [flux]
             })
 
     # insert metabolite circles and reaction paths into Vega template

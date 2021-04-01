@@ -16,7 +16,7 @@ __all__ = ['escher_to_vega']
 
 
 def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
-                   max_width_height=800, legend_padding=20, signal_height=20, legend_width=40,
+                   max_width_height=800, legend_padding=20, legend_width=40, signal_height=20,
                    arrow_head_gap=16., indent=2):
     """ Convert a metabolic pathway map from Escher format to Vega format.
 
@@ -24,10 +24,11 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
         escher_filename (:obj:`str`): path to the map in Escher format
         vega_filename (:obj:`str`): path to save the map in Vega format
         reaction_fluxes (:obj:`dict`, optional): dictionary that maps the id of each reaction to its predicted flux.
-        max_width_height (:obj:`int`): maximum height/width of the metabolic map in pixels
-        legend_padding (:obj:`int`): horizontal spacing between the metabolic map and legend in pixels
-        legend_width (:obj:`int`): legend width in pixels, including the width of the title
-        signal_height (:obj:`int`): height of signals in pixels
+        max_width_height (:obj:`int`, optional): maximum height/width of the metabolic map in pixels
+        legend_padding (:obj:`int`, optional): horizontal spacing between the metabolic map and legend in pixels
+        legend_width (:obj:`int`, optional): legend width in pixels, including the width of the title
+        signal_height (:obj:`int`, optional): height of signals in pixels
+        arrow_head_gap (:obj:`float`, optional): spacing between arrow heads and nodes
         indent (:obj:`int` or :obj:`None`, optional): indentation
     """
     # read the Escher version of the map

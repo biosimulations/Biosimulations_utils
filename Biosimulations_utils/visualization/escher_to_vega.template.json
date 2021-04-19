@@ -299,26 +299,44 @@
   "data": [{
       "name": "metabolitesData",
       "_mapToSedmlReport": false,
-      "values": null
+      "url": null,
+      "format": {
+        "type": "json",
+        "property": "metabolites"
+      }
     },
     {
       "name": "reactionSegmentCoordinatesData",
       "_mapToSedmlReport": false,
-      "values": null
+      "url": null,
+      "format": {
+        "type": "json",
+        "property": "reactionSegmentCoordinates"
+      }
     },
     {
       "name": "reactionArrowHeadCoordinatesData",
       "_mapToSedmlReport": false,
-      "values": null
+      "url": null,
+      "format": {
+        "type": "json",
+        "property": "reactionArrowHeadCoordinates"
+      }
     },
     {
       "name": "reactionLabelsData",
-      "_mapToSedmlReport": false,
-      "values": null
+      "url": null,
+      "format": {
+        "type": "json",
+        "property": "reactionLabelsData"
+      }
     },
     {
       "name": "reactionFluxes",
-      "values": null
+      "url": null,
+      "format": {
+        "type": "json"
+      }
     },
     {
       "name": "metabolitesScaled",

@@ -15,15 +15,20 @@ import os
 __all__ = ['escher_to_vega']
 
 
-def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
+def escher_to_vega(escher_filename, vega_filename, metabolic_map_data_filename, metabolic_map_data_url,
+                   reaction_fluxes=None, reaction_flux_data_filename=None, reaction_flux_data_url=None,
                    max_width_height=800, legend_padding=20, legend_width=40, signal_height=20,
                    arrow_head_gap=16., indent=2):
     """ Convert a metabolic pathway map from Escher format to Vega format.
 
     Args:
-        escher_filename (:obj:`str`): path to the map in Escher format
-        vega_filename (:obj:`str`): path to save the map in Vega format
+        escher_filename (:obj:`str`): path to the visualization in Escher format
+        vega_filename (:obj:`str`): path to save the visualization in Vega format
+        metabolic_map_data_filename (:obj:`str`): path to save the map data for the visualization in JSON format
+        metabolic_map_data_url (:obj:`str`): URL where the map data for the visualization will be accessed
         reaction_fluxes (:obj:`dict`, optional): dictionary that maps the id of each reaction to its predicted flux.
+        reaction_flux_data_filename (:obj:`str`): path to save the flux data for the visualization in JSON format
+        reaction_flux_data_url (:obj:`str`): URL where the flux data for the visualization will be accessed
         max_width_height (:obj:`int`, optional): maximum height/width of the metabolic map in pixels
         legend_padding (:obj:`int`, optional): horizontal spacing between the metabolic map and legend in pixels
         legend_width (:obj:`int`, optional): legend width in pixels, including the width of the title
@@ -294,20 +299,33 @@ def escher_to_vega(escher_filename, vega_filename, reaction_fluxes=None,
     arrow_head_stroke_width_signal = next(signal for signal in vega['signals'] if signal['name'] == 'arrowHeadStrokeWidthData')
     arrow_head_stroke_width_signal['value'] = 1 * coordinate_scale
 
+    metabolic_map_data = {
+        "metabolites": metabolites,
+        "reactionSegmentCoordinates": reaction_segment_coordinates,
+        "reactionArrowHeadCoordinates": reaction_arrow_head_coordinates,
+        "reactionLabelsData": reaction_labels,
+    }
+    with open(metabolic_map_data_filename, 'w') as file:
+        json.dump(metabolic_map_data, file, indent=indent)
+
     metabolites_data = next(data for data in vega['data'] if data['name'] == 'metabolitesData')
-    metabolites_data['values'] = metabolites
+    metabolites_data['url'] = metabolic_map_data_url
 
     reactions_data = next(data for data in vega['data'] if data['name'] == 'reactionSegmentCoordinatesData')
-    reactions_data['values'] = reaction_segment_coordinates
+    reactions_data['url'] = metabolic_map_data_url
 
     reactions_data = next(data for data in vega['data'] if data['name'] == 'reactionArrowHeadCoordinatesData')
-    reactions_data['values'] = reaction_arrow_head_coordinates
+    reactions_data['url'] = metabolic_map_data_url
 
     reactions_data = next(data for data in vega['data'] if data['name'] == 'reactionLabelsData')
-    reactions_data['values'] = reaction_labels
+    reactions_data['url'] = metabolic_map_data_url
 
-    reaction_fluxes_data = next(data for data in vega['data'] if data['name'] == 'reactionFluxes')
-    reaction_fluxes_data['values'] = vega_reaction_fluxes
+    if reaction_fluxes:
+        with open(reaction_flux_data_filename, 'w') as file:
+            json.dump(vega_reaction_fluxes, file, indent=indent)
+
+        reaction_fluxes_data = next(data for data in vega['data'] if data['name'] == 'reactionFluxes')
+        reaction_fluxes_data['url'] = reaction_flux_data_url
 
     # save Vega-formatted map
     with open(vega_filename, 'w') as file:

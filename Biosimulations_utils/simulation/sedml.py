@@ -1342,7 +1342,7 @@ def modify_xml_model_for_simulation(simulation, in_model_filename, out_model_fil
         # get object to change
         obj_xpath, sep, attr = change.parameter.target.rpartition('/@')
         if sep != '/@':
-            raise ValueError('target {} is not a valid XPATH to an attribute of a model element'.format(change.parameter.target))
+            raise ValueError('target {} is not a valid XPath to an attribute of a model element'.format(change.parameter.target))
         objs = et.xpath(obj_xpath, namespaces=namespaces)
         if len(objs) != 1:
             raise ValueError('xpath {} must match a single object in {}'.format(obj_xpath, in_model_filename))

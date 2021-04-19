@@ -259,7 +259,7 @@ class WriteSedMlTestCase(unittest.TestCase):
         # invalid simulation configurations
         simulation_filename = 'tests/fixtures/BIOMD0000000806-invalid-change-attribute-target.sedml'
         simulations, _ = read_simulation(simulation_filename)
-        with self.assertRaisesRegex(ValueError, 'is not a valid XPATH'):
+        with self.assertRaisesRegex(ValueError, 'is not a valid XPath'):
             modify_xml_model_for_simulation(simulations[0], in_model_filename, out_model_filename, default_namespace='sbml')
 
         simulation_filename = 'tests/fixtures/BIOMD0000000806-invalid-change-attribute-target-2.sedml'
